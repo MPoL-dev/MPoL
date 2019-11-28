@@ -251,9 +251,9 @@ data_values = fourier_plane(u_data, v_data)
 # these are scipy csc sparse matrices
 C_real, C_imag = gridding.calc_matrices(u_data, v_data, us, vs)
 
-fig, ax = plt.subplots(nrows=2, figsize=(12, 6))
+fig, ax = plt.subplots(nrows=1, figsize=(6, 6))
 vvmax = np.max(np.abs(C_real.toarray()[:, 0:300]))
-ax[0].imshow(
+ax.imshow(
     C_real.toarray()[:, 0:300],
     interpolation="none",
     origin="upper",
@@ -262,7 +262,7 @@ ax[0].imshow(
     vmin=-vvmax,
     vmax=vvmax,
 )
-ax[1].spy(C_real.toarray()[:, 0:300], marker=".", precision="present", aspect="auto")
+# ax[1].spy(C_real[:, 0:300], marker=".", precision="present", aspect="auto")
 fig.savefig("C_real.png", dpi=300)
 #
 # fig, ax = plt.subplots(ncols=1, figsize=(12,3))
