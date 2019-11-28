@@ -1,4 +1,7 @@
 # test the numpy matrices for interpolation
+
+import pytest
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,14 +22,20 @@ def sky_plane(
     Omega=0.0,
 ):
     """
-    alpha: ra (in radians)
-    delta: dec (in radians)
-    a : amplitude
-    delta_alpha : offset (in radians)
-    delta_dec : offset (in radians)
-    sigma_alpha : width (in radians)
-    sigma_dec : width (in radians)
-    Omega : position angle of ascending node (in degrees east of north)
+    Calculates a Gaussian on the sky plane 
+
+    Args:
+        alpha: ra (in radians)
+        delta: dec (in radians)
+        a : amplitude
+        delta_alpha : offset (in radians)
+        delta_dec : offset (in radians)
+        sigma_alpha : width (in radians)
+        sigma_dec : width (in radians)
+        Omega : position angle of ascending node (in degrees east of north)
+
+    Returns:
+        Gaussian evaluated at input args
     """
 
     return a * np.exp(
@@ -48,7 +57,20 @@ def fourier_plane(
     Omega=0.0,
 ):
     """
-    Calculate the Fourier transform of the Gaussian. Assumes u, v in kλ.
+    Calculates the Analytic Fourier transform of the sky plane Gaussian. 
+
+    Args:
+        u: spatial freq (in kλ)
+        v: spatial freq (in  kλ)
+        a : amplitude
+        delta_alpha : offset (in radians)
+        delta_dec : offset (in radians)
+        sigma_alpha : width (in radians)
+        sigma_dec : width (in radians)
+        Omega : position angle of ascending node (in degrees east of north)
+    
+    Returns:
+        FT Gaussian evaluated at u, v points
     """
 
     # convert back to radians
@@ -68,31 +90,14 @@ def fourier_plane(
     )
 
 
-def fftspace(width, N):
-    """Oftentimes it is necessary to get a symmetric coordinate array that spans ``N``
-     elements from `-width` to `+width`, but makes sure that the middle point lands
-     on ``0``. The indices go from ``0`` to ``N -1.``
-     `linspace` returns  the end points inclusive, wheras we want to leave out the
-     right endpoint, because we are sampling the function in a cyclic manner."""
-
-    assert N % 2 == 0, "N must be even."
-
-    dx = width * 2.0 / N
-    xx = np.empty(N, np.float)
-    for i in range(N):
-        xx[i] = -width + i * dx
-
-    return xx
-
-
 # Let's plot this up and see what it looks like
 N_alpha = 128
 N_dec = 128
 img_radius = 15.0 * arcsec
 
 # full span of the image
-ra = fftspace(img_radius, N_alpha)  # [arcsec]
-dec = fftspace(img_radius, N_dec)  # [arcsec]
+ra = gridding.fftspace(img_radius, N_alpha)  # [arcsec]
+dec = gridding.fftspace(img_radius, N_dec)  # [arcsec]
 
 # fill out an image
 img = np.empty((N_dec, N_alpha), np.float)
@@ -191,25 +196,26 @@ ax[1, 1].imshow(
 )
 
 # compare to the analytic version
+vis_diff = np.fft.fftshift(vis_no_cor - vis_analytical, axes=0)
+
+np.imag(np.fft.fftshift(vis_no_cor - vis_analytical, axes=0))
 ax[0, 2].set_title("difference")
 im_real = ax[0, 2].imshow(
-    np.real(np.fft.fftshift(vis_no_cor - vis_analytical, axes=0)),
-    origin="upper",
-    interpolation="none",
-    aspect="equal",
-    extent=ext,
+    np.real(vis_diff), origin="upper", interpolation="none", aspect="equal", extent=ext
 )
 plt.colorbar(im_real, ax=ax[0, 2])
 im_imag = ax[1, 2].imshow(
-    np.imag(np.fft.fftshift(vis_no_cor - vis_analytical, axes=0)),
-    origin="upper",
-    interpolation="none",
-    aspect="equal",
-    extent=ext,
+    np.imag(vis_diff), origin="upper", interpolation="none", aspect="equal", extent=ext
 )
 plt.colorbar(im_imag, ax=ax[1, 2])
 
 fig.savefig("output.png", dpi=300, wspace=0.05)
+
+
+def test_2D_interpolation():
+    # create a numerical test to make sure the difference is small
+    assert np.sum(np.abs(vis_diff)) < 1e-10, "visibilities don't match"
+
 
 # create a dataset with baselines
 np.random.seed(42)
