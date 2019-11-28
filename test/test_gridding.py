@@ -249,7 +249,7 @@ data_values = fourier_plane(u_data, v_data)
 
 # calculate and visualize the C_real and C_imag matrices
 # these are scipy csc sparse matrices
-C_real, C_imag = gridding.calc_matrices(data_points, us, vs)
+C_real, C_imag = gridding.calc_matrices(u_data, v_data, us, vs)
 
 fig, ax = plt.subplots(nrows=2, figsize=(12, 6))
 vvmax = np.max(np.abs(C_real[:, 0:300]))
