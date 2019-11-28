@@ -5,15 +5,17 @@ from torch import nn
 from mpol import gridding
 from mpol.constants import *
 
-# define a custom model
+
 class MpolImage(nn.Module):
-    def __init__(self, npix, cell_size, dataset=None):
+    def __init__(self, npix, cell_size, image=None, dataset=None):
         """
         Initialize a Model class.
 
         Args:
             npix: the number of pixels per image side
             cell_size: the size of a pixel in arcseconds
+            image: an image to initialize the model with. If None, assumes image is all ones.
+            dataset (UVDataset): the dataset to precache the interpolation matrices against. 
         """
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
@@ -44,10 +46,19 @@ class MpolImage(nn.Module):
         # and with East pointing right (i.e., RA increasing to the right)
         # this is contrary to the way astronomers normally plot images, but
         # is correct for what the FFT expects
-        self._image = nn.Parameter(
-            # torch.zeros(self.npix, self.npix, requires_grad=True, dtype=torch.double)
-            torch.ones(self.npix, self.npix, requires_grad=True, dtype=torch.double)
-        )
+        if image is None:
+            self._image = nn.Parameter(
+                # torch.zeros(self.npix, self.npix, requires_grad=True, dtype=torch.double)
+                torch.ones(self.npix, self.npix, requires_grad=True, dtype=torch.double)
+            )
+        else:
+            self._image = nn.Parameter(
+                # torch.zeros(self.npix, self.npix, requires_grad=True, dtype=torch.double)
+                torch.tensor(image, requires_grad=True, dtype=torch.double)
+            )
+        # the units are Jy/arcsec^2. An extended source with a brightness temperature
+        # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
+        # loss of numerical precision (I think)
 
         # calculate the pre-fftshifted gridding correction function
         self.corrfun = torch.tensor(
@@ -93,7 +104,10 @@ class MpolImage(nn.Module):
         """
 
         # get the RFFT'ed values
-        vis = self.dll ** 2 * torch.rfft(self._image * self.corrfun, signal_ndim=2)
+        # image is converted to Jy/ster
+        vis = self.dll ** 2 * torch.rfft(
+            self._image * self.corrfun / arcsec ** 2, signal_ndim=2
+        )
 
         # torch delivers the real and imag components separately
         vis_re = vis[:, :, 0]
