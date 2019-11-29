@@ -23,23 +23,17 @@ class MpolImage(nn.Module):
 
         assert cell_size > 0.0, "cell_size must be positive (arcseconds)"
         self.cell_size = cell_size * arcsec  # [radians]
+        # cell_size is also the differential change in sky angles
+        # dll = dmm = cell_size #[radians]
 
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
         # calculate the image axes
         self.ll = gridding.fftspace(img_radius, self.npix)  # [radians]
         # mm is the same
 
-        # differential change in sky angles
-        self.dll = self.npix * self.cell_size / self.npix  # [radians]
-        # dmm is the same
-
         # the output spatial frequencies of the RFFT routine
-        self.us = (
-            np.fft.rfftfreq(self.npix, d=(2 * img_radius) / self.npix) * 1e-3
-        )  # convert to [kλ]
-        self.vs = (
-            np.fft.fftfreq(self.npix, d=(2 * img_radius) / self.npix) * 1e-3
-        )  # convert to [kλ]
+        self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
+        self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
 
         # This shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
@@ -83,6 +77,18 @@ class MpolImage(nn.Module):
         Returns:
             None. Stores attributes self.C_re and self.C_im
         """
+
+        max_baseline = np.max(
+            np.abs([dataset.uu.numpy(), dataset.vv.numpy()])
+        )  # klambda
+
+        # check that the pixel scale is sufficiently small to sample
+        # the frequency corresponding to the largest baseline of the
+        # dataset (in klambda)
+        assert max_baseline < (
+            1e-3 / (2 * self.cell_size)
+        ), "Image cell size is too coarse to represent the largest spatial frequency sampled by the dataset. Make a finer image by decreasing cell_size. You may also need to increase npix to make sure the image remains wide enough."
+
         # calculate the interpolation matrices at the datapoints
         C_re, C_im = gridding.calc_matrices(
             dataset.uu.numpy(), dataset.vv.numpy(), self.us, self.vs
@@ -105,7 +111,7 @@ class MpolImage(nn.Module):
 
         # get the RFFT'ed values
         # image is converted to Jy/ster
-        vis = self.dll ** 2 * torch.rfft(
+        vis = self.cell_size ** 2 * torch.rfft(
             self._image * self.corrfun / arcsec ** 2, signal_ndim=2
         )
 
@@ -140,8 +146,7 @@ class MpolImage(nn.Module):
     @property
     def extent(self):
         """
-        Return the extent tuple (in arcsec) used for matplotlib plotting.
-        Assumes origin="upper"
+        Return the extent tuple (in arcsec) used for matplotlib plotting with imshow. Assumes `origin="upper"`.
         """
         low, high = np.min(self.ll) / arcsec, np.max(self.ll) / arcsec  # [arcseconds]
         return [high, low, low, high]
