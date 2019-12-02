@@ -6,13 +6,11 @@ A Million Points of Light are needed to synthesize image cubes from interferomet
 
 # Installation
 
-Requires `python > 3.5`. Install the requirements (`numpy`, `scipy`, `torch`, `torchvision`)
+Requires `python > 3.5`. Install the requirements (`numpy`, `scipy`, `torch`, `torchvision`). You may consider [installing PyTorch individually](https://pytorch.org/) if you do/do not require CUDA support and want to fine tune your installation. Or, you could just do
 
     pip install -r requirements.txt
 
-You may also consider [installing PyTorch separately](https://pytorch.org/) if you do/do not require CUDA support and want to fine tune your installation. 
-
-Download or git clone the MPoL repository and install:
+Download or `git clone` the MPoL repository and install:
 
     git clone https://github.com/iancze/MPoL.git
     cd MPoL

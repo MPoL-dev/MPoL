@@ -7,7 +7,7 @@ from mpol.constants import *
 
 
 class MpolImage(nn.Module):
-    def __init__(self, npix, cell_size, image=None, dataset=None):
+    def __init__(self, npix=None, cell_size=None, image=None, dataset=None, **kwargs):
         """
         Initialize a Model class.
 
@@ -15,7 +15,7 @@ class MpolImage(nn.Module):
             npix: the number of pixels per image side
             cell_size: the size of a pixel in arcseconds
             image: an image to initialize the model with. If None, assumes image is all ones.
-            dataset (UVDataset): the dataset to precache the interpolation matrices against. 
+            dataset (UVDataset): the dataset to precache the interpolation matrices against.
         """
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
@@ -68,10 +68,10 @@ class MpolImage(nn.Module):
 
     def precache_interpolation(self, dataset):
         """
-        Caches the interpolation matrices used to interpolate the output from the FFT to the measured (u,v) points. 
+        Caches the interpolation matrices used to interpolate the output from the FFT to the measured (u,v) points.
         If you did not specify your dataset when instantiating the model, run this before calculating a loss.
 
-        Args: 
+        Args:
             dataset: a UVDataset containing the u,v sampling points of the observation.
 
         Returns:
