@@ -7,7 +7,15 @@ from mpol.constants import *
 
 
 class MpolImage(nn.Module):
-    def __init__(self, npix=None, cell_size=None, image=None, dataset=None, **kwargs):
+    def __init__(
+        self,
+        npix=None,
+        cell_size=None,
+        image=None,
+        dataset=None,
+        grid_indices=None,
+        **kwargs
+    ):
         """
         Initialize a Model class.
 
@@ -31,7 +39,7 @@ class MpolImage(nn.Module):
         self.ll = gridding.fftspace(img_radius, self.npix)  # [radians]
         # mm is the same
 
-        # the output spatial frequencies of the RFFT routine
+        # the output spatial frequencies of the RFFT routine (unshifted)
         self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
         self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
 
@@ -56,15 +64,16 @@ class MpolImage(nn.Module):
 
         # calculate the pre-fftshifted gridding correction function
         self.corrfun = torch.tensor(
-            gridding.corrfun_mat(np.fft.fftshift(self.ll), np.fft.fftshift(self.ll))
+            gridding.corrfun_mat(np.fft.ifftshift(self.ll), np.fft.ifftshift(self.ll))
         )
+
+        self.gridded = False
 
         if dataset is not None:
             self.precache_interpolation(dataset)
         else:
-            print(
-                "Be sure to precalculate your interpolation matrices with your dataset before begining optimization."
-            )
+            self.grid_indices = grid_indices
+            self.gridded = True
 
     def precache_interpolation(self, dataset):
         """
@@ -111,22 +120,36 @@ class MpolImage(nn.Module):
 
         # get the RFFT'ed values
         # image is converted to Jy/ster
-        vis = self.cell_size ** 2 * torch.rfft(
-            self._image * self.corrfun / arcsec ** 2, signal_ndim=2
-        )
 
-        # torch delivers the real and imag components separately
-        vis_re = vis[:, :, 0]
-        vis_im = vis[:, :, 1]
+        if self.gridded:
+            vis = self.cell_size ** 2 * torch.rfft(
+                self._image / arcsec ** 2, signal_ndim=2
+            )
 
-        # reshape into (-1, 1) vector format so we can do matrix product
-        vr = torch.reshape(vis_re, (-1, 1))
-        vi = torch.reshape(vis_im, (-1, 1))
+            # torch delivers the real and imag components separately
+            vis_re = vis[:, :, 0]
+            vis_im = vis[:, :, 1]
 
-        # sample the FFT using the sparse matrices
-        # also trim the last dimension so that these are 1D tensors
-        re = torch.sparse.mm(self.C_re, vr)[:, 0]
-        im = torch.sparse.mm(self.C_im, vi)[:, 0]
+            re = vis_re[self.grid_indices]
+            im = vis_im[self.grid_indices]
+
+        else:
+            vis = self.cell_size ** 2 * torch.rfft(
+                self._image * self.corrfun / arcsec ** 2, signal_ndim=2
+            )
+
+            # torch delivers the real and imag components separately
+            vis_re = vis[:, :, 0]
+            vis_im = vis[:, :, 1]
+
+            # reshape into (-1, 1) vector format so we can do matrix product
+            vr = torch.reshape(vis_re, (-1, 1))
+            vi = torch.reshape(vis_im, (-1, 1))
+
+            # sample the FFT using the sparse matrices
+            # also trim the last dimension so that these are 1D tensors
+            re = torch.sparse.mm(self.C_re, vr)[:, 0]
+            im = torch.sparse.mm(self.C_im, vi)[:, 0]
 
         return re, im
 
@@ -139,9 +162,9 @@ class MpolImage(nn.Module):
             (2d numpy array)
         """
         # get the image
-        # ifftshift it to the correct quadrants
+        # fftshift it to the correct quadrants
         # fliplr so that East is to the left
-        return np.fliplr(np.fft.ifftshift(self._image.detach().numpy()))
+        return np.fft.fftshift(self._image.detach().numpy())
 
     @property
     def extent(self):

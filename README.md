@@ -19,4 +19,4 @@ Download or `git clone` the MPoL repository and install:
 If you have trouble installing please raise a [github issue](https://github.com/iancze/MPoL/issues).
 
 ---
-Copyright Ian Czekala 2019
+Copyright Ian Czekala and contributors 2019
