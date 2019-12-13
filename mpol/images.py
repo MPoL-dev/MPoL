@@ -4,6 +4,7 @@ from torch import nn
 
 from mpol import gridding
 from mpol.constants import *
+import mpol.utils
 
 
 class MpolImage(nn.Module):
@@ -164,7 +165,11 @@ class MpolImage(nn.Module):
         # get the image
         # fftshift it to the correct quadrants
         # fliplr so that East is to the left
-        return np.fft.fftshift(self._image.detach().numpy())
+        return mpol.utils.fftshift(self._image)
+
+    @property
+    def image_detached(self):
+        return self.image.detach().numpy()
 
     @property
     def extent(self):

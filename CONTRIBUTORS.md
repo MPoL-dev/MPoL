@@ -1,2 +1,4 @@
-Ian Czekala, @iancze
-Ryan Loomis, @ryanaloomis
+Contributors
+
+* Ian Czekala, `@iancze`
+* Ryan Loomis, `@ryanaloomis`
