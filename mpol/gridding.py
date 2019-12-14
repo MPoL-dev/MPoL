@@ -296,15 +296,21 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     return C_real.tocoo(), C_imag.tocoo()
 
 
-def grid_dataset(uu, vv, weights, re, im, cell_size, npix):
+def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
     """
-    Pre-grid a dataset to the expected `u_grid` and `v_grid` points from the RFFT routine to save on interpolation costs. 
+    Pre-grid a single-frequency dataset to the expected `u_grid` and `v_grid` points from the RFFT routine to save on interpolation costs. 
 
     Args:
-        dataset: an mpol `UVDataset` object containing the raw visibilities.
+        uu (nvis) list: the uu points (in klambda)
+        vv (nvis) list: the vv points (in klambda)
+        weights (nvis) list: the thermal weights
+        re (nvis) list: the real component of the visibilities
+        im (nvis) list: the imaginary component of the visibilities
         cell_size: the image cell size (in arcsec)
         npix: the number of pixels in each dimension of the square image
 
+    Returns:
+        (ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (npix, npix//2 + 1). This shape corresponds to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
 
     An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. Rather than interpolating the complex model visibilities from these grid points to the individual (u,v) points, pre-average the data visibilities to the nearest grid point. This means that there doesn't need to be an interpolation operation after every new model evaluation, since the model visibilities directly correspond to the locations of the gridded visibilities.
 
@@ -405,5 +411,51 @@ def grid_dataset(uu, vv, weights, re, im, cell_size, npix):
     avg_weights = np.fft.fftshift(weight_cell, axes=0)[ind]
     avg_re = np.fft.fftshift(weighted_mean_real, axes=0)[ind]
     avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)[ind]
+
+    return (ind, avg_weights, avg_re, avg_im)
+
+
+def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix):
+    """
+    Pre-grid a dataset containing multiple channels to the expected `u_grid` and `v_grid` points from the RFFT routine to save on interpolation costs. 
+
+    Note that nvis need not be the same for each channel (i.e., uu, vv, etc... can be a ragged array, as long as it is iterable across the channel dimension). This routine iterates through the channels, calling grid_datachannel for each one.
+
+    Args:
+        uu (nchan, nvis) list: the uu points (in klambda)
+        vv (nchan, nvis) list: the vv points (in klambda)
+        weights (nchan, nvis) list: the thermal weights
+        re (nchan, nvis) list: the real component of the visibilities
+        im (nchan, nvis) list: the imaginary component of the visibilities
+        cell_size: the image cell size (in arcsec)
+        npix: the number of pixels in each dimension of the square image
+
+    Returns:
+        (ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (nchan, npix, npix//2 + 1). This shape corresponds to the RFFT output of an image cube with `nchan`, `cell_size`, and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
+        
+    """
+
+    nchan = uus.shape[0]
+
+    # pre-allocate the index array
+    ind = np.zeros((nchan, npix, npix // 2 + 1), dtype="bool")
+
+    avg_weights = []
+    avg_re = []
+    avg_im = []
+
+    for i in range(nchan):
+        ind_temp, w_temp, re_temp, im_temp = grid_datachannel(
+            uus[i], vvs[i], weights[i], res[i], ims[i], cell_size, npix
+        )
+        ind[i] = ind_temp
+        avg_weights.append(w_temp)
+        avg_re.append(re_temp)
+        avg_im.append(im_temp)
+
+    # flatten all visibilities to a single vector
+    avg_weights = np.concatenate(avg_weights)
+    avg_re = np.concatenate(avg_re)
+    avg_im = np.concatenate(avg_im)
 
     return (ind, avg_weights, avg_re, avg_im)
