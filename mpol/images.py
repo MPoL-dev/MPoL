@@ -169,7 +169,7 @@ class MpolImage(nn.Module):
 
     @property
     def image_detached(self):
-        return self.image.detach().numpy()
+        return self.image.detach()
 
     @property
     def extent(self):
@@ -178,3 +178,21 @@ class MpolImage(nn.Module):
         """
         low, high = np.min(self.ll) / arcsec, np.max(self.ll) / arcsec  # [arcseconds]
         return [high, low, low, high]
+
+    def to_FITS(self, fname="image.fits", overwrite=False):
+        """
+        Export the image to a FITS file.
+
+        Args:
+            fname: the name of the FITS file to export to.
+            overwrite: if the file already exists, overwrite?
+        """
+
+        try:
+            from astropy.io import fits
+        except ImportError:
+            print(
+                "Please install the astropy package to use FITS export functionality."
+            )
+
+        pass

@@ -10,7 +10,9 @@ Requires `python > 3.5`. Install the requirements (`numpy`, `scipy`, `torch`, `t
 
     pip install -r requirements.txt
 
-Download or `git clone` the MPoL repository and install:
+If you would like to export your images to FITS files, you should also install the `astropy` package.
+
+Then download or `git clone` the MPoL repository and install:
 
     git clone https://github.com/iancze/MPoL.git
     cd MPoL
