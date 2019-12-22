@@ -217,7 +217,7 @@ class MpolImageCube(nn.Module):
             cell_size (float): the size of a pixel in arcseconds
             nchan (int): the number of channels in the image
             velocity_axis (list): vector of velocities (in km/s) corresponding to nchan. Channels should be spaced approximately equidistant in velocity but need not be strictly exact.
-            cube: an image cube to initialize the model with. If None, assumes cube is all ones.
+            cube (PyTorch tensor w/ `requires_grad = True`): an image cube to initialize the model with. If None, assumes cube is all ones.
             dataset (UVDataset): the dataset to precache the interpolation matrices against.
             grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
         """
@@ -263,9 +263,8 @@ class MpolImageCube(nn.Module):
                 )
             )
         else:
-            self._cube = nn.Parameter(
-                torch.tensor(cube, requires_grad=True, dtype=torch.double)
-            )
+            self._cube = nn.Parameter(cube)
+
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
         # loss of numerical precision (I think)
