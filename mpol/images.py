@@ -7,7 +7,7 @@ from mpol.constants import *
 import mpol.utils
 
 
-class MpolImage(nn.Module):
+class Image(nn.Module):
     def __init__(
         self,
         npix=None,
@@ -197,7 +197,7 @@ class MpolImage(nn.Module):
         pass
 
 
-class MpolImageCube(nn.Module):
+class ImageCube(nn.Module):
     def __init__(
         self,
         npix=None,
@@ -304,7 +304,7 @@ class MpolImageCube(nn.Module):
         # dataset (in klambda)
         assert max_baseline < (
             1e-3 / (2 * self.cell_size)
-        ), "Image cell size is too coarse to represent the largest spatial frequency sampled by the dataset. Make a finer image by decreasing cell_size. You may also need to increase npix to make sure the image remains wide enough."
+        ), "Image cell size is too coarse to represent the largest spatial frequency sampled by the dataset. Make a finer image by decreasing cell_size. You may also need to increase npix to make sure the image remains wide enough to capture all of the emission and avoid aliasing."
 
         # calculate the interpolation matrices at the datapoints
         C_re, C_im = gridding.calc_matrices(

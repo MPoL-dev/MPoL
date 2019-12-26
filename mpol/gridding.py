@@ -26,11 +26,11 @@ def fftspace(width, N):
 
 def horner(x, a):
     """
-    Use Horner's method to compute and return the polynomial
-        a[0] + a[1] x^1 + a[2] x^2 + ... + a[n-1] x^(n-1)
-    evaluated at x.
+    Use `Horner's method <https://introcs.cs.princeton.edu/python/21function/horner.py.html>`_ to compute and return the polynomial
 
-    from https://introcs.cs.princeton.edu/python/21function/horner.py.html
+    .. math::
+
+        f(x) = a_0 + a_1 x^1 + a_2 x^2 + \ldots + a_{n-1} x^{(n-1)}
     """
     result = 0
     for i in range(len(a) - 1, -1, -1):
@@ -41,10 +41,10 @@ def horner(x, a):
 @np.vectorize
 def spheroid(eta):
     """
-        `spheroid` function which assumes ``\\alpha`` = 1.0, ``m=6``,  built for speed."
+        `spheroid` function which assumes :math:`\alpha = 1`, :math:`m=6`,  built for speed."
 
         Args:
-            eta (float) : the value between [0, 1]
+            eta (float) : the value between ``[0, 1]``
     """
 
     # Since the function is symmetric, overwrite eta
@@ -84,7 +84,7 @@ def spheroid(eta):
 
 def corrfun(eta):
     """
-    Gridding *correction* function, but able to be passed either floating point numbers or vectors of `Float64`."
+    Gridding *correction* function, but able to be passed either floating point numbers or vectors of ``Float64``."
 
     Args:
         eta (float): the value in [0, 1]
@@ -135,7 +135,7 @@ def corrfun_mat(alphas, deltas):
 def gcffun(eta):
     """
     The gridding *convolution* function, used to do the convolution and interpolation of the visibilities in
-    the Fourier domain. This is also the Fourier transform of `corrfun`.
+    the Fourier domain. This is also the Fourier transform of ``corrfun``.
 
     Args:
         eta (float): in the domain of [0,1]
@@ -149,9 +149,13 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     Calcuate the real and imaginary interpolation matrices in one pass.
 
     Args:
+    
         data_points: the pairs of u,v points in the dataset (in klambda)
         u_model: the u axis delivered by the rfft (unflattened). Assuming this is the RFFT axis.
         v_model: the v axis delivered by the rfft (unflattened). Assuming this is the FFT axis.
+
+    Returns:
+        (C_real, C_imag) in `coo` sparse format        
 
     Start with an image packed like Img[j, i]. i is the alpha index and j is the delta index.
     Then the RFFT output will have RFFT[j, i]. i is the u index and j is the v index.

@@ -1,7 +1,7 @@
 """
 A library of potential loss functions to use in imaging.
 
-Many of the definitions follow those in Appendix A of EHT-IV 2019: https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract
+Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_
 
 including the regularization strength, \zeta, which seeks to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.
 """
@@ -32,7 +32,7 @@ def loss_fn(model_vis, data_vis):
 
 def loss_fn_entropy(cube, prior_intensity):
     """
-    Calculate the entropy loss of a set of pixels. Following the entropy definition in Carcamo et al. 2018: https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract
+    Calculate the entropy loss of a set of pixels. Following the entropy definition in `Carcamo et al. 2018 <https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract>`_
 
     Args:
         cube (any tensor): the array and pixel values. Pixel values must be positive.
@@ -51,7 +51,7 @@ def loss_fn_entropy(cube, prior_intensity):
 
 def loss_fn_TV_image(image, epsilon=1e-10):
     """
-    Calculate the total variation loss. Following the definition in EHT-IV 2019: https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
+    Calculate the total variation loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
 
     Args:
         image (any 2D tensor): the array and pixel values
@@ -75,7 +75,7 @@ def loss_fn_TV_image(image, epsilon=1e-10):
 
 def loss_fn_TSV_cube(cube, vel_rel=1.0, epsilon=1e-10):
     """
-    Calculate the total variation loss. Following the definition in EHT-IV 2019: https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
+    Calculate the total variation loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
 
     Args:
         cube (any 3D tensor): the array and pixel values
