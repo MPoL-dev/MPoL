@@ -11,9 +11,9 @@ Typically, you'll want to import the following depedencies ::
     import numpy as np
     import torch
 
-    import mpol.gridding
-    from mpol.losses import loss_fn, loss_fn_entropy
-    from mpol.images import Image
+    from mpol.losses import loss_fn, loss_fn_sparsity
+    from mpol.images import ImageCube
+    from mpol.datasets import UVDataset
     from mpol.constants import *
 
 
@@ -28,86 +28,106 @@ The fundamental dataset is the set of complex-valued visibility measurements: li
     data_im = # your data here in [Jy]
     weights = # your data here in [1/Jy^2]
 
-For convenience, we provide a dataset wrapper for these quantities, :class:`mpol.datasets.UVDataset`. 
+To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3594093#.XgZgfhdKhTY>`_::
 
+    npzfile = np.load("data.npz")
+    uu = npzfile["uu"] # [kilolambda]
+    vv = npzfile["vv"] # [kilolambda]
+    data_re = npzfile["re"] # [Jy]
+    data_im = npzfile["im"] # [Jy]
+    weights = npzfile["weights"] # [1/Jy]
+
+For convenience, we provide a dataset wrapper for these quantities, :class:`mpol.datasets.UVDataset`. After loading your data, you can initialize this with ::
+
+    dataset = UVDataset(uu, vv, data_re, data_im, weights)
+
+However, if we already know the image dimensions that we would like to use, the optimization loop can be greatly sped up if we pre-grid the dataset to the RFFT output grid. You can do this by providing both of the ``cell_size`` and ``npix`` optional keywords to ``UVDataset``. If you don't know apriori how big your source is on the sky, it's always a good idea to make as large an image as possible. Otherwise, if you make a very small image, you will alias emission back into your map. To save you some time, the dataset was made with a (512x512) image of Saturn scaled to 16 arcseconds wide (this is actually smaller than it appears from Earth), so anything larger than this should be fine ::
+
+    # pre-grid visibilities to anticipated output RFFT grid
+    npix = 800
+    dataset = UVDataset(uu, vv, data_re, data_im, weights, cell_size=16.0/npix, npix=npix)
 
 Image Model 
 -----------
 
-You will need to decide how many pixels (``npix``) to use in your image and how large each pixel will be (``cell_size``, in arcseconds). You will want to make an image that is large enough to contain all of the emission in the dataset, because otherwise you will alias bright sources into your image. You will also want to make ``cell_size`` small enough so that you can capture the highest spatial frequency visibility sampled by your dataset. 
+If you didn't already set them in the ``UVDataset`` stage, you will need to decide how many pixels (``npix``) to use in your image and how large each pixel will be (``cell_size``, in arcseconds). You will want to make an image that is large enough to contain all of the emission in the dataset, because otherwise you will alias bright sources into your image. You will also want to make ``cell_size`` small enough so that you can capture the highest spatial frequency visibility sampled by your dataset. 
 
 
-:class:`mpol.images.Image` is a simplified version of :class:`mpol.images.ImageCube`, which assumes there is only one frequency/velocity channel to the dataset. There are different instantiation options depending on whether and how you would like to pre-grid the dataset, so be sure to check out the API documentation on these objects. Pre-gridding the dataset is almost always the faster option, but removes the option for some more fine-grained optimization schemes. ::
+The :class:`mpol.images.ImageCube` requires the following options ::
 
-    model = Image(
-        cell_size=10.0 / npix,
-        npix=npix,
-        image=None,
-        dataset=dataset,
-        grid_indices=grid_indices,
+    model = ImageCube(
+        cell_size=16.0 / npix, npix=npix, image=None, velocity_axis=[0], nchan=1
     )
 
-The main functionility of the Image class is to forward-model the visibilities starting from an image, done using the ``Image.forward`` method. This method is called automatically when you use ``model()``. To save computation, the core image representation is actually stored `pre-fftshifted <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html>`_ in the ``model._image`` variable, but you can query the de-shifted version using `model.image`. 
 
-Since we have just initialized the model, we can see that `model.image` is blank. If you have a better starting image, you can pass this as a PyTorch tensor to the ``image`` parameter.
+We set the number of channels to 1, since we just have a single channel map. The relative velocity of this channel is also 0. 
 
-We've also chosen to grid the data, with ``grid=True``.
+The main functionility of the Image class is to forward-model the visibilities starting from an image, done using the ``Image.forward`` method. This method is called automatically when you use ``model()``. To save computation, the core image representation is actually stored `pre-fftshifted <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html>`_ in the ``model._cube`` variable, but you can query the de-shifted version using ``model.cube``. 
 
+Since we have just initialized the model, we can see that ``model.image`` is blank. If you have a better starting image, you can pass this as a PyTorch tensor to the ``image`` parameter.
 
 Optimizer 
 ---------
 
 Define an optimizer ::
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
 
+As we'll see in a moment, this optimizer will advance the parameters (in this case, the pixel values of the image cube) based upon the gradient of the loss function with respect to those parameters. PyTorch has many different `optimizers <https://pytorch.org/docs/stable/optim.html#module-torch.optim>`_ available, and it would be worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we'll start here. The ``lr`` parameter is the 'loss rate,' or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the loss rate to be small enough so that the algorithm doesn't diverge but large enough so that the optimization completes in a reasonable amount of time. 
 
 Losses
 ------
 
-In the parlance of the machine learning community, one can define loss functions against the model image and visibilities. For regularized maximum likelihood imaging, one key loss function that we are interested in is the data likelihood. 
-
-:func:`mpol.losses.loss_fn`
+In the parlance of the machine learning community, one can define loss functions against the model image and visibilities. For regularized maximum likelihood imaging, one key loss function that we are interested in is the data likelihood (:func:`mpol.losses.loss_fn`), which is just the :math:`\chi^2` of the visibilities. Because imaging is an ill-defined inverse problem, however, the visibility likelihood function is not sufficient. We also need to apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The :mod:`mpol.losses` module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.
 
 
 Training loop 
 -------------
 
-This is to train. Choose some range to iterate over. It's a good idea to track the loss, as well. ::
+Next, we'll set up a loop that will 
+
+    1) evaluate the current ``model`` (i.e., the image cube) against the loss functions
+    2) calculate the gradients of the loss w.r.t. the model 
+    3) advance the ``model`` so as to minimize the loss 
+
+Here is a minimal loop that will accomplish this and track the value of the loss with each iteration. ::
+
+    loss_log = []
 
     for i in range(1000):
         # clears the gradients of all optimized tensors
         optimizer.zero_grad()
 
         # query the model for the new model visibilities
-        model_vis = model()
+        model_vis = model(dataset)
 
-        # calculate the loss function
-        loss_nll = loss_fn(model_vis, (g_re, g_im, g_weights))
-        loss_entropy = 0.1 * loss_fn_entropy(model.image, prior_intensity=0.05)
+        # calculate the losses
+        loss_nll = loss_fn(model_vis, (dataset.re, dataset.im, dataset.weights))
+        loss_sparse = 0.1 * loss_fn_sparsity(model.cube)
 
-        # needs to be fftshifted
-        loss_TV = 0.5 * loss_fn_TV(model.image)
-        loss = loss_nll + loss_entropy + loss_TV
-
-        l_nll.append(loss_nll.item())
-        l_entropy.append(loss_entropy.item())
+        loss = loss_nll + loss_sparse
+        loss_log.append(loss.item())
 
         # compute the intermediate gradients that go into
         # calculating the loss and attach them to the image
         loss.backward()
 
+        # advance the optimizer
         optimizer.step()
 
-        # clip negative image values to positive, if using the entropy term
-        model._image.data[model._image.data < 0] = 1e-10
+        # you can also query the current cube value as `model.cube`
 
+It is an excellent idea to track and plot diagnostics like the loss values while optimizing. This will help gain intuition for how the penalty terms (the scale factor in front of the sparsity regularization) affect the image quality. You can also query and save the image cube values and RFFT output during optimization as well.
+
+Moreover, you can compose many intricate optimization strategies using the tools available in PyTorch.
 
 Saving output 
 -------------
 
-You can save the output ::
+When you are finished optimizing, you can save the output ::
 
-        img = model.image.detach().numpy()
-        np.save("image.npy", img)
+    cube = model.cube.detach().numpy()
+    np.save("cube.npy", cube)
+
+Image bounds for ``matplotlib.pyplot.imshow`` are available in ``model.extent``.
 

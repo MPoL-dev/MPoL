@@ -128,16 +128,21 @@ def loss_fn_edge_clamp(cube):
     return loss
 
 
-def loss_fn_sparsity(cube):
+def loss_fn_sparsity(cube, mask=None):
     """
-    Make the cube sparse.
+    Enforce a sparsity prior on the cube. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. Typically you would want this prior to be true for background regions.
 
     Args:
         cube
+        mask (boolean): array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``.
 
     Returns:
         L1 norm
     """
 
-    loss = torch.sum(torch.abs(cube))
+    if mask is not None:
+        loss = torch.sum(torch.abs(cube.masked_select(mask)))
+    else:
+        loss = torch.sum(torch.abs(cube))
+
     return loss
