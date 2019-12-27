@@ -5,6 +5,15 @@ from torch.utils.data import Dataset
 # custom dataset loader
 class UVDataset(Dataset):
     def __init__(self, uu, vv, weights, data_real, data_imag, **kwargs):
+        """
+        PyTorch Dataset container for interferometric visibilities.
+
+        Args:
+            uu (2d array: (nchan, nvis)):  
+            vv (2d array: (nchan, nvis)):
+
+        Optional pre-gridding.
+        """
 
         # assert that all vectors are 1D and the same length
         shape = uu.shape
