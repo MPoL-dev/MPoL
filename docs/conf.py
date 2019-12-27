@@ -22,8 +22,8 @@ copyright = "2019, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
-version = release
+version = mpol.__version__
+release = version
 
 
 # -- General configuration ---------------------------------------------------

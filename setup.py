@@ -3,12 +3,16 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+import mpol
+
+version = mpol.__version__
+
 setuptools.setup(
-    name="MPoL",  # Replace with your own username
-    version="0.0.1",
+    name="MPoL",
+    version=version,
     author="Ian Czekala",
     author_email="iancze@gmail.com",
-    description="Maximum Entropy Imaging for Radio Astronomy",
+    description="Regularized Maximum Likelihood Imaging for Radio Astronomy",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
