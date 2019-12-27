@@ -111,7 +111,7 @@ ax.imshow(img, origin="upper", interpolation="none", aspect="equal")
 ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
 ax.set_ylabel(r"$\Delta \delta$")
 ax.set_title("Input image")
-fig.savefig("input.png", dpi=300)
+fig.savefig("test/input.png", dpi=300)
 
 # pre-multiply the image by the correction function
 corrfun_mat = gridding.corrfun_mat(np.fft.fftshift(ra), np.fft.fftshift(dec))
@@ -122,7 +122,7 @@ plt.colorbar(im)
 ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
 ax.set_ylabel(r"$\Delta \delta$")
 ax.set_title("Correction function")
-fig.savefig("corrfun.png", dpi=300)
+fig.savefig("test/corrfun.png", dpi=300)
 
 
 # calculate the Fourier coordinates
@@ -155,7 +155,7 @@ ax[0].imshow(
 ax[1].imshow(
     np.imag(np.fft.fftshift(vis_analytical_full)), origin="upper", extent=ext_full
 )
-fig.savefig("analytical_full.png", dpi=300)
+fig.savefig("test/analytical_full.png", dpi=300)
 
 
 ext = [us[0], us[-1], vs_limit[-1], vs_limit[0]]
@@ -209,7 +209,7 @@ im_imag = ax[1, 2].imshow(
 )
 plt.colorbar(im_imag, ax=ax[1, 2])
 
-fig.savefig("output.png", dpi=300, wspace=0.05)
+fig.savefig("test/output.png", dpi=300, wspace=0.05)
 
 
 def test_2D_interpolation():
@@ -269,7 +269,7 @@ ax.imshow(
     vmax=vvmax,
 )
 # ax[1].spy(C_real[:, 0:300], marker=".", precision="present", aspect="auto")
-fig.savefig("C_real.png", dpi=300)
+fig.savefig("test/C_real.png", dpi=300)
 #
 # fig, ax = plt.subplots(ncols=1, figsize=(12,3))
 # vvmax = np.max(np.abs(C_imag[:,0:300]))
@@ -292,4 +292,4 @@ ax[2].set_ylabel("imag")
 ax[3].plot(interp_imag - np.imag(data_values), ".")
 ax[3].set_ylabel("imag diff")
 fig.subplots_adjust(hspace=0.4, left=0.2)
-fig.savefig("real_comp.png", dpi=300)
+fig.savefig("test/real_comp.png", dpi=300)

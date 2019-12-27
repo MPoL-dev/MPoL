@@ -8,6 +8,17 @@ import mpol.utils
 
 
 class ImageCube(nn.Module):
+    """
+    Initialize an ImageCube.
+
+    Args:
+        npix (int): the number of pixels per image side
+        cell_size (float): the size of a pixel in arcseconds
+        nchan (int): the number of channels in the image
+        velocity_axis (list): vector of velocities (in km/s) corresponding to nchan. Channels should be spaced approximately equidistant in velocity but need not be strictly exact.
+        cube (PyTorch tensor w/ `requires_grad = True`): an image cube to initialize the model with. If None, assumes cube is all ones.
+    """
+
     def __init__(
         self,
         npix=None,
@@ -17,16 +28,7 @@ class ImageCube(nn.Module):
         cube=None,
         **kwargs
     ):
-        """
-        Initialize an ImageCube.
 
-        Args:
-            npix (int): the number of pixels per image side
-            cell_size (float): the size of a pixel in arcseconds
-            nchan (int): the number of channels in the image
-            velocity_axis (list): vector of velocities (in km/s) corresponding to nchan. Channels should be spaced approximately equidistant in velocity but need not be strictly exact.
-            cube (PyTorch tensor w/ `requires_grad = True`): an image cube to initialize the model with. If None, assumes cube is all ones.
-        """
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
         self.npix = int(npix)
@@ -88,14 +90,14 @@ class ImageCube(nn.Module):
 
     def precache_interpolation(self, dataset):
         """
-        Caches the interpolation matrices used to interpolate the output from the FFT to the measured (u,v) points.
-        If you did not specify your dataset when instantiating the model, run this before calculating a loss.
+        Caches the interpolation matrices used to interpolate the output from the FFT to the measured (u,v) points if the dataset has not been pre-gridded.
+        Will be run automatically upon the first call to the model.
 
         Args:
             dataset: a UVDataset containing the u,v sampling points of the observation.
 
         Returns:
-            None. Stores attributes self.C_re and self.C_im
+            None. Stores attributes self.C_res and self.C_ims, which are lists of sparse interpolation matrices corresponding to each channel.
         """
 
         max_baseline = torch.max(
