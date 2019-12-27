@@ -205,8 +205,6 @@ class ImageCube(nn.Module):
         nchan=None,
         velocity_axis=None,
         cube=None,
-        dataset=None,
-        grid_mask=None,
         **kwargs
     ):
         """
@@ -218,8 +216,6 @@ class ImageCube(nn.Module):
             nchan (int): the number of channels in the image
             velocity_axis (list): vector of velocities (in km/s) corresponding to nchan. Channels should be spaced approximately equidistant in velocity but need not be strictly exact.
             cube (PyTorch tensor w/ `requires_grad = True`): an image cube to initialize the model with. If None, assumes cube is all ones.
-            dataset (UVDataset): the dataset to precache the interpolation matrices against.
-            grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
         """
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
@@ -240,12 +236,16 @@ class ImageCube(nn.Module):
 
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
         # calculate the image axes
-        self.ll = gridding.fftspace(img_radius, self.npix)  # [radians]
+        self.ll = torch.tensor(gridding.fftspace(img_radius, self.npix))  # [radians]
         # mm is the same
 
         # the output spatial frequencies of the RFFT routine (unshifted)
-        self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
-        self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
+        self.us = torch.tensor(
+            np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3
+        )  # convert to [kλ]
+        self.vs = torch.tensor(
+            np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3
+        )  # convert to [kλ]
 
         # This shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
@@ -274,13 +274,7 @@ class ImageCube(nn.Module):
             gridding.corrfun_mat(np.fft.ifftshift(self.ll), np.fft.ifftshift(self.ll))
         )
 
-        self.gridded = False
-
-        if dataset is not None:
-            self.precache_interpolation(dataset)
-        else:
-            self.grid_mask = torch.tensor(grid_mask, dtype=torch.bool)
-            self.gridded = True
+        self.precached = False
 
     def precache_interpolation(self, dataset):
         """
@@ -293,10 +287,9 @@ class ImageCube(nn.Module):
         Returns:
             None. Stores attributes self.C_re and self.C_im
         """
-        raise NotImplementedError
 
-        max_baseline = np.max(
-            np.abs([dataset.uu.numpy(), dataset.vv.numpy()])
+        max_baseline = torch.max(
+            torch.abs(torch.cat([dataset.uu, dataset.vv]))
         )  # klambda
 
         # check that the pixel scale is sufficiently small to sample
@@ -307,65 +300,98 @@ class ImageCube(nn.Module):
         ), "Image cell size is too coarse to represent the largest spatial frequency sampled by the dataset. Make a finer image by decreasing cell_size. You may also need to increase npix to make sure the image remains wide enough to capture all of the emission and avoid aliasing."
 
         # calculate the interpolation matrices at the datapoints
-        C_re, C_im = gridding.calc_matrices(
-            dataset.uu.numpy(), dataset.vv.numpy(), self.us, self.vs
-        )
-        C_shape = C_re.shape
+        # the .detach().cpu() is to enable the numpy conversion even after transferred to GPU
+        uu = dataset.uu.detach().cpu().numpy()
+        vv = dataset.vv.detach().cpu().numpy()
+        us = self.us.detach().cpu().numpy()
+        vs = self.vs.detach().cpu().numpy()
+        self.C_res = []
+        self.C_ims = []
+        for i in range(self.nchan):
+            C_re, C_im = gridding.calc_matrices(uu[i], vv[i], us, vs)
+            C_shape = C_re.shape
 
-        # make these torch sparse tensors
-        i_re = torch.LongTensor([C_re.row, C_re.col])
-        v_re = torch.DoubleTensor(C_re.data)
-        self.C_re = torch.sparse.DoubleTensor(i_re, v_re, torch.Size(C_shape))
+            # make these torch sparse tensors
+            i_re = torch.LongTensor([C_re.row, C_re.col])
+            v_re = torch.DoubleTensor(C_re.data)
+            C_re = torch.sparse.DoubleTensor(i_re, v_re, torch.Size(C_shape))
+            self.C_res.append(C_re)
 
-        i_im = torch.LongTensor([C_im.row, C_im.col])
-        v_im = torch.DoubleTensor(C_im.data)
-        self.C_im = torch.sparse.DoubleTensor(i_im, v_im, torch.Size(C_shape))
+            i_im = torch.LongTensor([C_im.row, C_im.col])
+            v_im = torch.DoubleTensor(C_im.data)
+            C_im = torch.sparse.DoubleTensor(i_im, v_im, torch.Size(C_shape))
+            self.C_ims.append(C_im)
 
-    def forward(self):
+        self.precached = True
+
+    def forward(self, dataset):
         """
         Compute the interpolated visibilities.
+
+        Args:
+            dataset (UVDataset): the dataset to forward model.
         """
 
-        if self.gridded:
+        if dataset.gridded:
+            # re, im output will always be 1D
+            assert torch.allclose(
+                dataset.uu, self.us
+            ), "Pre-gridded uu is different than model us"
+            assert torch.allclose(
+                dataset.vv, self.vs
+            ), "Pre-gridded vv is different than model vs"
+            assert (
+                dataset.npix == self.npix
+            ), "Pre-gridded npix is different than model npix"
+            assert (
+                dataset.cell_size == self.cell_size
+            ), "Pre-gridded cell_size is different than model cell_size."
 
             # convert the image to Jy/ster
             # and perform the RFFT
-            vis = self.cell_size ** 2 * torch.rfft(
+            self.vis = self.cell_size ** 2 * torch.rfft(
                 self._cube / arcsec ** 2, signal_ndim=2
             )
 
             # torch delivers the real and imag components separately
-            vis_re = vis[:, :, :, 0]
-            vis_im = vis[:, :, :, 1]
+            vis_re = self.vis[:, :, :, 0]
+            vis_im = self.vis[:, :, :, 1]
 
             # grid mask is a (nchan, npix, npix//2 + 1) size boolean array
-            re = vis_re.masked_select(self.grid_mask)
-            im = vis_im.masked_select(self.grid_mask)
+            re = vis_re.masked_select(dataset.grid_mask)
+            im = vis_im.masked_select(dataset.grid_mask)
 
         else:
-            raise NotImplementedError
-            # TODO: does the corrfun broadcast correctly?
-            vis = self.cell_size ** 2 * torch.rfft(
+            # re, im output will always be 2D (nchan, nvis)
+
+            # test to see if the interpolation is pre-cached
+            if not self.precached:
+                self.precache_interpolation(dataset)
+
+            # TODO: does the corrfun broadcast correctly across the cube?
+            self.vis = self.cell_size ** 2 * torch.rfft(
                 self._cube * self.corrfun / arcsec ** 2, signal_ndim=2
             )
 
             # torch delivers the real and imag components separately
-            vis_re = vis[:, :, :, 0]
-            vis_im = vis[:, :, :, 1]
+            vis_re = self.vis[:, :, :, 0]
+            vis_im = self.vis[:, :, :, 1]
 
-            # TODO: figure out the fastest way to do the sparse matrix multiply
-            # I think we want to preserve the capacity to have individual channel
-            # visibilities at the end, so probably a per-channel multiply makes
-            # the most sense
+            # reshape into (nchan, -1, 1) vector format so we can do matrix product
+            vr = torch.reshape(vis_re, (self.nchan, -1, 1))
+            vi = torch.reshape(vis_im, (self.nchan, -1, 1))
 
-            # reshape into (-1, 1) vector format so we can do matrix product
-            vr = torch.reshape(vis_re, (-1, 1))
-            vi = torch.reshape(vis_im, (-1, 1))
-
+            res = []
+            ims = []
             # sample the FFT using the sparse matrices
-            # also trim the last dimension so that these are 1D tensors
-            re = torch.sparse.mm(self.C_re, vr)[:, 0]
-            im = torch.sparse.mm(self.C_im, vi)[:, 0]
+            # the output of mm is a (nvis, 1) dimension tensor
+            for i in range(self.nchan):
+                res.append(torch.sparse.mm(self.C_res[i], vr[i]))
+                ims.append(torch.sparse.mm(self.C_ims[i], vi[i]))
+
+            # concatenate to a single (nchan, nvis) tensor
+            re = torch.transpose(torch.cat(res, dim=1), 0, 1)
+            im = torch.transpose(torch.cat(ims, dim=1), 0, 1)
 
         return re, im
 
@@ -385,11 +411,25 @@ class ImageCube(nn.Module):
         return self.cube.detach()
 
     @property
+    def vis_cube(self):
+        """
+        Return the visibility cube and u, v axes.
+
+        Returns:
+            3-tuple of (us, vs, vis)
+        """
+
+        return (self.us, self.vs, self.vis)
+
+    @property
     def extent(self):
         """
         Return the extent tuple (in arcsec) used for matplotlib plotting with imshow. Assumes `origin="upper"`.
         """
-        low, high = np.min(self.ll) / arcsec, np.max(self.ll) / arcsec  # [arcseconds]
+        low, high = (
+            torch.min(self.ll) / arcsec,
+            torch.max(self.ll) / arcsec,
+        )  # [arcseconds]
         return [high, low, low, high]
 
     def to_FITS(self, fname="cube.fits", overwrite=False):

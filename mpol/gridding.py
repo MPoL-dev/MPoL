@@ -314,7 +314,7 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
         npix: the number of pixels in each dimension of the square image
 
     Returns:
-        (ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (npix, npix//2 + 1). This shape corresponds to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
+        (u_grid, v_grid, ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (npix, npix//2 + 1). This shape corresponds to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
 
     An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. Rather than interpolating the complex model visibilities from these grid points to the individual (u,v) points, pre-average the data visibilities to the nearest grid point. This means that there doesn't need to be an interpolation operation after every new model evaluation, since the model visibilities directly correspond to the locations of the gridded visibilities.
 
@@ -337,14 +337,14 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
     # dll = dmm = cell_size #[radians]
 
     # the output spatial frequencies of the RFFT routine
-    u_grid = np.fft.rfftfreq(npix, d=cell_size) * 1e-3  # convert to [kλ]
-    v_grid = np.fft.fftfreq(npix, d=cell_size) * 1e-3  # convert to [kλ]
+    uu_grid = np.fft.rfftfreq(npix, d=cell_size) * 1e-3  # convert to [kλ]
+    vv_grid = np.fft.fftfreq(npix, d=cell_size) * 1e-3  # convert to [kλ]
 
-    nu = len(u_grid)
-    nv = len(v_grid)
+    nu = len(uu_grid)
+    nv = len(vv_grid)
 
-    du = np.abs(u_grid[1] - u_grid[0])
-    dv = np.abs(v_grid[1] - v_grid[0])
+    du = np.abs(uu_grid[1] - uu_grid[0])
+    dv = np.abs(vv_grid[1] - vv_grid[0])
 
     # The RFFT outputs u in the range [0, +] and v in the range [-, +],
     # but the dataset contains measurements at u [-,+] and v [-, +].
@@ -363,8 +363,8 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
         uu,
         bins=[nv, nu],
         range=[
-            (np.min(v_grid) - dv / 2, np.max(v_grid) + dv / 2),
-            (np.min(u_grid) - du / 2, np.max(u_grid) + du / 2),
+            (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
+            (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
         ],
         weights=weights,
     )
@@ -384,8 +384,8 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
         uu,
         bins=[nv, nu],
         range=[
-            (np.min(v_grid) - dv / 2, np.max(v_grid) + dv / 2),
-            (np.min(u_grid) - du / 2, np.max(u_grid) + du / 2),
+            (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
+            (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
         ],
         weights=re * weights,
     )
@@ -395,8 +395,8 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
         uu,
         bins=[nv, nu],
         range=[
-            (np.min(v_grid) - dv / 2, np.max(v_grid) + dv / 2),
-            (np.min(u_grid) - du / 2, np.max(u_grid) + du / 2),
+            (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
+            (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
         ],
         weights=im * weights,
     )
@@ -416,7 +416,7 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
     avg_re = np.fft.fftshift(weighted_mean_real, axes=0)[ind]
     avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)[ind]
 
-    return (ind, avg_weights, avg_re, avg_im)
+    return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im)
 
 
 def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix):
@@ -449,7 +449,7 @@ def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix):
     avg_im = []
 
     for i in range(nchan):
-        ind_temp, w_temp, re_temp, im_temp = grid_datachannel(
+        uu_temp, vv_temp, ind_temp, w_temp, re_temp, im_temp = grid_datachannel(
             uus[i], vvs[i], weights[i], res[i], ims[i], cell_size, npix
         )
         ind[i] = ind_temp
@@ -458,8 +458,13 @@ def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix):
         avg_im.append(im_temp)
 
     # flatten all visibilities to a single vector
+    # these are done because, once gridded, it's not certain that there will
+    # be the same number of nvis per channel, depending on where the visibilities
+    # fall in u,v space and to which cell they are gridded.
     avg_weights = np.concatenate(avg_weights)
     avg_re = np.concatenate(avg_re)
     avg_im = np.concatenate(avg_im)
 
-    return (ind, avg_weights, avg_re, avg_im)
+    # just take the last uu and vv values, since they are the same for all channels
+
+    return (uu_temp, vv_temp, ind, avg_weights, avg_re, avg_im)

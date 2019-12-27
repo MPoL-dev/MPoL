@@ -25,6 +25,7 @@ def loss_fn(model_vis, data_vis):
     """
     model_re, model_im = model_vis
     data_re, data_im, data_weights = data_vis
+
     return torch.sum(data_weights * (data_re - model_re) ** 2) + torch.sum(
         data_weights * (data_im - model_im) ** 2
     )
