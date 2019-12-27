@@ -18,7 +18,7 @@ class UVDataset(Dataset):
         cell_size (float): the image pixel size in arcsec. Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         npix (int): the number of pixels per image side (square images only). Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
     
-    Optional pre-gridding.
+    If both `cell_size` and `npix` are set, the dataset will be pre-gridded to the RFFT output grid. This will greatly speed up performance.
     """
 
     def __init__(

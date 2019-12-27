@@ -25,5 +25,21 @@ Then download or `git clone` the MPoL repository and install:
 
 If you have trouble installing please raise a [github issue](https://github.com/iancze/MPoL/issues).
 
+# Citation 
+
+If you use this package or derivatives of it, please cite
+
+    @software{ian_czekala_2019_3594082,
+    author       = {Ian Czekala},
+    title        = {iancze/MPoL: Base version},
+    month        = dec,
+    year         = 2019,
+    publisher    = {Zenodo},
+    version      = {v0.0.1},
+    doi          = {10.5281/zenodo.3594082},
+    url          = {https://doi.org/10.5281/zenodo.3594082}
+    }
+
+
 ---
 Copyright Ian Czekala and contributors 2019
