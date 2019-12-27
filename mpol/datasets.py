@@ -27,11 +27,15 @@ class UVDataset(Dataset):
 
         # assert that all vectors are 1D and the same length
         shape = uu.shape
-        assert len(shape) == 2, "All dataset inputs must be 2D and have the same shape."
         for a in [vv, weights, data_re, data_im]:
-            assert (
-                a.shape == shape
-            ), "All dataset inputs must be 1D and have the same length."
+            assert a.shape == shape, "All dataset inputs must be the same shape."
+
+        if len(shape) == 1:
+            uu = np.atleast_2d(uu)
+            vv = np.atleast_2d(vv)
+            weights = np.atleast_2d(weights)
+            data_re = np.atleast_2d(data_re)
+            data_im = np.atleast_2d(data_im)
 
         if cell_size is not None and npix is not None:
             self.cell_size = cell_size * arcsec  # [radians]
