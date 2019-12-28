@@ -8,22 +8,26 @@ import mpol.utils
 
 
 class ImageCube(nn.Module):
-    """
-    Initialize an ImageCube.
+    r"""
+    A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.
+
+    The parameter set is the pixel values of the image cube itself. The transformations are the real fast Fourier transform (RFFT) and band-limited interpolation routines. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+
+    All keyword arguments are required unless noted.
 
     Args:
         npix (int): the number of pixels per image side
-        cell_size (float): the size of a pixel in arcseconds
         nchan (int): the number of channels in the image
-        velocity_axis (list): vector of velocities (in km/s) corresponding to nchan. Channels should be spaced approximately equidistant in velocity but need not be strictly exact.
-        cube (PyTorch tensor w/ `requires_grad = True`): an image cube to initialize the model with. If None, assumes cube is all ones.
+        cell_size (float): the width of a pixel [arcseconds]
+        velocity_axis (list): vector of velocities in units [:math:`\mathrm{km}\,\mathrm{s}^{-1}`] with length ``nchan``. Generally the image channels should be spaced approximately equidistant in velocity but need not be exact.
+        cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.ones``. 
     """
 
     def __init__(
         self,
         npix=None,
-        cell_size=None,
         nchan=None,
+        cell_size=None,
         velocity_axis=None,
         cube=None,
         **kwargs
@@ -59,7 +63,7 @@ class ImageCube(nn.Module):
             np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3
         )  # convert to [kλ]
 
-        # This shouldn't really be accessed by the user, since it's naturally
+        # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
         # and with East pointing right (i.e., RA increasing to the right)
         # this is contrary to the way astronomers normally plot images, but
@@ -75,7 +79,7 @@ class ImageCube(nn.Module):
                 )
             )
         else:
-            self._cube = nn.Parameter(cube)
+            self._cube = nn.Parameter(mpol.utils.fftshift(cube, axes=(1, 2)))
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
@@ -90,14 +94,17 @@ class ImageCube(nn.Module):
 
     def precache_interpolation(self, dataset):
         """
-        Caches the interpolation matrices used to interpolate the output from the FFT to the measured (u,v) points if the dataset has not been pre-gridded.
-        Will be run automatically upon the first call to the model.
+        Cache the interpolation matrices used to interpolate the output from the RFFT to the measured :math:`(u,v)` points. This is only applicable if the dataset has not been pre-gridded, and will be run automatically upon the first call to :meth:`mpol.ImageCube.forward`.
+
+        Stores the attributes ``C_res`` and ``C_ims``, which are lists of sparse interpolation matrices corresponding to each channel.
 
         Args:
-            dataset: a UVDataset containing the u,v sampling points of the observation.
+            dataset (UVDataset): a UVDataset containing the :math:`(u,v)` sampling points of the observation.
 
         Returns:
-            None. Stores attributes self.C_res and self.C_ims, which are lists of sparse interpolation matrices corresponding to each channel.
+            None
+            
+            
         """
 
         max_baseline = torch.max(
@@ -138,10 +145,13 @@ class ImageCube(nn.Module):
 
     def forward(self, dataset):
         """
-        Compute the interpolated visibilities.
+        Compute the model visibilities at the :math:`(u, v)` locations of the dataset. 
 
         Args:
             dataset (UVDataset): the dataset to forward model.
+
+        Returns:
+            (torch.double, torch.double): a 2-tuple of the :math:`\Re` and :math:`\Im` model values.
         """
 
         if dataset.gridded:
@@ -210,33 +220,22 @@ class ImageCube(nn.Module):
     @property
     def cube(self):
         """
-        Query the current state of the image.
+        The image cube.
 
         Returns:
-            (2d numpy array)
+            torch.double : image cube of shape ``(nchan, npix, npix)``
+            
         """
         # fftshift the image cube to the correct quadrants
         return mpol.utils.fftshift(self._cube, axes=(1, 2))
 
     @property
-    def cube_detached(self):
-        return self.cube.detach()
-
-    @property
-    def vis_cube(self):
-        """
-        Return the visibility cube and u, v axes.
+    def extent(self):
+        r"""
+        The extent 4-tuple (in arcsec) to assign relative image coordinates (:math:`\Delta \alpha \cos \delta`,  :math:`\Delta \delta`) with matplotlib imshow. Assumes ``origin="upper"``.
 
         Returns:
-            3-tuple of (us, vs, vis)
-        """
-
-        return (self.us, self.vs, self.vis)
-
-    @property
-    def extent(self):
-        """
-        Return the extent tuple (in arcsec) used for matplotlib plotting with imshow. Assumes `origin="upper"`.
+            4-tuple: extent
         """
         low, high = (
             torch.min(self.ll) / arcsec,
@@ -244,13 +243,27 @@ class ImageCube(nn.Module):
         )  # [arcseconds]
         return [high, low, low, high]
 
-    def to_FITS(self, fname="cube.fits", overwrite=False):
+    @property
+    def vis_cube(self):
+        r"""
+        The :math:`(u, v)` coordinates and the visibility cube fftshifted such that the 0-th frequency is stored in 0 index.
+
+        Returns:
+            3-tuple torch.double: of (us, vs, vis)
         """
-        Export the image cube to a FITS file.
+
+        return (self.us, self.vs, self.vis)
+
+    def to_FITS(self, fname="cube.fits", overwrite=False, **kwargs):
+        """
+        Export the image cube to a FITS file. Any extra keyword arguments will written to the FITS header.
 
         Args:
-            fname: the name of the FITS file to export to.
-            overwrite: if the file already exists, overwrite?
+            fname (str): the name of the FITS file to export to.
+            overwrite (bool): if the file already exists, overwrite?
+
+        Returns:
+            None
         """
 
         try:
