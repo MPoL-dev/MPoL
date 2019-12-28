@@ -6,14 +6,14 @@ from mpol.constants import *
 
 def get_Jy_arcsec2(T_b, nu=230e9):
     """
-    Get specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.
+    Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.
 
     Args:
-        T_b : brightness temperature in Kelvin
+        T_b : brightness temperature in [:math:`K`]
         nu : frequency (in Hz)
 
     Returns:
-        specific intensity (in Jy/arcsec^2)
+        float: specific intensity (in [:math:`\mathrm{Jy}\, \mathrm{arcsec}^2]`)
     """
 
     # brightness temperature assuming RJ limit
@@ -31,14 +31,14 @@ def get_Jy_arcsec2(T_b, nu=230e9):
 
 def fftshift(x, axes=None):
     """
-    fftshift the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations. 
+    `fftshift <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html>`_ the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations. 
 
     Args:
         x : a torch tensor 
         axes : tuple selecting which axes to shift over. Default is all.
 
     Returns:
-        an fftshift-ed tensor along all axes.
+        x : an fftshift-ed tensor
     """
     if axes is None:
         axes = range(0, len(x.size()))

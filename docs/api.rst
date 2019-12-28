@@ -7,8 +7,6 @@ This page documents all of the available components of the MPoL package. If you 
 Images 
 ------
 
-The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.
-
 .. automodule:: mpol.images
     :members:
 
@@ -24,15 +22,16 @@ Datasets
 .. automodule:: mpol.datasets
     :members:
 
-Gridding
---------
-
-.. automodule:: mpol.gridding
-    :members:
-
 
 Utilities
 ---------
 
 .. automodule:: mpol.utils 
+    :members:
+
+
+Gridding
+--------
+
+.. automodule:: mpol.gridding
     :members:

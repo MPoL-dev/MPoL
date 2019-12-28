@@ -1,18 +1,24 @@
+r"""
+The gridding module contains routines to manipulate visibility data between uniform and non-uniform samples in the :math:`(u,v)` plane. You probably wont need to use these routines in the normal workflow of MPoL, but they are documented here for reference.
+"""
+
 import numpy as np
 from scipy.sparse import lil_matrix
 from mpol.datasets import UVDataset
 from mpol.constants import *
 
-# implementation of the gridding convolution functions in sparse matrix form
-# also image pre-multiply (corrfun)
-
 
 def fftspace(width, N):
-    """Oftentimes it is necessary to get a symmetric coordinate array that spans ``N``
-     elements from `-width` to `+width`, but makes sure that the middle point lands
-     on ``0``. The indices go from ``0`` to ``N -1.``
-     `linspace` returns  the end points inclusive, wheras we want to leave out the
-     right endpoint, because we are sampling the function in a cyclic manner."""
+    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.` 
+    
+    Args:
+        width (float): the width of the array
+        N (int): the number of elements in the array
+        
+    Returns:
+        numpy.float64 1D array: the fftspace array
+    
+    """
 
     assert N % 2 == 0, "N must be even."
 
@@ -31,6 +37,13 @@ def horner(x, a):
     .. math::
 
         f(x) = a_0 + a_1 x^1 + a_2 x^2 + \ldots + a_{n-1} x^{(n-1)}
+
+    Args:
+        x (float): input
+        a (list): list of polynomial coefficients 
+
+    Returns:
+        float: the polynomial evaluated at `x`
     """
     result = 0
     for i in range(len(a) - 1, -1, -1):
@@ -40,11 +53,14 @@ def horner(x, a):
 
 @np.vectorize
 def spheroid(eta):
-    """
-        `spheroid` function which assumes :math:`\alpha = 1`, :math:`m=6`,  built for speed."
+    r"""
+    Prolate spheroidal wavefunction function assuming :math:`\alpha = 1` and :math:`m=6` for speed."
 
-        Args:
-            eta (float) : the value between ``[0, 1]``
+    Args:
+        eta (float) : the value between ``[0, 1]``
+
+    Returns:
+        float : the value of the spheroid at :math:`\eta`
     """
 
     # Since the function is symmetric, overwrite eta
@@ -84,25 +100,27 @@ def spheroid(eta):
 
 def corrfun(eta):
     """
-    Gridding *correction* function, but able to be passed either floating point numbers or vectors of ``Float64``."
+    The gridding *correction* function is applied to the image plane to counter-act the effects of the convolutional interpolation in the Fourier plane. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_. 
 
     Args:
-        eta (float): the value in [0, 1]
+        eta (float): the value in [0, 1]. Accepts floats or vectors of float.
+
+    Returns:
+        float: the correction function evaluated at :math:`\eta`
     """
     return spheroid(eta)
 
 
 def corrfun_mat(alphas, deltas):
     """
-    Calculate the pre-multiply correction function to the image.
-    Return as a 2D array.
+    Calculate the image correction function over deminsionalities corresponding to the image. Apply to the image using a a multiply operation. The input coordinates must be fftshifted the same way as the image.
 
     Args:
-        alphas (1D array): RA list (pre-fftshifted)
-        deltas (1D array): DEC list (pre-fftshifted)
+        alphas (1D array): RA list 
+        deltas (1D array): DEC list 
 
     Returns:
-        (2D array): correction function matrix evaluated over alphas and deltas
+        2D array: correction function matrix evaluated over alphas and deltas
 
     """
 
@@ -134,42 +152,57 @@ def corrfun_mat(alphas, deltas):
 
 def gcffun(eta):
     """
-    The gridding *convolution* function, used to do the convolution and interpolation of the visibilities in
-    the Fourier domain. This is also the Fourier transform of ``corrfun``.
+    The gridding *convolution* function for the convolution and interpolation of the visibilities in
+    the Fourier domain. This is also the Fourier transform of ``corrfun``. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_.
 
     Args:
         eta (float): in the domain of [0,1]
+
+    Returns:
+        float : the gridding convolution function evaluated at :math:`\eta`
     """
 
     return np.abs(1.0 - eta ** 2) * spheroid(eta)
 
 
 def calc_matrices(u_data, v_data, u_model, v_model):
-    """
-    Calcuate the real and imaginary interpolation matrices in one pass.
+    r"""
+    Calculate real :math:`C_\Re` and imaginary :math:`C_\Im` sparse interpolation matrices for RFFT output, using spheroidal wave functions.
+
+    Let :math:`W_\Re` and :math:`W_\Im` represent the real and imaginary output from the RFFT operatation carried out on an image that was pre-multiplied by the gridding correction function. To interpolate from the RFFT grid to the locations of `u_data` and `v_data`, one uses these matrices with a sparse matrix multiply to carry out 
+
+    .. math::
+
+        V_\Re = C_\Re W_\Re
+
+    and 
+
+    .. math::
+
+        V_\Im = C_\Im W_\Im
+
+    such that :math:`V_\Re` and :math:`V_\Im` are the real and imaginary visibilities interpolated to `u_data` and `v_data`. 
 
     Args:
     
-        data_points: the pairs of u,v points in the dataset (in klambda)
-        u_model: the u axis delivered by the rfft (unflattened). Assuming this is the RFFT axis.
-        v_model: the v axis delivered by the rfft (unflattened). Assuming this is the FFT axis.
+        u_data (1D numpy array): the :math:`u` coordinates of the dataset (in [:math:`k\lambda`])
+        v_data (1D numpy array): the :math:`v` coordinates of the dataset (in [:math:`k\lambda`])
+        u_model: the :math:`u` axis delivered by the rfft (unflattened, in [:math:`k\lambda`]). Assuming this is trailing dimension, which is the one over which the RFFT was carried out.
+        v_model: the :math:`v` axis delivered by the rfft (unflattened, in [:math:`k\lambda`]). Assuming this is leading dimension, which is the one over which the FFT was carried out.
 
     Returns:
-        (C_real, C_imag) in `coo` sparse format        
+        2-tuple : `coo` format sparse matrices :math:`C_\Re` and :math:`C_\Im`
 
-    Start with an image packed like Img[j, i]. i is the alpha index and j is the delta index.
-    Then the RFFT output will have RFFT[j, i]. i is the u index and j is the v index.
+    Begin with an image packed like ``Img[j, i]``, where ``i`` is the :math:`l` index and ``j`` is the :math:`m` index.
+    Then the RFFT output will look like ``RFFT[j, i]``, where ``i`` is the u index and ``j`` is the v index.
 
-    see also `Model.for` routine in MIRIAD source code.
-    Uses spheroidal wave functions to interpolate a model to a (u,v) coordinate.
-    Ensure that datapoints and u_model,v_model are in consistent units (either λ or kλ).
+    This assumes the `u_model` array is like the output from `np.fft.rfftfreq <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html#numpy.fft.rfftfreq>`_ ::
 
-    (m, ..., n//2+1, 2)
-    u freqs stored like this
-    f = [0, 1, ...,     n/2-1,     n/2] / (d*n)   if n is even
+        f = [0, 1, ...,     n/2-1,     n/2] / (d*n)   if n is even
 
-    v freqs stored like this
-    f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
+    and that the `v_model` array is like the output from `np.fft.fftfreq <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftfreq.html>`_ ::
+
+        f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
 
     """
 
@@ -300,32 +333,32 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     return C_real.tocoo(), C_imag.tocoo()
 
 
-def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
+def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
     """
-    Pre-grid a single-frequency dataset to the expected `u_grid` and `v_grid` points from the RFFT routine to save on interpolation costs. 
+    Rather than interpolating the complex model visibilities from these grid points to the non-uniform :math:`(u,v)` points, pre-average the data visibilities to the nearest grid point. This saves time by eliminating an interpolation operation after every new model evaluation, since the model visibilities correspond to the locations of the gridded visibilities.
 
     Args:
-        uu (nvis) list: the uu points (in klambda)
-        vv (nvis) list: the vv points (in klambda)
-        weights (nvis) list: the thermal weights
-        re (nvis) list: the real component of the visibilities
-        im (nvis) list: the imaginary component of the visibilities
-        cell_size: the image cell size (in arcsec)
-        npix: the number of pixels in each dimension of the square image
+        uu (list): the uu points (in [:math:`k\lambda`])
+        vv (list): the vv points (in [:math:`k\lambda`])
+        weights (list): the thermal weights (in [:math:`\mathrm{Jy}^{-2}`])
+        re (list): the real component of the visibilities (in [:math:`\mathrm{Jy}`])
+        im (list): the imaginary component of the visibilities (in [:math:`\mathrm{Jy}`])
+        cell_size (float): the image cell size (in arcsec)
+        npix (int): the number of pixels in each dimension of the square image
 
     Returns:
-        (u_grid, v_grid, ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (npix, npix//2 + 1). This shape corresponds to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
+        6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`.
 
-    An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. Rather than interpolating the complex model visibilities from these grid points to the individual (u,v) points, pre-average the data visibilities to the nearest grid point. This means that there doesn't need to be an interpolation operation after every new model evaluation, since the model visibilities directly correspond to the locations of the gridded visibilities.
+    An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. 
 
-    This procedure is similar to "uniform" weighting of visibilities for imaging, but not exactly the same in practice. This is because we are still evaluating a visibility likelihood function which incorporates the uncertainties of the measured spatial frequencies (imaging routines do not use the uncertainties in quite the same way). Evaluating a model against these gridded visibilities should be equivalent to the full interpolated calculation so long as it is true that 
+    This pre-gridding procedure is similar to "uniform" weighting of visibilities for imaging, but not exactly the same in practice. This is because we are still evaluating a visibility likelihood function which incorporates the uncertainties of the measured spatial frequencies, whereas imaging routines use the weights to adjust the contributions of the measured visibility to the synthesize image. Evaluating a model against these gridded visibilities should be equivalent to the full interpolated calculation so long as it is true that 
     
-        1) the visibility function is approximately constant over the (u,v) cell it was averaged
+        1) the visibility function is approximately constant over a :math:`(u,v)` cell 
         2) the measurement uncertainties on the real and imaginary components of individual visibilities are correct and described by Gaussian noise
 
-    If (1) is violated, you can always increase the width and npix of the image (keeping cell_size constant) to shrink the size of the (u,v) cells (i.e., see https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html). This is also probably indicative that you aren't using an image size appropriate for your dataset. 
+    If (1) is violated, you can always increase the width and npix of the image (keeping `cell_size` constant) to shrink the size of the :math:`(u,v)` cells (i.e., see https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html). If you need to do this, this probably indicates that you weren't using an image size appropriate for your dataset. 
     
-    If (2) is violated, then it's not a good idea to procede with this faster routine. Instead, revisit the calibration of your dataset, or build in self-calibration using tweaks to amplitude gain factors. That said, in general it will not be possible to use self-calibration type loss functions with pre-gridded visibilities
+    If (2) is violated, then it's not a good idea to procede with this faster routine. Instead, revisit the calibration of your dataset, or build in self-calibration adjustments based upon antenna and time metadata of the visibilities. One downside of the pre-gridding operation is that it eliminates the possibility of using self-calibration type loss functions.
     """
 
     assert npix % 2 == 0, "Image must have an even number of pixels"
@@ -419,24 +452,24 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix):
     return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im)
 
 
-def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix):
+def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix, **kwargs):
     """
-    Pre-grid a dataset containing multiple channels to the expected `u_grid` and `v_grid` points from the RFFT routine to save on interpolation costs. 
+    Pre-grid a dataset containing multiple channels to the expected `u_grid` and `v_grid` points from the RFFT routine. 
 
-    Note that nvis need not be the same for each channel (i.e., uu, vv, etc... can be a ragged array, as long as it is iterable across the channel dimension). This routine iterates through the channels, calling grid_datachannel for each one.
+    Note that `nvis` need not be the same for each channel (i.e., `uus`, `vvs`, etc... can be ragged arrays, as long as each is iterable across the channel dimension). This routine iterates through the channels, calling :meth:`mpol.gridding.grid_datachannel` for each one.
 
     Args:
-        uu (nchan, nvis) list: the uu points (in klambda)
-        vv (nchan, nvis) list: the vv points (in klambda)
+        uus (nchan, nvis) list: the uu points (in klambda)
+        vvs (nchan, nvis) list: the vv points (in klambda)
         weights (nchan, nvis) list: the thermal weights
-        re (nchan, nvis) list: the real component of the visibilities
-        im (nchan, nvis) list: the imaginary component of the visibilities
+        res (nchan, nvis) list: the real component of the visibilities
+        ims (nchan, nvis) list: the imaginary component of the visibilities
         cell_size: the image cell size (in arcsec)
         npix: the number of pixels in each dimension of the square image
 
     Returns:
-        (ind, avg_weights, avg_re, avg_im) tuple of arrays. `ind` has shape (nchan, npix, npix//2 + 1). This shape corresponds to the RFFT output of an image cube with `nchan`, `cell_size`, and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`.
-        
+        6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `u_grid` and `v_grid` are 1D arrays representing the coordinates of the RFFT grid, and are provided for reference. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`.
+
     """
 
     nchan = uus.shape[0]

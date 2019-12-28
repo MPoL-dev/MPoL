@@ -1,3 +1,7 @@
+"""
+The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.
+"""
+
 import numpy as np
 import torch
 from torch import nn
@@ -256,7 +260,7 @@ class ImageCube(nn.Module):
 
     def to_FITS(self, fname="cube.fits", overwrite=False, **kwargs):
         """
-        Export the image cube to a FITS file. Any extra keyword arguments will written to the FITS header.
+        Export the image cube to a FITS file. Any extra keyword arguments will be written to the FITS header.
 
         Args:
             fname (str): the name of the FITS file to export to.
