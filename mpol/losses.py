@@ -1,9 +1,7 @@
 """
-A library of potential loss functions to use in imaging.
+The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the regularization strength, :math:`\zeta`, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.
 
-Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_
-
-including the regularization strength, \zeta, which seeks to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.
+If you don't see a loss function you need, it's easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!
 """
 
 import numpy as np
@@ -13,15 +11,22 @@ from mpol.constants import *
 
 
 def loss_fn(model_vis, data_vis):
-    """
-    Calculate the weighted chi^2 loss between two tensors of data and model visibilities (must be the same shape).
+    r"""
+    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all quantities have the same shape.
 
     Args:
         model_vis: 2-tuple of (real, imaginary) values of the model
-        data_vis: a 3-tuple of (real, imaginary, weights) of the data
+        data_vis: 3-tuple of (real, imaginary, weights) of the data
 
     Returns:
-        double
+        torch.double: the :math:`\chi^2` likelihood loss
+
+    .. math::
+
+        L = \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2
+
+    where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
+
     """
     model_re, model_im = model_vis
     data_re, data_im, data_weights = data_vis
@@ -32,15 +37,23 @@ def loss_fn(model_vis, data_vis):
 
 
 def loss_fn_entropy(cube, prior_intensity):
-    """
-    Calculate the entropy loss of a set of pixels. Following the entropy definition in `Carcamo et al. 2018 <https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract>`_
+    r"""
+    Calculate the entropy loss of a set of pixels. Following the entropy definition in `Carcamo et al. 2018 <https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract>`_.
+
 
     Args:
-        cube (any tensor): the array and pixel values. Pixel values must be positive.
-        prior_intensity (any tensor): the prior value to calculate entropy against. Could be a single constant or an array the same shape as image.
+        cube (any tensor): pixel values must be positive :math:`I_i > 0` for all :math:`i`
+        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy against. Could be a single constant or an array the same shape as image.
 
     Returns:
-        float : image entropy
+        torch.double: entropy loss
+
+    The entropy loss is calculated as 
+
+    .. math::
+
+        L = \sum_i \frac{I_i}{p_i}\; \ln \frac{I_i}{p_i}
+
     """
     # check to make sure image is positive, otherwise raise an error
     assert (cube >= 0.0).all(), "image cube contained negative pixel values"
@@ -50,41 +63,18 @@ def loss_fn_entropy(cube, prior_intensity):
     return torch.sum(norm * torch.log(norm))
 
 
-def loss_fn_TV_image(image, epsilon=1e-10):
-    """
-    Calculate the total variation loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
+def loss_fn_TSV(cube, vel_rel=1.0, epsilon=1e-10):
+    r"""
+    Calculate the total squared variation (TSV) loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
 
     Args:
-        image (any 2D tensor): the array and pixel values
-        epsilon (float): the softening parameter in Jy/arcsec^2. Any pixel-to-pixel variations smaller than this parameter will not be penalized.
-
-    Returns:
-        float: loss due to total variation
-    """
-    # calculate the difference of the image with its eastern pixel
-    diff_ll = image[:, 1:] - image[:, 0:-1]
-    # calculate the difference of the image with its southern pixel
-    diff_mm = image[1:, :] - image[0:-1, :]
-
-    # print(diff_ll.shape)
-    # print(diff_mm.shape)
-
-    loss = torch.sum(torch.sqrt(diff_ll ** 2 + diff_mm.T ** 2 + epsilon))
-
-    return loss
-
-
-def loss_fn_TSV_cube(cube, vel_rel=1.0, epsilon=1e-10):
-    """
-    Calculate the total variation loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth, or the gradient of the image to be sparse.
-
-    Args:
-        cube (any 3D tensor): the array and pixel values
+        cube (any 3D tensor): the image cube array :math:`I_{lmv}`
         vel_rel (scalar): the relative influence of the velocity dimension in the TSV calculation.
-        epsilon (float): the softening parameter in Jy/arcsec^2. Any pixel-to-pixel variations smaller than this parameter will not be penalized.
+        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations smaller than this parameter will have a significant penalty.
 
     Returns:
-        float: loss due to total variation
+        torch.double: total squared variation loss
+
     """
     # calculate the difference of the image with its eastern pixel
     diff_ll = cube[:, :, 1:] - cube[:, :, 0:-1]
@@ -101,20 +91,21 @@ def loss_fn_TSV_cube(cube, vel_rel=1.0, epsilon=1e-10):
         torch.sum(diff_ll ** 2)
         + torch.sum(diff_mm ** 2)
         + vel_rel * torch.sum(diff_vel ** 2)
+        + epsilon
     )
 
     return loss
 
 
 def loss_fn_edge_clamp(cube):
-    """
-    Promote all pixels at the edge of the image to be zero.
+    r"""
+    Promote all pixels at the edge of the image to be zero using an :math:`L_2` norm.
 
     Args:
         cube (any 3D tensor): the array and pixel values
 
     Returns:
-        (float) edge loss
+        torch.double: edge loss
     """
 
     # find edge pixels
@@ -130,14 +121,20 @@ def loss_fn_edge_clamp(cube):
 
 def loss_fn_sparsity(cube, mask=None):
     """
-    Enforce a sparsity prior on the cube. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. Typically you would want this prior to be true for background regions.
+    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. Typically you might want this mask to be ``True`` for background regions.
 
     Args:
-        cube
-        mask (boolean): array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``.
+        cube (nchan, npix, npix): tensor image cube
+        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``.
 
     Returns:
-        L1 norm
+        torch.double: sparsity loss calculated where ``mask == True``
+
+    The sparsity loss calculated as 
+
+    .. math::
+
+        L = \sum_i | I_i |
     """
 
     if mask is not None:
