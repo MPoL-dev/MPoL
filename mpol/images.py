@@ -23,19 +23,10 @@ class ImageCube(nn.Module):
         npix (int): the number of pixels per image side
         nchan (int): the number of channels in the image
         cell_size (float): the width of a pixel [arcseconds]
-        velocity_axis (list): vector of velocities in units [:math:`\mathrm{km}\,\mathrm{s}^{-1}`] with length ``nchan``. Generally the image channels should be spaced approximately equidistant in velocity but need not be exact.
         cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.ones``. 
     """
 
-    def __init__(
-        self,
-        npix=None,
-        nchan=None,
-        cell_size=None,
-        velocity_axis=None,
-        cube=None,
-        **kwargs
-    ):
+    def __init__(self, npix=None, nchan=None, cell_size=None, cube=None, **kwargs):
 
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
@@ -48,11 +39,6 @@ class ImageCube(nn.Module):
 
         assert nchan > 0, "must have a positive number of channels"
         self.nchan = int(nchan)
-
-        assert (
-            len(velocity_axis) == self.nchan
-        ), "Velocity axis must be a list of length `nchan`"
-        self.velocity_axis = torch.tensor(velocity_axis)
 
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
         # calculate the image axes
@@ -277,5 +263,13 @@ class ImageCube(nn.Module):
                 "Please install the astropy package to use FITS export functionality."
             )
 
-        raise NotImplementedError
+        hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy())
+
+        # nx = header["NAXIS1"]
+        # ny = header["NAXIS2"]
+
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(fname, overwrite=overwrite)
+
+        hdul.close()
 

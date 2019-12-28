@@ -56,15 +56,15 @@ If you didn't already set them in the ``UVDataset`` stage, you will need to deci
 The :class:`mpol.images.ImageCube` requires the following options ::
 
     model = ImageCube(
-        cell_size=16.0 / npix, npix=npix, image=None, velocity_axis=[0], nchan=1
+        cell_size=16.0 / npix, npix=npix, cube=None, nchan=1
     )
 
 
-We set the number of channels to 1, since we just have a single channel map. The relative velocity of this channel is also 0. 
+We set the number of channels to 1, since we just have a single channel map. 
 
 The main functionility of the Image class is to forward-model the visibilities starting from an image, done using the ``Image.forward`` method. This method is called automatically when you use ``model()``. To save computation, the core image representation is actually stored `pre-fftshifted <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html>`_ in the ``model._cube`` variable, but you can query the de-shifted version using ``model.cube``. 
 
-Since we have just initialized the model, we can see that ``model.image`` is blank. If you have a better starting image, you can pass this as a PyTorch tensor to the ``image`` parameter.
+Since we have just initialized the model, we can see that ``model.cube`` is blank. If you have a better starting image, you can pass this as a PyTorch tensor to the ``cube`` parameter.
 
 Optimizer 
 ---------
