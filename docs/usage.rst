@@ -20,12 +20,14 @@ Typically, you'll want to import the following depedencies ::
 Data
 ----
 
-The fundamental dataset is the set of complex-valued visibility measurements: lists of the :math:`u`, :math:`v` coordinates, real and imaginary visibility values (:math:`\Re` and :math:`\Im`), and visibility weights (:math:`w \propto \frac{1}{\sigma^2}`). If you have a CASA measurement set, you'll want to export these quantities. You can achieve this by writing a CASA script yourself or using the `UVHDF5 package <https://github.com/AstroChem/UVHDF5>`_. It goes without saying that you should make sure the data are correctly calibrated, particularly the `weights <https://casaguides.nrao.edu/index.php/DataWeightsAndCombination>`_. ::
+The fundamental dataset is the set of complex-valued visibility measurements: lists of the :math:`u`, :math:`v` coordinates, real and imaginary visibility values (:math:`\Re` and :math:`\Im`), and visibility weights (:math:`w \propto \frac{1}{\sigma^2}`). If you have a CASA measurement set, you'll want to export these quantities. You can achieve this by writing a CASA script yourself or using the `UVHDF5 package <https://github.com/AstroChem/UVHDF5>`_. It goes without saying that you should make sure the data are correctly calibrated, particularly the `weights <https://casaguides.nrao.edu/index.php/DataWeightsAndCombination>`_. 
+
+One important thing to note is that the effective CASA (and AIPS) baseline convention is opposite that of the interferometric coordinate system typically presented in textbooks, e.g., `TMS <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`_, Fig. 3.2. Urvashi Rao has a very `helpful memo <https://casa.nrao.edu/casadocs/casa-5.6.0/memo-series/casa-memos/casa_memo2_coordconvention_rau.pdf>`_ explaining the baseline convention in CASA. Essentially, this means you'll want to take the complex conjugate of your visibilities to have your images show up in the correct orientation. ::
 
     uu = # your data here in [kilolam] 
     vv = # your data here in [kilolam]
     data_re = # your data here in [Jy]
-    data_im = # your data here in [Jy]
+    data_im = # -1.0 * (your data here) in [Jy]
     weights = # your data here in [1/Jy^2]
 
 To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3594093#.XgZgfhdKhTY>`_::
@@ -34,7 +36,7 @@ To test out the package, you can play with a mock dataset of Saturn available `h
     uu = npzfile["uu"] # [kilolambda]
     vv = npzfile["vv"] # [kilolambda]
     data_re = npzfile["re"] # [Jy]
-    data_im = npzfile["im"] # [Jy]
+    data_im = -1.0 * npzfile["im"] # [Jy]
     weights = npzfile["weights"] # [1/Jy]
 
 For convenience, we provide a dataset wrapper for these quantities, :class:`mpol.datasets.UVDataset`. After loading your data, you can initialize this with ::

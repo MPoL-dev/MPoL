@@ -69,7 +69,12 @@ class ImageCube(nn.Module):
                 )
             )
         else:
-            self._cube = nn.Parameter(mpol.utils.fftshift(cube, axes=(1, 2)))
+            # we expect the user to supply an image cube as it looks on the sky
+            # with East pointing to the left. Therefore we will need to
+            # flip the image across the RA dimension
+            flipped = torch.flip(cube, (2,))
+            shifted = mpol.utils.fftshift(flipped, axes=(1, 2))
+            self._cube = nn.Parameter(shifted)
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
@@ -217,12 +222,15 @@ class ImageCube(nn.Module):
             
         """
         # fftshift the image cube to the correct quadrants
-        return mpol.utils.fftshift(self._cube, axes=(1, 2))
+        shifted = mpol.utils.fftshift(self._cube, axes=(1, 2))
+        # flip so that east points left
+        flipped = torch.flip(shifted, (2,))
+        return flipped
 
     @property
     def extent(self):
         r"""
-        The extent 4-tuple (in arcsec) to assign relative image coordinates (:math:`\Delta \alpha \cos \delta`,  :math:`\Delta \delta`) with matplotlib imshow. Assumes ``origin="upper"``.
+        The extent 4-tuple (in arcsec) to assign relative image coordinates (:math:`\Delta \alpha \cos \delta`,  :math:`\Delta \delta`) with matplotlib imshow. Assumes ``origin="lower"``.
 
         Returns:
             4-tuple: extent
@@ -258,15 +266,28 @@ class ImageCube(nn.Module):
 
         try:
             from astropy.io import fits
+            from astropy import wcs
         except ImportError:
             print(
                 "Please install the astropy package to use FITS export functionality."
             )
 
-        hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy())
+        w = wcs.WCS(naxis=2)
 
-        # nx = header["NAXIS1"]
-        # ny = header["NAXIS2"]
+        w.wcs.crpix = np.array([1, 1])
+        w.wcs.cdelt = (
+            np.array([self.cell_size, self.cell_size]) * 180.0 / np.pi
+        )  # decimal degrees
+        w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+
+        header = w.to_header()
+
+        # add in the kwargs to the header
+        if kwargs is not None:
+            for k, v in kwargs.items():
+                header[k] = v
+
+        hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy(), header=header)
 
         hdul = fits.HDUList([hdu])
         hdul.writeto(fname, overwrite=overwrite)
