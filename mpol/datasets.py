@@ -83,3 +83,23 @@ class UVDataset(Dataset):
 
     def __len__(self):
         return len(self.uu)
+
+    def to(self, device):
+        """
+        Transfer the dataset to a new device.
+
+        Args:
+            device: the device to transfer the dataset to. Typically e.g., "cpu" or "cuda"
+
+        Returns:
+            None
+        """
+
+        self.uu.to(device)
+        self.vv.to(device)
+        self.weights.to(device)
+        self.re.to(device)
+        self.im.to(device)
+
+        if self.gridded:
+            self.grid_mask.to(device)
