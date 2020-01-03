@@ -151,12 +151,12 @@ class ImageCube(nn.Module):
 
         if dataset.gridded:
             # re, im output will always be 1D
-            assert torch.allclose(
-                dataset.uu, self.us
-            ), "Pre-gridded uu is different than model us"
-            assert torch.allclose(
-                dataset.vv, self.vs
-            ), "Pre-gridded vv is different than model vs"
+            # assert torch.allclose(
+            #     dataset.uu, self.us
+            # ), "Pre-gridded uu is different than model us"
+            # assert torch.allclose(
+            #     dataset.vv, self.vs
+            # ), "Pre-gridded vv is different than model vs"
             assert (
                 dataset.npix == self.npix
             ), "Pre-gridded npix is different than model npix"
