@@ -17,6 +17,7 @@ class UVDataset(Dataset):
         data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
         cell_size (float): the image pixel size in arcsec. Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         npix (int): the number of pixels per image side (square images only). Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
+        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
     
     If both `cell_size` and `npix` are set, the dataset will be automatically pre-gridded to the RFFT output grid. This will greatly speed up performance.
 
@@ -24,7 +25,16 @@ class UVDataset(Dataset):
     """
 
     def __init__(
-        self, uu, vv, weights, data_re, data_im, cell_size=None, npix=None, **kwargs
+        self,
+        uu,
+        vv,
+        weights,
+        data_re,
+        data_im,
+        cell_size=None,
+        npix=None,
+        device=None,
+        **kwargs
     ):
 
         # assert that all vectors are 1D and the same length
@@ -54,21 +64,23 @@ class UVDataset(Dataset):
             )
 
             # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
-            self.uu = torch.tensor(uu_grid)
-            self.vv = torch.tensor(vv_grid)
-            self.grid_mask = torch.tensor(grid_mask, dtype=torch.bool)
-            self.weights = torch.tensor(g_weights)
-            self.re = torch.tensor(g_re)
-            self.im = torch.tensor(g_im)
+            self.uu = torch.tensor(uu_grid, device=device)
+            self.vv = torch.tensor(vv_grid, device=device)
+            self.grid_mask = torch.tensor(grid_mask, dtype=torch.bool, device=device)
+            self.weights = torch.tensor(g_weights, device=device)
+            self.re = torch.tensor(g_re, device=device)
+            self.im = torch.tensor(g_im, device=device)
             self.gridded = True
 
         else:
             self.gridded = False
-            self.uu = torch.tensor(uu, dtype=torch.double)  # klambda
-            self.vv = torch.tensor(vv, dtype=torch.double)  # klambda
-            self.weights = torch.tensor(weights, dtype=torch.double)  # 1/Jy^2
-            self.re = torch.tensor(data_re, dtype=torch.double)  # Jy
-            self.im = torch.tensor(data_im, dtype=torch.double)  # Jy
+            self.uu = torch.tensor(uu, dtype=torch.double, device=device)  # klambda
+            self.vv = torch.tensor(vv, dtype=torch.double, device=device)  # klambda
+            self.weights = torch.tensor(
+                weights, dtype=torch.double, device=device
+            )  # 1/Jy^2
+            self.re = torch.tensor(data_re, dtype=torch.double, device=device)  # Jy
+            self.im = torch.tensor(data_im, dtype=torch.double, device=device)  # Jy
 
         # TODO: store kwargs to do something for antenna self-cal
 
@@ -83,23 +95,3 @@ class UVDataset(Dataset):
 
     def __len__(self):
         return len(self.uu)
-
-    def to(self, device):
-        """
-        Transfer the dataset to a new device.
-
-        Args:
-            device: the device to transfer the dataset to. Typically e.g., "cpu" or "cuda"
-
-        Returns:
-            None
-        """
-
-        self.uu.to(device)
-        self.vv.to(device)
-        self.weights.to(device)
-        self.re.to(device)
-        self.im.to(device)
-
-        if self.gridded:
-            self.grid_mask.to(device)
