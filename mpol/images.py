@@ -23,7 +23,7 @@ class ImageCube(nn.Module):
         npix (int): the number of pixels per image side
         nchan (int): the number of channels in the image
         cell_size (float): the width of a pixel [arcseconds]
-        cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.ones``. 
+        cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
     """
 
     def __init__(self, npix=None, nchan=None, cell_size=None, cube=None, **kwargs):
@@ -60,7 +60,7 @@ class ImageCube(nn.Module):
         # is correct for what the FFT expects
         if cube is None:
             self._cube = nn.Parameter(
-                torch.ones(
+                torch.zeros(
                     self.nchan,
                     self.npix,
                     self.npix,

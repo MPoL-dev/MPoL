@@ -58,7 +58,7 @@ If you didn't already set them in the ``UVDataset`` stage, you will need to deci
 The :class:`mpol.images.ImageCube` requires the following options ::
 
     model = ImageCube(
-        cell_size=16.0 / npix, npix=npix, cube=None, nchan=1
+        cell_size=8.0 / npix, npix=npix, cube=None, nchan=1
     )
 
 
