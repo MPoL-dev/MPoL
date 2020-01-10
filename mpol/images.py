@@ -80,10 +80,10 @@ class ImageCube(nn.Module):
         # a cube with East (l) increasing with array index and North (m) increasing
         # with array index
         self._ll = torch.tensor(
-            np.flip(np.ifftshift(gridding.fftspace(img_radius, self.npix)))
-        )  # [radians]
+            np.flip(np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))).copy()
+        )  # [radians] The copy is because PyTorch didn't like the negative strides
         self._mm = torch.tensor(
-            np.ifftshift(gridding.fftspace(img_radius, self.npix))
+            np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))
         )  # [radians]
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
