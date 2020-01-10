@@ -30,7 +30,7 @@ One important thing to note is that the effective CASA (and AIPS) baseline conve
     data_im = # -1.0 * (your data here) in [Jy]
     weights = # your data here in [1/Jy^2]
 
-To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3594093#.XgZgfhdKhTY>`_::
+To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3603569#.XhgUZBdKjyg>`_::
 
     npzfile = np.load("data.npz")
     uu = npzfile["uu"] # [kilolambda]
@@ -43,7 +43,7 @@ For convenience, we provide a dataset wrapper for these quantities, :class:`mpol
 
     dataset = UVDataset(uu, vv, data_re, data_im, weights)
 
-However, if we already know the image dimensions that we would like to use, the optimization loop can be greatly sped up if we pre-grid the dataset to the RFFT output grid. You can do this by providing both of the ``cell_size`` and ``npix`` optional keywords to ``UVDataset``. If you don't know apriori how big your source is on the sky, it's always a good idea to make as large an image as possible. Otherwise, if you make a very small image, you will alias emission back into your map. To save you some time, the dataset was made with a (512x512) image of Saturn scaled to 16 arcseconds wide (this is actually smaller than it appears from Earth), so anything larger than this should be fine ::
+However, if we already know the image dimensions that we would like to use, the optimization loop can be greatly sped up if we pre-grid the dataset to the RFFT output grid. You can do this by providing both of the ``cell_size`` and ``npix`` optional keywords to ``UVDataset``. If you don't know apriori how big your source is on the sky, it's always a good idea to make as large an image as possible. Otherwise, if you make a very small image, you will alias emission back into your map. To save you some time, the dataset was made with a (512x512) image of Saturn scaled to 8 arcseconds wide (this is actually smaller than it appears from Earth), so anything larger and more finely gridded than this should be fine ::
 
     # pre-grid visibilities to anticipated output RFFT grid
     npix = 800
