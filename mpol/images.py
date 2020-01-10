@@ -41,9 +41,6 @@ class ImageCube(nn.Module):
         self.nchan = int(nchan)
 
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
-        # calculate the image axes
-        self.ll = torch.tensor(gridding.fftspace(img_radius, self.npix))  # [radians]
-        # mm is the same
 
         # the output spatial frequencies of the RFFT routine (unshifted)
         self.us = torch.tensor(
@@ -72,18 +69,30 @@ class ImageCube(nn.Module):
             # we expect the user to supply an image cube as it looks on the sky
             # with East pointing to the left. Therefore we will need to
             # flip the image across the RA dimension
+            # so that the native cube has East (l) increasing with array index
+            # North (m) should already be increasing with array index
             flipped = torch.flip(cube, (2,))
             shifted = mpol.utils.fftshift(flipped, axes=(1, 2))
             self._cube = nn.Parameter(shifted)
 
+        # calculate the image axes corresponding to the shifted _cube
+        # the native _cube is stored as an FFT-shifted version of
+        # a cube with East (l) increasing with array index and North (m) increasing
+        # with array index
+        self._ll = torch.tensor(
+            np.flip(np.ifftshift(gridding.fftspace(img_radius, self.npix)))
+        )  # [radians]
+        self._mm = torch.tensor(
+            np.ifftshift(gridding.fftspace(img_radius, self.npix))
+        )  # [radians]
+
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
-        # loss of numerical precision (I think)
+        # loss of numerical precision
 
-        # calculate the pre-fftshifted gridding correction function
-        self.corrfun = torch.tensor(
-            gridding.corrfun_mat(np.fft.ifftshift(self.ll), np.fft.ifftshift(self.ll))
-        )
+        # calculate the gridding correction function to apply to _cube
+        # evaluated over the (preshifted) _ll and _mm coordinates
+        self.corrfun = torch.tensor(gridding.corrfun_mat(self._ll, self._mm))
 
         self.precached = False
 
@@ -230,8 +239,8 @@ class ImageCube(nn.Module):
             4-tuple: extent
         """
         low, high = (
-            torch.min(self.ll) / arcsec,
-            torch.max(self.ll) / arcsec,
+            torch.min(self._ll) / arcsec,
+            torch.max(self._ll) / arcsec,
         )  # [arcseconds]
         return [high, low, low, high]
 
