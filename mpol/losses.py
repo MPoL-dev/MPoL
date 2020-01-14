@@ -63,36 +63,58 @@ def loss_fn_entropy(cube, prior_intensity):
     return torch.sum(norm * torch.log(norm))
 
 
-def loss_fn_TSV(cube, vel_rel=1.0, epsilon=1e-10):
+def loss_fn_TV_image(cube, epsilon=1e-10):
     r"""
-    Calculate the total squared variation (TSV) loss. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
+    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
+
+    Args:
+        cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension
+        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.
+
+    Returns:
+        torch.double: total variation loss
+
+    .. math::
+
+        L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 + (I_{l, m+1, v} - I_{l, m, v})^2 + \epsilon}
+
+    """
+
+    # create two cubes
+
+    # the first cube is missing the first column and first row
+    cube_1 = cube[:, 1:, 1:]
+
+    # the second cube is missing the last column and last row
+    cube_0 = cube[:, 0:-1, 0:-1]
+
+    # calculate the difference between these two cubes
+    diff = cube_1 - cube_0
+
+    loss = torch.sqrt(torch.sum(diff ** 2 + epsilon))
+
+    return loss
+
+
+def loss_fn_TV_channel(cube, epsilon=1e-10):
+    r"""
+    Calculate the total variation (TV) loss in the channel dimension. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
     Args:
         cube (any 3D tensor): the image cube array :math:`I_{lmv}`
-        vel_rel (scalar): the relative influence of the velocity dimension in the TSV calculation.
-        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations smaller than this parameter will have a significant penalty.
+        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel variations greater than this parameter will have a significant penalty.
 
     Returns:
-        torch.double: total squared variation loss
+        torch.double: total variation loss
+
+    .. math::
+
+        L = \sum_{l,m,v} \sqrt{(I_{l, m, v + 1} - I_{l,m,v})^2 + \epsilon}
 
     """
-    # calculate the difference of the image with its eastern pixel
-    diff_ll = cube[:, :, 1:] - cube[:, :, 0:-1]
-    # calculate the difference of the image with its southern pixel
-    diff_mm = cube[:, 1:, :] - cube[:, 0:-1, :]
-
-    # calculate the difference of the cube with its blueshifted velocity pixel
+    # calculate the difference between the n+1 cube and the n cube
     diff_vel = cube[1:] - cube[0:-1]
-
-    # these diff arrays have the same total number of elements but they are all
-    # different shapes, hence the calls to flatten
-
-    loss = (
-        torch.sum(diff_ll ** 2)
-        + torch.sum(diff_mm ** 2)
-        + vel_rel * torch.sum(diff_vel ** 2)
-        + epsilon
-    )
+    loss = torch.sqrt(torch.sum(diff_vel ** 2 + epsilon))
 
     return loss
 
