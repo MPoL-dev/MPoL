@@ -80,18 +80,13 @@ def loss_fn_TV_image(cube, epsilon=1e-10):
 
     """
 
-    # create two cubes
+    # diff the cube in ll and remove the last row
+    diff_ll = cube[:, 0:-1, 1:] - cube[:, 0:-1, 0:-1]
 
-    # the first cube is missing the first column and first row
-    cube_1 = cube[:, 1:, 1:]
+    # diff the cube in mm and remove the last column
+    diff_mm = cube[:, 1:, 0:-1] - cube[:, 0:-1, 0:-1]
 
-    # the second cube is missing the last column and last row
-    cube_0 = cube[:, 0:-1, 0:-1]
-
-    # calculate the difference between these two cubes
-    diff = cube_1 - cube_0
-
-    loss = torch.sqrt(torch.sum(diff ** 2 + epsilon))
+    loss = torch.sum(torch.sqrt(diff_ll ** 2 + diff_mm ** 2 + epsilon))
 
     return loss
 
