@@ -238,10 +238,9 @@ class ImageCube(nn.Module):
         Returns:
             4-tuple: extent
         """
-        low, high = (
-            torch.min(self._ll) / arcsec - 0.5 * self.cell_size,
-            torch.max(self._ll) / arcsec + 0.5 * self.cell_size,
-        )  # [arcseconds]
+        low = torch.min(self._ll).item() / arcsec - 0.5 * self.cell_size # [arcseconds]
+        high = torch.max(self._ll).item() / arcsec + 0.5 * self.cell_size # [arcseconds]
+        
         return [high, low, low, high]
 
     @property
@@ -263,11 +262,11 @@ class ImageCube(nn.Module):
         Returns:
             4-tuple: extent
         """
-        du = 1 / (self.npix * self.cell_size)
-        left = torch.min(self._us) - 0.5 * du
-        right = torch.max(self._us) + 0.5 * du
-        bottom = torch.min(self._vs) - 0.5 * du
-        top = torch.max(self._vs) + 0.5 * du
+        du = 1 / (self.npix * self.cell_size) * 1e-3 # klambda
+        left = torch.min(self.us).item() - 0.5 * du
+        right = torch.max(self.us).item() + 0.5 * du
+        bottom = torch.min(self.vs).item() - 0.5 * du
+        top = torch.max(self.vs).item() + 0.5 * du
 
         return [left, right, bottom, top]
 
