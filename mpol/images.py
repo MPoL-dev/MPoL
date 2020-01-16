@@ -47,8 +47,10 @@ class ImageCube(nn.Module):
         self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
 
         # the 2D versions, for indexing
-        # self.us_2D, self.vs_2D = np.meshgrid(self.us.numpy(), self.vs.numpy()) # cartesian indexing
-        # self.qs_2D = np.sqrt(self.us_2D**2 + self.vs_2D**2)
+        us_2D, vs_2D = np.meshgrid(self.us, self.vs, indexing="xy") # cartesian indexing (default)
+        self._us_2D = np.fft.fftshift(us_2D, axes=0) # storing the same as vis
+        self._vs_2D = np.fft.fftshift(vs_2D, axes=0) # storing the same as vis
+        self._qs_2D = np.sqrt(self._us_2D**2 + self._vs_2D**2)
 
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
@@ -122,8 +124,6 @@ class ImageCube(nn.Module):
         # the .detach().cpu() is to enable the numpy conversion even after transferred to GPU
         uu = dataset.uu.detach().cpu().numpy()
         vv = dataset.vv.detach().cpu().numpy()
-        # us = self.us.detach().cpu().numpy()
-        # vs = self.vs.detach().cpu().numpy()
         self.C_res = []
         self.C_ims = []
         for i in range(self.nchan):
@@ -165,13 +165,13 @@ class ImageCube(nn.Module):
 
             # convert the image to Jy/ster
             # and perform the RFFT
-            self.vis = self.cell_size ** 2 * torch.rfft(
+            self._vis = self.cell_size ** 2 * torch.rfft(
                 self._cube / arcsec ** 2, signal_ndim=2
             )
 
             # torch delivers the real and imag components separately
-            vis_re = self.vis[:, :, :, 0]
-            vis_im = self.vis[:, :, :, 1]
+            vis_re = self._vis[:, :, :, 0]
+            vis_im = self._vis[:, :, :, 1]
 
             # grid mask is a (nchan, npix, npix//2 + 1) size boolean array
             re = vis_re.masked_select(dataset.grid_mask)
@@ -185,13 +185,13 @@ class ImageCube(nn.Module):
                 self.precache_interpolation(dataset)
 
             # TODO: does the corrfun broadcast correctly across the cube?
-            self.vis = self.cell_size ** 2 * torch.rfft(
+            self._vis = self.cell_size ** 2 * torch.rfft(
                 self._cube * self.corrfun / arcsec ** 2, signal_ndim=2
             )
 
             # torch delivers the real and imag components separately
-            vis_re = self.vis[:, :, :, 0]
-            vis_im = self.vis[:, :, :, 1]
+            vis_re = self._vis[:, :, :, 0]
+            vis_im = self._vis[:, :, :, 1]
 
             # reshape into (nchan, -1, 1) vector format so we can do matrix product
             vr = torch.reshape(vis_re, (self.nchan, -1, 1))
@@ -240,7 +240,7 @@ class ImageCube(nn.Module):
         return [high, low, low, high]
 
     @property
-    def vis_cube(self):
+    def vis(self):
         r"""
         The visibility RFFT cube fftshifted for plotting with ``imshow`` (the v coordinate goes from -ve to +ve).
 
@@ -248,10 +248,10 @@ class ImageCube(nn.Module):
             torch.double: visibility cube
         """
 
-        return mpol.utils.fftshift(self.vis, axes=(1,))
+        return mpol.utils.fftshift(self._vis, axes=(1,))
 
     @property
-    def vis_cube_extent(self):
+    def vis_extent(self):
         r"""
         The `imshow` ``extent`` argument corresponding to `vis_cube` when plotted with ``origin="lower"``. The :math:`(u, v)` coordinates.
 
