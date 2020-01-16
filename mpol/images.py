@@ -79,12 +79,8 @@ class ImageCube(nn.Module):
         # the native _cube is stored as an FFT-shifted version of
         # a cube with East (l) increasing with array index and North (m) increasing
         # with array index
-        self._ll = torch.tensor(
-            np.flip(np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))).copy()
-        )  # [radians] The copy is because PyTorch didn't like the negative strides
-        self._mm = torch.tensor(
-            np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))
-        )  # [radians]
+        self._ll = np.flip(np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))) # [radians]
+        self._mm = np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))  # [radians]
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
@@ -238,8 +234,8 @@ class ImageCube(nn.Module):
         Returns:
             4-tuple: extent
         """
-        low = torch.min(self._ll).item() / arcsec - 0.5 * self.cell_size # [arcseconds]
-        high = torch.max(self._ll).item() / arcsec + 0.5 * self.cell_size # [arcseconds]
+        low = np.min(self._ll) / arcsec - 0.5 * self.cell_size # [arcseconds]
+        high = np.max(self._ll) / arcsec + 0.5 * self.cell_size # [arcseconds]
         
         return [high, low, low, high]
 
