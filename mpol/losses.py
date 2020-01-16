@@ -160,3 +160,10 @@ def loss_fn_sparsity(cube, mask=None):
         loss = torch.sum(torch.abs(cube))
 
     return loss
+
+def loss_fn_UV_sparsity(vis, q_max):
+    """
+    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`
+    """
+    
+    pass

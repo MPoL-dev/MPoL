@@ -43,12 +43,12 @@ class ImageCube(nn.Module):
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
 
         # the output spatial frequencies of the RFFT routine (unshifted)
-        self.us = torch.tensor(
-            np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3
-        )  # convert to [kλ]
-        self.vs = torch.tensor(
-            np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3
-        )  # convert to [kλ]
+        self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
+        self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
+
+        # the 2D versions, for indexing
+        # self.us_2D, self.vs_2D = np.meshgrid(self.us.numpy(), self.vs.numpy()) # cartesian indexing
+        # self.qs_2D = np.sqrt(self.us_2D**2 + self.vs_2D**2)
 
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
@@ -126,12 +126,12 @@ class ImageCube(nn.Module):
         # the .detach().cpu() is to enable the numpy conversion even after transferred to GPU
         uu = dataset.uu.detach().cpu().numpy()
         vv = dataset.vv.detach().cpu().numpy()
-        us = self.us.detach().cpu().numpy()
-        vs = self.vs.detach().cpu().numpy()
+        # us = self.us.detach().cpu().numpy()
+        # vs = self.vs.detach().cpu().numpy()
         self.C_res = []
         self.C_ims = []
         for i in range(self.nchan):
-            C_re, C_im = gridding.calc_matrices(uu[i], vv[i], us, vs)
+            C_re, C_im = gridding.calc_matrices(uu[i], vv[i], self.us, self.vs)
             C_shape = C_re.shape
 
             # make these torch sparse tensors
@@ -263,10 +263,10 @@ class ImageCube(nn.Module):
             4-tuple: extent
         """
         du = 1 / (self.npix * self.cell_size) * 1e-3 # klambda
-        left = torch.min(self.us).item() - 0.5 * du
-        right = torch.max(self.us).item() + 0.5 * du
-        bottom = torch.min(self.vs).item() - 0.5 * du
-        top = torch.max(self.vs).item() + 0.5 * du
+        left = np.min(self.us) - 0.5 * du
+        right = np.max(self.us) + 0.5 * du
+        bottom = np.min(self.vs) - 0.5 * du
+        top = np.max(self.vs) + 0.5 * du
 
         return [left, right, bottom, top]
 
