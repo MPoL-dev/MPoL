@@ -46,11 +46,14 @@ class ImageCube(nn.Module):
         self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
         self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
 
-        # the 2D versions, for indexing
-        us_2D, vs_2D = np.meshgrid(self.us, self.vs, indexing="xy") # cartesian indexing (default)
-        self._us_2D = np.fft.fftshift(us_2D, axes=0) # storing the same as vis
-        self._vs_2D = np.fft.fftshift(vs_2D, axes=0) # storing the same as vis
+        # the fft-packed versions corresponding to _vis
+        self._us_2D, self._vs_2D = np.meshgrid(self.us, self.vs, indexing="xy") # cartesian indexing (default)
         self._qs_2D = np.sqrt(self._us_2D**2 + self._vs_2D**2)
+
+        # the normal 2D versions corresponding to vis
+        self.us_2D = np.fft.fftshift(self._us_2D, axes=0) 
+        self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0) 
+        self.qs_2D = np.fft.fftshift(self._qs_2D, axes=0)
 
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier

@@ -161,9 +161,31 @@ def loss_fn_sparsity(cube, mask=None):
 
     return loss
 
-def loss_fn_UV_sparsity(vis, q_max):
+def loss_fn_UV_sparsity(vis, qs, q_max):
     """
-    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`
+    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. 
+
+    Args:
+        vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)
+        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2) 
+        q_max (float): maximum radial baseline 
+
+    Returns:
+        torch.double: UV sparsity loss above :math:`q_\mathrm{max}`
+
     """
     
-    pass
+    # make a mask, then send it to the device (in case we're using a GPU)
+    mask = torch.tensor((qs > q_max), dtype=torch.bool).to(vis.device)
+
+    vis_re = vis[:,:,:,0]
+    vis_im = vis[:,:,:,1]
+
+    # broadcast mask to the same shape as vis
+    mask = mask.unsqueeze(0)
+
+    loss = torch.sum(torch.abs(vis_re.masked_select(mask))) + torch.sum(torch.abs(vis_im.masked_select(mask)))
+
+    return loss
+
+    
