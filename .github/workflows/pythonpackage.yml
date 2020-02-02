@@ -35,6 +35,7 @@ jobs:
       run: |
         pip install pytest matplotlib
         pytest
+  build-and-deploy:
     - name: Install pep517
       run: >-
         python -m
