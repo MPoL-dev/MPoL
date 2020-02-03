@@ -12,9 +12,9 @@ class UVDataset(Dataset):
     Args:
         uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]  
         vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]  
-        weights (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) length array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
         data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        weights (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
         cell_size (float): the image pixel size in arcsec. Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         npix (int): the number of pixels per image side (square images only). Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
@@ -26,11 +26,11 @@ class UVDataset(Dataset):
 
     def __init__(
         self,
-        uu,
-        vv,
-        weights,
-        data_re,
-        data_im,
+        uu=None,
+        vv=None,
+        data_re=None,
+        data_im=None,
+        weights=None,
         cell_size=None,
         npix=None,
         device=None,
@@ -45,9 +45,9 @@ class UVDataset(Dataset):
         if len(shape) == 1:
             uu = np.atleast_2d(uu)
             vv = np.atleast_2d(vv)
-            weights = np.atleast_2d(weights)
             data_re = np.atleast_2d(data_re)
             data_im = np.atleast_2d(data_im)
+            weights = np.atleast_2d(weights)
 
         if cell_size is not None and npix is not None:
             self.cell_size = cell_size * arcsec  # [radians]
