@@ -2,6 +2,10 @@
 Usage
 =====
 
+.. note::
+    
+    You can try out MPoL in your browser using this example `Google Colaboratory Notebook <https://colab.research.google.com/drive/1CDLlDwIDHzhsqSdzZM112lY2x_L8ETcV>`_. This notebook also includes an example of how to run on a GPU.
+
 MPoL is a Regularized Maximum Likelihood (RML) imaging package built on top of the machine learning framework `PyTorch <https://pytorch.org/>`_. The key ingredient that MPoL provides is the :class:`mpol.images.ImageCube` module. This is a PyTorch layer that links the base parameter set (the image cube pixels) to the dataset (the complex visibilities) through the FFT and band-limited interpolation routines used in the radio astronomy community. The MPoL package is designed such that you use the native infrastructure of PyTorch to write custom optimization routines to interact with :class:`mpol.images.ImageCube`. You don't need to know PyTorch to use MPoL, but it doesn't hurt to spend a little time browsing the `tutorials <https://pytorch.org/tutorials/>`_.
 
 This document will give you an idea of one workflow to generate an image from a set of visibilities, and in the process demonstrate some of the core functionality of the package. 
@@ -30,7 +34,7 @@ One important thing to note is that the effective CASA (and AIPS) baseline conve
     data_im = # -1.0 * (your data here) in [Jy]
     weights = # your data here in [1/Jy^2]
 
-To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3603569#.XhgUZBdKjyg>`_::
+To test out the package, you can play with a mock dataset of Saturn available `here <https://zenodo.org/record/3634225#.XjeyDBNKiL8>`_::
 
     npzfile = np.load("data.npz")
     uu = npzfile["uu"] # [kilolambda]
@@ -41,13 +45,13 @@ To test out the package, you can play with a mock dataset of Saturn available `h
 
 For convenience, we provide a dataset wrapper for these quantities, :class:`mpol.datasets.UVDataset`. After loading your data, you can initialize this with ::
 
-    dataset = UVDataset(uu, vv, data_re, data_im, weights)
+    dataset = UVDataset(uu=uu, vv=vv, data_re=data_re, data_im=data_im, weights=weights)
 
 However, if we already know the image dimensions that we would like to use, the optimization loop can be greatly sped up if we pre-grid the dataset to the RFFT output grid. You can do this by providing both of the ``cell_size`` and ``npix`` optional keywords to ``UVDataset``. If you don't know apriori how big your source is on the sky, it's always a good idea to make as large an image as possible. Otherwise, if you make a very small image, you will alias emission back into your map. To save you some time, the dataset was made with a (512x512) image of Saturn scaled to 8 arcseconds wide (this is actually smaller than it appears from Earth), so anything larger and more finely gridded than this should be fine ::
 
     # pre-grid visibilities to anticipated output RFFT grid
     npix = 800
-    dataset = UVDataset(uu, vv, data_re, data_im, weights, cell_size=16.0/npix, npix=npix)
+    dataset = UVDataset(uu=uu, vv=vv, data_re=data_re, data_im=data_im, weights=weights, cell_size=8.0/npix, npix=npix)
 
 Image Model 
 -----------
