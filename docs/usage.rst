@@ -31,6 +31,7 @@ One important thing to note is that the effective CASA (and AIPS) baseline conve
     uu = # your data here in [kilolam] 
     vv = # your data here in [kilolam]
     data_re = # your data here in [Jy]
+    # perform the complex conjugate by multiplying the imaginaries by -1
     data_im = # -1.0 * (your data here) in [Jy]
     weights = # your data here in [1/Jy^2]
 
@@ -40,6 +41,7 @@ To test out the package, you can play with a mock dataset of Saturn available `h
     uu = npzfile["uu"] # [kilolambda]
     vv = npzfile["vv"] # [kilolambda]
     data_re = npzfile["re"] # [Jy]
+    # perform the complex conjugate by multiplying the imaginaries by -1
     data_im = -1.0 * npzfile["im"] # [Jy]
     weights = npzfile["weights"] # [1/Jy]
 

@@ -21,3 +21,22 @@ If you'd like to install the package from source, download or `git clone` the MP
     $ python setup.py install
 
 If you have trouble installing please raise a `github issue <https://github.com/iancze/MPoL/issues>`_.
+
+Upgrading
+---------
+
+To upgrade to the latest stable version of MPoL, do ::
+
+    $ pip install --upgrade MPoL
+
+If you want to follow along with the latest developments, we recommend installing from source and tracking the ``master`` branch. Then, to update the repository ::
+
+    $ cd MPoL
+    $ git pull 
+    $ python setup.py install
+
+You can determine your current installed version by ::
+
+    $ python 
+    >>> import mpol 
+    >>> print(mpol.__version__)
