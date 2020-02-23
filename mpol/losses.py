@@ -161,6 +161,7 @@ def loss_fn_sparsity(cube, mask=None):
 
     return loss
 
+
 def loss_fn_UV_sparsity(vis, qs, q_max):
     """
     Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. 
@@ -174,18 +175,55 @@ def loss_fn_UV_sparsity(vis, qs, q_max):
         torch.double: UV sparsity loss above :math:`q_\mathrm{max}`
 
     """
-    
+
     # make a mask, then send it to the device (in case we're using a GPU)
     mask = torch.tensor((qs > q_max), dtype=torch.bool).to(vis.device)
 
-    vis_re = vis[:,:,:,0]
-    vis_im = vis[:,:,:,1]
+    vis_re = vis[:, :, :, 0]
+    vis_im = vis[:, :, :, 1]
 
     # broadcast mask to the same shape as vis
     mask = mask.unsqueeze(0)
 
-    loss = torch.sum(torch.abs(vis_re.masked_select(mask))) + torch.sum(torch.abs(vis_im.masked_select(mask)))
+    loss = torch.sum(torch.abs(vis_re.masked_select(mask))) + torch.sum(
+        torch.abs(vis_im.masked_select(mask))
+    )
 
     return loss
 
-    
+
+def loss_PSD(qs_2D, psd, l):
+    r"""
+    Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
+
+    Assumes an image plane kernel of 
+
+    .. math::
+
+        k(r) = exp(-\frac{r^2}{2 \ell^2})
+
+    The corresponding power spectral density is 
+
+    .. math::
+
+        P(q) = (2 \pi \ell^2) exp(- 2 \pi^2 \ell^2 q^2)
+
+
+    Args:
+        qs_2D (torch.double): the radial UV coordinate (in kilolambda)
+        psd (torch.double): the power spectral density cube
+        l (torch.double): the  
+
+    Returns:
+        torch.double : the loss calculated using the power spectral density
+
+    """
+
+    # calculate the expected power spectral density
+    expected_PSD = 2 * np.pi * l ** 2 * torch.exp(-2 * np.pi ** 2 * l ** 2 * qs_2D ** 2)
+
+    # broadcast the penalty correctly across all channels
+    loss = torch.sum(psd / expected_PSD)
+
+    return loss
+
