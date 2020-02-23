@@ -3,9 +3,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-import mpol
-
-version = mpol.__version__
+# Read the version from the last line in the README
+# This is the one location that the version is single-sourced
+with open("README.md") as version_file:
+    for line in version_file:
+        pass
+    version = line.strip()
 
 setuptools.setup(
     name="MPoL",
