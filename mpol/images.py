@@ -43,16 +43,18 @@ class ImageCube(nn.Module):
         img_radius = self.cell_size * (self.npix // 2)  # [radians]
 
         # the output spatial frequencies of the RFFT routine (unshifted)
-        self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
-        self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3 # convert to [kλ]
+        self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
+        self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
 
         # the fft-packed versions corresponding to _vis
-        self._us_2D, self._vs_2D = np.meshgrid(self.us, self.vs, indexing="xy") # cartesian indexing (default)
-        self._qs_2D = np.sqrt(self._us_2D**2 + self._vs_2D**2)
+        self._us_2D, self._vs_2D = np.meshgrid(
+            self.us, self.vs, indexing="xy"
+        )  # cartesian indexing (default)
+        self._qs_2D = np.sqrt(self._us_2D ** 2 + self._vs_2D ** 2)
 
         # the normal 2D versions corresponding to vis
-        self.us_2D = np.fft.fftshift(self._us_2D, axes=0) 
-        self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0) 
+        self.us_2D = np.fft.fftshift(self._us_2D, axes=0)
+        self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0)
         self.qs_2D = np.fft.fftshift(self._qs_2D, axes=0)
 
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
@@ -84,8 +86,12 @@ class ImageCube(nn.Module):
         # the native _cube is stored as an FFT-shifted version of
         # a cube with East (l) increasing with array index and North (m) increasing
         # with array index
-        self._ll = np.flip(np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))) # [radians]
-        self._mm = np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))  # [radians]
+        self._ll = np.flip(
+            np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))
+        )  # [radians]
+        self._mm = np.fft.ifftshift(
+            gridding.fftspace(img_radius, self.npix)
+        )  # [radians]
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
@@ -237,9 +243,9 @@ class ImageCube(nn.Module):
         Returns:
             4-tuple: extent
         """
-        low = np.min(self._ll) / arcsec - 0.5 * self.cell_size # [arcseconds]
-        high = np.max(self._ll) / arcsec + 0.5 * self.cell_size # [arcseconds]
-        
+        low = np.min(self._ll) / arcsec - 0.5 * self.cell_size  # [arcseconds]
+        high = np.max(self._ll) / arcsec + 0.5 * self.cell_size  # [arcseconds]
+
         return [high, low, low, high]
 
     @property
@@ -254,6 +260,22 @@ class ImageCube(nn.Module):
         return mpol.utils.fftshift(self._vis, axes=(1,))
 
     @property
+    def psd(self):
+        r"""
+        The power spectral density of the cube, fftshifted for plotting. (The v coordinate goes from -ve to +ve).
+
+        Returns:
+            torch.double: power spectral density cube
+        """
+
+        vis_re = self.vis[:, :, :, 0]
+        vis_im = self.vis[:, :, :, 1]
+
+        psd = vis_re ** 2 + vis_im ** 2
+
+        return psd
+
+    @property
     def vis_extent(self):
         r"""
         The `imshow` ``extent`` argument corresponding to `vis_cube` when plotted with ``origin="lower"``. The :math:`(u, v)` coordinates.
@@ -261,7 +283,7 @@ class ImageCube(nn.Module):
         Returns:
             4-tuple: extent
         """
-        du = 1 / (self.npix * self.cell_size) * 1e-3 # klambda
+        du = 1 / (self.npix * self.cell_size) * 1e-3  # klambda
         left = np.min(self.us) - 0.5 * du
         right = np.max(self.us) + 0.5 * du
         bottom = np.min(self.vs) - 0.5 * du
