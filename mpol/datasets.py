@@ -53,7 +53,14 @@ class UVDataset(Dataset):
             self.cell_size = cell_size * arcsec  # [radians]
             self.npix = npix
 
-            uu_grid, vv_grid, grid_mask, g_weights, g_re, g_im = mpol.gridding.grid_dataset(
+            (
+                uu_grid,
+                vv_grid,
+                grid_mask,
+                g_weights,
+                g_re,
+                g_im,
+            ) = mpol.gridding.grid_dataset(
                 uu,
                 vv,
                 weights,
