@@ -81,7 +81,7 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
     f_sq = ((5 * 10 ** (-robust)) ** 2) / (np.sum(weight_cell**2) / np.sum(weights))
 
     # the robust weight corresponding to the cell 
-    cell_robust_weight = 1 / (1 + W_k * f_sq)
+    cell_robust_weight = 1 / (1 + weight_cell * f_sq)
 
     # zero out cells that have no visibilities 
     cell_robust_weight[weight_cell <= 0.0] = 0
