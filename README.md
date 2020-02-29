@@ -29,4 +29,4 @@ If you use this package or derivatives of it, please cite
 Copyright Ian Czekala and contributors 2019-20
 
 Version : 
-0.0.5.dev2
+0.0.5.dev3

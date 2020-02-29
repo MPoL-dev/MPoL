@@ -28,16 +28,16 @@ class UVDataset(Dataset):
         self,
         uu=None,
         vv=None,
+        weights=None,
         data_re=None,
         data_im=None,
-        weights=None,
         cell_size=None,
         npix=None,
         device=None,
         **kwargs
     ):
 
-        # assert that all vectors are 1D and the same length
+        # assert that all vectors are the same shape
         shape = uu.shape
         for a in [vv, weights, data_re, data_im]:
             assert a.shape == shape, "All dataset inputs must be the same shape."
@@ -70,6 +70,7 @@ class UVDataset(Dataset):
                 npix=self.npix,
             )
 
+            
             # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
             self.uu = torch.tensor(uu_grid, device=device)
             self.vv = torch.tensor(vv_grid, device=device)
@@ -78,6 +79,7 @@ class UVDataset(Dataset):
             self.re = torch.tensor(g_re, device=device)
             self.im = torch.tensor(g_im, device=device)
             self.gridded = True
+
 
         else:
             self.gridded = False
