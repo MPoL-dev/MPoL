@@ -49,9 +49,14 @@ class UVDataset(Dataset):
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
+        assert np.all(weights > 0.0), "Not all thermal weights are positive, check inputs."
+
         if cell_size is not None and npix is not None:
             self.cell_size = cell_size * arcsec  # [radians]
             self.npix = npix
+
+            assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
+            assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
 
             (
                 uu_grid,

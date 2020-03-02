@@ -192,7 +192,7 @@ def loss_fn_UV_sparsity(vis, qs, q_max):
     return loss
 
 
-def loss_PSD(qs_2D, psd, l):
+def loss_fn_PSD(qs_2D, psd, l):
     r"""
     Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
 
