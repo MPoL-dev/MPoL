@@ -63,15 +63,15 @@ class ImageCube(nn.Module):
         # this is contrary to the way astronomers normally plot images, but
         # is correct for what the FFT expects
         if cube is None:
-            self._cube = nn.Parameter(
-                torch.zeros(
-                    self.nchan,
+            self._log_cube = nn.Parameter(torch.full(
+                    (self.nchan,
                     self.npix,
-                    self.npix,
+                    self.npix),
+                    fill_value= -3.0,
                     requires_grad=True,
                     dtype=torch.double,
-                )
-            )
+                ))
+     
         else:
             # we expect the user to supply an image cube as it looks on the sky
             # with East pointing to the left. Therefore we will need to
@@ -80,7 +80,7 @@ class ImageCube(nn.Module):
             # North (m) should already be increasing with array index
             flipped = torch.flip(cube, (2,))
             shifted = mpol.utils.fftshift(flipped, axes=(1, 2))
-            self._cube = nn.Parameter(shifted)
+            self._log_cube = nn.Parameter(torch.log(shifted))
 
         # calculate the image axes corresponding to the shifted _cube
         # the native _cube is stored as an FFT-shifted version of
@@ -219,6 +219,14 @@ class ImageCube(nn.Module):
             im = torch.transpose(torch.cat(ims, dim=1), 0, 1)
 
         return re, im
+
+    @property 
+    def _cube(self):
+        """
+        The shifted image cube.
+        """
+
+        return torch.exp(self._log_cube)
 
     @property
     def cube(self):
