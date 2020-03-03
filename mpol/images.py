@@ -187,13 +187,10 @@ class ImageCube(nn.Module):
             im = vis_im.masked_select(dataset.grid_mask)
 
         else:
-            assert torch.max(torch.abs(dataset.uu)) < mpol.utils.get_max_spatial_freq(self.cell_size/arcsec, self.npix), "Dataset contains uu spatial frequency measurements larger than those in the model image."
-            assert torch.max(torch.abs(dataset.vv)) < mpol.utils.get_max_spatial_freq(self.cell_size/arcsec, self.npix), "Dataset contains vv spatial frequency measurements larger than those in the model image."
-
             # re, im output will always be 2D (nchan, nvis)
-
             # test to see if the interpolation is pre-cached
             if not self.precached:
+                # this routine checks that the maxbaseline is contained within the grid.
                 self.precache_interpolation(dataset)
 
             # TODO: does the corrfun broadcast correctly across the cube?

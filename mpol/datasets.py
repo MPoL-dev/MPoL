@@ -55,9 +55,6 @@ class UVDataset(Dataset):
             self.cell_size = cell_size * arcsec  # [radians]
             self.npix = npix
 
-            assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
-            assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
-
             (
                 uu_grid,
                 vv_grid,

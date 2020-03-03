@@ -6,6 +6,7 @@ import numpy as np
 from scipy.sparse import lil_matrix
 from mpol.datasets import UVDataset
 from mpol.constants import *
+import mpol.utils
 
 
 def fftspace(width, N):
@@ -206,16 +207,20 @@ def calc_matrices(u_data, v_data, u_model, v_model):
 
     """
 
+    # calculate the stride needed to advance one v point in the flattened array = the length of the u row
+    vstride = len(u_model)
+    Npix = len(v_model)
+
+
     data_points = np.array([u_data, v_data]).T
-    # TODO: assert that the maximum baseline is contained within the model grid.
-    # TODO: assert that the image-plane pixels are small enough.
+    # assert that the maximum baseline is contained within the model grid, which is the same as saying 
+    # that the image-plane pixels are small enough.
+    assert np.max(np.abs(u_data)) < u_model[-4] # choose -4, because we'll need 3 pixels to do the interpolation
+    assert np.max(np.abs(v_data)) < v_model[Npix//2 - 4] # choose -4, because we'll need 3 pixels to do the interpolation
 
     # number of visibility points in the dataset
     N_vis = len(data_points)
 
-    # calculate the stride needed to advance one v point in the flattened array = the length of the u row
-    vstride = len(u_model)
-    Npix = len(v_model)
 
     # initialize two sparse lil matrices for the instantiation
     # convert to csc at the end
@@ -333,7 +338,7 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     return C_real.tocoo(), C_imag.tocoo()
 
 
-def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
+def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kwargs):
     """
     Rather than interpolating the complex model visibilities from these grid points to the non-uniform :math:`(u,v)` points, pre-average the data visibilities to the nearest grid point. This saves time by eliminating an interpolation operation after every new model evaluation, since the model visibilities correspond to the locations of the gridded visibilities.
 
@@ -345,9 +350,10 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
         im (list): the imaginary component of the visibilities (in [:math:`\mathrm{Jy}`])
         cell_size (float): the image cell size (in arcsec)
         npix (int): the number of pixels in each dimension of the square image
+        debug (bool): provide the full 2D grid output of the gridded reals, imaginaries, and weights. Default False. 
 
     Returns:
-        6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`.
+        6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`. If debug is true, return a 7-tuple which includes the number of visibilities per cell.
 
     An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. 
 
@@ -363,8 +369,13 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
 
     assert npix % 2 == 0, "Image must have an even number of pixels"
 
-    # calculate the grid spacings
+    assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
+    assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
 
+    assert np.all(weights > 0), "some weights are negative, check input args"
+
+
+    # calculate the grid spacings
     cell_size = cell_size * arcsec  # [radians]
     # cell_size is also the differential change in sky angles
     # dll = dmm = cell_size #[radians]
@@ -401,6 +412,18 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
         ],
         weights=weights,
     )
+
+    if debug:
+        nvis, v_edges, u_edges = np.histogram2d(
+        vv,
+        uu,
+        bins=[nv, nu],
+        range=[
+            (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
+            (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
+        ]
+    )
+    
 
     # calculate the weighted average and weighted variance for each cell
     # https://en.wikipedia.org/wiki/Weighted_arithmetic_mean
@@ -445,11 +468,21 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, **kwargs):
     # compare to these values
 
     # list of gridded visibilities
-    avg_weights = np.fft.fftshift(weight_cell, axes=0)[ind]
-    avg_re = np.fft.fftshift(weighted_mean_real, axes=0)[ind]
-    avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)[ind]
+    if debug:
+        avg_weights = np.fft.fftshift(weight_cell, axes=0)
+        avg_re = np.fft.fftshift(weighted_mean_real, axes=0)
+        avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)
+        nvis = np.fft.fftshift(nvis, axes=0)
 
-    return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im)
+        return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im, nvis)
+
+    else:
+        avg_weights = np.fft.fftshift(weight_cell, axes=0)[ind]
+        avg_re = np.fft.fftshift(weighted_mean_real, axes=0)[ind]
+        avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)[ind]
+
+        return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im)
+
 
 
 def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix, **kwargs):
