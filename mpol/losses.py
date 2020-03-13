@@ -192,7 +192,7 @@ def loss_fn_UV_sparsity(vis, qs, q_max):
     return loss
 
 
-def loss_fn_PSD(qs_2D, psd, l):
+def loss_fn_PSD(qs, psd, l):
     r"""
     Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
 
@@ -210,19 +210,26 @@ def loss_fn_PSD(qs_2D, psd, l):
 
 
     Args:
-        qs_2D (torch.double): the radial UV coordinate (in kilolambda)
+        qs (torch.double): the radial UV coordinate (in kilolambda)
         psd (torch.double): the power spectral density cube
-        l (torch.double): the  
+        l (torch.double): the correlation length in the image plane (in arcsec)
 
     Returns:
         torch.double : the loss calculated using the power spectral density
 
     """
 
-    # calculate the expected power spectral density
-    expected_PSD = 2 * np.pi * l ** 2 * torch.exp(-2 * np.pi ** 2 * l ** 2 * qs_2D ** 2)
+    nchan = psd.size()[0]
+    
+    # stack to the full 3D shape
+    qs = qs * 1e3 # lambda
 
-    # broadcast the penalty correctly across all channels
+    l_rad = l * arcsec # radians
+
+    # calculate the expected power spectral density
+    expected_PSD = 2 * np.pi * l_rad ** 2 * torch.exp(-2 * np.pi ** 2 * l_rad ** 2 * qs ** 2)
+
+    # evaluate the chi^2 for the PSD, making sure it broadcasts across all channels
     loss = torch.sum(psd / expected_PSD)
 
     return loss
