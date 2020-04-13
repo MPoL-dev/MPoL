@@ -5,7 +5,7 @@ from numpy.fft import fft2, ifft2, fftfreq, fftshift, ifftshift, rfftfreq
 from mpol.constants import *
 
 
-def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwargs):
+def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs):
     r"""
     "Grid" the data visibilities using robust weighting, then do the inverse FFT. This delivers a maximum likelihood "dirty image" when robust=-2, corresponding to the uniform image. For decent image quality, however, robust values of 0.5 or 1.0 are recommended.
 
@@ -29,6 +29,10 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
     assert npix % 2 == 0, "Image must have an even number of pixels"
     assert (robust >= -2) and (robust <= 2), "Robust parameter must be in the range [-2, 2]"
 
+    assert uu.ndim == 1, "Input arrays must be 1-dimensional"
+
+    assert np.all(np.array([len(arr) for arr in [vv, weight, re, im]]) == len(uu)), "Input arrays are not the same length."
+
     # calculate the grid spacings
     cell_size = cell_size * arcsec  # [radians]
     # cell_size is also the differential change in sky angles
@@ -47,7 +51,7 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
     # expand and overwrite the vectors to include complex conjugates
     uu = np.concatenate([uu, -uu])
     vv = np.concatenate([vv, -vv])
-    weights = np.concatenate([weights, weights])
+    weight = np.concatenate([weight, weight])
     re = np.concatenate([re, re])
     im = np.concatenate([im, -im])  # the complex conjugates
 
@@ -74,11 +78,11 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
             (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
             (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
         ],
-        weights=weights,
+        weights=weight,
     )
 
     # calculate the robust parameter f^2
-    f_sq = ((5 * 10 ** (-robust)) ** 2) / (np.sum(weight_cell**2) / np.sum(weights))
+    f_sq = ((5 * 10 ** (-robust)) ** 2) / (np.sum(weight_cell**2) / np.sum(weight))
 
     # the robust weight corresponding to the cell 
     cell_robust_weight = 1 / (1 + weight_cell * f_sq)
@@ -95,7 +99,7 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
     # now assign the cell robust weight to each visibility within that cell
     vis_robust_weight = cell_robust_weight[index_v, index_u]
 
-    vis_total_weight = weights * vis_robust_weight
+    vis_total_weight = weight * vis_robust_weight
 
     real_part, v_edges, u_edges = np.histogram2d(
         vv,
@@ -128,6 +132,23 @@ def get_dirty_image(uu, vv, weights, re, im, cell_size, npix, robust=-2, **kwarg
     VV = avg_re + avg_im * 1.0j
     VV /= np.sum(vis_total_weight)
 
-    im = np.fliplr(np.fft.fftshift(np.fft.irfftn(VV, axes=(0,1))))
+    dirty_image = np.fliplr(np.fft.fftshift(np.fft.irfftn(VV, axes=(0,1))))
 
-    return im
+    return dirty_image
+
+def get_dirty_cube(uus, vvs, weights, res, ims, cell_size, npix, robust=-2, **kwargs):
+    '''
+    Make a series of image cubes.
+    '''
+
+    assert uus.ndim == 2, "Arrays must be 2 dimensional"
+    assert vvs.ndim == 2, "Arrays must be 2 dimensional"
+
+    nchan = len(uus)
+
+    dirty_images = np.empty((nchan, npix, npix))
+
+    for i in range(nchan):
+        dirty_images[i, :, :] = get_dirty_image(uus[i], vvs[i], weights[i], res[i], ims[i], cell_size, npix, robust=robust, **kwargs)
+
+    return dirty_images

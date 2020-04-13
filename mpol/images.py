@@ -299,13 +299,14 @@ class ImageCube(nn.Module):
 
         return [left, right, bottom, top]
 
-    def to_FITS(self, fname="cube.fits", overwrite=False, **kwargs):
+    def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
-        Export the image cube to a FITS file. Any extra keyword arguments will be written to the FITS header.
+        Export the image cube to a FITS file. 
 
         Args:
             fname (str): the name of the FITS file to export to.
             overwrite (bool): if the file already exists, overwrite?
+            header_kwargs (dict): Extra keyword arguments to write to the FITS header.
 
         Returns:
             None
@@ -330,8 +331,8 @@ class ImageCube(nn.Module):
         header = w.to_header()
 
         # add in the kwargs to the header
-        if kwargs is not None:
-            for k, v in kwargs.items():
+        if header_kwargs is not None:
+            for k, v in header_kwargs.items():
                 header[k] = v
 
         hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy(), header=header)
