@@ -27,11 +27,15 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
     """
 
     assert npix % 2 == 0, "Image must have an even number of pixels"
-    assert (robust >= -2) and (robust <= 2), "Robust parameter must be in the range [-2, 2]"
+    assert (robust >= -2) and (
+        robust <= 2
+    ), "Robust parameter must be in the range [-2, 2]"
 
     assert uu.ndim == 1, "Input arrays must be 1-dimensional"
 
-    assert np.all(np.array([len(arr) for arr in [vv, weight, re, im]]) == len(uu)), "Input arrays are not the same length."
+    assert np.all(
+        np.array([len(arr) for arr in [vv, weight, re, im]]) == len(uu)
+    ), "Input arrays are not the same length."
 
     # calculate the grid spacings
     cell_size = cell_size * arcsec  # [radians]
@@ -82,12 +86,12 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
     )
 
     # calculate the robust parameter f^2
-    f_sq = ((5 * 10 ** (-robust)) ** 2) / (np.sum(weight_cell**2) / np.sum(weight))
+    f_sq = ((5 * 10 ** (-robust)) ** 2) / (np.sum(weight_cell ** 2) / np.sum(weight))
 
-    # the robust weight corresponding to the cell 
+    # the robust weight corresponding to the cell
     cell_robust_weight = 1 / (1 + weight_cell * f_sq)
 
-    # zero out cells that have no visibilities 
+    # zero out cells that have no visibilities
     cell_robust_weight[weight_cell <= 0.0] = 0
 
     # figure out which cell each visibility lands in, so that
@@ -123,7 +127,6 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
         weights=im * vis_total_weight,
     )
 
-    
     # gridded visibilities
     avg_re = np.fft.fftshift(real_part, axes=0)
     avg_im = np.fft.fftshift(imag_part, axes=0)
@@ -132,14 +135,20 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
     VV = avg_re + avg_im * 1.0j
     VV /= np.sum(vis_total_weight)
 
-    dirty_image = np.fliplr(np.fft.fftshift(np.fft.irfftn(VV, axes=(0,1))))
+    # what are the units here? Per steradian^2?
+
+    # dirty_image = np.fliplr(np.fft.fftshift(np.fft.irfftn(VV, axes=(0, 1))))
+    dirty_image = np.fliplr(np.fft.fftshift(np.fft.irfftn(VV, axes=(0, 1)))) / (
+        arcsec ** 2
+    )
 
     return dirty_image
 
+
 def get_dirty_cube(uus, vvs, weights, res, ims, cell_size, npix, robust=-2, **kwargs):
-    '''
+    """
     Make a series of image cubes.
-    '''
+    """
 
     assert uus.ndim == 2, "Arrays must be 2 dimensional"
     assert vvs.ndim == 2, "Arrays must be 2 dimensional"
@@ -149,6 +158,16 @@ def get_dirty_cube(uus, vvs, weights, res, ims, cell_size, npix, robust=-2, **kw
     dirty_images = np.empty((nchan, npix, npix))
 
     for i in range(nchan):
-        dirty_images[i, :, :] = get_dirty_image(uus[i], vvs[i], weights[i], res[i], ims[i], cell_size, npix, robust=robust, **kwargs)
+        dirty_images[i, :, :] = get_dirty_image(
+            uus[i],
+            vvs[i],
+            weights[i],
+            res[i],
+            ims[i],
+            cell_size,
+            npix,
+            robust=robust,
+            **kwargs
+        )
 
     return dirty_images
