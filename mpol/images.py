@@ -63,15 +63,15 @@ class ImageCube(nn.Module):
         # this is contrary to the way astronomers normally plot images, but
         # is correct for what the FFT expects
         if cube is None:
-            self._log_cube = nn.Parameter(torch.full(
-                    (self.nchan,
-                    self.npix,
-                    self.npix),
-                    fill_value= -3.0,
+            self._log_cube = nn.Parameter(
+                torch.full(
+                    (self.nchan, self.npix, self.npix),
+                    fill_value=-3.0,
                     requires_grad=True,
                     dtype=torch.double,
-                ))
-     
+                )
+            )
+
         else:
             # we expect the user to supply an image cube as it looks on the sky
             # with East pointing to the left. Therefore we will need to
@@ -172,8 +172,13 @@ class ImageCube(nn.Module):
                 dataset.cell_size == self.cell_size
             ), "Pre-gridded cell_size is different than model cell_size."
 
-            # convert the image to Jy/ster
-            # and perform the RFFT
+            # convert the image to Jy/ster and perform the RFFT
+            # the self.cell_size prefactor (in radians) is to obtain the correct output units
+            # since it needs to correct for the spacing of the input grid.
+            # See MPoL documentation and/or TMS Eqn A8.18 for more information.
+            # Alternatively we could send the rfft routine _cube in its native Jy/arcsec^2
+            # and then multiply the result by cell_size (in units of arcsec).
+            # It seemed easiest to do it this way where we keep things in radians.
             self._vis = self.cell_size ** 2 * torch.rfft(
                 self._cube / arcsec ** 2, signal_ndim=2
             )
@@ -220,7 +225,7 @@ class ImageCube(nn.Module):
 
         return re, im
 
-    @property 
+    @property
     def _cube(self):
         """
         The shifted image cube.
@@ -341,4 +346,3 @@ class ImageCube(nn.Module):
         hdul.writeto(fname, overwrite=overwrite)
 
         hdul.close()
-
