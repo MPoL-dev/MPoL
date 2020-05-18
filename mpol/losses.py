@@ -12,7 +12,7 @@ from mpol.constants import *
 
 def loss_fn(model_vis, data_vis):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all quantities have the same shape.
+    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum.
 
     Args:
         model_vis: 2-tuple of (real, imaginary) values of the model
@@ -23,16 +23,22 @@ def loss_fn(model_vis, data_vis):
 
     .. math::
 
-        L = \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2
+        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
 
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
     """
+    nvis = data_vis.size()[0]
     model_re, model_im = model_vis
     data_re, data_im, data_weights = data_vis
 
-    return torch.sum(data_weights * (data_re - model_re) ** 2) + torch.sum(
-        data_weights * (data_im - model_im) ** 2
+    return (
+        1
+        / (2 * nvis)
+        * (
+            torch.sum(data_weights * (data_re - model_re) ** 2)
+            + torch.sum(data_weights * (data_im - model_im) ** 2)
+        )
     )
 
 
