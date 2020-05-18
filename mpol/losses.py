@@ -38,8 +38,7 @@ def loss_fn(model_vis, data_vis):
 
 def loss_fn_entropy(cube, prior_intensity):
     r"""
-    Calculate the entropy loss of a set of pixels. Following the entropy definition in `Carcamo et al. 2018 <https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract>`_.
-
+    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_. 
 
     Args:
         cube (any tensor): pixel values must be positive :math:`I_i > 0` for all :math:`i`
@@ -52,15 +51,15 @@ def loss_fn_entropy(cube, prior_intensity):
 
     .. math::
 
-        L = \sum_i \frac{I_i}{p_i}\; \ln \frac{I_i}{p_i}
+        L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}
 
     """
     # check to make sure image is positive, otherwise raise an error
     assert (cube >= 0.0).all(), "image cube contained negative pixel values"
     assert prior_intensity > 0, "image prior intensity must be positive"
 
-    norm = cube / prior_intensity
-    return torch.sum(norm * torch.log(norm))
+    tot = torch.sum(cube)
+    return (1 / tot) * torch.sum(cube * torch.log(cube / prior_intensity))
 
 
 def loss_fn_TV_image(cube, epsilon=1e-10):
@@ -220,17 +219,18 @@ def loss_fn_PSD(qs, psd, l):
     """
 
     nchan = psd.size()[0]
-    
-    # stack to the full 3D shape
-    qs = qs * 1e3 # lambda
 
-    l_rad = l * arcsec # radians
+    # stack to the full 3D shape
+    qs = qs * 1e3  # lambda
+
+    l_rad = l * arcsec  # radians
 
     # calculate the expected power spectral density
-    expected_PSD = 2 * np.pi * l_rad ** 2 * torch.exp(-2 * np.pi ** 2 * l_rad ** 2 * qs ** 2)
+    expected_PSD = (
+        2 * np.pi * l_rad ** 2 * torch.exp(-2 * np.pi ** 2 * l_rad ** 2 * qs ** 2)
+    )
 
     # evaluate the chi^2 for the PSD, making sure it broadcasts across all channels
     loss = torch.sum(psd / expected_PSD)
 
     return loss
-
