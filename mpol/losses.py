@@ -28,9 +28,9 @@ def loss_fn(model_vis, data_vis):
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
     """
-    nvis = data_vis.size()[0]
     model_re, model_im = model_vis
     data_re, data_im, data_weights = data_vis
+    nvis = data_re.size()[0]
 
     return (
         1
