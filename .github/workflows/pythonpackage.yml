@@ -19,8 +19,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --upgrade pip
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -30,10 +29,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Install package 
       run: |
-        python setup.py install
+        pip install .
     - name: Test with pytest
       run: |
-        pip install pytest matplotlib
+        pip install .[test]
         pytest
     
   build-and-deploy:
@@ -46,8 +45,7 @@ jobs:
         python-version: 3.7
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --upgrade pip
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -57,14 +55,13 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Install package 
       run: |
-        python setup.py install
+        pip install .
     - name: Test with pytest
       run: |
-        pip install pytest matplotlib
+        pip install .[test]
         pytest
     - name: Install pep517
       run: >-
-        python -m
         pip install
         pep517
         --user

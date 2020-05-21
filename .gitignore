@@ -112,3 +112,6 @@ docs/.DS_Store
 
 # images from tests 
 test/*.png
+
+# virtual environment
+venv/

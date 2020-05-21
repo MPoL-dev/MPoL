@@ -1,13 +1,26 @@
 import setuptools
+import os.path
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-# it's not that mpol is installed at this point, just that 
-# it's in the current working directory and we can actually
-# import just the __init__.py file, which contains __version__
-import mpol
-version=mpol.__version__
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, rel_path), "r") as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
+
+version = get_version("src/mpol/__init__.py")
 
 
 setuptools.setup(
@@ -20,7 +33,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
     install_requires=["numpy", "scipy", "torch", "torchvision"],
-    packages=setuptools.find_packages(),
+    extras_require={"test": ["pytest", "matplotlib"]},
+    packages=setuptools.find_packages("src"),
+    package_dir={"": "src"},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
