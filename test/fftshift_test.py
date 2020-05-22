@@ -4,7 +4,7 @@ import mpol.utils
 import matplotlib.pyplot as plt
 
 
-def test_mpol_fftshift():
+def test_mpol_fftshift(tmp_path):
 
     # create a fake image
     xx, yy = np.mgrid[0:20, 0:20]
@@ -23,7 +23,7 @@ def test_mpol_fftshift():
     ax[0].imshow(shifted_numpy, origin="upper")
     ax[1].imshow(shifted_torch.detach().numpy(), origin="upper")
     ax[2].imshow(shifted_numpy - shifted_torch.detach().numpy(), origin="upper")
-    fig.savefig("test/fftshift.png")
+    fig.savefig(tmp_path / "fftshift.png")
 
     assert np.allclose(
         shifted_numpy, shifted_torch.detach().numpy()

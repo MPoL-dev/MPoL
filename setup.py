@@ -23,6 +23,11 @@ def get_version(rel_path):
 version = get_version("src/mpol/__init__.py")
 
 
+EXTRA_REQUIRES = {"test":["pytest", "matplotlib"], "docs":["sphinx>=2.3.0", "numpy", "sphinx_rtd_theme"]}
+
+EXTRA_REQUIRES["dev"] = EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black"]
+
+
 setuptools.setup(
     name="MPoL",
     version=version,
@@ -33,7 +38,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
     install_requires=["numpy", "scipy", "torch", "torchvision"],
-    extras_require={"test": ["pytest", "matplotlib"]},
+    extras_require=EXTRA_REQUIRES,
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
     classifiers=[
