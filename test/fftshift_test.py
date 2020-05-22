@@ -23,7 +23,7 @@ def test_mpol_fftshift(tmp_path):
     ax[0].imshow(shifted_numpy, origin="upper")
     ax[1].imshow(shifted_torch.detach().numpy(), origin="upper")
     ax[2].imshow(shifted_numpy - shifted_torch.detach().numpy(), origin="upper")
-    fig.savefig(tmp_path / "fftshift.png")
+    fig.savefig(str(tmp_path / "fftshift.png"))
 
     assert np.allclose(
         shifted_numpy, shifted_torch.detach().numpy()

@@ -128,7 +128,7 @@ def test_plot_input(image_dict, tmp_path):
     ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
     ax.set_ylabel(r"$\Delta \delta$")
     ax.set_title("Input image")
-    fig.savefig(tmp_path / "input.png", dpi=300)
+    fig.savefig(str(tmp_path / "input.png"), dpi=300)
 
 
 def test_fill_corrfun_matrix(corrfun_mat, tmp_path):
@@ -139,7 +139,7 @@ def test_fill_corrfun_matrix(corrfun_mat, tmp_path):
     ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
     ax.set_ylabel(r"$\Delta \delta$")
     ax.set_title("Correction function")
-    fig.savefig(tmp_path / "corrfun.png", dpi=300)
+    fig.savefig(str(tmp_path / "corrfun.png"), dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -192,7 +192,7 @@ def test_plot_full_analytical(tmp_path, vis_dict, vis_analytical_full):
     ax[1].imshow(
         np.imag(np.fft.fftshift(vis_analytical_full)), origin="upper", extent=ext_full
     )
-    fig.savefig(tmp_path / "analytical_full.png", dpi=300)
+    fig.savefig(str(tmp_path / "analytical_full.png"), dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -270,7 +270,7 @@ def test_compare_analytical_numerical(
     )
     plt.colorbar(im_imag, ax=ax[1, 2])
 
-    fig.savefig(tmp_path / "comparison.png", dpi=300, wspace=0.05)
+    fig.savefig(str(tmp_path / "comparison.png"), dpi=300, wspace=0.05)
 
 
 @pytest.fixture(scope="module")
@@ -323,7 +323,7 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
         vmax=vvmax,
     )
     # ax[1].spy(C_real[:, 0:300], marker=".", precision="present", aspect="auto")
-    fig.savefig(tmp_path / "C_real.png", dpi=300)
+    fig.savefig(str(tmp_path / "C_real.png"), dpi=300)
 
     # fig, ax = plt.subplots(ncols=1, figsize=(12,3))
     # vvmax = np.max(np.abs(C_imag[:,0:300]))
@@ -360,4 +360,4 @@ def test_plot_interpolate_points(tmp_path, analytic_samples, interpolated_points
     ax[3].plot(interp_imag - np.imag(analytic_samples), ".")
     ax[3].set_ylabel("imag diff")
     fig.subplots_adjust(hspace=0.4, left=0.2)
-    fig.savefig(tmp_path / "real_comp.png", dpi=300)
+    fig.savefig(str(tmp_path / "real_comp.png"), dpi=300)
