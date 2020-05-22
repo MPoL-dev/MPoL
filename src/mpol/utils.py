@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from mpol.constants import *
+from .constants import *
 
 
 def get_Jy_arcsec2(T_b, nu=230e9):
@@ -47,8 +47,9 @@ def fftshift(x, axes=None):
         x = torch.roll(x, x.size(dim) // 2, dims=dim)
     return x
 
+
 def get_max_spatial_freq(cell_size, npix):
-    '''
+    """
     Calculate the maximum spatial frequency contained in the image.
 
     Args:
@@ -57,11 +58,10 @@ def get_max_spatial_freq(cell_size, npix):
 
     Returns:
         max_freq : the maximum spatial frequency contained in the image (in kilolambda)
-    '''
+    """
 
-    # technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized 
+    # technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized
     # arrays, the highest positive spatial frequency is (npix/2 - 1) / (npix * cell_size)
     # it is the most negative spatial frequency that goes to - 1/(2 * cell_size)
 
-    return (npix/2 - 1) / (npix * cell_size * arcsec) * 1e-3 # kilolambda
-
+    return (npix / 2 - 1) / (npix * cell_size * arcsec) * 1e-3  # kilolambda

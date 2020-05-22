@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-import mpol
-from mpol.constants import *
+from . import gridding
+from .constants import *
 
 # custom dataset loader
 class UVDataset(Dataset):
@@ -49,7 +49,9 @@ class UVDataset(Dataset):
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
-        assert np.all(weights > 0.0), "Not all thermal weights are positive, check inputs."
+        assert np.all(
+            weights > 0.0
+        ), "Not all thermal weights are positive, check inputs."
 
         if cell_size is not None and npix is not None:
             self.cell_size = cell_size * arcsec  # [radians]
@@ -62,7 +64,7 @@ class UVDataset(Dataset):
                 g_weights,
                 g_re,
                 g_im,
-            ) = mpol.gridding.grid_dataset(
+            ) = gridding.grid_dataset(
                 uu,
                 vv,
                 weights,
@@ -72,7 +74,6 @@ class UVDataset(Dataset):
                 npix=self.npix,
             )
 
-            
             # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
             self.uu = torch.tensor(uu_grid, device=device)
             self.vv = torch.tensor(vv_grid, device=device)
@@ -81,7 +82,6 @@ class UVDataset(Dataset):
             self.re = torch.tensor(g_re, device=device)
             self.im = torch.tensor(g_im, device=device)
             self.gridded = True
-
 
         else:
             self.gridded = False

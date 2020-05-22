@@ -1,8 +1,7 @@
-import matplotlib.pylab as plt
 import numpy as np
 import numpy.linalg as linalg
 from numpy.fft import fft2, ifft2, fftfreq, fftshift, ifftshift, rfftfreq
-from mpol.constants import *
+from .constants import *
 
 
 def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs):

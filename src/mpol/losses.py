@@ -7,7 +7,7 @@ If you don't see a loss function you need, it's easy to write your own directly 
 import numpy as np
 import torch
 
-from mpol.constants import *
+from .constants import *
 
 
 def loss_fn(model_vis, data_vis):

@@ -6,9 +6,9 @@ import numpy as np
 import torch
 from torch import nn
 
-from mpol import gridding
-from mpol.constants import *
-import mpol.utils
+from . import gridding
+from .constants import *
+from . import utils
 
 
 class ImageCube(nn.Module):

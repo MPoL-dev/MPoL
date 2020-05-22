@@ -4,9 +4,9 @@ The gridding module contains routines to manipulate visibility data between unif
 
 import numpy as np
 from scipy.sparse import lil_matrix
-from mpol.datasets import UVDataset
-from mpol.constants import *
-import mpol.utils
+from .datasets import UVDataset
+from .constants import *
+from . import utils
 
 
 def fftspace(width, N):
@@ -211,16 +211,18 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     vstride = len(u_model)
     Npix = len(v_model)
 
-
     data_points = np.array([u_data, v_data]).T
-    # assert that the maximum baseline is contained within the model grid, which is the same as saying 
+    # assert that the maximum baseline is contained within the model grid, which is the same as saying
     # that the image-plane pixels are small enough.
-    assert np.max(np.abs(u_data)) < u_model[-4] # choose -4, because we'll need 3 pixels to do the interpolation
-    assert np.max(np.abs(v_data)) < v_model[Npix//2 - 4] # choose -4, because we'll need 3 pixels to do the interpolation
+    assert (
+        np.max(np.abs(u_data)) < u_model[-4]
+    )  # choose -4, because we'll need 3 pixels to do the interpolation
+    assert (
+        np.max(np.abs(v_data)) < v_model[Npix // 2 - 4]
+    )  # choose -4, because we'll need 3 pixels to do the interpolation
 
     # number of visibility points in the dataset
     N_vis = len(data_points)
-
 
     # initialize two sparse lil matrices for the instantiation
     # convert to csc at the end
@@ -369,11 +371,14 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
 
     assert npix % 2 == 0, "Image must have an even number of pixels"
 
-    assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
-    assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(cell_size, npix), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
+    assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(
+        cell_size, npix
+    ), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
+    assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(
+        cell_size, npix
+    ), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
 
     assert np.all(weights > 0), "some weights are negative, check input args"
-
 
     # calculate the grid spacings
     cell_size = cell_size * arcsec  # [radians]
@@ -415,15 +420,14 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
 
     if debug:
         nvis, v_edges, u_edges = np.histogram2d(
-        vv,
-        uu,
-        bins=[nv, nu],
-        range=[
-            (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
-            (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
-        ]
-    )
-    
+            vv,
+            uu,
+            bins=[nv, nu],
+            range=[
+                (np.min(vv_grid) - dv / 2, np.max(vv_grid) + dv / 2),
+                (np.min(uu_grid) - du / 2, np.max(uu_grid) + du / 2),
+            ],
+        )
 
     # calculate the weighted average and weighted variance for each cell
     # https://en.wikipedia.org/wiki/Weighted_arithmetic_mean
@@ -482,7 +486,6 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
         avg_im = np.fft.fftshift(weighted_mean_imag, axes=0)[ind]
 
         return (uu_grid, vv_grid, ind, avg_weights, avg_re, avg_im)
-
 
 
 def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix, **kwargs):
