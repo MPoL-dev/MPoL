@@ -79,7 +79,7 @@ class ImageCube(nn.Module):
             # so that the native cube has East (l) increasing with array index
             # North (m) should already be increasing with array index
             flipped = torch.flip(cube, (2,))
-            shifted = mpol.utils.fftshift(flipped, axes=(1, 2))
+            shifted = utils.fftshift(flipped, axes=(1, 2))
             self._log_cube = nn.Parameter(torch.log(shifted))
 
         # calculate the image axes corresponding to the shifted _cube
@@ -243,7 +243,7 @@ class ImageCube(nn.Module):
             
         """
         # fftshift the image cube to the correct quadrants
-        shifted = mpol.utils.fftshift(self._cube, axes=(1, 2))
+        shifted = utils.fftshift(self._cube, axes=(1, 2))
         # flip so that east points left
         flipped = torch.flip(shifted, (2,))
         return flipped
@@ -270,7 +270,7 @@ class ImageCube(nn.Module):
             torch.double: visibility cube
         """
 
-        return mpol.utils.fftshift(self._vis, axes=(1,))
+        return utils.fftshift(self._vis, axes=(1,))
 
     @property
     def psd(self):

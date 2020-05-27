@@ -4,7 +4,6 @@ The gridding module contains routines to manipulate visibility data between unif
 
 import numpy as np
 from scipy.sparse import lil_matrix
-from .datasets import UVDataset
 from .constants import *
 from . import utils
 
@@ -371,10 +370,10 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
 
     assert npix % 2 == 0, "Image must have an even number of pixels"
 
-    assert np.max(np.abs(uu)) < mpol.utils.get_max_spatial_freq(
+    assert np.max(np.abs(uu)) < utils.get_max_spatial_freq(
         cell_size, npix
     ), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image."
-    assert np.max(np.abs(vv)) < mpol.utils.get_max_spatial_freq(
+    assert np.max(np.abs(vv)) < utils.get_max_spatial_freq(
         cell_size, npix
     ), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image."
 
