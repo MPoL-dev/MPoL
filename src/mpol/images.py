@@ -57,16 +57,21 @@ class ImageCube(nn.Module):
         self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0)
         self.qs_2D = np.fft.fftshift(self._qs_2D, axes=0)
 
+        if "beta" in kwargs:
+            self.pixel_mapping = torch.nn.Softplus(kwargs["beta"])
+        else:
+            self.pixel_mapping = torch.nn.Softplus()
+
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
         # and with East pointing right (i.e., RA increasing to the right)
         # this is contrary to the way astronomers normally plot images, but
         # is correct for what the FFT expects
         if cube is None:
-            self._log_cube = nn.Parameter(
+            self._base_cube = nn.Parameter(
                 torch.full(
                     (self.nchan, self.npix, self.npix),
-                    fill_value=-3.0,
+                    fill_value=0.05,
                     requires_grad=True,
                     dtype=torch.double,
                 )
@@ -80,7 +85,12 @@ class ImageCube(nn.Module):
             # North (m) should already be increasing with array index
             flipped = torch.flip(cube, (2,))
             shifted = utils.fftshift(flipped, axes=(1, 2))
-            self._log_cube = nn.Parameter(torch.log(shifted))
+            import warnings
+
+            warnings.warn(
+                "Inverse of pixel mapping not yet implemented. Assigning cube to base_cube as is."
+            )
+            self._base_cube = nn.Parameter(shifted)
 
         # calculate the image axes corresponding to the shifted _cube
         # the native _cube is stored as an FFT-shifted version of
@@ -231,7 +241,7 @@ class ImageCube(nn.Module):
         The shifted image cube.
         """
 
-        return torch.exp(self._log_cube)
+        return self.pixel_mapping(self._base_cube)
 
     @property
     def cube(self):
