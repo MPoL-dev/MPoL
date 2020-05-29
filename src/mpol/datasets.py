@@ -49,6 +49,8 @@ class UVDataset(Dataset):
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
+        self.nchan = shape[0]
+
         assert np.all(
             weights > 0.0
         ), "Not all thermal weights are positive, check inputs."
