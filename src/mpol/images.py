@@ -24,9 +24,18 @@ class ImageCube(nn.Module):
         nchan (int): the number of channels in the image
         cell_size (float): the width of a pixel [arcseconds]
         cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`.
     """
 
-    def __init__(self, npix=None, nchan=None, cell_size=None, cube=None, **kwargs):
+    def __init__(
+        self,
+        npix=None,
+        nchan=None,
+        cell_size=None,
+        cube=None,
+        pixel_mapping=None,
+        **kwargs
+    ):
 
         super().__init__()
         assert npix % 2 == 0, "npix must be even (for now)"
@@ -57,10 +66,11 @@ class ImageCube(nn.Module):
         self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0)
         self.qs_2D = np.fft.fftshift(self._qs_2D, axes=0)
 
-        if "beta" in kwargs:
-            self.pixel_mapping = torch.nn.Softplus(kwargs["beta"])
-        else:
+        if pixel_mapping is None:
             self.pixel_mapping = torch.nn.Softplus()
+        else:
+            # TODO assert that this is a PyTorch function
+            self.pixel_mapping = pixel_mapping
 
         # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
         # packed in the fftshifted format to make the Fourier transformation easier
