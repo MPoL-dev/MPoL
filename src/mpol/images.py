@@ -1,6 +1,4 @@
-"""
-The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.
-"""
+"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
 
 import numpy as np
 import torch
@@ -12,6 +10,7 @@ from . import utils
 
 
 class ImageCube(nn.Module):
+
     r"""
     A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.
 

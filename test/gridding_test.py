@@ -32,7 +32,6 @@ def sky_plane(
     Returns:
         Gaussian evaluated at input args
     """
-
     return a * np.exp(
         -(
             (alpha - delta_alpha) ** 2 / (2 * sigma_alpha ** 2)
@@ -334,9 +333,9 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
 def test_interpolate_points(vis_dict, interpolation_matrices):
     vis = vis_dict["vis"]
     C_real, C_imag = interpolation_matrices
-    # interpolated points
-    interp_real = C_real.dot(np.real(vis.flatten()))
-    interp_imag = C_imag.dot(np.imag(vis.flatten()))
+    # get interpolated points (TODO: check that they are correct...)
+    C_real.dot(np.real(vis.flatten()))
+    C_imag.dot(np.imag(vis.flatten()))
 
 
 @pytest.fixture(scope="module")

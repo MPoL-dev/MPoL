@@ -12,7 +12,10 @@ from .constants import *
 
 def loss_fn(model_vis, data_vis):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum.
+    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all 
+    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply 
+    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real 
+    and imaginaries in the :math:`\chi^2` sum.
 
     Args:
         model_vis: 2-tuple of (real, imaginary) values of the model
@@ -58,7 +61,6 @@ def loss_fn_entropy(cube, prior_intensity):
     .. math::
 
         L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}
-
     """
     # check to make sure image is positive, otherwise raise an error
     assert (cube >= 0.0).all(), "image cube contained negative pixel values"
@@ -178,7 +180,6 @@ def loss_fn_UV_sparsity(vis, qs, q_max):
 
     Returns:
         torch.double: UV sparsity loss above :math:`q_\mathrm{max}`
-
     """
 
     # make a mask, then send it to the device (in case we're using a GPU)
@@ -223,8 +224,6 @@ def loss_fn_PSD(qs, psd, l):
         torch.double : the loss calculated using the power spectral density
 
     """
-
-    nchan = psd.size()[0]
 
     # stack to the full 3D shape
     qs = qs * 1e3  # lambda

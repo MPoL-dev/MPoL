@@ -6,10 +6,9 @@
 
 A Million Points of Light are needed to synthesize image cubes from interferometers.
 
-Documentation and installation instructions: https://mpol.readthedocs.io/
+Documentation and installation instructions: [https://mpol.readthedocs.io/](https://mpol.readthedocs.io/)
 
-
-# Citation 
+## Citation 
 
 If you use this package or derivatives of it, please cite
 

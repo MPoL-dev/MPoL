@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 from .constants import *
@@ -15,7 +14,6 @@ def get_Jy_arcsec2(T_b, nu=230e9):
     Returns:
         float: specific intensity (in [:math:`\mathrm{Jy}\, \mathrm{arcsec}^2]`)
     """
-
     # brightness temperature assuming RJ limit
     # units of ergs/s/cm^2/Hz/ster
     I_nu = T_b * 2 * nu ** 2 * kB / cc ** 2

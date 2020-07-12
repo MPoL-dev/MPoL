@@ -1,6 +1,5 @@
 import numpy as np
-import numpy.linalg as linalg
-from numpy.fft import fft2, ifft2, fftfreq, fftshift, ifftshift, rfftfreq
+from numpy.fft import ifft2, fftfreq, fftshift, ifftshift, rfftfreq
 from .constants import *
 
 
@@ -22,9 +21,7 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
         An image packed with the mm values increasing with row index and ll values decreasing with column index. If the image is plotted with `imshow` and `origin="lower"` it will display correctly.
         
     An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. 
-
     """
-
     assert npix % 2 == 0, "Image must have an even number of pixels"
     assert (robust >= -2) and (
         robust <= 2
@@ -145,9 +142,7 @@ def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs
 
 
 def get_dirty_cube(uus, vvs, weights, res, ims, cell_size, npix, robust=-2, **kwargs):
-    """
-    Make a series of image cubes.
-    """
+    """Make a series of image cubes."""
 
     assert uus.ndim == 2, "Arrays must be 2 dimensional"
     assert vvs.ndim == 2, "Arrays must be 2 dimensional"

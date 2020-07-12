@@ -1,5 +1,6 @@
 r"""
-The gridding module contains routines to manipulate visibility data between uniform and non-uniform samples in the :math:`(u,v)` plane. You probably wont need to use these routines in the normal workflow of MPoL, but they are documented here for reference.
+The gridding module contains routines to manipulate visibility data between uniform and non-uniform samples in the :math:`(u,v)` plane.
+You probably wont need to use these routines in the normal workflow of MPoL, but they are documented here for reference.
 """
 
 import numpy as np
@@ -9,7 +10,7 @@ from . import utils
 
 
 def fftspace(width, N):
-    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.` 
+    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
     
     Args:
         width (float): the width of the array
@@ -19,7 +20,6 @@ def fftspace(width, N):
         numpy.float64 1D array: the fftspace array
     
     """
-
     assert N % 2 == 0, "N must be even."
 
     dx = width * 2.0 / N
@@ -116,8 +116,8 @@ def corrfun_mat(alphas, deltas):
     Calculate the image correction function over deminsionalities corresponding to the image. Apply to the image using a a multiply operation. The input coordinates must be fftshifted the same way as the image.
 
     Args:
-        alphas (1D array): RA list 
-        deltas (1D array): DEC list 
+        alphas (1D array): RA list
+        deltas (1D array): DEC list
 
     Returns:
         2D array: correction function matrix evaluated over alphas and deltas
@@ -203,7 +203,6 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     and that the `v_model` array is like the output from `np.fft.fftfreq <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftfreq.html>`_ ::
 
         f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
-
     """
 
     # calculate the stride needed to advance one v point in the flattened array = the length of the u row
@@ -351,7 +350,7 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
         im (list): the imaginary component of the visibilities (in [:math:`\mathrm{Jy}`])
         cell_size (float): the image cell size (in arcsec)
         npix (int): the number of pixels in each dimension of the square image
-        debug (bool): provide the full 2D grid output of the gridded reals, imaginaries, and weights. Default False. 
+        debug (bool): provide the full 2D grid output of the gridded reals, imaginaries, and weights. Default False.
 
     Returns:
         6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`. If debug is true, return a 7-tuple which includes the number of visibilities per cell.
@@ -367,7 +366,6 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
     
     If (2) is violated, then it's not a good idea to procede with this faster routine. Instead, revisit the calibration of your dataset, or build in self-calibration adjustments based upon antenna and time metadata of the visibilities. One downside of the pre-gridding operation is that it eliminates the possibility of using self-calibration type loss functions.
     """
-
     assert npix % 2 == 0, "Image must have an even number of pixels"
 
     assert np.max(np.abs(uu)) < utils.get_max_spatial_freq(
@@ -504,7 +502,6 @@ def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix, **kwargs):
 
     Returns:
         6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `u_grid` and `v_grid` are 1D arrays representing the coordinates of the RFFT grid, and are provided for reference. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`.
-
     """
 
     nchan = uus.shape[0]
