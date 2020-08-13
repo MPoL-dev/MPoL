@@ -31,7 +31,7 @@ def fftspace(width, N):
 
 
 def horner(x, a):
-    """
+    r"""
     Use `Horner's method <https://introcs.cs.princeton.edu/python/21function/horner.py.html>`_ to compute and return the polynomial
 
     .. math::
@@ -99,7 +99,7 @@ def spheroid(eta):
 
 
 def corrfun(eta):
-    """
+    r"""
     The gridding *correction* function is applied to the image plane to counter-act the effects of the convolutional interpolation in the Fourier plane. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_. 
 
     Args:
@@ -151,7 +151,7 @@ def corrfun_mat(alphas, deltas):
 
 
 def gcffun(eta):
-    """
+    r"""
     The gridding *convolution* function for the convolution and interpolation of the visibilities in
     the Fourier domain. This is also the Fourier transform of ``corrfun``. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_.
 
@@ -339,7 +339,7 @@ def calc_matrices(u_data, v_data, u_model, v_model):
 
 
 def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kwargs):
-    """
+    r"""
     Rather than interpolating the complex model visibilities from these grid points to the non-uniform :math:`(u,v)` points, pre-average the data visibilities to the nearest grid point. This saves time by eliminating an interpolation operation after every new model evaluation, since the model visibilities correspond to the locations of the gridded visibilities.
 
     Args:

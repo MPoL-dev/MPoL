@@ -268,8 +268,9 @@ def test_compare_analytical_numerical(
         extent=ext,
     )
     plt.colorbar(im_imag, ax=ax[1, 2])
+    fig.subplots_adjust(wspace=0.05)
 
-    fig.savefig(str(tmp_path / "comparison.png"), dpi=300, wspace=0.05)
+    fig.savefig(str(tmp_path / "comparison.png"), dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -338,7 +339,7 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
         vmin=-vvmax,
         vmax=vvmax,
     )
-    fig.savefig(tmp_path / "C_imag.png", dpi=300)
+    fig.savefig(str(tmp_path / "C_imag.png"), dpi=300)
 
 
 def test_interpolate_points(vis_dict, interpolation_matrices):

@@ -172,7 +172,7 @@ class ImageCube(nn.Module):
         self.precached = True
 
     def forward(self, dataset):
-        """
+        r"""
         Compute the model visibilities at the :math:`(u, v)` locations of the dataset. 
 
         Args:

@@ -1,4 +1,4 @@
-"""
+r"""
 The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the regularization strength, :math:`\zeta`, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.
 
 If you don't see a loss function you need, it's easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!
@@ -144,7 +144,7 @@ def loss_fn_edge_clamp(cube):
 
 
 def loss_fn_sparsity(cube, mask=None):
-    """
+    r"""
     Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. Typically you might want this mask to be ``True`` for background regions.
 
     Args:
@@ -170,7 +170,7 @@ def loss_fn_sparsity(cube, mask=None):
 
 
 def loss_fn_UV_sparsity(vis, qs, q_max):
-    """
+    r"""
     Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. 
 
     Args:
