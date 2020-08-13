@@ -310,10 +310,13 @@ def interpolation_matrices(vis_dict, baselines):
 def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
     C_real, C_imag = interpolation_matrices
 
+    C_real = C_real.toarray()
+    C_imag = C_imag.toarray()
+
     fig, ax = plt.subplots(nrows=1, figsize=(6, 6))
-    vvmax = np.max(np.abs(C_real.toarray()[:, 0:300]))
+    vvmax = np.max(np.abs(C_real[:, 0:300]))
     ax.imshow(
-        C_real.toarray()[:, 0:300],
+        C_real[:, 0:300],
         interpolation="none",
         origin="upper",
         cmap="RdBu",
@@ -324,10 +327,18 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
     # ax[1].spy(C_real[:, 0:300], marker=".", precision="present", aspect="auto")
     fig.savefig(str(tmp_path / "C_real.png"), dpi=300)
 
-    # fig, ax = plt.subplots(ncols=1, figsize=(12,3))
-    # vvmax = np.max(np.abs(C_imag[:,0:300]))
-    # ax.imshow(C_imag[:,0:300], interpolation="none", origin="upper", cmap="RdBu", aspect="auto", vmin=-vvmax, vmax=vvmax)
-    # fig.savefig("C_imag.png", dpi=300)
+    fig, ax = plt.subplots(ncols=1, figsize=(6, 6))
+    vvmax = np.max(np.abs(C_imag[:, 0:300]))
+    ax.imshow(
+        C_imag[:, 0:300],
+        interpolation="none",
+        origin="upper",
+        cmap="RdBu",
+        aspect="auto",
+        vmin=-vvmax,
+        vmax=vvmax,
+    )
+    fig.savefig(tmp_path / "C_imag.png", dpi=300)
 
 
 def test_interpolate_points(vis_dict, interpolation_matrices):
