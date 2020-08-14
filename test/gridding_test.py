@@ -17,7 +17,7 @@ def sky_plane(
     Omega=0.0,
 ):
     """
-    Calculates a Gaussian on the sky plane 
+    Calculates a Gaussian on the sky plane
 
     Args:
         alpha: ra (in radians)
@@ -51,7 +51,7 @@ def fourier_plane(
     Omega=0.0,
 ):
     """
-    Calculates the Analytic Fourier transform of the sky plane Gaussian. 
+    Calculates the Analytic Fourier transform of the sky plane Gaussian.
 
     Args:
         u: spatial freq (in kλ)
@@ -62,7 +62,7 @@ def fourier_plane(
         sigma_alpha : width (in radians)
         sigma_dec : width (in radians)
         Omega : position angle of ascending node (in degrees east of north)
-    
+
     Returns:
         FT Gaussian evaluated at u, v points
     """

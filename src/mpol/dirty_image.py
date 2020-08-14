@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.fft import ifft2, fftfreq, fftshift, ifftshift, rfftfreq
-from .constants import *
+from .constants import arcsec
 
 
 def get_dirty_image(uu, vv, weight, re, im, cell_size, npix, robust=-2, **kwargs):

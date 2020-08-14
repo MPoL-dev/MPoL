@@ -1,4 +1,4 @@
 Contributors
 
-  * Ian Czekala, `@iancze`
-  * Ryan Loomis, `@ryanaloomis`
+* Ian Czekala, `@iancze`
+* Ryan Loomis, `@ryanaloomis`

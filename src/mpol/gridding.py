@@ -3,7 +3,6 @@ The gridding module contains routines to manipulate visibility data between unif
 You probably wont need to use these routines in the normal workflow of MPoL, but they are documented here for reference.
 """
 
-import scipy.interpolate
 import numpy as np
 from scipy.sparse import lil_matrix
 from .constants import *
@@ -41,7 +40,7 @@ def horner(x, a):
 
     Args:
         x (float): input
-        a (list): list of polynomial coefficients 
+        a (list): list of polynomial coefficients
 
     Returns:
         float: the polynomial evaluated at `x`
@@ -101,7 +100,7 @@ def spheroid(eta):
 
 def corrfun(eta):
     r"""
-    The gridding *correction* function is applied to the image plane to counter-act the effects of the convolutional interpolation in the Fourier plane. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_. 
+    The gridding *correction* function is applied to the image plane to counter-act the effects of the convolutional interpolation in the Fourier plane. For more information see `Schwab 1984 <https://ui.adsabs.harvard.edu/abs/1984iimp.conf..333S/abstract>`_.
 
     Args:
         eta (float): the value in [0, 1]. Accepts floats or vectors of float.
@@ -170,13 +169,13 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     r"""
     Calculate real :math:`C_\Re` and imaginary :math:`C_\Im` sparse interpolation matrices for RFFT output, using spheroidal wave functions.
 
-    Let :math:`W_\Re` and :math:`W_\Im` represent the real and imaginary output from the RFFT operatation carried out on an image that was pre-multiplied by the gridding correction function. To interpolate from the RFFT grid to the locations of `u_data` and `v_data`, one uses these matrices with a sparse matrix multiply to carry out 
+    Let :math:`W_\Re` and :math:`W_\Im` represent the real and imaginary output from the RFFT operatation carried out on an image that was pre-multiplied by the gridding correction function. To interpolate from the RFFT grid to the locations of `u_data` and `v_data`, one uses these matrices with a sparse matrix multiply to carry out
 
     .. math::
 
         V_\Re = C_\Re W_\Re
 
-    and 
+    and
 
     .. math::
 
@@ -356,7 +355,7 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
     Returns:
         6-tuple: (`u_grid`, `v_grid`, `grid_mask`, `avg_weights`, `avg_re`, `avg_im`) tuple of arrays. `grid_mask` has shape (npix, npix//2 + 1) corresponding to the RFFT output of an image with `cell_size` and dimensions (npix, npix). The remaining arrays are 1D and have length corresponding to the number of true elements in `ind`. They correspond to the model visibilities when the RFFT output is indexed with `grid_mask`. If debug is true, return a 7-tuple which includes the number of visibilities per cell.
 
-    An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT. 
+    An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT.
 
     This pre-gridding procedure is similar to "uniform" weighting of visibilities for imaging, but not exactly the same in practice. This is because we are still evaluating a visibility likelihood function which incorporates the uncertainties of the measured spatial frequencies, whereas imaging routines use the weights to adjust the contributions of the measured visibility to the synthesize image. Evaluating a model against these gridded visibilities should be equivalent to the full interpolated calculation so long as it is true that 
     
@@ -488,7 +487,7 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
 
 def grid_dataset(uus, vvs, weights, res, ims, cell_size, npix, **kwargs):
     """
-    Pre-grid a dataset containing multiple channels to the expected `u_grid` and `v_grid` points from the RFFT routine. 
+    Pre-grid a dataset containing multiple channels to the expected `u_grid` and `v_grid` points from the RFFT routine.
 
     Note that `nvis` need not be the same for each channel (i.e., `uus`, `vvs`, etc... can be ragged arrays, as long as each is iterable across the channel dimension). This routine iterates through the channels, calling :meth:`mpol.gridding.grid_datachannel` for each one.
 
