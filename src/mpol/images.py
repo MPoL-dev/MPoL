@@ -5,7 +5,7 @@ import torch
 from torch import nn
 
 from . import gridding
-from .constants import *
+from .constants import arcsec
 from . import utils
 
 

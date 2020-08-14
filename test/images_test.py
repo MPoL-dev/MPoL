@@ -1,10 +1,7 @@
-import torch
-import numpy as np
-
 import pytest
+import torch
 
 from mpol import images
-
 
 def test_odd_npix():
     with pytest.raises(AssertionError):

@@ -1,6 +1,6 @@
 import torch
 
-from .constants import *
+from .constants import arcsec
 
 
 def get_Jy_arcsec2(T_b, nu=230e9):

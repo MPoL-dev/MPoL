@@ -5,7 +5,7 @@ You probably wont need to use these routines in the normal workflow of MPoL, but
 
 import numpy as np
 from scipy.sparse import lil_matrix
-from .constants import *
+from .constants import arcsec
 from . import utils
 
 

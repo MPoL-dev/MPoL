@@ -212,7 +212,7 @@ def vis_diff(vis_dict, vis_analytical_half):
 
 def test_vis_prolate_diff(vis_diff):
     # create a numerical test to make sure the difference is small
-    # i.e., we're actually comparing the right numerical grid 
+    # i.e., we're actually comparing the right numerical grid
     # relative to the expected analytical function
     assert np.sum(np.abs(vis_diff)) < 1e-10
 
@@ -360,19 +360,19 @@ def interpolated_prolate(vis_dict, interpolation_matrices):
 
 def test_interpolate_points_prolate(analytic_samples, interpolated_prolate, vis_dict):
     vis = vis_dict["vis_no_cor"]
-    range = np.max(np.abs(vis)) - np.min(np.abs(vis))
+    vis_range = np.max(np.abs(vis)) - np.min(np.abs(vis))
 
     interp_real, interp_imag = interpolated_prolate
     interp = interp_real + interp_imag * 1.0j
 
     # the relative difference is using the full visibility range
-    assert np.all(np.abs((np.real(analytic_samples) - interp_real) / range) < 1e-3)
-    assert np.all(np.abs((np.imag(analytic_samples) - interp_imag) / range) < 1e-3)
-    assert np.all(np.abs(np.abs(analytic_samples - interp)/range) < 1e-3)
+    assert np.all(np.abs((np.real(analytic_samples) - interp_real) / vis_range) < 1e-3)
+    assert np.all(np.abs((np.imag(analytic_samples) - interp_imag) / vis_range) < 1e-3)
+    assert np.all(np.abs(np.abs(analytic_samples - interp)/vis_range) < 1e-3)
 
 def test_plot_points_prolate(tmp_path, analytic_samples, interpolated_prolate, vis_dict):
     vis = vis_dict["vis_no_cor"]
-    range = np.max(np.abs(vis)) - np.min(np.abs(vis))
+    vis_range = np.max(np.abs(vis)) - np.min(np.abs(vis))
 
     interp_real, interp_imag = interpolated_prolate
     fig, ax = plt.subplots(nrows=4, figsize=(4, 5))
@@ -380,12 +380,12 @@ def test_plot_points_prolate(tmp_path, analytic_samples, interpolated_prolate, v
     ax[0].plot(np.real(analytic_samples), ".", ms=4)
     ax[0].plot(interp_real, ".", ms=3)
     ax[0].set_ylabel("real")
-    ax[1].plot((np.real(analytic_samples) - interp_real)/range, ".")
+    ax[1].plot((np.real(analytic_samples) - interp_real)/vis_range, ".")
     ax[1].set_ylabel("rel difference")
     ax[2].plot(np.imag(analytic_samples), ".", ms=4)
     ax[2].plot(interp_imag, ".", ms=3)
     ax[2].set_ylabel("imag")
-    ax[3].plot((np.imag(analytic_samples) - interp_imag)/range, ".")
+    ax[3].plot((np.imag(analytic_samples) - interp_imag)/vis_range, ".")
     ax[3].set_ylabel("rel difference")
     fig.subplots_adjust(hspace=0.4, left=0.2)
     fig.savefig(str(tmp_path / "interpolated_comparison.png"), dpi=300)
