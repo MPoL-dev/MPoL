@@ -3,6 +3,7 @@ The gridding module contains routines to manipulate visibility data between unif
 You probably wont need to use these routines in the normal workflow of MPoL, but they are documented here for reference.
 """
 
+import scipy.interpolate
 import numpy as np
 from scipy.sparse import lil_matrix
 from .constants import *

@@ -86,7 +86,9 @@ def fourier_plane(
 
 @pytest.fixture(scope="module")
 def image_dict():
-
+    """
+    A useful fixture containing the analytic Gaussian evaluated on the sky plane.
+    """
     N_alpha = 128
     N_dec = 128
     img_radius = 15.0 * arcsec
@@ -114,6 +116,9 @@ def image_dict():
 
 @pytest.fixture(scope="module")
 def corrfun_mat(image_dict):
+    """
+    A useful fixture containing the correction function evaluated over the range of the sky plane test image.
+    """
     ra = image_dict["ra"]
     dec = image_dict["dec"]
 
@@ -143,6 +148,9 @@ def test_fill_corrfun_matrix(corrfun_mat, tmp_path):
 
 @pytest.fixture(scope="module")
 def vis_dict(image_dict, corrfun_mat):
+    """
+    A useful fixture containing the corrected on non-corrected outputs from the FFT of the sky plane image.
+    """
 
     img = image_dict["img"]
 
@@ -202,12 +210,12 @@ def vis_diff(vis_dict, vis_analytical_half):
     return np.fft.fftshift(vis_no_cor - vis_analytical_half, axes=0)
 
 
-def test_vis_diff_ok(vis_diff):
+def test_vis_prolate_diff(vis_diff):
     # create a numerical test to make sure the difference is small
     assert np.sum(np.abs(vis_diff)) < 1e-10
 
 
-def test_compare_analytical_numerical(
+def test_plot_analytical_prolate(
     tmp_path, vis_dict, vis_analytical_half, vis_diff
 ):
     vis_no_cor = vis_dict["vis_no_cor"]
@@ -217,6 +225,7 @@ def test_compare_analytical_numerical(
     ext = [us[0], us[-1], vs_limit[-1], vs_limit[0]]
 
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(7, 5))
+    fig.suptitle("no interpolation")
     ax[0, 0].set_title("numerical")
     ax[0, 0].imshow(
         np.real(np.fft.fftshift(vis_no_cor, axes=0)),
@@ -275,16 +284,17 @@ def test_compare_analytical_numerical(
 
 @pytest.fixture(scope="module")
 def baselines():
+    # Make sure we get enough samples in different quadrants.
     return np.array(
         [
-            [50.0, 10.0],
+            [50.0, 10.1],
             [50.0, 0.0],
-            [50.0, -1.0],
-            [-50.0, 10.0],
-            [5.0, 1.0],
-            [-5.0, 1.0],
-            [5.0, 20.0],
-            [-5.0, -20.0],
+            [39.5, -1.0],
+            [-50.1, 10.0],
+            [5.1, 1.0],
+            [-5.3, 1.0],
+            [5.8, 20.0],
+            [-5.0, -21.3],
         ]
     )
 
@@ -341,34 +351,31 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
     )
     fig.savefig(str(tmp_path / "C_imag.png"), dpi=300)
 
-
-def test_interpolate_points(vis_dict, interpolation_matrices):
-    vis = vis_dict["vis"]
-    C_real, C_imag = interpolation_matrices
-    # get interpolated points (TODO: check that they are correct...)
-    C_real.dot(np.real(vis.flatten()))
-    C_imag.dot(np.imag(vis.flatten()))
-
-
 @pytest.fixture(scope="module")
-def interpolated_points(vis_dict, interpolation_matrices):
+def interpolated_prolate(vis_dict, interpolation_matrices):
     vis = vis_dict["vis"]
     C_real, C_imag = interpolation_matrices
     return C_real.dot(np.real(vis.flatten())), C_imag.dot(np.imag(vis.flatten()))
 
+def test_interpolate_points_prolate(analytic_samples, interpolated_prolate):
+    interp_real, interp_imag = interpolated_prolate
+    interp = interp_real + interp_imag * 1.0j
+    assert np.all(np.abs((np.real(analytic_samples) - interp_real) / np.real(analytic_samples)) < 1e-2)
+    assert np.all(np.abs((np.imag(analytic_samples) - interp_imag) / np.imag(analytic_samples)) < 1e-2)
+    assert np.all(np.abs(np.abs(analytic_samples - interp)/analytic_samples) < 1e-2)
 
-def test_plot_interpolate_points(tmp_path, analytic_samples, interpolated_points):
-    interp_real, interp_imag = interpolated_points
+def test_plot_points_prolate(tmp_path, analytic_samples, interpolated_prolate):
+    interp_real, interp_imag = interpolated_prolate
     fig, ax = plt.subplots(nrows=4, figsize=(4, 5))
     ax[0].plot(np.real(analytic_samples), ".", ms=4)
     ax[0].plot(interp_real, ".", ms=3)
     ax[0].set_ylabel("real")
-    ax[1].plot(interp_real - np.real(analytic_samples), ".")
-    ax[1].set_ylabel("real diff")
+    ax[1].plot((np.real(analytic_samples) - interp_real)/np.real(analytic_samples), ".")
+    ax[1].set_ylabel("relative difference")
     ax[2].plot(np.imag(analytic_samples), ".", ms=4)
     ax[2].plot(interp_imag, ".", ms=3)
     ax[2].set_ylabel("imag")
-    ax[3].plot(interp_imag - np.imag(analytic_samples), ".")
-    ax[3].set_ylabel("imag diff")
+    ax[3].plot((np.imag(analytic_samples) - interp_imag)/np.imag(analytic_samples), ".")
+    ax[3].set_ylabel("relative difference")
     fig.subplots_adjust(hspace=0.4, left=0.2)
-    fig.savefig(str(tmp_path / "real_comp.png"), dpi=300)
+    fig.savefig(str(tmp_path / "interpolated_comparison.png"), dpi=300)
