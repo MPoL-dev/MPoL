@@ -13,7 +13,7 @@ Documentation and installation instructions: [https://mpol.readthedocs.io/](http
 If you use this package or derivatives of it, please cite
 
     @software{ian_czekala_2020_3647603,
-    author       = {Ian Czekala, Brianna Zawadski, and
+    author       = {Ian Czekala, Brianna Zawadzki, and
                     Ryan Loomis},
     title        = {iancze/MPoL: Pip installable package},
     month        = feb,
