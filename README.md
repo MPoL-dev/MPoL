@@ -1,6 +1,6 @@
 # MPoL
 
-![](https://github.com/iancze/MPoL/workflows/Python%20package/badge.svg)
+![Tests](https://github.com/MPoL-dev/MPoL/workflows/Tests/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/mpol/badge/?version=latest)](https://mpol.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/224543208.svg)](https://zenodo.org/badge/latestdoi/224543208)
 
