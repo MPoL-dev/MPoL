@@ -13,18 +13,22 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import mpol
 
 # -- Project information -----------------------------------------------------
+from pkg_resources import DistributionNotFound, get_distribution
+
+try:
+    __version__ = get_distribution("MPoL").version
+except DistributionNotFound:
+    __version__ = "unknown version"
 
 project = "MPoL"
 copyright = "2019, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
-version = mpol.__version__
-release = version
-
+version = __version__
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -37,6 +41,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
 ]
+
+autodoc_mock_imports = ["numpy", "scipy", "torch", "torchvision"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
