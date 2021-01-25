@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from . import gridding
+from . import spheroidal_gridding
 from .constants import arcsec
 from . import utils
 
@@ -106,11 +106,9 @@ class ImageCube(nn.Module):
         # a cube with East (l) increasing with array index and North (m) increasing
         # with array index
         self._ll = np.flip(
-            np.fft.ifftshift(gridding.fftspace(img_radius, self.npix))
+            np.fft.ifftshift(utils.fftspace(img_radius, self.npix))
         )  # [radians]
-        self._mm = np.fft.ifftshift(
-            gridding.fftspace(img_radius, self.npix)
-        )  # [radians]
+        self._mm = np.fft.ifftshift(utils.fftspace(img_radius, self.npix))  # [radians]
 
         # the image units are Jy/arcsec^2. An extended source with a brightness temperature
         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent
@@ -118,7 +116,7 @@ class ImageCube(nn.Module):
 
         # calculate the gridding correction function to apply to _cube
         # evaluated over the (preshifted) _ll and _mm coordinates
-        self.corrfun = torch.tensor(gridding.corrfun_mat(self._ll, self._mm))
+        self.corrfun = torch.tensor(spheroidal_gridding.corrfun_mat(self._ll, self._mm))
 
         self.precached = False
 
@@ -155,7 +153,9 @@ class ImageCube(nn.Module):
         self.C_res = []
         self.C_ims = []
         for i in range(self.nchan):
-            C_re, C_im = gridding.calc_matrices(uu[i], vv[i], self.us, self.vs)
+            C_re, C_im = spheroidal_gridding.calc_matrices(
+                uu[i], vv[i], self.us, self.vs
+            )
             C_shape = C_re.shape
 
             # make these torch sparse tensors

@@ -9,27 +9,6 @@ from .constants import arcsec
 from . import utils
 
 
-def fftspace(width, N):
-    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
-    
-    Args:
-        width (float): the width of the array
-        N (int): the number of elements in the array
-        
-    Returns:
-        numpy.float64 1D array: the fftspace array
-    
-    """
-    assert N % 2 == 0, "N must be even."
-
-    dx = width * 2.0 / N
-    xx = np.empty(N, np.float)
-    for i in range(N):
-        xx[i] = -width + i * dx
-
-    return xx
-
-
 def horner(x, a):
     r"""
     Use `Horner's method <https://introcs.cs.princeton.edu/python/21function/horner.py.html>`_ to compute and return the polynomial

@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from . import gridding
+from . import spheroidal_gridding
 from .constants import *
 
 # custom dataset loader
@@ -67,7 +67,7 @@ class UVDataset(Dataset):
                 g_weights,
                 g_re,
                 g_im,
-            ) = gridding.grid_dataset(
+            ) = spheroidal_gridding.grid_dataset(
                 uu,
                 vv,
                 weights,

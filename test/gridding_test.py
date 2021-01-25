@@ -2,7 +2,8 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mpol import gridding
+from mpol import utils
+from mpol import spheroidal_gridding
 from mpol.constants import *
 
 
@@ -94,8 +95,8 @@ def image_dict():
     img_radius = 15.0 * arcsec
 
     # full span of the image
-    ra = gridding.fftspace(img_radius, N_alpha)  # [arcsec]
-    dec = gridding.fftspace(img_radius, N_dec)  # [arcsec]
+    ra = utils.fftspace(img_radius, N_alpha)  # [arcsec]
+    dec = utils.fftspace(img_radius, N_dec)  # [arcsec]
 
     # fill out an image
     img = np.empty((N_dec, N_alpha), np.float)
@@ -123,7 +124,7 @@ def corrfun_mat(image_dict):
     dec = image_dict["dec"]
 
     # pre-multiply the image by the correction function
-    return gridding.corrfun_mat(np.fft.fftshift(ra), np.fft.fftshift(dec))
+    return spheroidal_gridding.corrfun_mat(np.fft.fftshift(ra), np.fft.fftshift(dec))
 
 
 def test_plot_input(image_dict, tmp_path):
@@ -217,9 +218,7 @@ def test_vis_prolate_diff(vis_diff):
     assert np.sum(np.abs(vis_diff)) < 1e-10
 
 
-def test_plot_analytical_prolate(
-    tmp_path, vis_dict, vis_analytical_half, vis_diff
-):
+def test_plot_analytical_prolate(tmp_path, vis_dict, vis_analytical_half, vis_diff):
     vis_no_cor = vis_dict["vis_no_cor"]
 
     us = vis_dict["us"]
@@ -317,7 +316,7 @@ def interpolation_matrices(vis_dict, baselines):
 
     # calculate and visualize the C_real and C_imag matrices
     # these are scipy csc sparse matrices
-    return gridding.calc_matrices(u_data, v_data, us, vs)
+    return spheroidal_gridding.calc_matrices(u_data, v_data, us, vs)
 
 
 def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
@@ -352,11 +351,13 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
     )
     fig.savefig(str(tmp_path / "C_imag.png"), dpi=300)
 
+
 @pytest.fixture(scope="module")
 def interpolated_prolate(vis_dict, interpolation_matrices):
     vis = vis_dict["vis"]
     C_real, C_imag = interpolation_matrices
     return C_real.dot(np.real(vis.flatten())), C_imag.dot(np.imag(vis.flatten()))
+
 
 def test_interpolate_points_prolate(analytic_samples, interpolated_prolate, vis_dict):
     vis = vis_dict["vis_no_cor"]
@@ -368,9 +369,12 @@ def test_interpolate_points_prolate(analytic_samples, interpolated_prolate, vis_
     # the relative difference is using the full visibility range
     assert np.all(np.abs((np.real(analytic_samples) - interp_real) / vis_range) < 1e-3)
     assert np.all(np.abs((np.imag(analytic_samples) - interp_imag) / vis_range) < 1e-3)
-    assert np.all(np.abs(np.abs(analytic_samples - interp)/vis_range) < 1e-3)
+    assert np.all(np.abs(np.abs(analytic_samples - interp) / vis_range) < 1e-3)
 
-def test_plot_points_prolate(tmp_path, analytic_samples, interpolated_prolate, vis_dict):
+
+def test_plot_points_prolate(
+    tmp_path, analytic_samples, interpolated_prolate, vis_dict
+):
     vis = vis_dict["vis_no_cor"]
     vis_range = np.max(np.abs(vis)) - np.min(np.abs(vis))
 
@@ -380,12 +384,12 @@ def test_plot_points_prolate(tmp_path, analytic_samples, interpolated_prolate, v
     ax[0].plot(np.real(analytic_samples), ".", ms=4)
     ax[0].plot(interp_real, ".", ms=3)
     ax[0].set_ylabel("real")
-    ax[1].plot((np.real(analytic_samples) - interp_real)/vis_range, ".")
+    ax[1].plot((np.real(analytic_samples) - interp_real) / vis_range, ".")
     ax[1].set_ylabel("rel difference")
     ax[2].plot(np.imag(analytic_samples), ".", ms=4)
     ax[2].plot(interp_imag, ".", ms=3)
     ax[2].set_ylabel("imag")
-    ax[3].plot((np.imag(analytic_samples) - interp_imag)/vis_range, ".")
+    ax[3].plot((np.imag(analytic_samples) - interp_imag) / vis_range, ".")
     ax[3].set_ylabel("rel difference")
     fig.subplots_adjust(hspace=0.4, left=0.2)
     fig.savefig(str(tmp_path / "interpolated_comparison.png"), dpi=300)
