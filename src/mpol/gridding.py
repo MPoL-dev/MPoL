@@ -141,6 +141,7 @@ class Gridder:
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
+        gridcoords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
@@ -153,7 +154,7 @@ class Gridder:
         self,
         cell_size=None,
         npix=None,
-        GridCoords=None,
+        gridcoords=None,
         uu=None,
         vv=None,
         weight=None,

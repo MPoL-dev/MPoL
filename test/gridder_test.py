@@ -41,6 +41,45 @@ def test_grid_coords_fail(mock_visibility_data):
         mycoords.check_data_fit(uu, vv)
 
 
+def test_gridder_instantiate_cell_npix(mock_visibility_data):
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data_re = d["data_re"]
+    data_im = d["data_im"]
+
+    gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+
+def test_gridder_instantiate_grid_coord(mock_visibility_data):
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data_re = d["data_re"]
+    data_im = d["data_im"]
+
+    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
+
+    gridding.Gridder(
+        gridcoords=mycoords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+
 # if it works, create a fixture with the initialized visibilities for latter gridding ops
 # @pytest.fixture
 # def gridder(mock_visibility_data):
