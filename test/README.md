@@ -12,6 +12,13 @@ To run all of the tests, from  the root of the repository, invoke
 
     $ python -m pytest
 
+## Test cache
+
+Several of the tests require mock data that is not practical to package within the github repository itself. These files are stored on Zenodo, and for continuous integration tests (e.g., on github workflows), they are downloaded as needed. 
+
+However, local developers might need to run these tests frequently in the course of making changes to the package. If you are writing a test, the structure we are following is to keep all large files in a cache directory. Before testing, set the environment variable `MPOL_CACHE_DIR` to a location of your choosing. If this environment variable is unset, then all test data files will be downloaded to a temporary directory which will eventually be cleaned up by the operating system. This means the test data files will be re-downloaded on each run of the tests.
+
+
 ## Viewing plots
 
 Some tests produce temporary files, like plots, that could be useful to view in the case of development or debugging. Normally these are produced to a temporary directory created by the system which will eventually be deleted. To preserve them, first create a plot directory and then run the code
