@@ -1,38 +1,53 @@
 import numpy as np
 from numpy.fft import ifft2, fftfreq, fftshift, ifftshift, rfftfreq
 from .constants import arcsec
+from .utils import get_max_spatial_freq, get_maximum_cell_size
 
 
-class Gridder:
-    def __init__(self, cell_size, npix, uu, vv, weight, data_re, data_im):
-        """
-        The Gridder object serves several functions. It uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. It also takes in *ungridded* visibility data and stores it to the object.
+class GridCoords:
+    r"""
+    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. 
+    
+    Args:
+        cell_size (float): width of a single square pixel in [arcsec]
+        npix (int): number of pixels in the width of the image
 
-        Then, the user can decide how to 'grid', or average, the loose visibilities to a more compact representation on the Fourier grid using the `self.grid_visibilities` routine.
+    For real images, the Fourier grid is minimally defined by an RFFT grid over the domain :math:`[0,+u]`, :math:`[-v,+v]`. 
 
-        If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the `self.to_pytorch_dataset` routine.
+    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will have a corresponding RFFT Fourier grid with shape ``(npix, npix//2 + 1)`` because the RFFT is performed over the trailing coordinate, in this case :math:`u`. 
 
-        If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded, these are available via the `self.dirty_image` and `self.dirty_beam` attributes.
-        
-        Like the ImageCube class, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    After the object is initialized, instance variables can be accessed, for example
+    
+    >>> myCoords = GridCoords(cell_size=0.005, 512)
+    >>> myCoords.img_ext
+    
+    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]
+    :ivar dm: image-plane cell spacing in DEC direction [radians]
+    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [arcsec]
+    :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]
+    :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]
+    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`]. 
+    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`]. 
+    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`]. 
+    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`]. 
+    :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]
+    :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]
+    :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]
+    :ivar v_bin_max: maximum v edge [:math:`\mathrm{k}\lambda`]
+    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid [:math:`\mathrm{k}\lambda`]
+    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
+    """
 
-        Args:
-            cell_size (float): width of a single square pixel in [arcsec]
-            npix (int): number of pixels in the width of the image 
-            uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-            vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-            weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
-            data_re (2d numpy array): (nchan, nvis) length array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
-            data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
-        """
+    def __init__(self, cell_size, npix):
         # set up the bin edges, centers, etc.
         assert npix % 2 == 0, "Image must have an even number of pixels"
+        assert cell_size > 0, "cell_size must be positive"
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix
 
         # calculate the image extent
-        # say we had 10 pixels
+        # say we had 10 pixels representing centers -5, -4, -3, ...
         # it should go from -5.5 to +4.5
         lmax = cell_size * (self.npix // 2 - 0.5)
         lmin = -cell_size * (self.npix // 2 + 0.5)
@@ -42,23 +57,120 @@ class Gridder:
         self.dm = cell_size * arcsec  # [radians]
 
         # the output spatial frequencies of the FFT routine
-        self.du = 1 / (self.npix * self.dl) * 1e-3  # klambda
-        self.dv = 1 / (self.npix * self.dm) * 1e-3  # klambda
+        self.du = 1 / (self.npix * self.dl) * 1e-3  # [kλ]
+        self.dv = 1 / (self.npix * self.dm) * 1e-3  # [kλ]
 
-        int_edges = np.arange(self.npix + 1) - self.npix // 2 - 0.5
-        self.u_edges = self.du * int_edges  # klambda
-        self.v_edges = self.dv * int_edges
+        # define the max/min of the RFFT grid
+        # https://numpy.org/doc/stable/reference/generated/numpy.fft.rfftn.html#numpy.fft.rfftn
+        # the real transform is performed over the last axis.
+        # because we store images as [y, x]
+        # this means we store visibilities as [v, u]
+        # that means that the u dimension gets the real transform
+        # and the v dimension gets the full transform
+        int_u_edges = np.arange(self.npix // 2 + 2) - 0.5
+        int_v_edges = np.arange(self.npix + 1) - self.npix // 2 - 0.5
+        self.u_edges = self.du * int_u_edges  # [kλ]
+        self.v_edges = self.dv * int_v_edges  # [kλ]
 
-        int_centers = np.arange(self.npix) - self.npix // 2
-        self.u_centers = self.du * int_centers
-        self.v_centers = self.dv * int_centers
+        int_u_centers = np.arange(self.npix // 2 + 1)
+        int_v_centers = np.arange(self.npix) - self.npix // 2
+        self.u_centers = self.du * int_u_centers  # [kλ]
+        self.v_centers = self.dv * int_v_centers  # [kλ]
 
-        v_bin_min = np.min(self.v_edges)
-        v_bin_max = np.max(self.v_edges)
-        u_bin_min = np.min(self.u_edges)
-        u_bin_max = np.max(self.u_edges)
+        self.v_bin_min = np.min(self.v_edges)
+        self.v_bin_max = np.max(self.v_edges)
 
-        self.vis_ext = [u_bin_min, u_bin_max, v_bin_min, v_bin_max]  # klambda
+        self.u_bin_min = np.min(self.u_edges)
+        self.u_bin_max = np.max(self.u_edges)
+
+        self.vis_ext = [
+            self.u_bin_min,
+            self.u_bin_max,
+            self.v_bin_min,
+            self.v_bin_max,
+        ]  # [kλ]
+
+        # max freq supported by current grid
+        self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
+
+    def check_data_fit(self, uu, vv):
+        """
+        Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
+
+        Args:
+            uu (np.array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+            vv (np.array): array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+
+        Returns: ``True`` if all visibilities fit within the Fourier grid defined by ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an ``AssertionError`` is raised on the first violated boundary.
+        """
+
+        # max freq in dataset
+        max_uu_vv = np.max(np.abs(np.concatenate([uu, vv])))
+
+        # max freq needed to support dataset
+        max_cell_size = get_maximum_cell_size(max_uu_vv)
+
+        assert (
+            np.max(np.abs(uu)) < self.max_grid
+        ), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
+            max_cell_size
+        )
+        assert (
+            np.max(np.abs(vv)) < self.max_grid
+        ), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
+            max_cell_size
+        )
+
+        return True
+
+
+class Gridder:
+    """
+    The Gridder object serves several functions. It uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. Because we are dealing with real images, the Fourier grid is defined by the RFFT grid. This means the visibility grid will have shape ``(npix, npix//2 + 1)`` corresponding to the RFFT output of an image with ``cell_size` and dimensions ``(npix, npix)``. A pre-computed ``GridCoords`` can also be supplied in lieu of ``cell_size`` and ``npix.``
+
+    The ``Gridder`` object accepts "loose" *ungridded* visibility data and stores it to the object. The visibility data can be over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will mirror the loose data into the RFFT domain (:math:`[0,u]` and :math:`[-v,v]`) automatically.
+
+    Then, the user can decide how to 'grid', or average, the loose visibilities to a more compact representation on the Fourier grid using the ``self.grid_visibilities`` routine.
+
+    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the `self.to_pytorch_dataset` routine.
+
+    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded, these are available via the `self.dirty_image` and `self.dirty_beam` attributes.
+
+    Like the ImageCube class, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    Args:
+        cell_size (float): width of a single square pixel in [arcsec]
+        npix (int): number of pixels in the width of the image
+        uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
+        data_re (2d numpy array): (nchan, nvis) length array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+
+    """
+
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        GridCoords=None,
+        uu=None,
+        vv=None,
+        weight=None,
+        data_re=None,
+        data_im=None,
+    ):
+
+        if GridCoords:
+            assert (
+                npix is None and cell_size is None
+            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+        elif npix or cell_size:
+            assert (
+                GridCoords is None
+            ), "GridCoords must be empty if npix and cell_size are supplied."
+
+        self.gridCoords = GridCoords(cell_size=cell_size, npix=npix)
 
         assert (
             uu.ndim == 2
@@ -76,38 +188,41 @@ class Gridder:
         assert data_im.dtype == np.float64, "data_im should be type np.float64"
 
         # within each channel, expand and overwrite the vectors to include complex conjugates
-        self.uu = np.concatenate([uu, -uu], axis=1)
-        self.vv = np.concatenate([vv, -vv], axis=1)
-        self.weight = np.concatenate([weight, weight], axis=1)
-        self.data_re = np.concatenate([data_re, data_re], axis=1)
-        self.data_im = np.concatenate(
+        uu_full = np.concatenate([uu, -uu], axis=1)
+        vv_full = np.concatenate([vv, -vv], axis=1)
+        weight_full = np.concatenate([weight, weight], axis=1)
+        data_re_full = np.concatenate([data_re, data_re], axis=1)
+        data_im_full = np.concatenate(
             [data_im, -data_im], axis=1
         )  # the complex conjugates
 
-        # make sure the data visibilities fit within the Fourier grid defined by cell_size and npix.
-        assert (
-            np.min(self.uu) > u_bin_min
-        ), "uu data visibilities outside (more negative than) uu grid bounds. Adjust cell_size and npix."
-        assert (
-            np.min(self.vv) > v_bin_min
-        ), "vv data visibilities outside (more negative than) vv grid bounds. Adjust cell_size and npix."
-        assert (
-            np.max(self.uu) < u_bin_max
-        ), "uu data visibilities outside (greater than) uu grid bounds. Adjust cell_size and npix."
-        assert (
-            np.max(self.vv) < v_bin_max
-        ), "vv data visibilities outside (greater than) vv grid bounds. Adjust cell_size and npix."
+        # The RFFT outputs u in the range [0, +] and v in the range [-, +],
+        # but the dataset contains measurements at u [-,+] and v [-, +].
+        # Find all the u < 0 points and convert them via complex conj
+        ind_u_neg = uu_full < 0.0
+        uu_full[ind_u_neg] *= -1.0  # swap axes so all u > 0
+        vv_full[ind_u_neg] *= -1.0  # swap axes
+        data_im_full[ind_u_neg] *= -1.0  # complex conjugate
+
+        self.gridCoords.check_data_fit(uu=uu_full, vv=vv_full)
+
+        # if all checks out, store these to the object
+        self.uu = uu_full
+        self.vv = vv_full
+        self.weight = weight_full
+        self.data_re = data_re_full
+        self.data_im = data_im_full
 
         self.nchan = len(self.uu)
 
-        # figure out which cell each visibility lands in, so that
+        # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
         # do this by calculating the nearest cell index [0, N] for all samples
         self.index_u = np.array(
-            [np.digitize(u_chan, self.u_edges) - 1 for u_chan in self.uu]
+            [np.digitize(u_chan, self.gridCoords.u_edges) - 1 for u_chan in self.uu]
         )
         self.index_v = np.array(
-            [np.digitize(v_chan, self.v_edges) - 1 for v_chan in self.vv]
+            [np.digitize(v_chan, self.gridCoords.v_edges) - 1 for v_chan in self.vv]
         )
 
     def grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
@@ -126,6 +241,7 @@ class Gridder:
         # create the cells as edges around the existing points
         # note that at this stage, the bins are strictly increasing
         # when in fact, later on, we'll need to put this into fftshift format for the FFT
+        cell_weight = np.empty((self.nchan, self.npix, self.npix))
         cell_weight, junk, junk = np.histogram2d(
             self.vv, self.uu, bins=[self.v_edges, self.u_edges], weights=self.weight,
         )
@@ -221,7 +337,7 @@ class Gridder:
 
     def get_dirty_image(self, unit="Jy/beam"):
         """
-        Calculate the dirty image. 
+        Calculate the dirty image.
 
         Args:
             unit (string): what unit should the image be in. Default is "Jy/beam". If "Jy/arcsec^2", then the effective area of the dirty beam will be used to convert from "Jy/beam" to "Jy/arcsec^2".

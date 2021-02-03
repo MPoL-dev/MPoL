@@ -65,6 +65,7 @@ Images
 
 .. automodule:: mpol.images
     :members:
+    :inherited-members:
 
 Losses
 ------

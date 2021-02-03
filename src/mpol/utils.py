@@ -81,7 +81,21 @@ def get_max_spatial_freq(cell_size, npix):
     """
 
     # technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized
-    # arrays, the highest positive spatial frequency is (npix/2 - 1) / (npix * cell_size)
+    # arrays, the highest *positive* spatial frequency is (npix/2 - 1) / (npix * cell_size)
     # it is the most negative spatial frequency that goes to - 1/(2 * cell_size)
 
     return (npix / 2 - 1) / (npix * cell_size * arcsec) * 1e-3  # kilolambda
+
+
+def get_maximum_cell_size(uu_vv_point):
+    """
+    Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.
+
+    Args: 
+        uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].
+
+    Returns: cell_size (in arcsec)
+    """
+
+    return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
+
