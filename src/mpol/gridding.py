@@ -141,7 +141,7 @@ class Gridder:
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
-        gridcoords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        gridCoords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
@@ -154,7 +154,7 @@ class Gridder:
         self,
         cell_size=None,
         npix=None,
-        gridcoords=None,
+        gridCoords=None,
         uu=None,
         vv=None,
         weight=None,
@@ -162,16 +162,18 @@ class Gridder:
         data_im=None,
     ):
 
-        if GridCoords:
+        if gridCoords:
             assert (
                 npix is None and cell_size is None
             ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+            self.gridCoords = gridCoords
+
         elif npix or cell_size:
             assert (
-                GridCoords is None
+                gridCoords is None
             ), "GridCoords must be empty if npix and cell_size are supplied."
 
-        self.gridCoords = GridCoords(cell_size=cell_size, npix=npix)
+            self.gridCoords = GridCoords(cell_size=cell_size, npix=npix)
 
         assert (
             uu.ndim == 2
