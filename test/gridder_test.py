@@ -103,6 +103,27 @@ def test_gridder_instantiate_npix_gridCoord_conflict(mock_visibility_data):
         )
 
 
+def test_gridder_instantiate_bounds_fail(mock_visibility_data):
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data_re = d["data_re"]
+    data_im = d["data_im"]
+
+    mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
+
+    with pytest.raises(AssertionError):
+        gridding.Gridder(
+            gridCoords=mycoords,
+            uu=uu,
+            vv=vv,
+            weight=weight,
+            data_re=data_re,
+            data_im=data_im,
+        )
+
+
 # if it works, create a fixture with the initialized visibilities for latter gridding ops
 # @pytest.fixture
 # def gridder(mock_visibility_data):
