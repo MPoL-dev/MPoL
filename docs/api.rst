@@ -65,7 +65,9 @@ Images
 
 .. automodule:: mpol.images
     :members:
-    :inherited-members:
+
+.. autoclass:: mpol.images.ImageCube
+    :members:
 
 Losses
 ------

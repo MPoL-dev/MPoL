@@ -10,7 +10,6 @@ from . import utils
 
 
 class ImageCube(nn.Module):
-
     r"""
     A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.
 

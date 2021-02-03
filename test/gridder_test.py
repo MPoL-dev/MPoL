@@ -124,26 +124,38 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
         )
 
 
-# if it works, create a fixture with the initialized visibilities for latter gridding ops
-# @pytest.fixture
-# def gridder(mock_visibility_data):
-#     d = mock_visibility_data
+# now that we've tested the creation ops, cache an instantiated gridder for future ops
+@pytest.fixture
+def gridder(mock_visibility_data):
+    d = mock_visibility_data
 
-#     uu = d["uu"]
-#     vv = d["vv"]
-#     weight = d["weight"]
-#     data_re = d["data_re"]
-#     data_im = d["data_im"]
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data_re = d["data_re"]
+    data_im = d["data_im"]
 
-#     cell_size = 0.005
-#     npix = 800
+    cell_size = 0.005
+    npix = 800
 
-#     return gridding.Gridder(cell_size, npix, uu, vv, weight, data_re, data_im)
+    return gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
 
 
-# # actually do the gridding
-# def test_grid_uniform(gridder):
-#     gridder.grid_visibilities()
+# actually do the gridding
+def test_grid_uniform(gridder):
+    gridder.grid_visibilities()
+
+    beam = gridder.get_dirty_beam()
+    print(beam)
+    assert False
 
 
 # def test_grid_natural(gridder):

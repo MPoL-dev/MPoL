@@ -14,7 +14,7 @@ class GridCoords:
 
     For real images, the Fourier grid is minimally defined by an RFFT grid over the domain :math:`[0,+u]`, :math:`[-v,+v]`. 
 
-    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will have a corresponding RFFT Fourier grid with shape ``(npix, npix//2 + 1)`` because the RFFT is performed over the trailing coordinate, in this case :math:`u`. 
+    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will have a corresponding RFFT Fourier grid with shape ``(npix, npix//2 + 1)`` because the RFFT is performed over the trailing coordinate, in this case :math:`u`. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
 
     After the object is initialized, instance variables can be accessed, for example
     
@@ -45,6 +45,8 @@ class GridCoords:
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix
+        self.ncell_u = self.npix // 2 + 1
+        self.ncell_v = self.npix
 
         # calculate the image extent
         # say we had 10 pixels representing centers -5, -4, -3, ...
@@ -67,13 +69,13 @@ class GridCoords:
         # this means we store visibilities as [v, u]
         # that means that the u dimension gets the real transform
         # and the v dimension gets the full transform
-        int_u_edges = np.arange(self.npix // 2 + 2) - 0.5
-        int_v_edges = np.arange(self.npix + 1) - self.npix // 2 - 0.5
+        int_u_edges = np.arange(self.ncell_u + 1) - 0.5
+        int_v_edges = np.arange(self.ncell_v + 1) - self.ncell_v // 2 - 0.5
         self.u_edges = self.du * int_u_edges  # [kλ]
         self.v_edges = self.dv * int_v_edges  # [kλ]
 
-        int_u_centers = np.arange(self.npix // 2 + 1)
-        int_v_centers = np.arange(self.npix) - self.npix // 2
+        int_u_centers = np.arange(self.ncell_u)
+        int_v_centers = np.arange(self.ncell_v) - self.npix // 2
         self.u_centers = self.du * int_u_centers  # [kλ]
         self.v_centers = self.dv * int_v_centers  # [kλ]
 
@@ -94,7 +96,7 @@ class GridCoords:
         self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
 
     def check_data_fit(self, uu, vv):
-        """
+        r"""
         Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
 
         Args:
@@ -124,19 +126,22 @@ class GridCoords:
         return True
 
 
+# wrappers to do the histogramming
+
+
 class Gridder:
-    """
-    The Gridder object serves several functions. It uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. Because we are dealing with real images, the Fourier grid is defined by the RFFT grid. This means the visibility grid will have shape ``(npix, npix//2 + 1)`` corresponding to the RFFT output of an image with ``cell_size` and dimensions ``(npix, npix)``. A pre-computed ``GridCoords`` can also be supplied in lieu of ``cell_size`` and ``npix.``
+    r"""
+    The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The ``Gridder`` object accepts "loose" *ungridded* visibility data and stores it to the object. The visibility data can be over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will mirror the loose data into the RFFT domain (:math:`[0,u]` and :math:`[-v,v]`) automatically.
+    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates and shift all loose data into the RFFT domain (:math:`[0,u]` and :math:`[-v,v]`).
 
-    Then, the user can decide how to 'grid', or average, the loose visibilities to a more compact representation on the Fourier grid using the ``self.grid_visibilities`` routine.
+    Once the loose visibilities are attached, the user can decide how to 'grid', or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.
 
-    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the `self.to_pytorch_dataset` routine.
+    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
 
-    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded, these are available via the `self.dirty_image` and `self.dirty_beam` attributes.
+    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded with :func:`~mpol.gridding.Gridder.grid_visibilities`, these are available via the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
 
-    Like the ImageCube class, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    Like the :class:`~mpol.images.ImageCube` class, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
@@ -228,33 +233,94 @@ class Gridder:
             [np.digitize(v_chan, self.gridCoords.v_edges) - 1 for v_chan in self.vv]
         )
 
-    def grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
-        """
-        Grid the loose data visibilities to the Fourier grid defined by `cell_size` and `npix`.
+    def _histogram_channel(self, uu, vv, channel_weight):
+        r"""
+        Perform a 2D histogram over the Fourier grid defined by ``gridCoords``.
 
-        Specify weighting of "natural", "uniform", or "briggs", following CASA tclean. If "briggs", specify robust in [-2, 2].
-        If specifying a taper function, then it is assumed to be f(u, v).
+        Args:
+            uu (np.array): 1D array of East-West spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
+            vv: 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
+            channel_weight (np.array): 1D array of weights to use in the histogramming.
+
+        """
+        result = np.histogram2d(
+            vv,
+            uu,
+            bins=[self.gridCoords.v_edges, self.gridCoords.u_edges],
+            weights=channel_weight,
+        )
+
+        # only return the "H" value
+        return result[0]
+
+    def _histogram_cube(self, weight):
+        r"""
+        Perform a 2D histogram over the  Fourier grid defined by ``gridCoords``, for all channels..
+
+        Args:
+            weight (np.array): 2D array of weights of shape ``(nchan, nvis)`` to use in the histogramming.
+
+        """
+        # calculate the histogrammed result for all channels
+        cube = np.empty(
+            (self.nchan, self.gridCoords.ncell_v, self.gridCoords.ncell_u),
+            dtype=np.float64,
+        )
+
+        for i in range(self.nchan):
+            cube[i] = self._histogram_channel(self.vv[i], self.uu[i], weight[i])
+
+        return cube
+
+    def grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
+        r"""
+        Grid the loose data visibilities to the Fourier grid.
+
+        Args:
+            weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2].
+            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
         """
 
         if taper_function is None:
-            tapering_weights = np.ones_like(self.weight)
+            tapering_weight = np.ones_like(self.weight)
         else:
-            tapering_weights = taper_function(self.uu, self.vv)
+            tapering_weight = taper_function(self.uu, self.vv)
 
         # create the cells as edges around the existing points
         # note that at this stage, the bins are strictly increasing
         # when in fact, later on, we'll need to put this into fftshift format for the FFT
-        cell_weight = np.empty((self.nchan, self.npix, self.npix))
-        cell_weight, junk, junk = np.histogram2d(
-            self.vv, self.uu, bins=[self.v_edges, self.u_edges], weights=self.weight,
-        )
+        # cell_weight, junk, junk = np.histogram2d(
+        #     self.vv, self.uu, bins=[self.v_edges, self.u_edges], weights=self.weight,
+        # )
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to put this into fftshift format for the FFT
+        cell_weight = self._histogram_cube(self.weight)
 
         # calculate the density weights
         # the density weights have the same shape as the re, im samples.
         if weighting == "natural":
             density_weights = np.ones_like(self.weight)
         elif weighting == "uniform":
-            density_weights = 1 / cell_weight[self.index_v, self.index_u]
+            # cell_weight is (nchan, ncell_v, ncell_u)
+
+            # self.index_v, self.index_u are (nchan, nvis)
+            # density_weights = 1 / cell_weight[self.index_v, self.index_u]
+
+            # we want density_weights to be (nchan, nvis)
+
+            # this is turning out to divide by 0, when it should
+            # only index cells that have more than one visibility, and therefore have
+            # positive cell_weight values.
+            density_weights = 1 / np.array(
+                [
+                    cell_weight[i][self.index_v[i], self.index_u[i]]
+                    for i in range(self.nchan)
+                ]
+            )
+
         elif weighting == "briggs":
             if robust is None:
                 raise ValueError(
@@ -267,9 +333,9 @@ class Gridder:
             # implement robust weighting using the definition used in CASA
             # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
 
-            # calculate the robust parameter f^2
+            # calculate the robust parameter f^2 for each channel
             f_sq = ((5 * 10 ** (-robust)) ** 2) / (
-                np.sum(cell_weight ** 2) / np.sum(self.weight)
+                np.sum(cell_weight ** 2, axis=(1, 2)) / np.sum(self.weight, axis=(1, 2))
             )
 
             # the robust weight corresponding to the cell
@@ -285,40 +351,54 @@ class Gridder:
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
             )
 
-        self.C = 1 / np.sum(tapering_weights * density_weights * self.weight)
+        # Normalization constant for each channel
+        self.C = 1 / np.sum(tapering_weight * density_weights * self.weight, axis=(1,),)
 
-        # grid the reals and imaginaries
-        VV_g_real, junk, junk = np.histogram2d(
-            self.vv,
-            self.uu,
-            bins=[self.v_edges, self.u_edges],
-            weights=self.data_re * tapering_weights * density_weights * self.weight,
+        # grid the reals and imaginaries separately
+        # VV_g_real, junk, junk = np.histogram2d(
+        #     self.vv,
+        #     self.uu,
+        #     bins=[self.v_edges, self.u_edges],
+        #     weights=self.data_re * tapering_weights * density_weights * self.weight,
+        # )
+
+        # VV_g_imag, junk, junk = np.histogram2d(
+        #     self.vv,
+        #     self.uu,
+        #     bins=[self.v_edges, self.u_edges],
+        #     weights=self.data_im * tapering_weights * density_weights * self.weight,
+        # )
+
+        # grid the reals and imaginaries separately
+        self.gridded_re = self._histogram_cube(
+            self.data_re * tapering_weight * density_weights * self.weight
+        )
+        self.gridded_im = self._histogram_cube(
+            self.data_im * tapering_weight * density_weights * self.weight
         )
 
-        VV_g_imag, junk, junk = np.histogram2d(
-            self.vv,
-            self.uu,
-            bins=[self.v_edges, self.u_edges],
-            weights=self.data_im * tapering_weights * density_weights * self.weight,
-        )
+        # self.VV_g = VV_g_real + VV_g_imag * 1.0j
 
-        self.VV_g = VV_g_real + VV_g_imag * 1.0j
+        # the beam is the response to a point source, which is data_re = constant, data_im = 0
+        # so we save time and only calculate the reals, because gridded_beam_im = 0
+        self.gridded_beam_re = self._histogram_cube(
+            tapering_weight * density_weights * self.weight
+        )
 
         # do the beam too
-        beam_V_real, junk, junk = np.histogram2d(
-            self.vv,
-            self.uu,
-            bins=[self.v_edges, self.u_edges],
-            weights=tapering_weights * density_weights * self.weight,
-        )
-        self.beam_V = beam_V_real
+        # beam_V_real, junk, junk = np.histogram2d(
+        #     self.vv,
+        #     self.uu,
+        #     bins=[self.v_edges, self.u_edges],
+        #     weights=tapering_weights * density_weights * self.weight,
+        # )
+        # self.beam_V = beam_V_real
 
         # instantiate uncertainties for each averaged visibility.
         # self.VV_uncertainty = values
         # self.VV_uncertainty = None, for routines which it's not implemented yet.
 
-    @property
-    def dirty_beam(self):
+    def get_dirty_beam(self):
         """
         Compute the dirty beam corresponding to the gridded visibilities.
 
@@ -328,13 +408,17 @@ class Gridder:
         # no correction for du or dv prefactors needed here
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
+        self.beam = np.fft.fftshift(
+            self.gridCoords.npix ** 2
+            * np.fft.irfft2(
+                np.fft.fftshift(
+                    self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=0
+                )
+            ),
+            axes=(1, 2),
+        )  # Jy/radians^2
 
-        self.beam = np.fliplr(
-            np.fft.fftshift(
-                self.npix ** 2
-                * np.fft.ifftn(np.fft.fftshift(self.C * self.beam_V), axes=(0, 1))
-            )
-        ).real  # Jy/radians^2
+        # TODO need to add fliplr
 
         return self.beam
 
@@ -343,9 +427,9 @@ class Gridder:
         Calculate the dirty image.
 
         Args:
-            unit (string): what unit should the image be in. Default is "Jy/beam". If "Jy/arcsec^2", then the effective area of the dirty beam will be used to convert from "Jy/beam" to "Jy/arcsec^2".
+            unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
 
-        Returns: numpy image cube with a dirty image for each channel.
+        Returns: (nchan, npix, npix) numpy array of the dirty image cube.
         """
 
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
@@ -353,7 +437,7 @@ class Gridder:
 
         img = np.fliplr(
             np.fft.fftshift(
-                self.npix ** 2
+                self.gridCoords.npix ** 2
                 * np.fft.ifftn(np.fft.fftshift(self.C * self.VV_g), axes=(0, 1))
             )
         ).real  # Jy/radians^2
@@ -364,3 +448,8 @@ class Gridder:
             pass
             # return img / beam_area
 
+    def to_pytorch_dataset(self):
+        """
+        Export gridded visibilities to a PyTorch dataset object
+        """
+        raise NotImplementedError()
