@@ -410,19 +410,22 @@ class Gridder:
         # no correction for du or dv prefactors needed here
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
-        self.beam = np.fft.fftshift(
-            self.gridCoords.npix ** 2
-            * np.fft.irfft2(
-                np.fft.fftshift(
-                    self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=0
-                )
-            ),
-            axes=(1, 2),
-        )  # Jy/radians^2
+
+        print(np.sum(np.isnan(self.gridded_beam_re)))
+
+        # self.beam = np.fft.fftshift(
+        #     self.gridCoords.npix ** 2
+        #     * np.fft.irfft2(
+        #         np.fft.fftshift(
+        #             self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=0
+        #         )
+        #     ),
+        #     axes=(1, 2),
+        # )  # Jy/radians^2
 
         # TODO need to add fliplr
 
-        return self.beam
+        # return self.beam
 
     def get_dirty_image(self, unit="Jy/beam"):
         """
