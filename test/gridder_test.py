@@ -135,9 +135,6 @@ def gridder(mock_visibility_data):
     data_re = d["data_re"]
     data_im = d["data_im"]
 
-    cell_size = 0.005
-    npix = 800
-
     return gridding.Gridder(
         cell_size=0.005,
         npix=800,

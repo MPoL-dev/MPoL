@@ -243,6 +243,8 @@ class Gridder:
             channel_weight (np.array): 1D array of weights to use in the histogramming.
 
         """
+        # order is swapped because of the way the image looks
+
         result = np.histogram2d(
             vv,
             uu,
@@ -268,7 +270,7 @@ class Gridder:
         )
 
         for i in range(self.nchan):
-            cube[i] = self._histogram_channel(self.vv[i], self.uu[i], weight[i])
+            cube[i] = self._histogram_channel(self.uu[i], self.vv[i], weight[i])
 
         return cube
 
