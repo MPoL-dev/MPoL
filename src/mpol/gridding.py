@@ -379,6 +379,7 @@ class Gridder:
             self.data_im * tapering_weight * density_weights * self.weight
         )
 
+        self.gridded_vis = self.gridded_re + self.gridded_im * 1.0j
         # self.VV_g = VV_g_real + VV_g_imag * 1.0j
 
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
@@ -400,30 +401,31 @@ class Gridder:
         # self.VV_uncertainty = values
         # self.VV_uncertainty = None, for routines which it's not implemented yet.
 
+    def _fliplr_cube(self, cube):
+        return cube[:, :, ::-1]
+
     def get_dirty_beam(self):
         """
         Compute the dirty beam corresponding to the gridded visibilities.
 
-        Returns: numpy image cube with a dirty beam for each channel.
+        Returns: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.
         """
         # if we're sticking to the dirty beam and image equations in Briggs' Ph.D. thesis,
         # no correction for du or dv prefactors needed here
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
-
-        # print(np.sum(np.isnan(self.gridded_beam_re)))
-
-        self.beam = np.fft.fftshift(
-            self.gridCoords.npix ** 2
-            * np.fft.irfft2(
-                np.fft.fftshift(
-                    self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
-                )
-            ),
-            axes=(1, 2),
-        )  # Jy/radians^2
-
-        # TODO need to add fliplr
+        self.beam = self._fliplr_cube(
+            np.fft.fftshift(
+                self.gridCoords.ncell_u
+                * self.gridCoords.ncell_v
+                * np.fft.irfft2(
+                    np.fft.fftshift(
+                        self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
+                    )
+                ),
+                axes=(1, 2),
+            )
+        )
 
         return self.beam
 
@@ -440,18 +442,20 @@ class Gridder:
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
 
-        img = np.fliplr(
+        self.img = self._fliplr_cube(
             np.fft.fftshift(
-                self.gridCoords.npix ** 2
-                * np.fft.ifftn(np.fft.fftshift(self.C * self.VV_g), axes=(0, 1))
+                self.gridCoords.ncell_u
+                * self.gridCoords.ncell_v
+                * np.fft.irfft2(
+                    np.fft.fftshift(
+                        self.C[:, np.newaxis, np.newaxis] * self.gridded_vis, axes=1
+                    )
+                ),
+                axes=(1, 2),
             )
-        ).real  # Jy/radians^2
+        )  # Jy/beam
 
-        if unit == "Jy/beam":
-            return img
-        else:
-            pass
-            # return img / beam_area
+        return self.img
 
     def to_pytorch_dataset(self):
         """
