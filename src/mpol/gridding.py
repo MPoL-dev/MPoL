@@ -414,6 +414,19 @@ class Gridder:
         # no correction for du or dv prefactors needed here
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
+
+        beam_temp = (
+            self.gridCoords.ncell_u
+            * self.gridCoords.ncell_v
+            * np.fft.irfft2(
+                np.fft.fftshift(
+                    self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
+                )
+            )
+        )
+
+        print("beam at 0,0", beam_temp[:, 0, 0])
+
         self.beam = self._fliplr_cube(
             np.fft.fftshift(
                 self.gridCoords.ncell_u
