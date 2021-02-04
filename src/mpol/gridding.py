@@ -195,31 +195,26 @@ class Gridder:
         assert data_re.dtype == np.float64, "data_re should be type np.float64"
         assert data_im.dtype == np.float64, "data_im should be type np.float64"
 
-        # within each channel, expand and overwrite the vectors to include complex conjugates
-        uu_full = np.concatenate([uu, -uu], axis=1)
-        vv_full = np.concatenate([vv, -vv], axis=1)
-        weight_full = np.concatenate([weight, weight], axis=1)
-        data_re_full = np.concatenate([data_re, data_re], axis=1)
-        data_im_full = np.concatenate(
-            [data_im, -data_im], axis=1
-        )  # the complex conjugates
-
         # The RFFT outputs u in the range [0, +] and v in the range [-, +],
         # but the dataset contains measurements at u [-,+] and v [-, +].
         # Find all the u < 0 points and convert them via complex conj
-        ind_u_neg = uu_full < 0.0
-        uu_full[ind_u_neg] *= -1.0  # swap axes so all u > 0
-        vv_full[ind_u_neg] *= -1.0  # swap axes
-        data_im_full[ind_u_neg] *= -1.0  # complex conjugate
+        ind_u_neg = uu < 0.0
+        uu[ind_u_neg] *= -1.0  # swap axes so all u > 0
+        vv[ind_u_neg] *= -1.0  # swap axes
+        data_im[ind_u_neg] *= -1.0  # complex conjugate
 
-        self.coords.check_data_fit(uu=uu_full, vv=vv_full)
+        self.coords.check_data_fit(uu=uu, vv=vv)
+
+        # No need to duplicate and complex-conjugate visibilities
+        # like with the full FFT. The RFFT naturally assumes that the complex
+        # conjugates exist.
 
         # if all checks out, store these to the object
-        self.uu = uu_full
-        self.vv = vv_full
-        self.weight = weight_full
-        self.data_re = data_re_full
-        self.data_im = data_im_full
+        self.uu = uu
+        self.vv = vv
+        self.weight = weight
+        self.data_re = data_re
+        self.data_im = data_im
 
         self.nchan = len(self.uu)
 
@@ -422,3 +417,168 @@ class Gridder:
         Export gridded visibilities to a PyTorch dataset object
         """
         raise NotImplementedError()
+
+
+class ChannelImager:
+    def __init__(self, cell_size, npix, uu, vv, weights, re, im):
+        """
+        cell_size in arcsec
+        uu, vv in klambda
+        re, im in Jy
+        """
+        # set up the bin edges, centers, etc.
+        assert npix % 2 == 0, "Image must have an even number of pixels"
+
+        self.cell_size = cell_size
+        self.npix = npix
+
+        # calculate the image extent
+        # say we had 10 pixels
+        # it should go from -5.5 to +4.5
+        lmax = cell_size * (self.npix // 2 - 0.5)
+        lmin = -cell_size * (self.npix // 2 + 0.5)
+        self.img_ext = [lmax, lmin, lmin, lmax]  # arcsecs
+
+        self.dl = cell_size * arcsec  # [radians]
+        self.dm = cell_size * arcsec  # [radians]
+
+        # the output spatial frequencies of the FFT routine
+        self.du = 1 / (self.npix * self.dl) * 1e-3  # klambda
+        self.dv = 1 / (self.npix * self.dm) * 1e-3  # klambda
+
+        int_edges = np.arange(self.npix + 1) - self.npix // 2 - 0.5
+        self.u_edges = self.du * int_edges  # klambda
+        self.v_edges = self.dv * int_edges
+
+        int_centers = np.arange(self.npix) - self.npix // 2
+        self.u_centers = self.du * int_centers
+        self.v_centers = self.dv * int_centers
+
+        v_bin_min = np.min(self.v_edges)
+        v_bin_max = np.max(self.v_edges)
+        u_bin_min = np.min(self.u_edges)
+        u_bin_max = np.max(self.u_edges)
+
+        self.vis_ext = [u_bin_min, u_bin_max, v_bin_min, v_bin_max]  # klambda
+
+        assert uu.ndim == 1, "Input arrays must be 1-dimensional"
+
+        assert np.all(
+            np.array([len(arr) for arr in [vv, weights]]) == len(uu)
+        ), "Input arrays are not the same length."
+
+        # expand and overwrite the vectors to include complex conjugates
+        self.uu = np.concatenate([uu, -uu])
+        self.vv = np.concatenate([vv, -vv])
+        self.weights = np.concatenate([weights, weights])
+        self.re = np.concatenate([re, re])
+        self.im = np.concatenate([im, -im])  # the complex conjugates
+
+        # figure out which cell each visibility lands in, so that
+        # we can assign it the appropriate robust weight for that cell
+        # do this by calculating the nearest cell index [0, N] for all samples
+        self.index_u = np.digitize(self.uu, self.u_edges) - 1
+        self.index_v = np.digitize(self.vv, self.v_edges) - 1
+
+    def grid_visibilities(self, weighting, robust=None, taper_function=None):
+        """
+        Specify weighting of "natural", "uniform", or "briggs", following CASA tclean. If briggs, specify robust in [-2, 2].
+
+        If specifying a taper function, then it is assumed to be f(u, v).
+        """
+
+        if taper_function is None:
+            tapering_weights = np.ones_like(self.weights)
+        else:
+            tapering_weights = taper_function(self.uu, self.vv)
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the bins are strictly increasing
+        # when in fact, later on, we'll need to put this into fftshift format for the FFT
+        cell_weight, junk, junk = np.histogram2d(
+            self.vv, self.uu, bins=[self.v_edges, self.u_edges], weights=self.weights,
+        )
+
+        # calculate the density weights
+        # the density weights have the same shape as the re, im samples.
+        if weighting == "natural":
+            density_weights = np.ones_like(self.weights)
+        elif weighting == "uniform":
+            density_weights = 1 / cell_weight[self.index_v, self.index_u]
+        elif weighting == "briggs":
+            if robust is None:
+                raise ValueError(
+                    "If 'briggs' weighting, a robust value must be specified between [-2, 2]."
+                )
+            assert (robust >= -2) and (
+                robust <= 2
+            ), "robust parameter must be in the range [-2, 2]"
+
+            # implement robust weighting using the definition used in CASA
+            # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
+
+            # calculate the robust parameter f^2
+            f_sq = ((5 * 10 ** (-robust)) ** 2) / (
+                np.sum(cell_weight ** 2) / np.sum(self.weights)
+            )
+
+            # the robust weight corresponding to the cell
+            cell_robust_weight = 1 / (1 + cell_weight * f_sq)
+
+            # zero out cells that have no visibilities
+            cell_robust_weight[cell_weight <= 0.0] = 0
+
+            # now assign the cell robust weight to each visibility within that cell
+            density_weights = cell_robust_weight[self.index_v, self.index_u]
+        else:
+            raise ValueError(
+                "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
+            )
+
+        self.C = 1 / np.sum(tapering_weights * density_weights * self.weights)
+
+        # grid the reals and imaginaries
+        VV_g_real, junk, junk = np.histogram2d(
+            self.vv,
+            self.uu,
+            bins=[self.v_edges, self.u_edges],
+            weights=self.re * tapering_weights * density_weights * self.weights,
+        )
+
+        VV_g_imag, junk, junk = np.histogram2d(
+            self.vv,
+            self.uu,
+            bins=[self.v_edges, self.u_edges],
+            weights=self.im * tapering_weights * density_weights * self.weights,
+        )
+
+        self.VV_g = VV_g_real + VV_g_imag * 1.0j
+
+        # do the beam too
+        beam_V_real, junk, junk = np.histogram2d(
+            self.vv,
+            self.uu,
+            bins=[self.v_edges, self.u_edges],
+            weights=tapering_weights * density_weights * self.weights,
+        )
+        self.beam_V = beam_V_real
+
+    def image_gridded_visibilities(self):
+
+        # if we're sticking to Briggs' equations, no correction for du or dv prefactors needed here
+        # that is because we are using the FFT to compute an already discretized equation, not
+        # approximating a continuous equation.
+
+        self.beam = np.fliplr(
+            np.fft.fftshift(
+                self.npix ** 2
+                * np.fft.ifftn(np.fft.fftshift(self.C * self.beam_V), axes=(0, 1))
+            )
+        ).real  # Jy/radians^2
+
+        self.img = np.fliplr(
+            np.fft.fftshift(
+                self.npix ** 2
+                * np.fft.ifftn(np.fft.fftshift(self.C * self.VV_g), axes=(0, 1))
+            )
+        ).real  # Jy/radians^2

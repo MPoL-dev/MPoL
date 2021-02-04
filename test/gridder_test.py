@@ -120,29 +120,29 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
         )
 
 
-def test_gridder_conjugated(mock_visibility_data):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+# def test_gridder_conjugated(mock_visibility_data):
+#     coords = gridding.GridCoords(cell_size=0.005, npix=800)
 
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-    weight = 0.1 * np.ones_like(uu)
-    data_re = np.ones_like(uu)
-    data_im = np.zeros_like(uu)
+#     d = mock_visibility_data
+#     uu = d["uu"]
+#     vv = d["vv"]
+#     weight = 0.1 * np.ones_like(uu)
+#     data_re = np.ones_like(uu)
+#     data_im = np.zeros_like(uu)
 
-    nchan, nvis_start = uu.shape
+#     nchan, nvis_start = uu.shape
 
-    gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
-    )
+#     gridder = gridding.Gridder(
+#         coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+#     )
 
-    nchan, nvis_end = gridder.uu.shape
-    print("nvis start:{:} end:{:}".format(nvis_start, nvis_end))
-    assert nvis_end / nvis_start == 2
+#     nchan, nvis_end = gridder.uu.shape
+#     print("nvis start:{:} end:{:}".format(nvis_start, nvis_end))
+#     assert nvis_end / nvis_start == 2
 
-    assert np.min(gridder.uu) > 0
-    assert np.min(gridder.vv) < 0
-    assert np.max(gridder.vv) > 0
+#     assert np.min(gridder.uu) > 0
+#     assert np.min(gridder.vv) < 0
+#     assert np.max(gridder.vv) > 0
 
 
 # test that we're getting the right numbers back for some well defined operations
@@ -181,6 +181,34 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
 
 
+def test_natural_ones(mock_visibility_data, tmp_path):
+    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = 0.1 * np.ones_like(uu)
+    data_re = np.ones_like(uu)
+    data_im = np.zeros_like(uu)
+
+    gridder = gridding.Gridder(
+        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+    )
+
+    # with uniform weighting, the gridded sheet should be uniform and = 1
+    gridder.grid_visibilities(weighting="natural")
+    print(
+        "re",
+        np.mean(gridder.gridded_re),
+        np.std(gridder.gridded_re),
+        np.min(gridder.gridded_re),
+        np.max(gridder.gridded_re),
+    )
+    # data_re should be equal to the number of points in each cell (* weight)
+
+    # assert False
+
+
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
 @pytest.fixture
 def gridder(mock_visibility_data):
@@ -209,6 +237,10 @@ def test_grid_uniform(gridder):
 
     beam = gridder.get_dirty_beam()
 
+    print(np.max(beam))
+
+    # assert False
+
 
 # def test_grid_natural(gridder):
 #     gridder.grid_visibilities(weighting="natural")
@@ -226,3 +258,22 @@ def test_grid_uniform(gridder):
 # export them
 # does the imager work for single-channeled visiblities?
 
+
+def test_channel_gridder(mock_visibility_data):
+    d = mock_visibility_data
+
+    chan = 4
+
+    uu = d["uu"][chan]
+    vv = d["vv"][chan]
+    weight = d["weight"][chan]
+    data_re = d["data_re"][chan]
+    data_im = d["data_im"][chan]
+
+    gridder = gridding.ChannelImager(0.005, 800, uu, vv, weight, data_re, data_im)
+
+    gridder.grid_visibilities(weighting="uniform")
+
+    gridder.image_gridded_visibilities()
+    print(np.max(gridder.beam))
+    assert False
