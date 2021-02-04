@@ -146,7 +146,7 @@ class Gridder:
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
-        gridCoords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
@@ -159,7 +159,7 @@ class Gridder:
         self,
         cell_size=None,
         npix=None,
-        gridCoords=None,
+        coords=None,
         uu=None,
         vv=None,
         weight=None,
@@ -167,18 +167,18 @@ class Gridder:
         data_im=None,
     ):
 
-        if gridCoords:
+        if coords:
             assert (
                 npix is None and cell_size is None
             ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.gridCoords = gridCoords
+            self.coords = coords
 
         elif npix or cell_size:
             assert (
-                gridCoords is None
+                coords is None
             ), "GridCoords must be empty if npix and cell_size are supplied."
 
-            self.gridCoords = GridCoords(cell_size=cell_size, npix=npix)
+            self.coords = GridCoords(cell_size=cell_size, npix=npix)
 
         assert (
             uu.ndim == 2
@@ -212,7 +212,7 @@ class Gridder:
         vv_full[ind_u_neg] *= -1.0  # swap axes
         data_im_full[ind_u_neg] *= -1.0  # complex conjugate
 
-        self.gridCoords.check_data_fit(uu=uu_full, vv=vv_full)
+        self.coords.check_data_fit(uu=uu_full, vv=vv_full)
 
         # if all checks out, store these to the object
         self.uu = uu_full
@@ -227,15 +227,15 @@ class Gridder:
         # we can later assign it the appropriate robust weight for that cell
         # do this by calculating the nearest cell index [0, N] for all samples
         self.index_u = np.array(
-            [np.digitize(u_chan, self.gridCoords.u_edges) - 1 for u_chan in self.uu]
+            [np.digitize(u_chan, self.coords.u_edges) - 1 for u_chan in self.uu]
         )
         self.index_v = np.array(
-            [np.digitize(v_chan, self.gridCoords.v_edges) - 1 for v_chan in self.vv]
+            [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
 
     def _histogram_channel(self, uu, vv, channel_weight):
         r"""
-        Perform a 2D histogram over the Fourier grid defined by ``gridCoords``.
+        Perform a 2D histogram over the Fourier grid defined by ``coords``.
 
         Args:
             uu (np.array): 1D array of East-West spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
@@ -248,7 +248,7 @@ class Gridder:
         result = np.histogram2d(
             vv,
             uu,
-            bins=[self.gridCoords.v_edges, self.gridCoords.u_edges],
+            bins=[self.coords.v_edges, self.coords.u_edges],
             weights=channel_weight,
         )
 
@@ -257,7 +257,7 @@ class Gridder:
 
     def _histogram_cube(self, weight):
         r"""
-        Perform a 2D histogram over the  Fourier grid defined by ``gridCoords``, for all channels..
+        Perform a 2D histogram over the  Fourier grid defined by ``coords``, for all channels..
 
         Args:
             weight (np.array): 2D array of weights of shape ``(nchan, nvis)`` to use in the histogramming.
@@ -265,8 +265,7 @@ class Gridder:
         """
         # calculate the histogrammed result for all channels
         cube = np.empty(
-            (self.nchan, self.gridCoords.ncell_v, self.gridCoords.ncell_u),
-            dtype=np.float64,
+            (self.nchan, self.coords.ncell_v, self.coords.ncell_u), dtype=np.float64,
         )
 
         for i in range(self.nchan):
@@ -290,15 +289,9 @@ class Gridder:
             tapering_weight = taper_function(self.uu, self.vv)
 
         # create the cells as edges around the existing points
-        # note that at this stage, the bins are strictly increasing
-        # when in fact, later on, we'll need to put this into fftshift format for the FFT
-        # cell_weight, junk, junk = np.histogram2d(
-        #     self.vv, self.uu, bins=[self.v_edges, self.u_edges], weights=self.weight,
-        # )
-
-        # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to put this into fftshift format for the FFT
+        # when in fact, later on, we'll need to fftshift the v axis
+        # for the RFFT
         cell_weight = self._histogram_cube(self.weight)
 
         # calculate the density weights
@@ -307,15 +300,8 @@ class Gridder:
             density_weights = np.ones_like(self.weight)
         elif weighting == "uniform":
             # cell_weight is (nchan, ncell_v, ncell_u)
-
             # self.index_v, self.index_u are (nchan, nvis)
-            # density_weights = 1 / cell_weight[self.index_v, self.index_u]
-
             # we want density_weights to be (nchan, nvis)
-
-            # this is turning out to divide by 0, when it should
-            # only index cells that have more than one visibility, and therefore have
-            # positive cell_weight values.
             density_weights = 1 / np.array(
                 [
                     cell_weight[i][self.index_v[i], self.index_u[i]]
@@ -354,22 +340,7 @@ class Gridder:
             )
 
         # Normalization constant for each channel
-        self.C = 1 / np.sum(tapering_weight * density_weights * self.weight, axis=(1,),)
-
-        # grid the reals and imaginaries separately
-        # VV_g_real, junk, junk = np.histogram2d(
-        #     self.vv,
-        #     self.uu,
-        #     bins=[self.v_edges, self.u_edges],
-        #     weights=self.data_re * tapering_weights * density_weights * self.weight,
-        # )
-
-        # VV_g_imag, junk, junk = np.histogram2d(
-        #     self.vv,
-        #     self.uu,
-        #     bins=[self.v_edges, self.u_edges],
-        #     weights=self.data_im * tapering_weights * density_weights * self.weight,
-        # )
+        self.C = 1 / np.sum(tapering_weight * density_weights * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
         self.gridded_re = self._histogram_cube(
@@ -380,22 +351,12 @@ class Gridder:
         )
 
         self.gridded_vis = self.gridded_re + self.gridded_im * 1.0j
-        # self.VV_g = VV_g_real + VV_g_imag * 1.0j
 
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
         self.gridded_beam_re = self._histogram_cube(
             tapering_weight * density_weights * self.weight
         )
-
-        # do the beam too
-        # beam_V_real, junk, junk = np.histogram2d(
-        #     self.vv,
-        #     self.uu,
-        #     bins=[self.v_edges, self.u_edges],
-        #     weights=tapering_weights * density_weights * self.weight,
-        # )
-        # self.beam_V = beam_V_real
 
         # instantiate uncertainties for each averaged visibility.
         # self.VV_uncertainty = values
@@ -415,22 +376,9 @@ class Gridder:
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
 
-        beam_temp = (
-            self.gridCoords.ncell_u
-            * self.gridCoords.ncell_v
-            * np.fft.irfft2(
-                np.fft.fftshift(
-                    self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
-                )
-            )
-        )
-
-        print("beam at 0,0", beam_temp[:, 0, 0])
-
         self.beam = self._fliplr_cube(
             np.fft.fftshift(
-                self.gridCoords.ncell_u
-                * self.gridCoords.ncell_v
+                self.coords.npix ** 2
                 * np.fft.irfft2(
                     np.fft.fftshift(
                         self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
@@ -457,8 +405,7 @@ class Gridder:
 
         self.img = self._fliplr_cube(
             np.fft.fftshift(
-                self.gridCoords.ncell_u
-                * self.gridCoords.ncell_v
+                self.coords.npix ** 2
                 * np.fft.irfft2(
                     np.fft.fftshift(
                         self.C[:, np.newaxis, np.newaxis] * self.gridded_vis, axes=1
