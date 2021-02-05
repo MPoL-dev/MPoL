@@ -10,7 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
+
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -40,6 +41,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "nbsphinx",
+    "sphinx_copybutton",
 ]
 
 autodoc_mock_imports = ["torch", "torchvision"]
@@ -58,7 +61,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 # html_theme = "alabaster"
-html_theme = "sphinx_rtd_theme"
+# html_theme = "sphinx_rtd_theme"
+
+import sphinx_redactor_theme
+
+html_theme = "sphinx_redactor_theme"
+html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
 
 # html_theme_options = {
 #     "fixed_sidebar": True,
@@ -85,4 +93,16 @@ master_doc = "index"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
+
+# RTDs-action
+if "GITHUB_TOKEN" in os.environ:
+    extensions.append("rtds_action")
+
+    rtds_action_github_repo = "MPoL-dev/MPoL"
+    # The path where the artifact should be extracted
+    # Note: this is relative to the conf.py file!
+    rtds_action_path = "tutorials"
+    # The "prefix" used in the `upload-artifact` step of the action
+    rtds_action_artifact_prefix = "notebooks-for-"
+    rtds_action_github_token = os.environ["GITHUB_TOKEN"]
 

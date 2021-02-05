@@ -25,7 +25,17 @@ version = get_version("src/mpol/__init__.py")
 
 EXTRA_REQUIRES = {
     "test": ["pytest", "matplotlib", "requests"],
-    "docs": ["sphinx>=2.3.0", "numpy", "sphinx_rtd_theme"],
+    "docs": [
+        "sphinx>=2.3.0",
+        "numpy",
+        "jupytext",
+        "nbsphinx",
+        "sphinx_redactor_theme",
+        "sphinx_copybutton",
+        "jupyter",
+        "nbconvert",
+        "rtds-action",
+    ],
 }
 
 EXTRA_REQUIRES["dev"] = (

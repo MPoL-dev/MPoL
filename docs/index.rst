@@ -15,6 +15,7 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
    :caption: Contents:
 
    installation.rst
+   tutorials/gridder
    usage.rst
    api.rst
    changelog.rst
