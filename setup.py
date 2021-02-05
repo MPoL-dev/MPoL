@@ -30,7 +30,7 @@ EXTRA_REQUIRES = {
         "numpy",
         "jupytext",
         "nbsphinx",
-        "sphinx_redactor_theme",
+        "faculty-sphinx-theme",
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",

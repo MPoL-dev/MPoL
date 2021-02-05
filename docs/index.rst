@@ -23,7 +23,7 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
 If you use MPoL in your research, please cite us! ::
 
     @software{ian_czekala_2020_3647603,
-    author       = {Ian Czekala and
+    author       = {Ian Czekala, Brianna Zawadzki, and
                     Ryan Loomis},
     title        = {iancze/MPoL: Pip installable package},
     month        = feb,
@@ -33,7 +33,7 @@ If you use MPoL in your research, please cite us! ::
     doi          = {10.5281/zenodo.3647603},
     url          = {https://doi.org/10.5281/zenodo.3647603}
     }
-
+    
 Indices and tables
 ==================
 
