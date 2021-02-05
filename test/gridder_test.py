@@ -153,7 +153,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
         gridder.gridded_re[4], origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
-    plt.savefig(tmp_path / "gridded_re.png", dpi=300)
+    plt.savefig(str(tmp_path / "gridded_re.png"), dpi=300)
 
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
@@ -227,7 +227,7 @@ def test_grid_uniform(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(tmp_path / "uniform_v_robust.png", dpi=300)
+    fig.savefig(str(tmp_path / "uniform_v_robust.png"), dpi=300)
 
     assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
     assert np.all(np.abs(img_uniform - img_robust) < 1e-5)
@@ -267,7 +267,7 @@ def test_grid_natural(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(tmp_path / "natural_v_robust.png", dpi=300)
+    fig.savefig(str(tmp_path / "natural_v_robust.png"), dpi=300)
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
