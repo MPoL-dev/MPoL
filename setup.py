@@ -23,9 +23,14 @@ def get_version(rel_path):
 version = get_version("src/mpol/__init__.py")
 
 
-EXTRA_REQUIRES = {"test":["pytest", "matplotlib"], "docs":["sphinx>=2.3.0", "numpy", "sphinx_rtd_theme"]}
+EXTRA_REQUIRES = {
+    "test": ["pytest", "matplotlib", "requests"],
+    "docs": ["sphinx>=2.3.0", "numpy", "sphinx_rtd_theme"],
+}
 
-EXTRA_REQUIRES["dev"] = EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black"]
+EXTRA_REQUIRES["dev"] = (
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black"]
+)
 
 
 setuptools.setup(

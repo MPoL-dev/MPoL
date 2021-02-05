@@ -66,6 +66,9 @@ Images
 .. automodule:: mpol.images
     :members:
 
+.. autoclass:: mpol.images.ImageCube
+    :members:
+
 Losses
 ------
 
