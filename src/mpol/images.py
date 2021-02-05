@@ -1,4 +1,4 @@
-"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
+r"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
 
 import numpy as np
 import torch
