@@ -45,7 +45,7 @@ class GridCoords:
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix
-        self.ncell_u = self.npix // 2 + 1
+        self.ncell_u = self.npix
         self.ncell_v = self.npix
 
         # calculate the image extent
@@ -62,25 +62,17 @@ class GridCoords:
         self.du = 1 / (self.npix * self.dl) * 1e-3  # [kλ]
         self.dv = 1 / (self.npix * self.dm) * 1e-3  # [kλ]
 
-        # define the max/min of the RFFT grid
-        # https://numpy.org/doc/stable/reference/generated/numpy.fft.rfftn.html#numpy.fft.rfftn
-        # the real transform is performed over the last axis.
+        # define the max/min of the FFT grid
         # because we store images as [y, x]
         # this means we store visibilities as [v, u]
-        # that means that the u dimension gets the real transform
-        # and the v dimension gets the full transform
-        int_u_edges = np.arange(self.ncell_u + 1) - 0.5
+        int_u_edges = np.arange(self.ncell_u + 1) - self.ncell_v // 2 - 0.5
         int_v_edges = np.arange(self.ncell_v + 1) - self.ncell_v // 2 - 0.5
 
-        # print("int_u_edges", int_u_edges)
-        # print("int_v_edges", int_v_edges)
         self.u_edges = self.du * int_u_edges  # [kλ]
         self.v_edges = self.dv * int_v_edges  # [kλ]
 
-        int_u_centers = np.arange(self.ncell_u)
-        int_v_centers = np.arange(self.ncell_v) - self.npix // 2
-        # print("int_u_centers", int_u_centers)
-        # print("int_v_centers", int_v_centers)
+        int_u_centers = np.arange(self.ncell_u) - self.ncell_u // 2
+        int_v_centers = np.arange(self.ncell_v) - self.ncell_v // 2
         self.u_centers = self.du * int_u_centers  # [kλ]
         self.v_centers = self.dv * int_v_centers  # [kλ]
 
@@ -129,9 +121,6 @@ class GridCoords:
         )
 
         return True
-
-
-# wrappers to do the histogramming
 
 
 class Gridder:
@@ -200,34 +189,18 @@ class Gridder:
         assert data_re.dtype == np.float64, "data_re should be type np.float64"
         assert data_im.dtype == np.float64, "data_im should be type np.float64"
 
-        # expand and overwrite the vectors to include complex conjugates
+        # expand the vectors to include complex conjugates
         uu_full = np.concatenate([uu, -uu], axis=1)
         vv_full = np.concatenate([vv, -vv], axis=1)
-        weight_full = np.concatenate([weight, weight], axis=1)
-        data_re_full = np.concatenate([data_re, data_re], axis=1)
-        data_im_full = np.concatenate([data_im, -data_im], axis=1)
 
-        # remove all visibilities that have uu < u_bin_bin
+        # make sure we still fit into the grid
+        self.coords.check_data_fit(uu_full, vv_full)
 
-        # The RFFT outputs u in the range [0, +] and v in the range [-, +],
-        # but the dataset contains measurements at u [-,+] and v [-, +].
-        # Find all the u < 0 points and convert them via complex conj
-        ind_u_neg = uu < 0.0
-        uu[ind_u_neg] *= -1.0  # swap axes so all u > 0
-        vv[ind_u_neg] *= -1.0  # swap axes
-        data_im[ind_u_neg] *= -1.0  # complex conjugate
-        self.coords.check_data_fit(uu=uu, vv=vv)
-
-        # No need to duplicate and complex-conjugate visibilities
-        # like with the full FFT. The RFFT naturally assumes that the complex
-        # conjugates exist.
-
-        # if all checks out, store these to the object
         self.uu = uu_full
         self.vv = vv_full
-        self.weight = weight_full
-        self.data_re = data_re_full
-        self.data_im = data_im_full
+        self.weight = np.concatenate([weight, weight], axis=1)
+        self.data_re = np.concatenate([data_re, data_re], axis=1)
+        self.data_im = np.concatenate([data_im, -data_im], axis=1)
 
         self.nchan = len(self.uu)
 
@@ -237,6 +210,7 @@ class Gridder:
         self.index_u = np.array(
             [np.digitize(u_chan, self.coords.u_edges) - 1 for u_chan in self.uu]
         )
+
         self.index_v = np.array(
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
@@ -268,7 +242,7 @@ class Gridder:
         Perform a 2D histogram over the  Fourier grid defined by ``coords``, for all channels..
 
         Args:
-            weight (np.array): 2D array of weights of shape ``(nchan, nvis)`` to use in the histogramming.
+            weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.
 
         """
         # calculate the histogrammed result for all channels
@@ -305,12 +279,12 @@ class Gridder:
         # calculate the density weights
         # the density weights have the same shape as the re, im samples.
         if weighting == "natural":
-            density_weights = np.ones_like(self.weight)
+            density_weight = np.ones_like(self.weight)
         elif weighting == "uniform":
             # cell_weight is (nchan, ncell_v, ncell_u)
             # self.index_v, self.index_u are (nchan, nvis)
             # we want density_weights to be (nchan, nvis)
-            density_weights = 1 / np.array(
+            density_weight = 1 / np.array(
                 [
                     cell_weight[i][self.index_v[i], self.index_u[i]]
                     for i in range(self.nchan)
@@ -341,7 +315,7 @@ class Gridder:
             cell_robust_weight[cell_weight <= 0.0] = 0
 
             # now assign the cell robust weight to each visibility within that cell
-            density_weights = cell_robust_weight[self.index_v, self.index_u]
+            density_weight = cell_robust_weight[self.index_v, self.index_u]
         else:
             raise ValueError(
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
@@ -351,17 +325,15 @@ class Gridder:
         # we are approximating the Eqn 3.8 of Briggs' thesis
         # we need to sum over the Hermitian quantities in the
         # normalization constant.
-        self.debug_info = (tapering_weight[4], density_weights[4], self.weight[4])
-        self.C = 1 / (
-            2 * np.sum(tapering_weight * density_weights * self.weight, axis=1)
-        )
+        self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
         self.gridded_re = self._histogram_cube(
-            self.data_re * tapering_weight * density_weights * self.weight
+            self.data_re * tapering_weight * density_weight * self.weight
         )
+
         self.gridded_im = self._histogram_cube(
-            self.data_im * tapering_weight * density_weights * self.weight
+            self.data_im * tapering_weight * density_weight * self.weight
         )
 
         self.gridded_vis = self.gridded_re + self.gridded_im * 1.0j
@@ -369,7 +341,7 @@ class Gridder:
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
         self.gridded_beam_re = self._histogram_cube(
-            tapering_weight * density_weights * self.weight
+            tapering_weight * density_weight * self.weight
         )
 
         # instantiate uncertainties for each averaged visibility.
@@ -390,17 +362,24 @@ class Gridder:
         # that is because we are using the FFT to compute an already discretized equation, not
         # approximating a continuous equation.
 
-        self.beam = self._fliplr_cube(
+        beam = self._fliplr_cube(
             np.fft.fftshift(
                 self.coords.npix ** 2
-                * np.fft.irfft2(
+                * np.fft.ifft2(
                     np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re, axes=1
+                        self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re,
+                        axes=(1, 2),
                     )
                 ),
                 axes=(1, 2),
             )
         )
+
+        assert (
+            np.max(beam.imag) < 1e-10
+        ), "Dirty beam contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+
+        self.beam = beam.real
 
         return self.beam
 
@@ -417,17 +396,24 @@ class Gridder:
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
 
-        self.img = self._fliplr_cube(
+        img = self._fliplr_cube(
             np.fft.fftshift(
                 self.coords.npix ** 2
-                * np.fft.irfft2(
+                * np.fft.ifft2(
                     np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.gridded_vis, axes=1
+                        self.C[:, np.newaxis, np.newaxis] * self.gridded_vis,
+                        axes=(1, 2),
                     )
                 ),
                 axes=(1, 2),
             )
         )  # Jy/beam
+
+        assert (
+            np.max(img.imag) < 1e-10
+        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+
+        self.img = img.real
 
         return self.img
 
