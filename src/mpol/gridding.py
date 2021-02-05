@@ -12,9 +12,9 @@ class GridCoords:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
 
-    For real images, the Fourier grid is minimally defined by an RFFT grid over the domain :math:`[0,+u]`, :math:`[-v,+v]`. 
+    The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is implementation simplicity.
 
-    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will have a corresponding RFFT Fourier grid with shape ``(npix, npix//2 + 1)`` because the RFFT is performed over the trailing coordinate, in this case :math:`u`. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
+    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
 
     After the object is initialized, instance variables can be accessed, for example
     
@@ -127,7 +127,7 @@ class Gridder:
     r"""
     The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates and shift all loose data into the RFFT domain (:math:`[0,u]` and :math:`[-v,v]`).
+    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. 
 
     Once the loose visibilities are attached, the user can decide how to 'grid', or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.
 
@@ -261,7 +261,7 @@ class Gridder:
 
         Args:
             weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
-            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2].
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting. 
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
         """
 
@@ -303,19 +303,41 @@ class Gridder:
             # implement robust weighting using the definition used in CASA
             # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
 
+            # implement robust weighting using the definition used in CASA
+            # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
+
+            # # calculate the robust parameter f^2
+            # f_sq = ((5 * 10 ** (-robust)) ** 2) / (
+            #     np.sum(cell_weight ** 2) / np.sum(self.weights)
+            # )
+
+            # # the robust weight corresponding to the cell
+            # cell_robust_weight = 1 / (1 + cell_weight * f_sq)
+
+            # # zero out cells that have no visibilities
+            # cell_robust_weight[cell_weight <= 0.0] = 0
+
+            # # now assign the cell robust weight to each visibility within that cell
+            # density_weights = cell_robust_weight[self.index_v, self.index_u]
+
             # calculate the robust parameter f^2 for each channel
             f_sq = ((5 * 10 ** (-robust)) ** 2) / (
-                np.sum(cell_weight ** 2, axis=(1, 2)) / np.sum(self.weight, axis=(1, 2))
+                np.sum(cell_weight ** 2, axis=(1, 2)) / np.sum(self.weight, axis=1)
             )
 
             # the robust weight corresponding to the cell
-            cell_robust_weight = 1 / (1 + cell_weight * f_sq)
+            cell_robust_weight = 1 / (1 + cell_weight * f_sq[:, np.newaxis, np.newaxis])
 
             # zero out cells that have no visibilities
             cell_robust_weight[cell_weight <= 0.0] = 0
 
             # now assign the cell robust weight to each visibility within that cell
-            density_weight = cell_robust_weight[self.index_v, self.index_u]
+            density_weight = np.array(
+                [
+                    cell_robust_weight[i][self.index_v[i], self.index_u[i]]
+                    for i in range(self.nchan)
+                ]
+            )
         else:
             raise ValueError(
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"

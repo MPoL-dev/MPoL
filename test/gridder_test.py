@@ -4,14 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def test_grid_coords_index():
-    coords = gridding.GridCoords(cell_size=0.01, npix=16)
-    # print("u centers", coords.u_centers)
-    # print("v centers", coords.v_centers)
-
-    assert False
-
-
 def test_grid_coords_instantiate():
     coords = gridding.GridCoords(cell_size=0.01, npix=512)
 
@@ -56,7 +48,7 @@ def test_gridder_instantiate_cell_npix(mock_visibility_data):
     vv = d["vv"]
     weight = d["weight"]
     data_re = d["data_re"]
-    data_im = d["data_im"]
+    data_im = -d["data_im"]
 
     gridding.Gridder(
         cell_size=0.005,
@@ -75,7 +67,7 @@ def test_gridder_instantiate_gridCoord(mock_visibility_data):
     vv = d["vv"]
     weight = d["weight"]
     data_re = d["data_re"]
-    data_im = d["data_im"]
+    data_im = -d["data_im"]
 
     mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
 
@@ -90,7 +82,7 @@ def test_gridder_instantiate_npix_gridCoord_conflict(mock_visibility_data):
     vv = d["vv"]
     weight = d["weight"]
     data_re = d["data_re"]
-    data_im = d["data_im"]
+    data_im = -d["data_im"]
 
     mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
 
@@ -113,7 +105,7 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
     vv = d["vv"]
     weight = d["weight"]
     data_re = d["data_re"]
-    data_im = d["data_im"]
+    data_im = -d["data_im"]
 
     mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
 
@@ -126,31 +118,6 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
             data_re=data_re,
             data_im=data_im,
         )
-
-
-# def test_gridder_conjugated(mock_visibility_data):
-#     coords = gridding.GridCoords(cell_size=0.005, npix=800)
-
-#     d = mock_visibility_data
-#     uu = d["uu"]
-#     vv = d["vv"]
-#     weight = 0.1 * np.ones_like(uu)
-#     data_re = np.ones_like(uu)
-#     data_im = np.zeros_like(uu)
-
-#     nchan, nvis_start = uu.shape
-
-#     gridder = gridding.Gridder(
-#         coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
-#     )
-
-#     nchan, nvis_end = gridder.uu.shape
-#     print("nvis start:{:} end:{:}".format(nvis_start, nvis_end))
-#     assert nvis_end / nvis_start == 2
-
-#     assert np.min(gridder.uu) > 0
-#     assert np.min(gridder.vv) < 0
-#     assert np.max(gridder.vv) > 0
 
 
 # test that we're getting the right numbers back for some well defined operations
@@ -189,34 +156,6 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
 
 
-def test_natural_ones(mock_visibility_data, tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
-
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-    weight = 0.1 * np.ones_like(uu)
-    data_re = np.ones_like(uu)
-    data_im = np.zeros_like(uu)
-
-    gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
-    )
-
-    # with uniform weighting, the gridded sheet should be uniform and = 1
-    gridder.grid_visibilities(weighting="natural")
-    print(
-        "re",
-        np.mean(gridder.gridded_re),
-        np.std(gridder.gridded_re),
-        np.min(gridder.gridded_re),
-        np.max(gridder.gridded_re),
-    )
-    # data_re should be equal to the number of points in each cell (* weight)
-
-    # assert False
-
-
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
 @pytest.fixture
 def gridder(mock_visibility_data):
@@ -226,7 +165,7 @@ def gridder(mock_visibility_data):
     vv = d["vv"]
     weight = d["weight"]
     data_re = d["data_re"]
-    data_im = d["data_im"]
+    data_im = -d["data_im"]
 
     return gridding.Gridder(
         cell_size=0.005,
@@ -239,49 +178,101 @@ def gridder(mock_visibility_data):
     )
 
 
-# actually do the gridding
-def test_grid_uniform(gridder):
-    gridder.grid_visibilities()
+# make sure the peak of the PSF normalizes to 1 for each channel
+def test_beam_normalized(gridder):
+    r = -0.5
+    for weighting in ["uniform", "natural", "briggs"]:
+        if weighting == "briggs":
+            gridder.grid_visibilities(weighting=weighting, robust=r)
+        else:
+            gridder.grid_visibilities(weighting=weighting)
+        beam = gridder.get_dirty_beam()
 
-    beam = gridder.get_dirty_beam()
-
-    print(np.max(beam))
-
-    # assert False
-
-
-# def test_grid_natural(gridder):
-#     gridder.grid_visibilities(weighting="natural")
-
-
-# def test_grid_briggs(gridder):
-#     gridder.grid_visibilities(weighting="briggs", robust=0.5)
+        for i in range(gridder.nchan):
+            assert pytest.approx(np.max(beam[i]), 1.0)
 
 
-# make a dirty beam
+# compare uniform and robust = -2.0
+def test_grid_uniform(gridder, tmp_path):
 
-# make a dirty image
+    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+
+    chan = 4
+
+    gridder.grid_visibilities(weighting="uniform")
+    beam_uniform = gridder.get_dirty_beam()
+    img_uniform = gridder.get_dirty_image()
+
+    r = -2
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam_robust = gridder.get_dirty_beam()
+    img_robust = gridder.get_dirty_image()
+
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
+
+    ax[0, 0].imshow(beam_uniform[chan], **kw)
+    ax[0, 0].set_title("uniform")
+    ax[1, 0].imshow(img_uniform[chan], **kw)
+
+    ax[0, 1].imshow(beam_robust[chan], **kw)
+    ax[0, 1].set_title("robust={:}".format(r))
+    ax[1, 1].imshow(img_robust[chan], **kw)
+
+    # the differences
+    im = ax[0, 2].imshow(beam_uniform[chan] - beam_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[0, 2])
+    ax[0, 2].set_title("difference")
+    im = ax[1, 2].imshow(img_uniform[chan] - img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 2])
+
+    fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
+
+    fig.savefig(tmp_path / "uniform_v_robust.png", dpi=300)
+
+    assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
+    assert np.all(np.abs(img_uniform - img_robust) < 1e-5)
+
+
+def test_grid_natural(gridder, tmp_path):
+
+    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+
+    chan = 4
+
+    gridder.grid_visibilities(weighting="natural")
+    beam_natural = gridder.get_dirty_beam()
+    img_natural = gridder.get_dirty_image()
+
+    r = 2
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam_robust = gridder.get_dirty_beam()
+    img_robust = gridder.get_dirty_image()
+
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
+
+    ax[0, 0].imshow(beam_natural[chan], **kw)
+    ax[0, 0].set_title("natural")
+    ax[1, 0].imshow(img_natural[chan], **kw)
+
+    ax[0, 1].imshow(beam_robust[chan], **kw)
+    ax[0, 1].set_title("robust={:}".format(r))
+    ax[1, 1].imshow(img_robust[chan], **kw)
+
+    # the differences
+    im = ax[0, 2].imshow(beam_natural[chan] - beam_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[0, 2])
+    ax[0, 2].set_title("difference")
+    im = ax[1, 2].imshow(img_natural[chan] - img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 2])
+
+    fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
+
+    fig.savefig(tmp_path / "natural_v_robust.png", dpi=300)
+
+    assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
+    assert np.all(np.abs(img_natural - img_robust) < 1e-3)
+
 
 # see if we can get it in the correct units
 # export them
 # does the imager work for single-channeled visiblities?
-
-
-def test_channel_gridder(mock_visibility_data):
-    d = mock_visibility_data
-
-    chan = 4
-
-    uu = d["uu"][chan]
-    vv = d["vv"][chan]
-    weight = d["weight"][chan]
-    data_re = d["data_re"][chan]
-    data_im = d["data_im"][chan]
-
-    gridder = gridding.ChannelImager(0.005, 800, uu, vv, weight, data_re, data_im)
-
-    gridder.grid_visibilities(weighting="uniform")
-
-    gridder.image_gridded_visibilities()
-    print(np.max(gridder.beam))
-    assert False
