@@ -272,8 +272,7 @@ class Gridder:
 
         # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift the v axis
-        # for the RFFT
+        # when in fact, later on, we'll need to fftshift for the FFT
         cell_weight = self._histogram_cube(self.weight)
 
         # calculate the density weights
@@ -302,23 +301,6 @@ class Gridder:
 
             # implement robust weighting using the definition used in CASA
             # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
-
-            # implement robust weighting using the definition used in CASA
-            # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
-
-            # # calculate the robust parameter f^2
-            # f_sq = ((5 * 10 ** (-robust)) ** 2) / (
-            #     np.sum(cell_weight ** 2) / np.sum(self.weights)
-            # )
-
-            # # the robust weight corresponding to the cell
-            # cell_robust_weight = 1 / (1 + cell_weight * f_sq)
-
-            # # zero out cells that have no visibilities
-            # cell_robust_weight[cell_weight <= 0.0] = 0
-
-            # # now assign the cell robust weight to each visibility within that cell
-            # density_weights = cell_robust_weight[self.index_v, self.index_u]
 
             # calculate the robust parameter f^2 for each channel
             f_sq = ((5 * 10 ** (-robust)) ** 2) / (

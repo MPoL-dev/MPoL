@@ -274,5 +274,3 @@ def test_grid_natural(gridder, tmp_path):
 
 
 # see if we can get it in the correct units
-# export them
-# does the imager work for single-channeled visiblities?
