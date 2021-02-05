@@ -25,7 +25,7 @@ def mock_visibility_data(tmp_path_factory):
             # download the file here
             url = "https://zenodo.org/record/4498439/files/logo_cube.npz"
             r = requests.get(url)
-            with open(npz_path, "wb") as f:
+            with open(str(npz_path), "wb") as f:
                 f.write(r.content)
     else:
         # download the file to a temporary directory
@@ -37,8 +37,8 @@ def mock_visibility_data(tmp_path_factory):
         # download the file here
         url = "https://zenodo.org/record/4498439/files/logo_cube.npz"
         r = requests.get(url)
-        with open(npz_path, "wb") as f:
+        with open(str(npz_path), "wb") as f:
             f.write(r.content)
 
-    return np.load(npz_path)
+    return np.load(str(npz_path))
 
