@@ -4,8 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def test_grid_coords_index():
+    coords = gridding.GridCoords(cell_size=0.01, npix=16)
+    # print("u centers", coords.u_centers)
+    # print("v centers", coords.v_centers)
+
+    assert False
+
+
 def test_grid_coords_instantiate():
-    mycoords = gridding.GridCoords(cell_size=0.01, npix=512)
+    coords = gridding.GridCoords(cell_size=0.01, npix=512)
 
 
 def test_grid_coords_odd_fail():

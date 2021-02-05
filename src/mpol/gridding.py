@@ -71,11 +71,16 @@ class GridCoords:
         # and the v dimension gets the full transform
         int_u_edges = np.arange(self.ncell_u + 1) - 0.5
         int_v_edges = np.arange(self.ncell_v + 1) - self.ncell_v // 2 - 0.5
+
+        # print("int_u_edges", int_u_edges)
+        # print("int_v_edges", int_v_edges)
         self.u_edges = self.du * int_u_edges  # [kλ]
         self.v_edges = self.dv * int_v_edges  # [kλ]
 
         int_u_centers = np.arange(self.ncell_u)
         int_v_centers = np.arange(self.ncell_v) - self.npix // 2
+        # print("int_u_centers", int_u_centers)
+        # print("int_v_centers", int_v_centers)
         self.u_centers = self.du * int_u_centers  # [kλ]
         self.v_centers = self.dv * int_v_centers  # [kλ]
 
@@ -195,6 +200,15 @@ class Gridder:
         assert data_re.dtype == np.float64, "data_re should be type np.float64"
         assert data_im.dtype == np.float64, "data_im should be type np.float64"
 
+        # expand and overwrite the vectors to include complex conjugates
+        uu_full = np.concatenate([uu, -uu], axis=1)
+        vv_full = np.concatenate([vv, -vv], axis=1)
+        weight_full = np.concatenate([weight, weight], axis=1)
+        data_re_full = np.concatenate([data_re, data_re], axis=1)
+        data_im_full = np.concatenate([data_im, -data_im], axis=1)
+
+        # remove all visibilities that have uu < u_bin_bin
+
         # The RFFT outputs u in the range [0, +] and v in the range [-, +],
         # but the dataset contains measurements at u [-,+] and v [-, +].
         # Find all the u < 0 points and convert them via complex conj
@@ -202,7 +216,6 @@ class Gridder:
         uu[ind_u_neg] *= -1.0  # swap axes so all u > 0
         vv[ind_u_neg] *= -1.0  # swap axes
         data_im[ind_u_neg] *= -1.0  # complex conjugate
-
         self.coords.check_data_fit(uu=uu, vv=vv)
 
         # No need to duplicate and complex-conjugate visibilities
@@ -210,11 +223,11 @@ class Gridder:
         # conjugates exist.
 
         # if all checks out, store these to the object
-        self.uu = uu
-        self.vv = vv
-        self.weight = weight
-        self.data_re = data_re
-        self.data_im = data_im
+        self.uu = uu_full
+        self.vv = vv_full
+        self.weight = weight_full
+        self.data_re = data_re_full
+        self.data_im = data_im_full
 
         self.nchan = len(self.uu)
 
@@ -334,8 +347,14 @@ class Gridder:
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
             )
 
-        # Normalization constant for each channel
-        self.C = 1 / np.sum(tapering_weight * density_weights * self.weight, axis=1)
+        # the factor of 2 in the denominator is needed because
+        # we are approximating the Eqn 3.8 of Briggs' thesis
+        # we need to sum over the Hermitian quantities in the
+        # normalization constant.
+        self.debug_info = (tapering_weight[4], density_weights[4], self.weight[4])
+        self.C = 1 / (
+            2 * np.sum(tapering_weight * density_weights * self.weight, axis=1)
+        )
 
         # grid the reals and imaginaries separately
         self.gridded_re = self._histogram_cube(
@@ -535,6 +554,7 @@ class ChannelImager:
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
             )
 
+        self.debug_info = (tapering_weights, density_weights, self.weights)
         self.C = 1 / np.sum(tapering_weights * density_weights * self.weights)
 
         # grid the reals and imaginaries
