@@ -272,5 +272,3 @@ def test_grid_natural(gridder, tmp_path):
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
 
-
-# see if we can get it in the correct units
