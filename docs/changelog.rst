@@ -1,5 +1,16 @@
+   .. _changelog-reference-label:
+
 Changelog
 =========
+
+v0.0.6
+------
+
+* Updated citations to include Brianna Zawadzki
+* Added :class:`~mpol.gridding.Gridder` and :class:`~mpol.gridding.GridCoords` objects.
+* Removed ``mpol.dirty_image`` module.
+* Migrated prolate spheroidal wavefunctions to ``mpol.spheroidal_gridding`` module.
+* Added Jupyter notebook tutorial build process using `RTD-action <https://rtds-action.readthedocs.io/en/latest/>`_
 
 v0.0.5
 ------

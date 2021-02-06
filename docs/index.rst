@@ -12,12 +12,22 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User Guide
 
    installation.rst
+   api.rst
+   units-and-conventions.rst
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
    tutorials/gridder
    usage.rst
-   api.rst
+
+.. toctree::
+   :hidden:
+
    changelog.rst
 
 If you use MPoL in your research, please cite us! ::
@@ -33,10 +43,6 @@ If you use MPoL in your research, please cite us! ::
     doi          = {10.5281/zenodo.3647603},
     url          = {https://doi.org/10.5281/zenodo.3647603}
     }
-    
-Indices and tables
-==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+* :ref:`changelog-reference-label`

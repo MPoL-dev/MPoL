@@ -12,6 +12,6 @@
 #     name: python3
 # ---
 
-# # Gridder
+# # Gridding visibilities and making dirty images
 #
 # Working with the Gridder class.

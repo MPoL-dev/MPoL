@@ -116,3 +116,12 @@ test/*.png
 
 # virtual environment
 venv/
+
+# notebooks produced from jupytext 
+docs/tutorials/*.ipynb
+
+# testing cache
+tmp_cache 
+
+# setup file
+project_setup.sh

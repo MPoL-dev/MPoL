@@ -1,7 +1,7 @@
 Installation
 ============
 
-MPoL requires ``python > 3.5``. 
+MPoL requires ``python >= 3.5``. 
 
 Using pip
 ---------
@@ -15,16 +15,12 @@ From source
 
 If you'd like to install the package from source to access the latest development version, download or `git clone` the MPoL repository and install ::
 
-    $ git clone https://github.com/iancze/MPoL.git
+    $ git clone https://github.com/MPoL-dev/MPoL.git
     $ cd MPoL
     $ pip install .
 
-If you have trouble installing please raise a `github issue <https://github.com/iancze/MPoL/issues>`_.
+If you have trouble installing please raise a `github issue <https://github.com/MPoL-dev/MPoL/issues>`_.
 
-Conda
------
-
-Automatic installation of depedencies in conda environments failed intermittently for some users. You might want to install the requirements first(`numpy`, `scipy`, `torch`, `torchvision`), and then `pip install .`
 
 Upgrading
 ---------
@@ -48,4 +44,4 @@ You can determine your current installed version by ::
 Other considerations 
 --------------------
 
-You may consider `installing PyTorch individually <https://pytorch.org/>`_ if you do/do not require CUDA support and want to fine tune your installation. If you would like to export your images to FITS files, you should also install the `astropy` package. 
+If you would like to export your images to FITS files, you should also install the `astropy` package. 
