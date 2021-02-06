@@ -17,6 +17,7 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
    installation.rst
    api.rst
    units-and-conventions.rst
+   developer-documentation.rst
    
 .. toctree::
    :maxdepth: 2
@@ -32,10 +33,10 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
 
 If you use MPoL in your research, please cite us! ::
 
-    @software{ian_czekala_2020_3647603,
+    @software{MPoL,
     author       = {Ian Czekala, Brianna Zawadzki, and
                     Ryan Loomis},
-    title        = {iancze/MPoL: Pip installable package},
+    title        = {iancze/MPoL: A flexible Python Framework for Regularized Maximum Likelihood Imaging},
     month        = feb,
     year         = 2020,
     publisher    = {Zenodo},
