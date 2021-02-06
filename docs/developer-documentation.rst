@@ -48,11 +48,11 @@ Contributing
 
 We use a "fork and pull request" model for collaborative development on Github, using git. If you are unfamiliar with this workflow, check out this short Github guide on `forking projects <https://guides.github.com/activities/forking/>`_. For even more reference material, see the official Github documentation on `collaborating with issues and pull requests <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests>`_.
 
-After forking the MPoL repository to your own github account, clone the repository and install it with the development tools::
+After forking the MPoL repository to your own github account, clone the repository and install it with the development tools in editable mode::
 
     $ git clone https://github.com/MPoL-dev/MPoL.git
     $ cd MPoL
-    $ pip install .[dev]
+    $ pip install -e .[dev]
 
 .. note:: 
 
@@ -70,7 +70,7 @@ If you find that you're making regular contributions to the package, consider co
 Contributing tutorials
 ======================
 
-Like with the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ codebase, MPoL tutorials are written as ``.py`` python files and converted to Jupyter notebooks using `jupytex <https://jupytext.readthedocs.io/en/latest/>`_. This practice prevents the MPoL github repository from growing too with bloated Jupyter notebooks filled with evaluated cells.
+Like with the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ codebase, MPoL tutorials are written as ``.py`` python files and converted to Jupyter notebooks using `jupytex <https://jupytext.readthedocs.io/en/latest/>`_. This practice prevents the MPoL github repository from growing too bloated from Jupyter notebooks filled with evaluated cells.
 
 To contribute a new tutorial, we would recommend starting by
 

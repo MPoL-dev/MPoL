@@ -51,11 +51,12 @@ import os
 
 # For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file.
 
-url = "https://zenodo.org/record/4498439/files/logo_cube.npz"
-r = requests.get(url)
 fname = "viz.npz"
-with open(fname, "wb") as f:
-    f.write(r.content)
+if not os.path.exists(fname):  # check if the file exists, otherwise, download it
+    url = "https://zenodo.org/record/4498439/files/logo_cube.npz"
+    r = requests.get(url)
+    with open(fname, "wb") as f:
+        f.write(r.content)
 
 d = np.load(fname)
 uu = d["uu"]
@@ -127,7 +128,7 @@ print(img.shape)
 chan = 4
 kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
-fig, ax = plt.subplots(ncols=2, figsize=(6.5, 4))
+fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
 
 ax[0].imshow(beam[chan], **kw)
 ax[0].set_title("beam")
@@ -138,7 +139,7 @@ for a in ax:
     a.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
     a.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 
-fig.subplots_adjust(left=0.15, right=0.85, wspace=0.3, bottom=0.15, top=0.9)
+fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
 # -
 
 # If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the regular TMS convention.
