@@ -9,7 +9,169 @@ from .constants import arcsec
 from . import utils
 
 
+class BaseCube(nn.Module):
+    r"""
+    The parameter set is the pixel values of the base cube. the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+
+    All keyword arguments are required unless noted.
+
+    Args:
+        npix (int): the number of pixels per image side
+        nchan (int): the number of channels in the image
+        cell_size (float): the width of a pixel [arcseconds]
+        base_cube (torch.double tensor, optional): a base image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+    """
+
+    def __init__(
+        self, pixel_mapping=None,
+    ):
+
+        super().__init__()
+
+        # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
+        # packed in the fftshifted format to make the Fourier transformation easier
+        # and with East pointing right (i.e., RA increasing to the right)
+        # this is contrary to the way astronomers normally plot images, but
+        # is correct for what the FFT expects
+        if base_cube is None:
+            self._base_cube = nn.Parameter(
+                torch.full(
+                    (self.nchan, self.npix, self.npix),
+                    fill_value=0.05,
+                    requires_grad=True,
+                    dtype=torch.double,
+                )
+            )
+
+        else:
+            # we expect the user to supply an image cube as it looks on the sky
+            # with East pointing to the left. Therefore we will need to
+            # flip the image across the RA dimension
+            # so that the native cube has East (l) increasing with array index
+            # North (m) should already be increasing with array index
+            flipped = torch.flip(cube, (2,))
+            shifted = utils.fftshift(flipped, axes=(1, 2))
+            import warnings
+
+            warnings.warn(
+                "Inverse of pixel mapping not yet implemented. Assigning cube to base_cube as is."
+            )
+            self._base_cube = nn.Parameter(shifted)
+
+    def forward(self):
+        r"""
+        Return an image cube 
+        """
+
+        return self.pixel_mapping(self._base_cube)
+
+
 class ImageCube(nn.Module):
+    r"""
+    The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+
+    All keyword arguments are required unless noted.
+
+    Args:
+        npix (int): the number of pixels per image side
+        nchan (int): the number of channels in the image
+        cell_size (float): the width of a pixel [arcseconds]
+        cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`.
+    """
+
+    def __init__(self, cell_size=None, npix=None, nchan=None, cube=None):
+        pass
+        # initialize GridCoords object
+
+        super().__init__()
+
+        if cube is None:
+            self._cube = nn.Parameter(
+                torch.full(
+                    (self.nchan, self.npix, self.npix),
+                    fill_value=0.0,
+                    requires_grad=True,
+                    dtype=torch.double,
+                )
+            )
+
+        else:
+            # we expect the user to supply an image cube as it looks on the sky
+            # with East pointing to the left. Therefore we will need to
+            # flip the image across the RA dimension
+            # so that the native cube has East (l) increasing with array index
+            # North (m) should already be increasing with array index
+            flipped = torch.flip(cube, (2,))
+            shifted = utils.fftshift(flipped, axes=(1, 2))
+            self._cube = nn.Parameter(shifted)
+
+    def forward(self):
+        r"""
+        ImageCube is essentially an identity layer---it just passes on the cube (hopefully to a DataConnector).
+        """
+        return self._cube
+
+    @property
+    def cube(self):
+        """
+        The image cube.
+
+        Returns:
+            torch.double : image cube of shape ``(nchan, npix, npix)``
+            
+        """
+        # fftshift the image cube to the correct quadrants
+        shifted = utils.fftshift(self._cube, axes=(1, 2))
+        # flip so that east points left
+        flipped = torch.flip(shifted, (2,))
+        return flipped
+
+    def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
+        """
+        Export the image cube to a FITS file. 
+
+        Args:
+            fname (str): the name of the FITS file to export to.
+            overwrite (bool): if the file already exists, overwrite?
+            header_kwargs (dict): Extra keyword arguments to write to the FITS header.
+
+        Returns:
+            None
+        """
+
+        try:
+            from astropy.io import fits
+            from astropy import wcs
+        except ImportError:
+            print(
+                "Please install the astropy package to use FITS export functionality."
+            )
+
+        w = wcs.WCS(naxis=2)
+
+        w.wcs.crpix = np.array([1, 1])
+        w.wcs.cdelt = (
+            np.array([self.cell_size, self.cell_size]) * 180.0 / np.pi
+        )  # decimal degrees
+        w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+
+        header = w.to_header()
+
+        # add in the kwargs to the header
+        if header_kwargs is not None:
+            for k, v in header_kwargs.items():
+                header[k] = v
+
+        hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy(), header=header)
+
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(fname, overwrite=overwrite)
+
+        hdul.close()
+
+
+class ImageCubeOld(nn.Module):
     r"""
     A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.
 
