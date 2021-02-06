@@ -68,7 +68,7 @@ If you find that you're making regular contributions to the package, consider co
 
 
 Contributing tutorials
-----------------------
+======================
 
 Like with the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ codebase, MPoL tutorials are written as ``.py`` python files and converted to Jupyter notebooks using `jupytex <https://jupytext.readthedocs.io/en/latest/>`_. This practice prevents the MPoL github repository from growing too with bloated Jupyter notebooks filled with evaluated cells.
 

@@ -35,6 +35,7 @@ EXTRA_REQUIRES = {
         "jupyter",
         "nbconvert",
         "rtds-action",
+        "requests",
     ],
 }
 

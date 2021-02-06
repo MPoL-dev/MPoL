@@ -30,6 +30,7 @@ You can find the source code on `github <https://github.com/iancze/MPoL>`_.
    :hidden:
 
    changelog.rst
+   tutorials/notebook_setup
 
 If you use MPoL in your research, please cite us! ::
 
