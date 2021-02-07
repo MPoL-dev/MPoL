@@ -4,9 +4,24 @@ import numpy as np
 import torch
 from torch import nn
 
-from . import spheroidal_gridding
 from .constants import arcsec
+from .gridding import GridCoords
 from . import utils
+
+
+def sky_cube_to_packed_cube(sky_cube):
+    # If it's an identity layer, just set parameters to cube
+    flipped = torch.flip(cube, (2,))
+    shifted = utils.fftshift(flipped, axes=(1, 2))
+    return shifted
+
+
+def packed_cube_to_sky_cube(packed_cube):
+    # fftshift the image cube to the correct quadrants
+    shifted = utils.fftshift(packed_cube, axes=(1, 2))
+    # flip so that east points left
+    flipped = torch.flip(shifted, (2,))
+    return flipped
 
 
 class BaseCube(nn.Module):
@@ -23,18 +38,36 @@ class BaseCube(nn.Module):
     """
 
     def __init__(
-        self, pixel_mapping=None,
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        base_cube=None,
+        pixel_mapping=None,
     ):
 
         super().__init__()
 
-        # The ``_cube`` attribute shouldn't really be accessed by the user, since it's naturally
+        if coords:
+            assert (
+                npix is None and cell_size is None
+            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+            self.coords = coords
+
+        elif npix or cell_size:
+            assert (
+                coords is None
+            ), "GridCoords must be empty if npix and cell_size are supplied."
+
+            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+
+        # The ``base_cube`` attribute is naturally
         # packed in the fftshifted format to make the Fourier transformation easier
         # and with East pointing right (i.e., RA increasing to the right)
         # this is contrary to the way astronomers normally plot images, but
         # is correct for what the FFT expects
         if base_cube is None:
-            self._base_cube = nn.Parameter(
+            self.base_cube = nn.Parameter(
                 torch.full(
                     (self.nchan, self.npix, self.npix),
                     fill_value=0.05,
@@ -49,21 +82,14 @@ class BaseCube(nn.Module):
             # flip the image across the RA dimension
             # so that the native cube has East (l) increasing with array index
             # North (m) should already be increasing with array index
-            flipped = torch.flip(cube, (2,))
-            shifted = utils.fftshift(flipped, axes=(1, 2))
-            import warnings
-
-            warnings.warn(
-                "Inverse of pixel mapping not yet implemented. Assigning cube to base_cube as is."
-            )
-            self._base_cube = nn.Parameter(shifted)
+            self.base_cube = nn.Parameter(sky_cube_to_packed_cube(base_cube))
 
     def forward(self):
         r"""
         Return an image cube 
         """
 
-        return self.pixel_mapping(self._base_cube)
+        return self.pixel_mapping(self.base_cube)
 
 
 class ImageCube(nn.Module):
@@ -77,17 +103,37 @@ class ImageCube(nn.Module):
         nchan (int): the number of channels in the image
         cell_size (float): the width of a pixel [arcseconds]
         cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
-        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`.
+        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.
     """
 
-    def __init__(self, cell_size=None, npix=None, nchan=None, cube=None):
-        pass
-        # initialize GridCoords object
-
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        nchan=None,
+        cube=None,
+        passthrough=False,
+    ):
         super().__init__()
 
+        if coords:
+            assert (
+                npix is None and cell_size is None
+            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+            self.coords = coords
+
+        elif npix or cell_size:
+            assert (
+                coords is None
+            ), "GridCoords must be empty if npix and cell_size are supplied."
+
+            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+
+        self.passthrough = passthrough
+
         if cube is None:
-            self._cube = nn.Parameter(
+            self.cube = nn.Parameter(
                 torch.full(
                     (self.nchan, self.npix, self.npix),
                     fill_value=0.0,
@@ -104,16 +150,26 @@ class ImageCube(nn.Module):
             # North (m) should already be increasing with array index
             flipped = torch.flip(cube, (2,))
             shifted = utils.fftshift(flipped, axes=(1, 2))
-            self._cube = nn.Parameter(shifted)
+            self.cube = nn.Parameter(shifted)
 
-    def forward(self):
+    def forward(self, cube=None):
         r"""
-        ImageCube is essentially an identity layer---it just passes on the cube (hopefully to a DataConnector).
+        If ``passthrough=True`` on initialization, ImageCube is essentially an identity layer---it just passes on the cube when ``forward`` is called. 
+
+        If ``passthrough=False`` on initialization, ImageCube actually stores the trainable parameters.
         """
-        return self._cube
+
+        if cube is not None:
+            assert self.passthrough, "Must be passthrough if supplying cube."
+            self.cube = cube
+
+        if not self.passthrough:
+            assert cube is None, "Do not supply cube if passthrough."
+
+        return self.cube
 
     @property
-    def cube(self):
+    def sky_cube(self):
         """
         The image cube.
 
@@ -121,11 +177,7 @@ class ImageCube(nn.Module):
             torch.double : image cube of shape ``(nchan, npix, npix)``
             
         """
-        # fftshift the image cube to the correct quadrants
-        shifted = utils.fftshift(self._cube, axes=(1, 2))
-        # flip so that east points left
-        flipped = torch.flip(shifted, (2,))
-        return flipped
+        return packed_cube_to_sky_cube(self.cube)
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
@@ -152,7 +204,7 @@ class ImageCube(nn.Module):
 
         w.wcs.crpix = np.array([1, 1])
         w.wcs.cdelt = (
-            np.array([self.cell_size, self.cell_size]) * 180.0 / np.pi
+            np.array([self.coords.cell_size, self.coords.cell_size]) * 180.0 / np.pi
         )  # decimal degrees
         w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
 
@@ -163,12 +215,90 @@ class ImageCube(nn.Module):
             for k, v in header_kwargs.items():
                 header[k] = v
 
-        hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy(), header=header)
+        hdu = fits.PrimaryHDU(self.sky_cube.detach().cpu().numpy(), header=header)
 
         hdul = fits.HDUList([hdu])
         hdul.writeto(fname, overwrite=overwrite)
 
         hdul.close()
+
+
+class FourierCube(nn.Module):
+    r"""
+    The cube corresponding to the full FFT of ImageCube.
+
+    All keyword arguments are required unless noted.
+
+    Args:
+        npix (int): the number of pixels per image side
+        nchan (int): the number of channels in the image
+        cell_size (float): the width of a pixel [arcseconds]
+        cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`.
+    """
+
+    def __init__(
+        self, cell_size=None, npix=None, coords=None,
+    ):
+        super().__init__()
+
+        if coords:
+            assert (
+                npix is None and cell_size is None
+            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+            self.coords = coords
+
+        elif npix or cell_size:
+            assert (
+                coords is None
+            ), "GridCoords must be empty if npix and cell_size are supplied."
+
+            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+
+    def forward(self, cube):
+        """
+        Takes in img cube, returns FFT
+        """
+
+        # convert the image to Jy/ster and perform the FFT
+        # the self.cell_size prefactor (in radians) is to obtain the correct output units
+        # since it needs to correct for the spacing of the input grid.
+        # See MPoL documentation and/or TMS Eqn A8.18 for more information.
+        # Alternatively we could send the rfft routine _cube in its native Jy/arcsec^2
+        # and then multiply the result by cell_size (in units of arcsec).
+        # It seemed easiest to do it this way where we keep things in radians.
+        self.vis = self.coords.cell_size ** 2 * torch.fft(
+            cube / arcsec ** 2, signal_ndim=2
+        )
+
+        return self.vis
+
+    @property
+    def sky_vis(self):
+        r"""
+        The visibility FFT cube fftshifted for plotting with ``imshow``.
+
+        Returns:
+            torch.double: visibility cube
+        """
+
+        return utils.fftshift(self.vis, axes=(1, 2))
+
+    @property
+    def psd_sky(self):
+        r"""
+        The power spectral density of the cube, fftshifted for plotting. 
+
+        Returns:
+            torch.double: power spectral density cube
+        """
+
+        vis_re = self.vis_sky[:, :, :, 0]
+        vis_im = self.vis_sky[:, :, :, 1]
+
+        psd = vis_re ** 2 + vis_im ** 2
+
+        return psd
 
 
 class ImageCubeOld(nn.Module):
@@ -215,7 +345,7 @@ class ImageCubeOld(nn.Module):
         self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
         self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]
 
-        # the fft-packed versions corresponding to _vis
+        # the fft-packed versions corresponding to vis
         self._us_2D, self._vs_2D = np.meshgrid(
             self.us, self.vs, indexing="xy"
         )  # cartesian indexing (default)

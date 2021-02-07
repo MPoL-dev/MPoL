@@ -58,6 +58,11 @@ class GridCoords:
         self.dl = cell_size * arcsec  # [radians]
         self.dm = cell_size * arcsec  # [radians]
 
+        int_l_centers = np.arange(self.npix) - self.npix // 2
+        int_m_centers = np.arange(self.npix) - self.npix // 2
+        self.l_centers = self.dl * int_l_centers  # [radians]
+        self.m_centers = self.dm * int_m_centers  # [radians]
+
         # the output spatial frequencies of the FFT routine
         self.du = 1 / (self.npix * self.dl) * 1e-3  # [kλ]
         self.dv = 1 / (self.npix * self.dm) * 1e-3  # [kλ]
@@ -92,6 +97,33 @@ class GridCoords:
         # max freq supported by current grid
         self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
 
+        # only useful for plotting a sky_vis... uu, vv increasing, no fftshift
+        self.sky_u_centers_2D, self.sky_v_centers_2D = np.meshgrid(
+            self.u_centers, self.v_centers, indexing="xy"
+        )  # cartesian indexing (default)
+
+        # only useful for plotting... uu, vv increasing, no fftshift
+        self.sky_q_centers_2D = np.sqrt(
+            self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
+        )  # [kλ]
+
+        # for evaluating a packed vis... uu, vv increasing + fftshifted
+        self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
+        self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
+        self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
+
+        RA_centers_2D, DEC_centers_2D = np.meshgrid(
+            self.l_centers / arcsec, self.m_centers / arcsec, indexing="xy"
+        )  # [arcsec] cartesian indexing (default)
+
+        # for evaluating a packed cube... ll, mm increasing + fftshifted
+        self.packed_RA_centers_2D = np.fft.fftshift(RA_centers_2D)  # [arcsec]
+        self.packed_DEC_centers_2D = np.fft.fftshift(DEC_centers_2D)  # [arcsec]
+
+        # for evaluating a sky image... ll mirrored, mm increasing, no fftshift
+        self.sky_DEC_centers_2D = DEC_centers_2D  # [arcsec]
+        self.sky_RA_centers_2D = np.fliplr(RA_centers_2D)  # [arcsec]
+
     def check_data_fit(self, uu, vv):
         r"""
         Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
@@ -121,6 +153,15 @@ class GridCoords:
         )
 
         return True
+
+    def __eq__(self, other):
+        if not isinstance(other, GridCoords):
+            # don't attempt to compare against different types
+            return NotImplemented
+
+        # GridCoords objects are considered equal if they have the same cell_size and npix, since
+        # all other attributes are derived from these two core properties.
+        return self.cell_size == other.cell_size and self.npix == other.npix
 
 
 class Gridder:
