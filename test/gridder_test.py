@@ -8,6 +8,27 @@ def test_grid_coords_instantiate():
     coords = gridding.GridCoords(cell_size=0.01, npix=512)
 
 
+def test_grid_coords_equal():
+    coords1 = gridding.GridCoords(cell_size=0.01, npix=512)
+    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
+
+    assert coords1 == coords2
+
+
+def test_grid_coords_unequal_pix():
+    coords1 = gridding.GridCoords(cell_size=0.01, npix=510)
+    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
+
+    assert coords1 != coords2
+
+
+def test_grid_coords_unequal_cell_size():
+    coords1 = gridding.GridCoords(cell_size=0.011, npix=512)
+    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
+
+    assert coords1 != coords2
+
+
 def test_grid_coords_odd_fail():
     with pytest.raises(AssertionError):
         mycoords = gridding.GridCoords(cell_size=0.01, npix=511)
