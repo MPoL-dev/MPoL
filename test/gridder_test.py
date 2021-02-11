@@ -2,6 +2,7 @@ import pytest
 from mpol import gridding
 import numpy as np
 import matplotlib.pyplot as plt
+from mpol.constants import *
 
 
 def test_grid_coords_instantiate():
@@ -27,6 +28,93 @@ def test_grid_coords_unequal_cell_size():
     coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
 
     assert coords1 != coords2
+
+
+def test_grid_coords_plot_2D_uvq_sky(tmp_path):
+    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+
+    ikw = {"origin": "lower"}
+
+    fig, ax = plt.subplots(nrows=1, ncols=3)
+    im = ax[0].imshow(coords.sky_u_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(coords.sky_v_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[1])
+
+    im = ax[2].imshow(coords.sky_q_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[2])
+
+    for a, t in zip(ax, ["u", "v", "q"]):
+        a.set_title(t)
+
+    fig.savefig(str(tmp_path / "sky_uvq.png"), dpi=300)
+
+
+def test_grid_coords_plot_2D_uvq_packed(tmp_path):
+    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+
+    ikw = {"origin": "lower"}
+
+    fig, ax = plt.subplots(nrows=1, ncols=3)
+    im = ax[0].imshow(coords.packed_u_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(coords.packed_v_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[1])
+
+    im = ax[2].imshow(coords.packed_q_centers_2D, **ikw)
+    plt.colorbar(im, ax=ax[2])
+
+    for a, t in zip(ax, ["u", "v", "q"]):
+        a.set_title(t)
+
+    fig.savefig(str(tmp_path / "packed_uvq.png"), dpi=300)
+
+
+def test_grid_coords_eval_gauss_2D_packed(tmp_path):
+    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+
+    ikw = {"origin": "lower"}
+
+    def gexp(u, v):
+        # convert back to lambda
+        u = u * 1e3
+        v = v * 1e3
+
+        sigma_alpha = 0.1 * arcsec
+        sigma_delta = 0.1 * arcsec
+
+        return -2 * np.pi ** 2 * ((sigma_alpha * u) ** 2 + (sigma_delta * v) ** 2)
+
+        # ) - 2 * np.pi * 1.0j * (delta_alpha * u + delta_delta * v)
+
+    # return (
+    #     2
+    #     * np.pi
+    #     * a
+    #     * sigma_alpha
+    #     * sigma_delta
+    #     * np.exp(
+    #         -2 * np.pi ** 2 * ((sigma_alpha * u) ** 2 + (sigma_delta * v) ** 2)
+    #         - 2 * np.pi * 1.0j * (delta_alpha * u + delta_delta * v)
+    #     )
+    # )
+
+    g = gexp(coords.packed_u_centers_2D, coords.packed_v_centers_2D)
+    gauss = np.exp(g)
+
+    print(np.max(g), np.max(gauss))
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+    im = ax[0].imshow(g, **ikw)  # , vmin=-300)
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(gauss, **ikw)  # , vmin=-300)
+    plt.colorbar(im, ax=ax[1])
+
+    fig.savefig(str(tmp_path / "fourier_gauss_2D.png"), dpi=300)
+
+    assert False
 
 
 def test_grid_coords_odd_fail():

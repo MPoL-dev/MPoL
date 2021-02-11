@@ -3,6 +3,7 @@ r"""The ``images`` module provides the core functionality of MPoL via :class:`mp
 import numpy as np
 import torch
 from torch import nn
+import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from .constants import arcsec
 from .gridding import GridCoords
@@ -256,7 +257,6 @@ class FourierCube(nn.Module):
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the image
     """
 
     def __init__(self, cell_size=None, npix=None, coords=None):
@@ -287,10 +287,13 @@ class FourierCube(nn.Module):
             (torch.double tensor, of shape ``(nchan, npix, npix, 2)``): the FFT of the image cube, in packed format. The 4th axis of the array, contains the real and imaginary values.
         """
 
+        # make sure the cube is 3D
+        assert cube.dim() == 3, "cube must be 3D"
+
         # the self.cell_size prefactor (in arcsec) is to obtain the correct output units
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
-        self.vis = self.coords.cell_size ** 2 * torch.fft(cube, signal_ndim=2)
+        self.vis = self.coords.cell_size ** 2 * torch.fft.fftn(cube, dim=(1, 2))
 
         return self.vis
 

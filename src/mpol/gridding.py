@@ -112,17 +112,18 @@ class GridCoords:
         self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
         self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
 
-        RA_centers_2D, DEC_centers_2D = np.meshgrid(
+        # x_centers_2D and y_centers_2D are just l and m in units of arcsec
+        x_centers_2D, y_centers_2D = np.meshgrid(
             self.l_centers / arcsec, self.m_centers / arcsec, indexing="xy"
         )  # [arcsec] cartesian indexing (default)
 
         # for evaluating a packed cube... ll, mm increasing + fftshifted
-        self.packed_RA_centers_2D = np.fft.fftshift(RA_centers_2D)  # [arcsec]
-        self.packed_DEC_centers_2D = np.fft.fftshift(DEC_centers_2D)  # [arcsec]
+        self.packed_x_centers_2D = np.fft.fftshift(x_centers_2D)  # [arcsec]
+        self.packed_y_centers_2D = np.fft.fftshift(y_centers_2D)  # [arcsec]
 
         # for evaluating a sky image... ll mirrored, mm increasing, no fftshift
-        self.sky_DEC_centers_2D = DEC_centers_2D  # [arcsec]
-        self.sky_RA_centers_2D = np.fliplr(RA_centers_2D)  # [arcsec]
+        self.sky_y_centers_2D = y_centers_2D  # [arcsec]
+        self.sky_x_centers_2D = np.fliplr(x_centers_2D)  # [arcsec]
 
     def check_data_fit(self, uu, vv):
         r"""
