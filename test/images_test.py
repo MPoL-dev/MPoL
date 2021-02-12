@@ -38,11 +38,11 @@ def coords():
 def test_fourier_layer(coords, tmp_path):
     kw = {
         "a": 1,
-        "delta_x": 0.00,  # arcsec
-        "delta_y": 0.00,
-        "sigma_x": 0.1,
-        "sigma_y": 0.05,
-        "Omega": 10,  # degrees
+        "delta_x": 0.02,  # arcsec
+        "delta_y": -0.01,
+        "sigma_x": 0.02,
+        "sigma_y": 0.01,
+        "Omega": 20,  # degrees
     }
 
     img = utils.sky_gaussian_arcsec(
@@ -81,13 +81,19 @@ def test_fourier_layer(coords, tmp_path):
     im = ax[1, 1].imshow(fourier_packed_num.imag, **ikw)
     plt.colorbar(im, ax=ax[1, 1])
 
-    im = ax[2, 0].imshow(fourier_packed_an.real - fourier_packed_num.real, **ikw)
+    diff_real = fourier_packed_an.real - fourier_packed_num.real
+    diff_imag = fourier_packed_an.imag - fourier_packed_num.imag
+
+    im = ax[2, 0].imshow(diff_real, **ikw)
     ax[2, 0].set_ylabel("difference")
     plt.colorbar(im, ax=ax[2, 0])
-    im = ax[2, 1].imshow(fourier_packed_an.imag - fourier_packed_num.imag, **ikw)
+    im = ax[2, 1].imshow(diff_imag, **ikw)
     plt.colorbar(im, ax=ax[2, 1])
 
     fig.savefig(str(tmp_path / "fourier_packed.png"), dpi=300)
+
+    assert np.all(np.abs(diff_real) < 1e-12)
+    assert np.all(np.abs(diff_imag) < 1e-12)
 
 
 # test basecube pixel mapping

@@ -135,7 +135,7 @@ def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
         Omega : position angle of ascending node [degrees] east of north.
 
     Returns:
-        2D Gaussian evaluated at input args
+        2D Gaussian evaluated at input args with peak amplitude :math:`a`
     """
 
     # translate
@@ -164,7 +164,7 @@ def sky_gaussian_arcsec(x, y, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
         Omega : position angle of ascending node [degrees] east of north.
 
     Returns:
-        2D Gaussian evaluated at input args
+        2D Gaussian evaluated at input args with peak amplitude :math:`a`
     """
 
     return sky_gaussian_radians(
@@ -181,12 +181,12 @@ def sky_gaussian_arcsec(x, y, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
 
 def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
     r"""
-    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``).
+    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`. 
 
     Args:
         u: l in units of [lambda]
         v: m in units of [lambda]
-        a : amplitude prefactor
+        a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{steradian}`.
         delta_x : offset [radians]
         delta_y : offset [radians]
         sigma_x : width [radians]
@@ -313,12 +313,12 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
 def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
     r"""
-    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``).
+    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
 
     Args:
         u: l in units of [klambda]
         v: m in units of [klambda]
-        a : amplitude prefactor
+        a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
         delta_x : offset [arcsec]
         delta_y : offset [arcsec]
         sigma_x : width [arcsec]
@@ -326,13 +326,14 @@ def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y,
         Omega : position angle of ascending node [degrees] east of north.
 
     Returns:
-        2D Gaussian evaluated at input args
+        2D Fourier Gaussian evaluated at input args
     """
 
+    # convert the parameters and feed to the core routine
     return fourier_gaussian_lambda_radians(
         1e3 * u,
         1e3 * v,
-        a,
+        a / arcsec ** 2,
         delta_x * arcsec,
         delta_y * arcsec,
         sigma_x * arcsec,
