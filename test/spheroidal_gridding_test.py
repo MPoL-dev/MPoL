@@ -67,7 +67,6 @@ def fourier_plane(
     Returns:
         FT Gaussian evaluated at u, v points
     """
-    print("sigma_alpha", sigma_alpha)
 
     # convert back to lambda
     u = u * 1e3
@@ -80,12 +79,8 @@ def fourier_plane(
         * sigma_alpha
         * sigma_delta
         * np.exp(
-            -2
-            * np.pi ** 2
-            * (
-                (sigma_alpha ** 2 * u ** 2 + sigma_delta ** 2 * v ** 2)
-                - 2 * np.pi * 1.0j * (delta_alpha * u + delta_delta * v)
-            )
+            -2 * np.pi ** 2 * (sigma_alpha ** 2 * u ** 2 + sigma_delta ** 2 * v ** 2)
+            - 2 * np.pi * 1.0j * (delta_alpha * u + delta_delta * v)
         )
     )
 
