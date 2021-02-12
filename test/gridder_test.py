@@ -48,7 +48,7 @@ def test_grid_coords_plot_2D_uvq_sky(tmp_path):
     for a, t in zip(ax, ["u", "v", "q"]):
         a.set_title(t)
 
-    fig.savefig(str(tmp_path / "sky_uvq.png"), dpi=300)
+    fig.savefig(tmp_path / "sky_uvq.png", dpi=300)
 
 
 def test_grid_coords_plot_2D_uvq_packed(tmp_path):
@@ -69,7 +69,7 @@ def test_grid_coords_plot_2D_uvq_packed(tmp_path):
     for a, t in zip(ax, ["u", "v", "q"]):
         a.set_title(t)
 
-    fig.savefig(str(tmp_path / "packed_uvq.png"), dpi=300)
+    fig.savefig(tmp_path / "packed_uvq.png", dpi=300)
 
 
 def test_grid_coords_odd_fail():
@@ -217,7 +217,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
         gridder.gridded_re[4], origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
-    plt.savefig(str(tmp_path / "gridded_re.png"), dpi=300)
+    plt.savefig(tmp_path / "gridded_re.png", dpi=300)
 
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
