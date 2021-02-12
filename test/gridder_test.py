@@ -291,7 +291,7 @@ def test_grid_uniform(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(str(tmp_path / "uniform_v_robust.png"), dpi=300)
+    fig.savefig(tmp_path / "uniform_v_robust.png", dpi=300)
 
     assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
     assert np.all(np.abs(img_uniform - img_robust) < 1e-5)
@@ -331,7 +331,7 @@ def test_grid_natural(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(str(tmp_path / "natural_v_robust.png"), dpi=300)
+    fig.savefig(tmp_path / "natural_v_robust.png", dpi=300)
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)

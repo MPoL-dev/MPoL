@@ -90,7 +90,7 @@ def test_fourier_layer(coords, tmp_path):
     im = ax[2, 1].imshow(diff_imag, **ikw)
     plt.colorbar(im, ax=ax[2, 1])
 
-    fig.savefig(str(tmp_path / "fourier_packed.png"), dpi=300)
+    fig.savefig(tmp_path / "fourier_packed.png", dpi=300)
 
     assert np.all(np.abs(diff_real) < 1e-12)
     assert np.all(np.abs(diff_imag) < 1e-12)

@@ -133,7 +133,7 @@ def test_plot_input(image_dict, tmp_path):
     ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
     ax.set_ylabel(r"$\Delta \delta$")
     ax.set_title("Input image")
-    fig.savefig(str(tmp_path / "input.png"), dpi=300)
+    fig.savefig(tmp_path / "input.png", dpi=300)
 
 
 def test_fill_corrfun_matrix(corrfun_mat, tmp_path):
@@ -144,7 +144,7 @@ def test_fill_corrfun_matrix(corrfun_mat, tmp_path):
     ax.set_xlabel(r"$\Delta \alpha \cos \delta$")
     ax.set_ylabel(r"$\Delta \delta$")
     ax.set_title("Correction function")
-    fig.savefig(str(tmp_path / "corrfun.png"), dpi=300)
+    fig.savefig(tmp_path / "corrfun.png", dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -200,7 +200,7 @@ def test_plot_full_analytical(tmp_path, vis_dict, vis_analytical_full):
     ax[1].imshow(
         np.imag(np.fft.fftshift(vis_analytical_full)), origin="upper", extent=ext_full
     )
-    fig.savefig(str(tmp_path / "analytical_full.png"), dpi=300)
+    fig.savefig(tmp_path / "analytical_full.png", dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -280,7 +280,7 @@ def test_plot_analytical_prolate(tmp_path, vis_dict, vis_analytical_half, vis_di
     plt.colorbar(im_imag, ax=ax[1, 2])
     fig.subplots_adjust(wspace=0.05)
 
-    fig.savefig(str(tmp_path / "comparison.png"), dpi=300)
+    fig.savefig(tmp_path / "comparison.png", dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -336,7 +336,7 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
         vmin=-vvmax,
         vmax=vvmax,
     )
-    fig.savefig(str(tmp_path / "C_real.png"), dpi=300)
+    fig.savefig(tmp_path / "C_real.png", dpi=300)
 
     fig, ax = plt.subplots(ncols=1, figsize=(6, 6))
     vvmax = np.max(np.abs(C_imag[:, 0:300]))
@@ -349,7 +349,7 @@ def test_plot_interpolation_matrices(tmp_path, interpolation_matrices):
         vmin=-vvmax,
         vmax=vvmax,
     )
-    fig.savefig(str(tmp_path / "C_imag.png"), dpi=300)
+    fig.savefig(tmp_path / "C_imag.png", dpi=300)
 
 
 @pytest.fixture(scope="module")
@@ -392,4 +392,4 @@ def test_plot_points_prolate(
     ax[3].plot((np.imag(analytic_samples) - interp_imag) / vis_range, ".")
     ax[3].set_ylabel("rel difference")
     fig.subplots_adjust(hspace=0.4, left=0.2)
-    fig.savefig(str(tmp_path / "interpolated_comparison.png"), dpi=300)
+    fig.savefig(tmp_path / "interpolated_comparison.png", dpi=300)

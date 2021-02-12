@@ -31,7 +31,7 @@ def test_sky_gaussian(imagekw, tmp_path):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     im = ax.imshow(g, **ikw, extent=coords.img_ext)
     plt.colorbar(im, ax=ax)
-    fig.savefig(str(tmp_path / "sky_gauss_2D.png"), dpi=300)
+    fig.savefig(tmp_path / "sky_gauss_2D.png", dpi=300)
 
 
 def test_packed_gaussian(imagekw, tmp_path):
@@ -46,7 +46,7 @@ def test_packed_gaussian(imagekw, tmp_path):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     im = ax.imshow(g, **ikw)
     plt.colorbar(im, ax=ax)
-    fig.savefig(str(tmp_path / "packed_gauss_2D.png"), dpi=300)
+    fig.savefig(tmp_path / "packed_gauss_2D.png", dpi=300)
 
 
 def test_analytic_plot(tmp_path):
@@ -70,7 +70,7 @@ def test_analytic_plot(tmp_path):
     ax.set_xlabel("axis2 index")
     ax.set_ylabel("axis1 index")
     plt.colorbar(im, ax=ax, label=r"$Jy/\mathrm{arcsec}^2$")
-    fig.savefig(str(tmp_path / "gaussian_sky.png"), dpi=300)
+    fig.savefig(tmp_path / "gaussian_sky.png", dpi=300)
 
     img_packed = utils.sky_gaussian_arcsec(
         coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
@@ -80,7 +80,7 @@ def test_analytic_plot(tmp_path):
     ax.imshow(img_packed, origin="lower")
     ax.set_xlabel("axis2 index")
     ax.set_ylabel("axis1 index")
-    fig.savefig(str(tmp_path / "gaussian_packed.png"), dpi=300)
+    fig.savefig(tmp_path / "gaussian_packed.png", dpi=300)
 
     # calculated the packed FFT
     fourier_packed_num = coords.cell_size ** 2 * np.fft.fft2(img_packed)
@@ -115,7 +115,7 @@ def test_analytic_plot(tmp_path):
     im = ax[2, 1].imshow(diff_imag, **ikw)
     plt.colorbar(im, ax=ax[2, 1])
 
-    fig.savefig(str(tmp_path / "fourier_packed.png"), dpi=300)
+    fig.savefig(tmp_path / "fourier_packed.png", dpi=300)
 
     assert np.all(np.abs(diff_real) < 1e-12)
     assert np.all(np.abs(diff_imag) < 1e-12)
