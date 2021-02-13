@@ -89,7 +89,7 @@ class BaseCube(nn.Module):
             # We could apply this transformation for the user, but I think it will
             # lead to less confusion if we make this transformation explicit
             # for the user during the setup phase.
-            self.base_cube = nn.Parameter(base_cube)
+            self.base_cube = nn.Parameter(base_cube, requires_grad=True)
 
         if pixel_mapping is None:
             self.pixel_mapping = torch.nn.Softplus()
@@ -170,6 +170,11 @@ class ImageCube(nn.Module):
                 # lead to less confusion if we make this transformation explicit
                 # for the user during the setup phase.
                 self.cube = nn.Parameter(cube)
+        else:
+            # ImageCube is working as a passthrough layer, so cube should
+            # only be provided as an arg to the forward method, not as
+            # an initialization argument
+            self.cube = None
 
     def forward(self, cube=None):
         r"""

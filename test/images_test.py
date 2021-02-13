@@ -96,5 +96,54 @@ def test_fourier_layer(coords, tmp_path):
     assert np.all(np.abs(diff_imag) < 1e-12)
 
 
-# test basecube pixel mapping
-# using known input cube, known mapping function, compare output
+def test_basecube_imagecube(coords, tmp_path):
+
+    # create a mock cube that includes negative values
+    nchan = 1
+    mean = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
+    )
+    std = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
+    )
+
+    # tensor
+    base_cube = torch.normal(mean=mean, std=std)
+
+    # layer
+    basecube = images.BaseCube(coords=coords, nchan=nchan, base_cube=base_cube)
+
+    # the default softplus function should map everything to positive values
+    output = basecube.forward()
+
+    fig, ax = plt.subplots(ncols=2, nrows=1)
+
+    im = ax[0].imshow(
+        np.squeeze(base_cube.detach().numpy()), origin="lower", interpolation="none"
+    )
+    plt.colorbar(im, ax=ax[0])
+    ax[0].set_title("input")
+
+    im = ax[1].imshow(
+        np.squeeze(output.detach().numpy()), origin="lower", interpolation="none"
+    )
+    plt.colorbar(im, ax=ax[1])
+    ax[1].set_title("mapped")
+
+    fig.savefig(tmp_path / "basecube_mapped.png", dpi=300)
+
+    # try passing through ImageLayer
+    imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
+
+    # send things through this layer
+    imagecube.forward(basecube.forward())
+
+    fig, ax = plt.subplots(ncols=1)
+    im = ax.imshow(
+        np.squeeze(imagecube.sky_cube.detach().numpy()),
+        extent=imagecube.coords.img_ext,
+        origin="lower",
+        interpolation="none",
+    )
+    fig.savefig(tmp_path / "imagecube.png", dpi=300)
+
