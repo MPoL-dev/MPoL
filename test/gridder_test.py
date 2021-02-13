@@ -1,109 +1,9 @@
 import pytest
-from mpol import gridding
 import numpy as np
 import matplotlib.pyplot as plt
+from mpol import gridding
+from mpol import coordinates
 from mpol.constants import *
-
-
-def test_grid_coords_instantiate():
-    coords = gridding.GridCoords(cell_size=0.01, npix=512)
-
-
-def test_grid_coords_equal():
-    coords1 = gridding.GridCoords(cell_size=0.01, npix=512)
-    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
-
-    assert coords1 == coords2
-
-
-def test_grid_coords_unequal_pix():
-    coords1 = gridding.GridCoords(cell_size=0.01, npix=510)
-    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
-
-    assert coords1 != coords2
-
-
-def test_grid_coords_unequal_cell_size():
-    coords1 = gridding.GridCoords(cell_size=0.011, npix=512)
-    coords2 = gridding.GridCoords(cell_size=0.01, npix=512)
-
-    assert coords1 != coords2
-
-
-def test_grid_coords_plot_2D_uvq_sky(tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
-
-    ikw = {"origin": "lower"}
-
-    fig, ax = plt.subplots(nrows=1, ncols=3)
-    im = ax[0].imshow(coords.sky_u_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[0])
-
-    im = ax[1].imshow(coords.sky_v_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[1])
-
-    im = ax[2].imshow(coords.sky_q_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[2])
-
-    for a, t in zip(ax, ["u", "v", "q"]):
-        a.set_title(t)
-
-    fig.savefig(tmp_path / "sky_uvq.png", dpi=300)
-
-
-def test_grid_coords_plot_2D_uvq_packed(tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
-
-    ikw = {"origin": "lower"}
-
-    fig, ax = plt.subplots(nrows=1, ncols=3)
-    im = ax[0].imshow(coords.packed_u_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[0])
-
-    im = ax[1].imshow(coords.packed_v_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[1])
-
-    im = ax[2].imshow(coords.packed_q_centers_2D, **ikw)
-    plt.colorbar(im, ax=ax[2])
-
-    for a, t in zip(ax, ["u", "v", "q"]):
-        a.set_title(t)
-
-    fig.savefig(tmp_path / "packed_uvq.png", dpi=300)
-
-
-def test_grid_coords_odd_fail():
-    with pytest.raises(AssertionError):
-        mycoords = gridding.GridCoords(cell_size=0.01, npix=511)
-
-
-def test_grid_coords_neg_cell_size():
-    with pytest.raises(AssertionError):
-        mycoords = gridding.GridCoords(cell_size=-0.01, npix=512)
-
-
-# instantiate a Gridder object with mock visibilities
-def test_grid_coords_fit(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
-    mycoords.check_data_fit(uu, vv)
-
-
-def test_grid_coords_fail(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-
-    mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
-
-    print("max u data", np.max(uu))
-    print("max u grid", mycoords.max_grid)
-
-    with pytest.raises(AssertionError):
-        mycoords.check_data_fit(uu, vv)
 
 
 def test_gridder_instantiate_cell_npix(mock_visibility_data):
@@ -133,7 +33,7 @@ def test_gridder_instantiate_gridCoord(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     gridding.Gridder(
         coords=mycoords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
@@ -148,7 +48,7 @@ def test_gridder_instantiate_npix_gridCoord_conflict(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     with pytest.raises(AssertionError):
         gridding.Gridder(
@@ -171,7 +71,7 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     with pytest.raises(AssertionError):
         gridding.Gridder(
@@ -186,7 +86,7 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
 
 # test that we're getting the right numbers back for some well defined operations
 def test_uniform_ones(mock_visibility_data, tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     d = mock_visibility_data
     uu = d["uu"]
@@ -336,3 +236,30 @@ def test_grid_natural(gridder, tmp_path):
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
 
+
+def test_weight_gridding():
+
+    # make sure all average values are set to 1
+
+    # plot a histogram of weight values--should be integers.
+
+    pass
+
+
+def test_pytorch_export(gridder):
+    gridder.grid_visibilities(weighting="uniform")
+    gridder.to_pytorch_dataset()
+
+
+def test_pytorch_export_fail(gridder):
+    gridder.grid_visibilities(weighting="uniform", robust=0.5)
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
+
+    gridder.grid_visibilities(weighting="natural")
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
+
+    gridder.grid_visibilities(weighting="briggs", robust=0.5)
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()

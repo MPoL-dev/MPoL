@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from .constants import *
-from .gridding import _setup_coords
+from .coordinates import GridCoords, _setup_coords
 
 
 class GriddedDataset:
@@ -36,6 +36,8 @@ class GriddedDataset:
         self.mask = mask
 
         # pre-index the values
+        # note that these are *collapsed* across all channels
+        # 1D array
         self.vis_indexed = self.vis_gridded[self.mask]
         self.weight_indexed = self.weight_gridded[self.mask]
 
