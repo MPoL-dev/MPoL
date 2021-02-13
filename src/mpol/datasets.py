@@ -3,6 +3,42 @@ import torch
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from .constants import *
+from .gridding import _setup_coords
+
+
+class GriddedDataset:
+    r"""
+    Args:
+        cell_size (float): the width of a pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the image
+        vis_gridded (torch complex):
+        weight_gridded (torch double):
+        mask (boolean mask): 
+    """
+
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        nchan=None,
+        vis_gridded=None,
+        weight_gridded=None,
+        mask=None,
+    ):
+
+        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.vis_gridded = vis_gridded
+        self.weight_gridded = weight_gridded
+        self.mask = mask
+
+        # pre-index the values
+        self.vis_indexed = self.vis_gridded[self.mask]
+        self.weight_indexed = self.weight_gridded[self.mask]
+
 
 # custom dataset loader
 class UVDataset(Dataset):

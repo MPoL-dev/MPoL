@@ -165,6 +165,38 @@ class GridCoords:
         return self.cell_size == other.cell_size and self.npix == other.npix
 
 
+def _setup_coords(self, cell_size=None, npix=None, coords=None, nchan=None):
+    r"""
+    Convenience helper to setup coordinate objects inside BaseCube and ImageCube classes. This is meant to be called inside ``__init__``, and will create the instance attributes on ``self``.
+
+    Args:
+        self: reference to instance object of class.
+        cell_size (float): the width of a pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the image
+
+    Returns: None. 
+    """
+    if coords:
+        assert (
+            npix is None and cell_size is None
+        ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
+        self.coords = coords
+
+    elif npix or cell_size:
+        assert (
+            coords is None
+        ), "GridCoords must be empty if npix and cell_size are supplied."
+
+        self.coords = GridCoords(cell_size=cell_size, npix=npix)
+
+    if nchan is not None:
+        self.nchan = nchan
+    else:
+        self.nchan = 1
+
+
 class Gridder:
     r"""
     The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
@@ -203,18 +235,8 @@ class Gridder:
         data_im=None,
     ):
 
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
-
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+        nchan = len(uu)
+        _setup_coords(self, cell_size, npix, coords, nchan)
 
         assert (
             uu.ndim == 2
@@ -243,8 +265,6 @@ class Gridder:
         self.weight = np.concatenate([weight, weight], axis=1)
         self.data_re = np.concatenate([data_re, data_re], axis=1)
         self.data_im = np.concatenate([data_im, -data_im], axis=1)
-
-        self.nchan = len(self.uu)
 
         # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
@@ -374,19 +394,19 @@ class Gridder:
         self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
-        self.gridded_re = self._histogram_cube(
+        self.data_re_gridded = self._histogram_cube(
             self.data_re * tapering_weight * density_weight * self.weight
         )
 
-        self.gridded_im = self._histogram_cube(
+        self.data_im_gridded = self._histogram_cube(
             self.data_im * tapering_weight * density_weight * self.weight
         )
 
-        self.gridded_vis = self.gridded_re + self.gridded_im * 1.0j
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
 
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
-        self.gridded_beam_re = self._histogram_cube(
+        self.re_gridded_beam = self._histogram_cube(
             tapering_weight * density_weight * self.weight
         )
 
@@ -413,7 +433,7 @@ class Gridder:
                 self.coords.npix ** 2
                 * np.fft.ifft2(
                     np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.gridded_beam_re,
+                        self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
                         axes=(1, 2),
                     )
                 ),
@@ -447,7 +467,7 @@ class Gridder:
                 self.coords.npix ** 2
                 * np.fft.ifft2(
                     np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.gridded_vis,
+                        self.C[:, np.newaxis, np.newaxis] * self.vis_gridded,
                         axes=(1, 2),
                     )
                 ),

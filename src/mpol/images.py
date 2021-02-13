@@ -6,7 +6,7 @@ from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from .constants import arcsec
-from .gridding import GridCoords
+from .gridding import GridCoords, _setup_coords
 from . import utils
 
 
@@ -53,24 +53,7 @@ class BaseCube(nn.Module):
     ):
 
         super().__init__()
-
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
-
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
-
-        if nchan is not None:
-            self.nchan = nchan
-        else:
-            self.nchan = 1
+        _setup_coords(self, cell_size, npix, coords, nchan)
 
         # The ``base_cube`` is already packed to make the Fourier transformation easier
         if base_cube is None:
@@ -131,24 +114,7 @@ class ImageCube(nn.Module):
         cube=None,
     ):
         super().__init__()
-
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
-
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
-
-        if nchan is not None:
-            self.nchan = nchan
-        else:
-            self.nchan = 1
+        _setup_coords(self, cell_size, npix, coords, nchan)
 
         self.passthrough = passthrough
 
@@ -268,6 +234,9 @@ class FourierCube(nn.Module):
 
         super().__init__()
 
+        # we don't want to bother with the nchan argument here, so
+        # we don't use the convenience method _setup_coords
+        # and just do it manually
         if coords:
             assert (
                 npix is None and cell_size is None

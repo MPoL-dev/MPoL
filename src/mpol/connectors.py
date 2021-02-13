@@ -23,16 +23,10 @@ class DatasetConnector(nn.Module):
         Return model and data samples for evaluation with a likelihood function.
 
         Args: 
-            vis: torch tensor 
+            vis: complex torch tensor 
             dataset: gridded PyTorch dataset w/ mask locations  
         """
 
-        # torch delivers the real and imag components separately
-        vis_re = vis[:, :, :, 0]
-        vis_im = vis[:, :, :, 1]
+        # grid_mask is a (nchan, npix, npix) boolean array
+        return vis.masked_select(dataset.grid_mask)
 
-        # grid mask is a (nchan, npix, npix//2 + 1) size boolean array
-        re = vis_re.masked_select(dataset.grid_mask)
-        im = vis_im.masked_select(dataset.grid_mask)
-
-        return re, im

@@ -204,17 +204,17 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
     print(
         "re",
-        np.mean(gridder.gridded_re),
-        np.std(gridder.gridded_re),
-        np.min(gridder.gridded_re),
-        np.max(gridder.gridded_re),
+        np.mean(gridder.data_re_gridded),
+        np.std(gridder.data_re_gridded),
+        np.min(gridder.data_re_gridded),
+        np.max(gridder.data_re_gridded),
     )
 
-    assert pytest.approx(np.min(gridder.gridded_re), 0)
-    assert pytest.approx(np.max(gridder.gridded_re), 1)
+    assert pytest.approx(np.min(gridder.data_re_gridded), 0)
+    assert pytest.approx(np.max(gridder.data_im_gridded), 1)
 
     im = plt.imshow(
-        gridder.gridded_re[4], origin="lower", extent=gridder.coords.vis_ext
+        gridder.data_re_gridded[4], origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
