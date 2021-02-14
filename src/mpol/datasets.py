@@ -16,6 +16,7 @@ class GriddedDataset:
         vis_gridded (torch complex):
         weight_gridded (torch double):
         mask (boolean mask): 
+        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
     """
 
     def __init__(
@@ -27,13 +28,14 @@ class GriddedDataset:
         vis_gridded=None,
         weight_gridded=None,
         mask=None,
+        device=None,
     ):
 
         _setup_coords(self, cell_size, npix, coords, nchan)
 
-        self.vis_gridded = vis_gridded
-        self.weight_gridded = weight_gridded
-        self.mask = mask
+        self.vis_gridded = torch.tensor(vis_gridded, device=device)
+        self.weight_gridded = torch.tensor(weight_gridded, device=device)
+        self.mask = torch.tensor(mask, device=device)
 
         # pre-index the values
         # note that these are *collapsed* across all channels

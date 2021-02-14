@@ -29,11 +29,6 @@ def test_single_chan():
     assert im.nchan == 1
 
 
-@pytest.fixture
-def coords():
-    return gridding.GridCoords(cell_size=0.005, npix=800)
-
-
 # test image packing
 def test_fourier_layer(coords, tmp_path):
     kw = {

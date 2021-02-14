@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import requests
 import os
+from mpol import gridding
 
 # We need a fixture which provides mock visibilities of the sort we'd
 # expect from visread, but *without* the CASA dependency.
@@ -42,3 +43,7 @@ def mock_visibility_data(tmp_path_factory):
 
     return np.load(npz_path)
 
+
+@pytest.fixture
+def coords():
+    return gridding.GridCoords(cell_size=0.005, npix=800)

@@ -8,7 +8,11 @@ from . import utils
 
 class DatasetConnector(nn.Module):
     r"""
-    Connect a FourierCube to the data, and return visibilities for calculating the loss.
+    Connect a FourierCube to the data, and return visibilities for calculating the loss. 
+
+    Args:
+        FourierCube: 
+        GriddedDataset:
     """
 
     def __init__(self, FourierCube, GriddedDataset, **kwargs):
@@ -28,5 +32,7 @@ class DatasetConnector(nn.Module):
         """
 
         # grid_mask is a (nchan, npix, npix) boolean array
-        return vis.masked_select(dataset.grid_mask)
+        re = vis.real.masked_select(dataset.mask)
+        im = vis.imag.masked_select(dataset.mask)
+        return re + 1.0j * im
 

@@ -10,6 +10,12 @@ Utilities
 .. automodule:: mpol.utils 
     :members:
 
+Coordinates 
+-----------
+
+.. automodule:: mpol.coordinates
+    :members:
+
 Gridding
 --------
 
@@ -26,6 +32,12 @@ Images
 ------
 
 .. automodule:: mpol.images
+    :members:
+
+Connectors
+----------
+
+.. automodule:: mpol.connectors 
     :members:
 
 Losses

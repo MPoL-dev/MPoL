@@ -237,13 +237,48 @@ def test_grid_natural(gridder, tmp_path):
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
 
 
-def test_weight_gridding():
+def test_weight_gridding(mock_visibility_data, tmp_path):
+    d = mock_visibility_data
+
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = np.ones_like(uu)
+    data_re = np.ones_like(uu)
+    data_im = np.ones_like(uu)
+
+    gridder = gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    gridder.grid_visibilities(weighting="uniform")
 
     # make sure all average values are set to 1
+    diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
+    print(diff_real)
+    print(np.max(diff_real))
+    assert np.all(diff_real < 1e-10)
+
+    # can't do this with imaginaries and fake data.
+    # diff_imag = np.abs(1 - gridder.vis_gridded[gridder.mask].imag)
+    # print(diff_imag)
+    # print(np.max(diff_imag))
+    # assert np.all(diff_imag < 1e-10)
+
+    # figure out where non-1 averaged imaginaries are coming through.
+    # IDK, it's kind of a weird thing because we're complex-conjugating the visibilites. Maybe this is right?
+    # seems kind of dumb though. I think to just say imaginaries should be 1 and then mirror, you get into inconsistencies
 
     # plot a histogram of weight values--should be integers.
-
-    pass
+    fig, ax = plt.subplots(nrows=1)
+    ax.hist(np.log10(gridder.weight_gridded[gridder.mask]), density=True)
+    ax.set_xlabel(r"$\log_{10}(\mathrm{weight})$")
+    fig.savefig(tmp_path / "weight_hist.png", dpi=300)
 
 
 def test_pytorch_export(gridder):
