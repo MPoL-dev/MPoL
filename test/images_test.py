@@ -29,6 +29,23 @@ def test_single_chan():
     assert im.nchan == 1
 
 
+def test_basecube_grad():
+    bcube = images.BaseCube(npix=800, cell_size=0.015)
+    loss = torch.sum(bcube.forward())
+    loss.backward()
+
+
+def test_imagecube_grad(coords):
+
+    bcube = images.BaseCube(coords=coords)
+    # try passing through ImageLayer
+    imagecube = images.ImageCube(coords=coords, passthrough=True)
+
+    # send things through this layer
+    loss = torch.sum(imagecube.forward(bcube.forward()))
+    loss.backward()
+
+
 # test image packing
 def test_fourier_layer(coords, tmp_path):
     kw = {
@@ -89,6 +106,35 @@ def test_fourier_layer(coords, tmp_path):
 
     assert np.all(np.abs(diff_real) < 1e-12)
     assert np.all(np.abs(diff_imag) < 1e-12)
+    plt.close("all")
+
+
+def test_fourier_grad(coords):
+    kw = {
+        "a": 1,
+        "delta_x": 0.02,  # arcsec
+        "delta_y": -0.01,
+        "sigma_x": 0.02,
+        "sigma_y": 0.01,
+        "Omega": 20,  # degrees
+    }
+
+    img_packed = utils.sky_gaussian_arcsec(
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+    )
+
+    # calculated the packed FFT using the FourierLayer
+    flayer = images.FourierCube(coords=coords)
+    # convert img_packed to pytorch tensor
+    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
+
+    # calculated the packed FFT using the FourierLayer
+    flayer = images.FourierCube(coords=coords)
+
+    output = flayer.forward(img_packed_tensor)
+    loss = torch.sum(torch.abs(output))
+
+    loss.backward()
 
 
 def test_basecube_imagecube(coords, tmp_path):
@@ -142,3 +188,4 @@ def test_basecube_imagecube(coords, tmp_path):
     )
     fig.savefig(tmp_path / "imagecube.png", dpi=300)
 
+    plt.close("all")

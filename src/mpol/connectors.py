@@ -34,13 +34,18 @@ class DatasetConnector(nn.Module):
             dataset: gridded PyTorch dataset w/ mask locations  
         """
 
-        # grid_mask is a (nchan, npix, npix) boolean array
+        assert (
+            vis.size()[0] == self.mask.size()[0]
+        ), "vis and dataset mask do not have the same number of channels."
 
-        # # torch delivers the real and imag components separately
-        # vis_re = vis[:, :, :, 0]
-        # vis_im = vis[:, :, :, 1]
-
+        # As of Pytorch 1.7.0, complex numbers are partially supported.
+        # However, masked_select does not yet work (with gradients)
+        # on the complex vis, so hence this awkward step of selecting
+        # the reals and imaginaries separately
         re = vis.real.masked_select(self.mask)
         im = vis.imag.masked_select(self.mask)
-        return re + 1.0j * im
+
+        # we had trouble returning things as re + 1.0j * im,
+        # but for some reason torch.complex seems to work OK.
+        return torch.complex(re, im)
 

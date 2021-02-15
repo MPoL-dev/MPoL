@@ -6,11 +6,46 @@ from .coordinates import GridCoords, _setup_coords
 from .datasets import GriddedDataset
 
 
+def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None):
+    """
+    Check that all data inputs are the same shape, the weights are positive, and the data_re and data_im are floats.
+
+    If the user supplied 1d vectors of shape ``(nvis,)``, make them all 2d with one channel, ``(1,nvis)``.
+
+    """
+
+    assert (
+        uu.ndim == 2 or uu.ndim == 1
+    ), "Input data vectors should be either 1D or 2D numpy arrays."
+    shape = uu.shape
+
+    for a in [vv, weight, data_re, data_im]:
+        assert (
+            a.shape == shape
+        ), "All dataset inputs must be the same input shape and size."
+
+    assert np.all(weight > 0.0), "Not all thermal weights are positive, check inputs."
+
+    assert data_re.dtype == np.float64, "data_re should be type np.float64"
+    assert data_im.dtype == np.float64, "data_im should be type np.float64"
+
+    if uu.ndim == 1:
+        uu = np.atleast_2d(uu)
+        vv = np.atleast_2d(vv)
+        weight = np.atleast_2d(weight)
+        data_re = np.atleast_2d(data_re)
+        data_im = np.atleast_2d(data_im)
+
+    return uu, vv, weight, data_re, data_im
+
+    # expand to 2d with complex conjugates
+
+
 class Gridder:
     r"""
     The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. 
+    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d of shape ``(1, nvis)``.
 
     Once the loose visibilities are attached, the user can decide how to 'grid', or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.
 
@@ -24,8 +59,8 @@ class Gridder:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-        vv (2d numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        uu (numpy array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) length array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
         data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
@@ -44,23 +79,14 @@ class Gridder:
         data_im=None,
     ):
 
+        # check everything should be 2d, expand if not
+        uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im
+        )
+
+        # setup the coordinates object
         nchan = len(uu)
         _setup_coords(self, cell_size, npix, coords, nchan)
-
-        assert (
-            uu.ndim == 2
-        ), "Input data vectors should be 2D numpy arrays. If you have a continuum observation, make all data vectors 2D with shape (1, nvis)."
-        shape = uu.shape
-
-        for a in [vv, weight, data_re, data_im]:
-            assert a.shape == shape, "All dataset inputs must be the same 2D shape."
-
-        assert np.all(
-            weight > 0.0
-        ), "Not all thermal weights are positive, check inputs."
-
-        assert data_re.dtype == np.float64, "data_re should be type np.float64"
-        assert data_im.dtype == np.float64, "data_im should be type np.float64"
 
         # expand the vectors to include complex conjugates
         uu_full = np.concatenate([uu, -uu], axis=1)

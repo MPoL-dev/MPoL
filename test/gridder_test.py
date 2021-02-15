@@ -119,6 +119,8 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
 
+    plt.close("all")
+
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
 @pytest.fixture
@@ -196,6 +198,8 @@ def test_grid_uniform(gridder, tmp_path):
     assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
     assert np.all(np.abs(img_uniform - img_robust) < 1e-5)
 
+    plt.close("all")
+
 
 def test_grid_natural(gridder, tmp_path):
 
@@ -235,6 +239,8 @@ def test_grid_natural(gridder, tmp_path):
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
+
+    plt.close("all")
 
 
 def test_weight_gridding(mock_visibility_data, tmp_path):
@@ -280,6 +286,8 @@ def test_weight_gridding(mock_visibility_data, tmp_path):
     ax.set_xlabel(r"$\log_{10}(\mathrm{weight})$")
     fig.savefig(tmp_path / "weight_hist.png", dpi=300)
 
+    plt.close("all")
+
 
 def test_pytorch_export(gridder):
     gridder.grid_visibilities(weighting="uniform")
@@ -298,3 +306,22 @@ def test_pytorch_export_fail(gridder):
     gridder.grid_visibilities(weighting="briggs", robust=0.5)
     with pytest.raises(AssertionError):
         gridder.to_pytorch_dataset()
+
+
+def test_grid_cont(mock_visibility_data_cont):
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    gridder = gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    print(gridder.uu.shape)
+    print(gridder.nchan)
+
+    gridder.grid_visibilities(weighting="uniform")
