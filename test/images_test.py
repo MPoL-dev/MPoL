@@ -32,6 +32,8 @@ def test_single_chan():
 def test_basecube_grad():
     bcube = images.BaseCube(npix=800, cell_size=0.015)
     loss = torch.sum(bcube.forward())
+    # segfaults on 3.9
+    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
 
@@ -43,6 +45,9 @@ def test_imagecube_grad(coords):
 
     # send things through this layer
     loss = torch.sum(imagecube.forward(bcube.forward()))
+
+    # segfaults on 3.9
+    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
 
@@ -134,6 +139,8 @@ def test_fourier_grad(coords):
     output = flayer.forward(img_packed_tensor)
     loss = torch.sum(torch.abs(output))
 
+    # segfaults on 3.9
+    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
 

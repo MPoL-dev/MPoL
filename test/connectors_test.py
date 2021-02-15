@@ -53,6 +53,8 @@ def test_connector_grad(coords, dataset):
     print(samples)
     loss = torch.sum(torch.abs(samples))
 
+    # segfaults on 3.9
+    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
     print(basecube.base_cube.grad)
