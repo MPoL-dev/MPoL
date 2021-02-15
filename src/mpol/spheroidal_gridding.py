@@ -214,8 +214,8 @@ def calc_matrices(u_data, v_data, u_model, v_model):
     for row_index, (u, v) in enumerate(data_points):
 
         # assuming the grid stretched for -/+ values easily
-        i0 = np.int(np.ceil(u / du))
-        j0 = np.int(np.ceil(v / dv))
+        i0 = int(np.ceil(u / du))
+        j0 = int(np.ceil(v / dv))
 
         i_indices = np.arange(i0 - 3, i0 + 3)
         j_indices = np.arange(j0 - 3, j0 + 3)
