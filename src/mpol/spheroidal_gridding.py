@@ -106,7 +106,7 @@ def corrfun_mat(alphas, deltas):
     ny = len(deltas)
     nx = len(alphas)
 
-    mat = np.empty((ny, nx), dtype=np.float64)
+    mat = np.empty((ny, nx), dtype="float")
 
     # The size of one half-of the image.
     # sometimes ra and dec will be symmetric about 0, othertimes they won't
@@ -203,8 +203,8 @@ def calc_matrices(u_data, v_data, u_model, v_model):
 
     # initialize two sparse lil matrices for the instantiation
     # convert to csc at the end
-    C_real = lil_matrix((N_vis, (Npix * vstride)), dtype=np.float64)
-    C_imag = lil_matrix((N_vis, (Npix * vstride)), dtype=np.float64)
+    C_real = lil_matrix((N_vis, (Npix * vstride)), dtype="float")
+    C_imag = lil_matrix((N_vis, (Npix * vstride)), dtype="float")
 
     # determine model grid spacing
     du = np.abs(u_model[1] - u_model[0])
@@ -230,8 +230,8 @@ def calc_matrices(u_data, v_data, u_model, v_model):
         w = np.sum(uw) * np.sum(vw)
 
         l_indices = np.zeros(36, dtype=np.int)
-        weights_real = np.zeros(36, dtype=np.float)
-        weights_imag = np.zeros(36, dtype=np.float)
+        weights_real = np.zeros(36, dtype="float")
+        weights_imag = np.zeros(36, dtype="float")
 
         # loop through all 36 points and calculate the matrix element
         # do it in this order because u indices change the quickest
