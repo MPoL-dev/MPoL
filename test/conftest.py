@@ -47,3 +47,20 @@ def mock_visibility_data(tmp_path_factory):
 @pytest.fixture
 def coords():
     return gridding.GridCoords(cell_size=0.005, npix=800)
+
+
+@pytest.fixture
+def dataset(mock_visibility_data, coords):
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data_re = d["data_re"]
+    data_im = -d["data_im"]  # CASA convention
+
+    gridder = gridding.Gridder(
+        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+    )
+    gridder.grid_visibilities(weighting="uniform")
+
+    return gridder.to_pytorch_dataset()

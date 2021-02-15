@@ -2,25 +2,12 @@ import pytest
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from mpol import coordinates, connectors, datasets, gridding, images
+from mpol import coordinates, connectors, images
 from mpol.constants import *
 
 
 # test instantiate connector
-def test_instantiate_connector(coords, mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-    weight = d["weight"]
-    data_re = d["data_re"]
-    data_im = -d["data_im"]
-
-    gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
-    )
-    gridder.grid_visibilities(weighting="uniform")
-
-    dataset = gridder.to_pytorch_dataset()
+def test_instantiate_connector(coords, dataset):
 
     flayer = images.FourierCube(coords=coords)
 
@@ -48,7 +35,5 @@ def test_instantiate_connector(coords, mock_visibility_data):
     vis = flayer.forward(imagecube.forward(basecube.forward()))
 
     # take a basecube, imagecube, and dataset and predict
-    samples = dcon.forward(vis, dataset)
+    samples = dcon.forward(vis)
 
-
-# see if we can backprop gradients
