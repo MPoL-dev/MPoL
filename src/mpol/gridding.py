@@ -142,7 +142,7 @@ class Gridder:
         """
         # calculate the histogrammed result for all channels
         cube = np.empty(
-            (self.nchan, self.coords.ncell_v, self.coords.ncell_u), dtype=np.float64,
+            (self.nchan, self.coords.ncell_v, self.coords.ncell_u), dtype="float",
         )
 
         for i in range(self.nchan):

@@ -99,7 +99,7 @@ def image_dict():
     dec = utils.fftspace(img_radius, N_dec)  # [arcsec]
 
     # fill out an image
-    img = np.empty((N_dec, N_alpha), np.float)
+    img = np.empty((N_dec, N_alpha), "float")
 
     for i, delta in enumerate(dec):
         for j, alpha in enumerate(ra):

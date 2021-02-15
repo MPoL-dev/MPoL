@@ -42,7 +42,7 @@ def fftspace(width, N):
     assert N % 2 == 0, "N must be even."
 
     dx = width * 2.0 / N
-    xx = np.empty(N, np.float)
+    xx = np.empty(N, "float")
     for i in range(N):
         xx[i] = -width + i * dx
 
