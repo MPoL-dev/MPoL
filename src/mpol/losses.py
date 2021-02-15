@@ -9,6 +9,42 @@ import torch
 from .constants import *
 
 
+def nll(model_vis, data_vis, weight):
+    r"""
+    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all 
+    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply 
+    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real 
+    and imaginaries in the :math:`\chi^2` sum.
+
+    Args:
+        model_vis: 1-tuple of the model
+        data_vis: 1-tuple of the data
+        weight: 1-tuple of weight values
+
+    Returns:
+        torch.double: the :math:`\chi^2` likelihood loss
+
+    .. math::
+
+        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
+
+    where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
+
+    """
+    nvis = data_vis.size()[0]
+
+    # return 1 / (2 * nvis) * torch.sum(weight * torch.abs(data_vis - model_vis) ** 2)
+
+    return (
+        1
+        / (2 * nvis)
+        * (
+            torch.sum(weight * (data_vis.real - model_vis.real) ** 2)
+            + torch.sum(weight * (data_vis.imag - model_vis.imag) ** 2)
+        )
+    )
+
+
 def loss_fn(model_vis, data_vis):
     r"""
     Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all 

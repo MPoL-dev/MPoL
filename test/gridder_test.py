@@ -1,45 +1,9 @@
 import pytest
-from mpol import gridding
 import numpy as np
 import matplotlib.pyplot as plt
-
-
-def test_grid_coords_instantiate():
-    coords = gridding.GridCoords(cell_size=0.01, npix=512)
-
-
-def test_grid_coords_odd_fail():
-    with pytest.raises(AssertionError):
-        mycoords = gridding.GridCoords(cell_size=0.01, npix=511)
-
-
-def test_grid_coords_neg_cell_size():
-    with pytest.raises(AssertionError):
-        mycoords = gridding.GridCoords(cell_size=-0.01, npix=512)
-
-
-# instantiate a Gridder object with mock visibilities
-def test_grid_coords_fit(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
-    mycoords.check_data_fit(uu, vv)
-
-
-def test_grid_coords_fail(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-
-    mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
-
-    print("max u data", np.max(uu))
-    print("max u grid", mycoords.max_grid)
-
-    with pytest.raises(AssertionError):
-        mycoords.check_data_fit(uu, vv)
+from mpol import gridding
+from mpol import coordinates
+from mpol.constants import *
 
 
 def test_gridder_instantiate_cell_npix(mock_visibility_data):
@@ -69,7 +33,7 @@ def test_gridder_instantiate_gridCoord(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     gridding.Gridder(
         coords=mycoords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
@@ -84,7 +48,7 @@ def test_gridder_instantiate_npix_gridCoord_conflict(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.005, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     with pytest.raises(AssertionError):
         gridding.Gridder(
@@ -107,7 +71,7 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
     data_re = d["data_re"]
     data_im = -d["data_im"]
 
-    mycoords = gridding.GridCoords(cell_size=0.05, npix=800)
+    mycoords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     with pytest.raises(AssertionError):
         gridding.Gridder(
@@ -122,7 +86,7 @@ def test_gridder_instantiate_bounds_fail(mock_visibility_data):
 
 # test that we're getting the right numbers back for some well defined operations
 def test_uniform_ones(mock_visibility_data, tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     d = mock_visibility_data
     uu = d["uu"]
@@ -140,20 +104,22 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
     print(
         "re",
-        np.mean(gridder.gridded_re),
-        np.std(gridder.gridded_re),
-        np.min(gridder.gridded_re),
-        np.max(gridder.gridded_re),
+        np.mean(gridder.data_re_gridded),
+        np.std(gridder.data_re_gridded),
+        np.min(gridder.data_re_gridded),
+        np.max(gridder.data_re_gridded),
     )
 
-    assert pytest.approx(np.min(gridder.gridded_re), 0)
-    assert pytest.approx(np.max(gridder.gridded_re), 1)
+    assert pytest.approx(np.min(gridder.data_re_gridded), 0)
+    assert pytest.approx(np.max(gridder.data_im_gridded), 1)
 
     im = plt.imshow(
-        gridder.gridded_re[4], origin="lower", extent=gridder.coords.vis_ext
+        gridder.data_re_gridded[4], origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
-    plt.savefig(str(tmp_path / "gridded_re.png"), dpi=300)
+    plt.savefig(tmp_path / "gridded_re.png", dpi=300)
+
+    plt.close("all")
 
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
@@ -227,10 +193,12 @@ def test_grid_uniform(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(str(tmp_path / "uniform_v_robust.png"), dpi=300)
+    fig.savefig(tmp_path / "uniform_v_robust.png", dpi=300)
 
     assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
     assert np.all(np.abs(img_uniform - img_robust) < 1e-5)
+
+    plt.close("all")
 
 
 def test_grid_natural(gridder, tmp_path):
@@ -267,8 +235,93 @@ def test_grid_natural(gridder, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(str(tmp_path / "natural_v_robust.png"), dpi=300)
+    fig.savefig(tmp_path / "natural_v_robust.png", dpi=300)
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
 
+    plt.close("all")
+
+
+def test_weight_gridding(mock_visibility_data, tmp_path):
+    d = mock_visibility_data
+
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = np.ones_like(uu)
+    data_re = np.ones_like(uu)
+    data_im = np.ones_like(uu)
+
+    gridder = gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    gridder.grid_visibilities(weighting="uniform")
+
+    # make sure all average values are set to 1
+    diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
+    print(diff_real)
+    print(np.max(diff_real))
+    assert np.all(diff_real < 1e-10)
+
+    # can't do this with imaginaries and fake data.
+    # diff_imag = np.abs(1 - gridder.vis_gridded[gridder.mask].imag)
+    # print(diff_imag)
+    # print(np.max(diff_imag))
+    # assert np.all(diff_imag < 1e-10)
+
+    # figure out where non-1 averaged imaginaries are coming through.
+    # IDK, it's kind of a weird thing because we're complex-conjugating the visibilites. Maybe this is right?
+    # seems kind of dumb though. I think to just say imaginaries should be 1 and then mirror, you get into inconsistencies
+
+    # plot a histogram of weight values--should be integers.
+    fig, ax = plt.subplots(nrows=1)
+    ax.hist(np.log10(gridder.weight_gridded[gridder.mask]), density=True)
+    ax.set_xlabel(r"$\log_{10}(\mathrm{weight})$")
+    fig.savefig(tmp_path / "weight_hist.png", dpi=300)
+
+    plt.close("all")
+
+
+def test_pytorch_export(gridder):
+    gridder.grid_visibilities(weighting="uniform")
+    gridder.to_pytorch_dataset()
+
+
+def test_pytorch_export_fail(gridder):
+    gridder.grid_visibilities(weighting="uniform", robust=0.5)
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
+
+    gridder.grid_visibilities(weighting="natural")
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
+
+    gridder.grid_visibilities(weighting="briggs", robust=0.5)
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
+
+
+def test_grid_cont(mock_visibility_data_cont):
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    gridder = gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    print(gridder.uu.shape)
+    print(gridder.nchan)
+
+    gridder.grid_visibilities(weighting="uniform")

@@ -3,12 +3,60 @@ import torch
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from .constants import *
+from .coordinates import GridCoords, _setup_coords
+
+
+class GriddedDataset:
+    r"""
+    Args:
+        cell_size (float): the width of a pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the image (default = 1).
+        vis_gridded (torch complex): the gridded visibility data
+        weight_gridded (torch double): the weights corresponding to the gridded visibility data
+        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded``.
+        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
+
+
+    After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.
+
+    :ivar vis_indexed: 1D complex tensor of visibility data
+    :ivar weight_indexd: 1D tensor of weight values
+
+    If you index the output of the Fourier layer in the same manner using ``self.mask`` (as done internally within :class:`~mpol.connectors.DataConnector`), then the model and data visibilities can be directly compared using a loss function.
+    """
+
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        nchan=None,
+        vis_gridded=None,
+        weight_gridded=None,
+        mask=None,
+        device=None,
+    ):
+
+        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.vis_gridded = torch.tensor(vis_gridded, device=device)
+        self.weight_gridded = torch.tensor(weight_gridded, device=device)
+        self.mask = torch.tensor(mask, device=device)
+
+        # pre-index the values
+        # note that these are *collapsed* across all channels
+        # 1D array
+        self.vis_indexed = self.vis_gridded[self.mask]
+        self.weight_indexed = self.weight_gridded[self.mask]
+
 
 # custom dataset loader
 class UVDataset(Dataset):
 
     """
-    Container for interferometric visibilities.
+    Container for loose interferometric visibilities.
 
     Args:
         uu (2d numpy array): (nchan, nvis) length array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
