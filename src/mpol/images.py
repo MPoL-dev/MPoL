@@ -27,11 +27,11 @@ def packed_cube_to_sky_cube(packed_cube):
 
 class BaseCube(nn.Module):
     r"""
-    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function from the base cube values to the ImageCube domain.
+    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube domain.
 
     .. math::
 
-        I = \texttt{pixel_mapping}(b)
+        I = f_\mathrm{map}(b)
 
     The ``base_cube`` pixel values are set as PyTorch `parameters <https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html>`_.
 
@@ -88,7 +88,7 @@ class BaseCube(nn.Module):
             
         .. math::
 
-            I = \texttt{pixel_mapping}(b)
+            I = f_\mathrm{map}(b)
 
         Returns : an image cube in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
         """
