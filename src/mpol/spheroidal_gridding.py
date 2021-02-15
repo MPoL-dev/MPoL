@@ -229,7 +229,7 @@ def calc_matrices(u_data, v_data, u_model, v_model):
 
         w = np.sum(uw) * np.sum(vw)
 
-        l_indices = np.zeros(36, dtype=np.int)
+        l_indices = np.zeros(36, dtype="int")
         weights_real = np.zeros(36, dtype="float")
         weights_imag = np.zeros(36, dtype="float")
 
