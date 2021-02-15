@@ -8,11 +8,11 @@ from . import utils
 
 class DatasetConnector(nn.Module):
     r"""
-    Connect a FourierCube to the data, and return visibilities for calculating the loss. 
+    Connect a FourierCube to the data, and return indexed model visibilities for calculating the loss. 
 
     Args:
-        FourierCube: 
-        GriddedDataset:
+        FourierCube: instantiated :class:`~mpol.images.FourierCube` object
+        GriddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
     """
 
     def __init__(self, FourierCube, GriddedDataset):
@@ -27,11 +27,12 @@ class DatasetConnector(nn.Module):
 
     def forward(self, vis):
         r"""
-        Return model and data samples for evaluation with a likelihood function.
+        Return model samples for evaluation with a likelihood function.
 
         Args: 
-            vis: torch tensor old representation 
-            dataset: gridded PyTorch dataset w/ mask locations  
+            vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`.
+
+        Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
         """
 
         assert (

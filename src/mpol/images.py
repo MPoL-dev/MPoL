@@ -29,16 +29,18 @@ class BaseCube(nn.Module):
     r"""
     A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function from the base cube values to the ImageCube domain.
 
-    I = pixel_mapping(b)
+    .. math::
 
-    The parameters are the set of pixel values for the base cube. 
+        I = \texttt{pixel_mapping}(b)
+
+    The ``base_cube`` pixel values are set as PyTorch `parameters <https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html>`_.
 
     Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the base cube. Default = 1.
-        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`. Output of the function should be in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus() <https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus>`_. Output of the function should be in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
         base_cube (torch.double tensor, optional): a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``.
     """
 
@@ -82,7 +84,12 @@ class BaseCube(nn.Module):
 
     def forward(self):
         r"""
-    
+        Calculate the image representation from the ``base_cube`` using the pixel mapping 
+            
+        .. math::
+
+            I = \texttt{pixel_mapping}(b)
+
         Returns : an image cube in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
         """
 
@@ -258,7 +265,7 @@ class FourierCube(nn.Module):
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
 
         Returns: 
-            (torch.double tensor, of shape ``(nchan, npix, npix, 2)``): the FFT of the image cube, in packed format. The 4th axis of the array, contains the real and imaginary values.
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format. 
         """
 
         # make sure the cube is 3D
@@ -279,11 +286,7 @@ class FourierCube(nn.Module):
         Returns:
             torch.double: power spectral density cube
         """
-
-        vis_re = self.vis[:, :, :, 0]
-        vis_im = self.vis[:, :, :, 1]
-
-        return vis_re ** 2 + vis_im ** 2
+        return np.abs(self.vis) ** 2
 
     @property
     def sky_vis(self):
@@ -291,7 +294,7 @@ class FourierCube(nn.Module):
         The visibility FFT cube fftshifted for plotting with ``imshow``.
 
         Returns:
-            (torch.double tensor, of shape ``(nchan, npix, npix, 2)``): the FFT of the image cube, in sky plane format. The 4th axis of the array, contains the real and imaginary values
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
         """
 
         return utils.fftshift(self.vis, axes=(1, 2))
