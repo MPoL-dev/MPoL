@@ -3,7 +3,7 @@
 Changelog
 =========
 
-v0.0.6
+v0.1.0
 ------
 
 * Updated citations to include Brianna Zawadzki
@@ -11,6 +11,7 @@ v0.0.6
 * Removed ``mpol.dirty_image`` module.
 * Migrated prolate spheroidal wavefunctions to ``mpol.spheroidal_gridding`` module.
 * Added Jupyter notebook tutorial build process using `RTD-action <https://rtds-action.readthedocs.io/en/latest/>`_
+* Added SimpleNet precomposed module.
 
 v0.0.5
 ------
