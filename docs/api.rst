@@ -54,6 +54,3 @@ For convenience, we provide some "precomposed" `modules <https://pytorch.org/doc
 
 .. automodule:: mpol.precomposed
     :members:
-
-
-

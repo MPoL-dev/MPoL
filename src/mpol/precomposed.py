@@ -16,6 +16,13 @@ class SimpleNet(torch.nn.Module):
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
         base_cube : a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``.
     
+    After the object is initialized, instance variables can be accessed, for example
+    
+    :ivar bcube: the :class:`~mpol.images.BaseCube` instance
+    :ivar icube: the :class:`~mpol.images.ImageCube` instance
+
+    For example, you'll likely want to access the ``self.icube.sky_model`` at some point.
+
     """
 
     def __init__(
