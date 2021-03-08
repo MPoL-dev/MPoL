@@ -1,9 +1,8 @@
-import pytest
 import numpy as np
 import torch
 import torch.optim
 import matplotlib.pyplot as plt
-from mpol import connectors, images, losses, precomposed
+from mpol import losses, precomposed
 from mpol.constants import *
 
 
