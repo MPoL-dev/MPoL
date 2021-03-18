@@ -44,6 +44,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx_copybutton",
+    "sphinxcontrib.mermaid",
 ]
 
 autodoc_mock_imports = ["torch", "torchvision"]
@@ -74,6 +75,8 @@ html_favicon = "favicon.ico"
 #         "donate.html",
 #     ]
 # }
+
+html_js_files = ["https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"]
 
 master_doc = "index"
 
