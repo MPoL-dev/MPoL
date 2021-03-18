@@ -77,6 +77,7 @@ html_favicon = "favicon.ico"
 # }
 
 html_js_files = ["https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"]
+mermaid_version = ""
 
 master_doc = "index"
 
