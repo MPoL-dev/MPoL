@@ -37,6 +37,7 @@ EXTRA_REQUIRES = {
         "rtds-action",
         "requests",
         "matplotlib",
+        "sphinxcontrib-mermaid",
     ],
 }
 
