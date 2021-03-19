@@ -85,7 +85,7 @@ html_static_path = ["_static"]
 
 # Mermaid configuration
 # only works locally
-# mermaid_output_format = "svg"
+mermaid_output_format = "svg"
 
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:

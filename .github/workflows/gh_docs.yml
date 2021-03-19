@@ -23,6 +23,11 @@ jobs:
       - name: Install Pandoc dependency 
         run: | 
           sudo apt-get install pandoc
+      - name: Set up node 
+        uses: actions/setup-node@v2
+      - name: Install mermaid.js dependency 
+        run: | 
+          npm install @mermaid-js/mermaid-cli
       - name: Build the docs
         run: | 
           make -C docs clean
