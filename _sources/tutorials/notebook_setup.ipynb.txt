@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "collective-bowling",
+   "id": "cooked-focus",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T22:54:29.521741Z",
-     "iopub.status.busy": "2021-03-19T22:54:29.516500Z",
-     "iopub.status.idle": "2021-03-19T22:54:29.524081Z",
-     "shell.execute_reply": "2021-03-19T22:54:29.523499Z"
+     "iopub.execute_input": "2021-03-19T23:09:13.900027Z",
+     "iopub.status.busy": "2021-03-19T23:09:13.899467Z",
+     "iopub.status.idle": "2021-03-19T23:09:13.913009Z",
+     "shell.execute_reply": "2021-03-19T23:09:13.913731Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "hungry-swedish",
+   "id": "heated-mississippi",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "united-lambda",
+   "id": "associate-liability",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T22:54:29.535447Z",
-     "iopub.status.busy": "2021-03-19T22:54:29.534348Z",
-     "iopub.status.idle": "2021-03-19T22:54:29.536486Z",
-     "shell.execute_reply": "2021-03-19T22:54:29.536947Z"
+     "iopub.execute_input": "2021-03-19T23:09:13.926154Z",
+     "iopub.status.busy": "2021-03-19T23:09:13.924733Z",
+     "iopub.status.idle": "2021-03-19T23:09:13.926793Z",
+     "shell.execute_reply": "2021-03-19T23:09:13.927256Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "vertical-consensus",
+   "id": "unusual-effects",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T22:54:29.544903Z",
-     "iopub.status.busy": "2021-03-19T22:54:29.544200Z",
-     "iopub.status.idle": "2021-03-19T22:54:29.813358Z",
-     "shell.execute_reply": "2021-03-19T22:54:29.812874Z"
+     "iopub.execute_input": "2021-03-19T23:09:13.931674Z",
+     "iopub.status.busy": "2021-03-19T23:09:13.931066Z",
+     "iopub.status.idle": "2021-03-19T23:09:14.222035Z",
+     "shell.execute_reply": "2021-03-19T23:09:14.221037Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "controversial-dependence",
+   "id": "grave-packet",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T22:54:29.818994Z",
-     "iopub.status.busy": "2021-03-19T22:54:29.818463Z",
-     "iopub.status.idle": "2021-03-19T22:54:29.821675Z",
-     "shell.execute_reply": "2021-03-19T22:54:29.822085Z"
+     "iopub.execute_input": "2021-03-19T23:09:14.228643Z",
+     "iopub.status.busy": "2021-03-19T23:09:14.227999Z",
+     "iopub.status.idle": "2021-03-19T23:09:14.231393Z",
+     "shell.execute_reply": "2021-03-19T23:09:14.231856Z"
     }
    },
    "outputs": [],
