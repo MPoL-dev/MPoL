@@ -84,7 +84,8 @@ master_doc = "index"
 html_static_path = ["_static"]
 
 # Mermaid configuration
-mermaid_output_format = "svg"
+# only works locally
+# mermaid_output_format = "svg"
 
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:
