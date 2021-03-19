@@ -1,0 +1,876 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mpol.images &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="../../index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="../../_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="../../index.html">MPoL</a> &raquo;</li>
+    
+      <li class="breadcrumb"><a href="../index.html">Module code</a> &raquo;</li>
+    
+  <li class="breadcrumb">mpol.images</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mpol.images</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span>
+<span class="kn">from</span> <span class="nn">.gridding</span> <span class="kn">import</span> <span class="n">GridCoords</span><span class="p">,</span> <span class="n">_setup_coords</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
+    <span class="c1"># If it&#39;s an identity layer, just set parameters to cube</span>
+    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">shifted</span>
+
+
+<span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
+    <span class="c1"># fftshift the image cube to the correct quadrants</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># flip so that east points left</span>
+    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">shifted</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">flipped</span>
+
+
+<div class="viewcode-block" id="BaseCube"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube">[docs]</a><span class="k">class</span> <span class="nc">BaseCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube domain.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        I = f_\mathrm{map}(b)</span>
+
+<span class="sd">    The ``base_cube`` pixel values are set as PyTorch `parameters &lt;https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html&gt;`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
+<span class="sd">        npix (int): the number of pixels per image side</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        nchan (int): the number of channels in the base cube. Default = 1.</span>
+<span class="sd">        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus() &lt;https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus&gt;`_. Output of the function should be in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+<span class="sd">        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pixel_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">base_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
+
+        <span class="c1"># The ``base_cube`` is already packed to make the Fourier transformation easier</span>
+        <span class="k">if</span> <span class="n">base_cube</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_cube</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">),</span>
+                    <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                    <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We expect the user to supply a pre-packed base cube</span>
+            <span class="c1"># so that it&#39;s ready to go for the FFT</span>
+            <span class="c1"># We could apply this transformation for the user, but I think it will</span>
+            <span class="c1"># lead to less confusion if we make this transformation explicit</span>
+            <span class="c1"># for the user during the setup phase.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_cube</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">base_cube</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pixel_mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pixel_mapping</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO assert that this is a PyTorch function</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pixel_mapping</span> <span class="o">=</span> <span class="n">pixel_mapping</span>
+
+<div class="viewcode-block" id="BaseCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the image representation from the ``base_cube`` using the pixel mapping </span>
+<span class="sd">            </span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            I = f_\mathrm{map}(b)</span>
+
+<span class="sd">        Returns : an image cube in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_mapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_cube</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ImageCube"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube">[docs]</a><span class="k">class</span> <span class="nc">ImageCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+
+<span class="sd">    All keyword arguments are required unless noted. The passthrough argument is essential for specifying whether the ImageCube object is the set of root parameters (``passthrough==False``) or if its simply a passthrough layer (``pasthrough==True``). In either case, ImageCube is essentially an identity layer, since no transformations are applied to the ``cube`` tensor. The main purpose of the ImageCube layer is to provide useful functionality around the ``cube`` tensor, such as returning a sky_cube representation and providing FITS writing functionility. In the case of ``passthrough==False``, the ImageCube layer also acts as a container for the trainable parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
+<span class="sd">        npix (int): the number of pixels per image side</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        nchan (int): the number of channels in the image</span>
+<span class="sd">        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.</span>
+<span class="sd">        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">passthrough</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">passthrough</span> <span class="o">=</span> <span class="n">passthrough</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">passthrough</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cube</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">),</span>
+                        <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                        <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># We expect the user to supply a pre-packed base cube</span>
+                <span class="c1"># so that it&#39;s ready to go for the FFT</span>
+                <span class="c1"># We could apply this transformation for the user, but I think it will</span>
+                <span class="c1"># lead to less confusion if we make this transformation explicit</span>
+                <span class="c1"># for the user during the setup phase.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># ImageCube is working as a passthrough layer, so cube should</span>
+            <span class="c1"># only be provided as an arg to the forward method, not as</span>
+            <span class="c1"># an initialization argument</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ImageCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the ImageCube object was initialized with ``passthrough=True``, the ``cube`` argument is required. ``forward`` essentially just passes this on as an identity operation.</span>
+
+<span class="sd">        If the ImageCube object was initialized with ``passthrough=False``, the ``cube`` argument is not permitted, and ``forward`` passes on the stored ``nn.Parameter`` cube as an identity operation.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if the ImageCube object was initialized with ``passthrough=True``.</span>
+
+<span class="sd">        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity operation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">cube</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">passthrough</span>
+            <span class="p">),</span> <span class="s2">&quot;ImageCube.passthrough must be True if supplying cube.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">passthrough</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">cube</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Do not supply cube if ImageCube.passthrough == False.&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cube</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The image cube arrange as it would appear on the sky.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.double : 3D image cube of shape ``(nchan, npix, npix)``</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageCube.to_FITS"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.to_FITS">[docs]</a>    <span class="k">def</span> <span class="nf">to_FITS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;cube.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export the image cube to a FITS file. </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str): the name of the FITS file to export to.</span>
+<span class="sd">            overwrite (bool): if the file already exists, overwrite?</span>
+<span class="sd">            header_kwargs (dict): Extra keyword arguments to write to the FITS header.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+            <span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">wcs</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Please install the astropy package to use FITS export functionality.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">w</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">WCS</span><span class="p">(</span><span class="n">naxis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">w</span><span class="o">.</span><span class="n">wcs</span><span class="o">.</span><span class="n">crpix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">wcs</span><span class="o">.</span><span class="n">cdelt</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="p">])</span> <span class="o">*</span> <span class="mf">180.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="p">)</span>  <span class="c1"># decimal degrees</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">wcs</span><span class="o">.</span><span class="n">ctype</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RA---TAN&quot;</span><span class="p">,</span> <span class="s2">&quot;DEC--TAN&quot;</span><span class="p">]</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">to_header</span><span class="p">()</span>
+
+        <span class="c1"># add in the kwargs to the header</span>
+        <span class="k">if</span> <span class="n">header_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">header_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">header</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sky_cube</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">hdu</span><span class="p">])</span>
+        <span class="n">hdul</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+        <span class="n">hdul</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="FourierCube"><a class="viewcode-back" href="../../api.html#mpol.images.FourierCube">[docs]</a><span class="k">class</span> <span class="nc">FourierCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A layer holding the cube corresponding to the FFT of ImageCube.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cell_size (float): the width of an image-plane pixel [arcseconds]</span>
+<span class="sd">        npix (int): the number of pixels per image side</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># we don&#39;t want to bother with the nchan argument here, so</span>
+        <span class="c1"># we don&#39;t use the convenience method _setup_coords</span>
+        <span class="c1"># and just do it manually</span>
+        <span class="k">if</span> <span class="n">coords</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">npix</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cell_size</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="p">),</span> <span class="s2">&quot;npix and cell_size must be empty if precomputed GridCoords are supplied.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+
+        <span class="k">elif</span> <span class="n">npix</span> <span class="ow">or</span> <span class="n">cell_size</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">coords</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="p">),</span> <span class="s2">&quot;GridCoords must be empty if npix and cell_size are supplied.&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FourierCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.FourierCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the FFT of the image cube for each channel.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># make sure the cube is 3D</span>
+        <span class="k">assert</span> <span class="n">cube</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;cube must be 3D&quot;</span>
+
+        <span class="c1"># the self.cell_size prefactor (in arcsec) is to obtain the correct output units</span>
+        <span class="c1"># since it needs to correct for the spacing of the input grid.</span>
+        <span class="c1"># See MPoL documentation and/or TMS Eqn A8.18 for more information.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">psd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The power spectral density of the cube, in packed format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.double: power spectral density cube</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sky_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The visibility FFT cube fftshifted for plotting with ``imshow``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<span class="c1"># class ImageCubeOld(nn.Module):</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#     A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.</span>
+
+<span class="c1">#     The parameter set is the pixel values of the image cube itself. The transformations are the real fast Fourier transform (RFFT) and band-limited interpolation routines. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+
+<span class="c1">#     All keyword arguments are required unless noted.</span>
+
+<span class="c1">#     Args:</span>
+<span class="c1">#         npix (int): the number of pixels per image side</span>
+<span class="c1">#         nchan (int): the number of channels in the image</span>
+<span class="c1">#         cell_size (float): the width of a pixel [arcseconds]</span>
+<span class="c1">#         cube (torch.double tensor, optional): an image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``.</span>
+<span class="c1">#         pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus()`.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+
+<span class="c1">#     def __init__(</span>
+<span class="c1">#         self,</span>
+<span class="c1">#         npix=None,</span>
+<span class="c1">#         nchan=None,</span>
+<span class="c1">#         cell_size=None,</span>
+<span class="c1">#         cube=None,</span>
+<span class="c1">#         pixel_mapping=None,</span>
+<span class="c1">#         **kwargs</span>
+<span class="c1">#     ):</span>
+
+<span class="c1">#         super().__init__()</span>
+<span class="c1">#         assert npix % 2 == 0, &quot;npix must be even (for now)&quot;</span>
+<span class="c1">#         self.npix = int(npix)</span>
+
+<span class="c1">#         assert cell_size &gt; 0.0, &quot;cell_size must be positive (arcseconds)&quot;</span>
+<span class="c1">#         self.cell_size = cell_size * arcsec  # [radians]</span>
+<span class="c1">#         # cell_size is also the differential change in sky angles</span>
+<span class="c1">#         # dll = dmm = cell_size #[radians]</span>
+
+<span class="c1">#         assert nchan &gt; 0, &quot;must have a positive number of channels&quot;</span>
+<span class="c1">#         self.nchan = int(nchan)</span>
+
+<span class="c1">#         img_radius = self.cell_size * (self.npix // 2)  # [radians]</span>
+
+<span class="c1">#         # the output spatial frequencies of the RFFT routine (unshifted)</span>
+<span class="c1">#         self.us = np.fft.rfftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]</span>
+<span class="c1">#         self.vs = np.fft.fftfreq(self.npix, d=self.cell_size) * 1e-3  # convert to [kλ]</span>
+
+<span class="c1">#         # the fft-packed versions corresponding to vis</span>
+<span class="c1">#         self._us_2D, self._vs_2D = np.meshgrid(</span>
+<span class="c1">#             self.us, self.vs, indexing=&quot;xy&quot;</span>
+<span class="c1">#         )  # cartesian indexing (default)</span>
+<span class="c1">#         self._qs_2D = np.sqrt(self._us_2D ** 2 + self._vs_2D ** 2)</span>
+
+<span class="c1">#         # the normal 2D versions corresponding to vis</span>
+<span class="c1">#         self.us_2D = np.fft.fftshift(self._us_2D, axes=0)</span>
+<span class="c1">#         self.vs_2D = np.fft.fftshift(self._vs_2D, axes=0)</span>
+<span class="c1">#         self.qs_2D = np.fft.fftshift(self._qs_2D, axes=0)</span>
+
+<span class="c1">#         if pixel_mapping is None:</span>
+<span class="c1">#             self.pixel_mapping = torch.nn.Softplus()</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             # TODO assert that this is a PyTorch function</span>
+<span class="c1">#             self.pixel_mapping = pixel_mapping</span>
+
+<span class="c1">#         # The ``_cube`` attribute shouldn&#39;t really be accessed by the user, since it&#39;s naturally</span>
+<span class="c1">#         # packed in the fftshifted format to make the Fourier transformation easier</span>
+<span class="c1">#         # and with East pointing right (i.e., RA increasing to the right)</span>
+<span class="c1">#         # this is contrary to the way astronomers normally plot images, but</span>
+<span class="c1">#         # is correct for what the FFT expects</span>
+<span class="c1">#         if cube is None:</span>
+<span class="c1">#             self._base_cube = nn.Parameter(</span>
+<span class="c1">#                 torch.full(</span>
+<span class="c1">#                     (self.nchan, self.npix, self.npix),</span>
+<span class="c1">#                     fill_value=0.05,</span>
+<span class="c1">#                     requires_grad=True,</span>
+<span class="c1">#                     dtype=torch.double,</span>
+<span class="c1">#                 )</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#         else:</span>
+<span class="c1">#             # we expect the user to supply an image cube as it looks on the sky</span>
+<span class="c1">#             # with East pointing to the left. Therefore we will need to</span>
+<span class="c1">#             # flip the image across the RA dimension</span>
+<span class="c1">#             # so that the native cube has East (l) increasing with array index</span>
+<span class="c1">#             # North (m) should already be increasing with array index</span>
+<span class="c1">#             flipped = torch.flip(cube, (2,))</span>
+<span class="c1">#             shifted = utils.fftshift(flipped, axes=(1, 2))</span>
+<span class="c1">#             import warnings</span>
+
+<span class="c1">#             warnings.warn(</span>
+<span class="c1">#                 &quot;Inverse of pixel mapping not yet implemented. Assigning cube to base_cube as is.&quot;</span>
+<span class="c1">#             )</span>
+<span class="c1">#             self._base_cube = nn.Parameter(shifted)</span>
+
+<span class="c1">#         # calculate the image axes corresponding to the shifted _cube</span>
+<span class="c1">#         # the native _cube is stored as an FFT-shifted version of</span>
+<span class="c1">#         # a cube with East (l) increasing with array index and North (m) increasing</span>
+<span class="c1">#         # with array index</span>
+<span class="c1">#         self._ll = np.flip(</span>
+<span class="c1">#             np.fft.ifftshift(utils.fftspace(img_radius, self.npix))</span>
+<span class="c1">#         )  # [radians]</span>
+<span class="c1">#         self._mm = np.fft.ifftshift(utils.fftspace(img_radius, self.npix))  # [radians]</span>
+
+<span class="c1">#         # the image units are Jy/arcsec^2. An extended source with a brightness temperature</span>
+<span class="c1">#         # of 100 K is about 4 Jy/arcsec^2. These choice of units helps prevent</span>
+<span class="c1">#         # loss of numerical precision</span>
+
+<span class="c1">#         # calculate the gridding correction function to apply to _cube</span>
+<span class="c1">#         # evaluated over the (preshifted) _ll and _mm coordinates</span>
+<span class="c1">#         self.corrfun = torch.tensor(spheroidal_gridding.corrfun_mat(self._ll, self._mm))</span>
+
+<span class="c1">#         self.precached = False</span>
+
+<span class="c1">#     def precache_interpolation(self, dataset):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         Cache the interpolation matrices used to interpolate the output from the RFFT to the measured :math:`(u,v)` points. This is only applicable if the dataset has not been pre-gridded, and will be run automatically upon the first call to :meth:`mpol.ImageCube.forward`.</span>
+
+<span class="c1">#         Stores the attributes ``C_res`` and ``C_ims``, which are lists of sparse interpolation matrices corresponding to each channel.</span>
+
+<span class="c1">#         Args:</span>
+<span class="c1">#             dataset (UVDataset): a UVDataset containing the :math:`(u,v)` sampling points of the observation.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             None</span>
+
+
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         max_baseline = torch.max(</span>
+<span class="c1">#             torch.abs(torch.cat([dataset.uu, dataset.vv]))</span>
+<span class="c1">#         )  # klambda</span>
+
+<span class="c1">#         # check that the pixel scale is sufficiently small to sample</span>
+<span class="c1">#         # the frequency corresponding to the largest baseline of the</span>
+<span class="c1">#         # dataset (in klambda)</span>
+<span class="c1">#         assert max_baseline &lt; (</span>
+<span class="c1">#             1e-3 / (2 * self.cell_size)</span>
+<span class="c1">#         ), &quot;Image cell size is too coarse to represent the largest spatial frequency sampled by the dataset. Make a finer image by decreasing cell_size. You may also need to increase npix to make sure the image remains wide enough to capture all of the emission and avoid aliasing.&quot;</span>
+
+<span class="c1">#         # calculate the interpolation matrices at the datapoints</span>
+<span class="c1">#         # the .detach().cpu() is to enable the numpy conversion even after transferred to GPU</span>
+<span class="c1">#         uu = dataset.uu.detach().cpu().numpy()</span>
+<span class="c1">#         vv = dataset.vv.detach().cpu().numpy()</span>
+<span class="c1">#         self.C_res = []</span>
+<span class="c1">#         self.C_ims = []</span>
+<span class="c1">#         for i in range(self.nchan):</span>
+<span class="c1">#             C_re, C_im = spheroidal_gridding.calc_matrices(</span>
+<span class="c1">#                 uu[i], vv[i], self.us, self.vs</span>
+<span class="c1">#             )</span>
+<span class="c1">#             C_shape = C_re.shape</span>
+
+<span class="c1">#             # make these torch sparse tensors</span>
+<span class="c1">#             i_re = torch.LongTensor([C_re.row, C_re.col])</span>
+<span class="c1">#             v_re = torch.DoubleTensor(C_re.data)</span>
+<span class="c1">#             C_re = torch.sparse.DoubleTensor(i_re, v_re, torch.Size(C_shape))</span>
+<span class="c1">#             self.C_res.append(C_re)</span>
+
+<span class="c1">#             i_im = torch.LongTensor([C_im.row, C_im.col])</span>
+<span class="c1">#             v_im = torch.DoubleTensor(C_im.data)</span>
+<span class="c1">#             C_im = torch.sparse.DoubleTensor(i_im, v_im, torch.Size(C_shape))</span>
+<span class="c1">#             self.C_ims.append(C_im)</span>
+
+<span class="c1">#         self.precached = True</span>
+
+<span class="c1">#     def forward(self, dataset):</span>
+<span class="c1">#         r&quot;&quot;&quot;</span>
+<span class="c1">#         Compute the model visibilities at the :math:`(u, v)` locations of the dataset.</span>
+
+<span class="c1">#         Args:</span>
+<span class="c1">#             dataset (UVDataset): the dataset to forward model.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             (torch.double, torch.double): a 2-tuple of the :math:`\Re` and :math:`\Im` model values.</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         if dataset.gridded:</span>
+<span class="c1">#             # re, im output will always be 1D</span>
+<span class="c1">#             assert (</span>
+<span class="c1">#                 dataset.npix == self.npix</span>
+<span class="c1">#             ), &quot;Pre-gridded npix is different than model npix&quot;</span>
+<span class="c1">#             assert (</span>
+<span class="c1">#                 dataset.cell_size == self.cell_size</span>
+<span class="c1">#             ), &quot;Pre-gridded cell_size is different than model cell_size.&quot;</span>
+
+<span class="c1">#             # convert the image to Jy/ster and perform the RFFT</span>
+<span class="c1">#             # the self.cell_size prefactor (in radians) is to obtain the correct output units</span>
+<span class="c1">#             # since it needs to correct for the spacing of the input grid.</span>
+<span class="c1">#             # See MPoL documentation and/or TMS Eqn A8.18 for more information.</span>
+<span class="c1">#             # Alternatively we could send the rfft routine _cube in its native Jy/arcsec^2</span>
+<span class="c1">#             # and then multiply the result by cell_size (in units of arcsec).</span>
+<span class="c1">#             # It seemed easiest to do it this way where we keep things in radians.</span>
+<span class="c1">#             self._vis = self.cell_size ** 2 * torch.rfft(</span>
+<span class="c1">#                 self._cube / arcsec ** 2, signal_ndim=2</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#             # torch delivers the real and imag components separately</span>
+<span class="c1">#             vis_re = self._vis[:, :, :, 0]</span>
+<span class="c1">#             vis_im = self._vis[:, :, :, 1]</span>
+
+<span class="c1">#             # grid mask is a (nchan, npix, npix//2 + 1) size boolean array</span>
+<span class="c1">#             re = vis_re.masked_select(dataset.grid_mask)</span>
+<span class="c1">#             im = vis_im.masked_select(dataset.grid_mask)</span>
+
+<span class="c1">#         else:</span>
+<span class="c1">#             # re, im output will always be 2D (nchan, nvis)</span>
+<span class="c1">#             # test to see if the interpolation is pre-cached</span>
+<span class="c1">#             if not self.precached:</span>
+<span class="c1">#                 # this routine checks that the maxbaseline is contained within the grid.</span>
+<span class="c1">#                 self.precache_interpolation(dataset)</span>
+
+<span class="c1">#             # TODO: does the corrfun broadcast correctly across the cube?</span>
+<span class="c1">#             self._vis = self.cell_size ** 2 * torch.rfft(</span>
+<span class="c1">#                 self._cube * self.corrfun / arcsec ** 2, signal_ndim=2</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#             # torch delivers the real and imag components separately</span>
+<span class="c1">#             vis_re = self._vis[:, :, :, 0]</span>
+<span class="c1">#             vis_im = self._vis[:, :, :, 1]</span>
+
+<span class="c1">#             # reshape into (nchan, -1, 1) vector format so we can do matrix product</span>
+<span class="c1">#             vr = torch.reshape(vis_re, (self.nchan, -1, 1))</span>
+<span class="c1">#             vi = torch.reshape(vis_im, (self.nchan, -1, 1))</span>
+
+<span class="c1">#             res = []</span>
+<span class="c1">#             ims = []</span>
+<span class="c1">#             # sample the FFT using the sparse matrices</span>
+<span class="c1">#             # the output of mm is a (nvis, 1) dimension tensor</span>
+<span class="c1">#             for i in range(self.nchan):</span>
+<span class="c1">#                 res.append(torch.sparse.mm(self.C_res[i], vr[i]))</span>
+<span class="c1">#                 ims.append(torch.sparse.mm(self.C_ims[i], vi[i]))</span>
+
+<span class="c1">#             # concatenate to a single (nchan, nvis) tensor</span>
+<span class="c1">#             re = torch.transpose(torch.cat(res, dim=1), 0, 1)</span>
+<span class="c1">#             im = torch.transpose(torch.cat(ims, dim=1), 0, 1)</span>
+
+<span class="c1">#         return re, im</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def _cube(self):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         The shifted image cube.</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         return self.pixel_mapping(self._base_cube)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def cube(self):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         The image cube.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             torch.double : image cube of shape ``(nchan, npix, npix)``</span>
+
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         # fftshift the image cube to the correct quadrants</span>
+<span class="c1">#         shifted = utils.fftshift(self._cube, axes=(1, 2))</span>
+<span class="c1">#         # flip so that east points left</span>
+<span class="c1">#         flipped = torch.flip(shifted, (2,))</span>
+<span class="c1">#         return flipped</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def extent(self):</span>
+<span class="c1">#         r&quot;&quot;&quot;</span>
+<span class="c1">#         The extent 4-tuple (in arcsec) to assign relative image coordinates (:math:`\Delta \alpha \cos \delta`,  :math:`\Delta \delta`) with matplotlib imshow. Assumes ``origin=&quot;lower&quot;``.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             4-tuple: extent</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         low = np.min(self._ll) / arcsec - 0.5 * self.cell_size  # [arcseconds]</span>
+<span class="c1">#         high = np.max(self._ll) / arcsec + 0.5 * self.cell_size  # [arcseconds]</span>
+
+<span class="c1">#         return [high, low, low, high]</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def vis(self):</span>
+<span class="c1">#         r&quot;&quot;&quot;</span>
+<span class="c1">#         The visibility RFFT cube fftshifted for plotting with ``imshow`` (the v coordinate goes from -ve to +ve).</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             torch.double: visibility cube</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         return utils.fftshift(self._vis, axes=(1,))</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def psd(self):</span>
+<span class="c1">#         r&quot;&quot;&quot;</span>
+<span class="c1">#         The power spectral density of the cube, fftshifted for plotting. (The v coordinate goes from -ve to +ve).</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             torch.double: power spectral density cube</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         vis_re = self.vis[:, :, :, 0]</span>
+<span class="c1">#         vis_im = self.vis[:, :, :, 1]</span>
+
+<span class="c1">#         psd = vis_re ** 2 + vis_im ** 2</span>
+
+<span class="c1">#         return psd</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def vis_extent(self):</span>
+<span class="c1">#         r&quot;&quot;&quot;</span>
+<span class="c1">#         The `imshow` ``extent`` argument corresponding to `vis_cube` when plotted with ``origin=&quot;lower&quot;``. The :math:`(u, v)` coordinates.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             4-tuple: extent</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         du = 1 / (self.npix * self.cell_size) * 1e-3  # klambda</span>
+<span class="c1">#         left = np.min(self.us) - 0.5 * du</span>
+<span class="c1">#         right = np.max(self.us) + 0.5 * du</span>
+<span class="c1">#         bottom = np.min(self.vs) - 0.5 * du</span>
+<span class="c1">#         top = np.max(self.vs) + 0.5 * du</span>
+
+<span class="c1">#         return [left, right, bottom, top]</span>
+
+<span class="c1">#     def to_FITS(self, fname=&quot;cube.fits&quot;, overwrite=False, header_kwargs=None):</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         Export the image cube to a FITS file.</span>
+
+<span class="c1">#         Args:</span>
+<span class="c1">#             fname (str): the name of the FITS file to export to.</span>
+<span class="c1">#             overwrite (bool): if the file already exists, overwrite?</span>
+<span class="c1">#             header_kwargs (dict): Extra keyword arguments to write to the FITS header.</span>
+
+<span class="c1">#         Returns:</span>
+<span class="c1">#             None</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+
+<span class="c1">#         try:</span>
+<span class="c1">#             from astropy.io import fits</span>
+<span class="c1">#             from astropy import wcs</span>
+<span class="c1">#         except ImportError:</span>
+<span class="c1">#             print(</span>
+<span class="c1">#                 &quot;Please install the astropy package to use FITS export functionality.&quot;</span>
+<span class="c1">#             )</span>
+
+<span class="c1">#         w = wcs.WCS(naxis=2)</span>
+
+<span class="c1">#         w.wcs.crpix = np.array([1, 1])</span>
+<span class="c1">#         w.wcs.cdelt = (</span>
+<span class="c1">#             np.array([self.cell_size, self.cell_size]) * 180.0 / np.pi</span>
+<span class="c1">#         )  # decimal degrees</span>
+<span class="c1">#         w.wcs.ctype = [&quot;RA---TAN&quot;, &quot;DEC--TAN&quot;]</span>
+
+<span class="c1">#         header = w.to_header()</span>
+
+<span class="c1">#         # add in the kwargs to the header</span>
+<span class="c1">#         if header_kwargs is not None:</span>
+<span class="c1">#             for k, v in header_kwargs.items():</span>
+<span class="c1">#                 header[k] = v</span>
+
+<span class="c1">#         hdu = fits.PrimaryHDU(self.cube.detach().cpu().numpy(), header=header)</span>
+
+<span class="c1">#         hdul = fits.HDUList([hdu])</span>
+<span class="c1">#         hdul.writeto(fname, overwrite=overwrite)</span>
+
+<span class="c1">#         hdul.close()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

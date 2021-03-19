@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developer Documentation &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Gridding visibilities and making diagnostic images" href="tutorials/gridder.html" />
+    <link rel="prev" title="Units and Conventions" href="units-and-conventions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#code-bugs-and-enhancements">Code Bugs and Enhancements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#test-cache">Test cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#viewing-test-and-debug-plots">Viewing test and debug plots</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contributing-tutorials">Contributing tutorials</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
+    
+  <li class="breadcrumb">Developer Documentation</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/developer-documentation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developer-documentation">
+<h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<p>If you are new to contributing code to a project, we recommend a quick read through the excellent contributing guides of the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> and <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy</a> packages. What follows in this guide draws upon many of the suggestions from those two resources.</p>
+<div class="section" id="code-bugs-and-enhancements">
+<h2>Code Bugs and Enhancements<a class="headerlink" href="#code-bugs-and-enhancements" title="Permalink to this headline">¶</a></h2>
+<p>If you find an issue with the code, documentation, or would like to make a suggestion for an improvement, please raise an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
+<blockquote>
+<div></div></blockquote>
+</div>
+<div class="section" id="testing">
+<span id="testing-reference-label"></span><h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>MPoL includes a test suite written using <a class="reference external" href="https://docs.pytest.org/">pytest</a>. You can install the package dependencies for testing via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install .[test]
+</pre></div>
+</div>
+<p>after you’ve cloned the repository and changed to the root of the repository.</p>
+<p>To run all of the tests, from  the root of the repository, invoke</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m pytest
+</pre></div>
+</div>
+<p>If a test errors on a stable branch, please report what went wrong as an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
+<div class="section" id="test-cache">
+<h3>Test cache<a class="headerlink" href="#test-cache" title="Permalink to this headline">¶</a></h3>
+<p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo. For continuous integration tests (e.g., on github workflows), mock data is downloaded with each run of the tests. Because the data is saved to a temporary system directory, it is cleaned up after each run.</p>
+<p>Frequent downloading of moderately sized files can be burdensome, especially for developers who might want to run tests frequently in the course of making changes to the package. If you want to cache downloaded files, set your shell environment variable <code class="docutils literal notranslate"><span class="pre">MPOL_CACHE_DIR</span></code> to a location of your choosing. After the files are downloaded during the first test, subsequent tests will load files from this directory.</p>
+</div>
+<div class="section" id="viewing-test-and-debug-plots">
+<h3>Viewing test and debug plots<a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this headline">¶</a></h3>
+<p>Some tests produce temporary files, like plots, that could be useful to view for development or debugging. Normally these are saved to a temporary directory created by the system which will be cleaned up after the tests finish. To preserve them, first create a plot directory (e.g., <code class="docutils literal notranslate"><span class="pre">plotsdir</span></code>) and then run the tests with this <code class="docutils literal notranslate"><span class="pre">--basetemp</span></code> specified</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir plotsdir
+$ python -m pytest --basetemp=plotsdir
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>We use a “fork and pull request” model for collaborative development on Github, using git. If you are unfamiliar with this workflow, check out this short Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. For even more reference material, see the official Github documentation on <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests">collaborating with issues and pull requests</a>.</p>
+<p>After forking the MPoL repository to your own github account, clone the repository and install it with the development tools in editable mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/MPoL-dev/MPoL.git
+$ cd MPoL
+$ pip install -e .[dev]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'.[dev]'</span></code> instead.</p>
+</div>
+<p>Before starting to make any changes, it’s a good idea to first run the tests as described <a class="reference internal" href="#testing-reference-label"><span class="std std-ref">Testing</span></a> to make sure everything passes.</p>
+<p>Once you’re done making your changes, run the test suite again. If any tests fail, please address these issues before submitting a pull request. If you’ve changed a substantial amount of code or added new features, please write new tests covering these changes. Instructions on how to write new tests can be found in the <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html#toc">pytest documentation</a> and the <code class="docutils literal notranslate"><span class="pre">MPoL/tests/</span></code> directory contains many examples.</p>
+<p>Once you are satisfied with your changes and all tests pass, initiate a pull request back to the main <a class="reference external" href="https://github.com/MPoL-dev/MPoL/">MPoL-dev/MPoL repository</a> as described in the Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. Thank you for your contribution!</p>
+<p>If you find that you’re making regular contributions to the package, consider contacting <a class="reference external" href="https://sites.psu.edu/iczekala/">Ian Czekala</a> to become a member of the MPoL-dev organization on Github.</p>
+<div class="section" id="contributing-tutorials">
+<h3>Contributing tutorials<a class="headerlink" href="#contributing-tutorials" title="Permalink to this headline">¶</a></h3>
+<p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, MPoL tutorials are written as <code class="docutils literal notranslate"><span class="pre">.py</span></code> python files and converted to Jupyter notebooks using <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a>. This practice prevents the MPoL github repository from growing too bloated from Jupyter notebooks filled with evaluated cells.</p>
+<p>To contribute a new tutorial, we would recommend starting by</p>
+<ol class="arabic simple">
+<li><p>copying one of the existing <cite>.py</cite> files in <cite>docs/tutorials/</cite></p></li>
+<li><p>starting a jupyter notebook kernel</p></li>
+<li><p>opening the <cite>.py</cite> file as a notebook and editing it like you would any other Jupyter notebook. If you’ve already installed the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a>. tool (as part of <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.[dev]</span></code>), your changes in the Jupyter notebook window should be automatically saved back to the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file.</p></li>
+</ol>
+<p>You can learn more about this neat plugin on the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a> page. You don’t need to worry about pairing notebooks—we’re only interested in keeping the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file up to date and committed to source control. The <code class="docutils literal notranslate"><span class="pre">.py</span></code> file you created is the only thing you need to commit to the github repo (don’t commit <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> files to the git repository).</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/gridder.html" class="btn btn-neutral float-right" title="Gridding visibilities and making diagnostic images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="units-and-conventions.html" class="btn btn-neutral float-left" title="Units and Conventions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

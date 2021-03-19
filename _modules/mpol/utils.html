@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mpol.utils &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="../../index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="../../_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="../../index.html">MPoL</a> &raquo;</li>
+    
+      <li class="breadcrumb"><a href="../index.html">Module code</a> &raquo;</li>
+    
+  <li class="breadcrumb">mpol.utils</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mpol.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">kB</span><span class="p">,</span> <span class="n">deg</span>
+
+
+<div class="viewcode-block" id="get_Jy_arcsec2"><a class="viewcode-back" href="../../api.html#mpol.utils.get_Jy_arcsec2">[docs]</a><span class="k">def</span> <span class="nf">get_Jy_arcsec2</span><span class="p">(</span><span class="n">T_b</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">230e9</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        T_b : brightness temperature in [:math:`K`]</span>
+<span class="sd">        nu : frequency (in Hz)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: specific intensity (in [:math:`\mathrm{Jy}\, \mathrm{arcsec}^2]`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># brightness temperature assuming RJ limit</span>
+    <span class="c1"># units of ergs/s/cm^2/Hz/ster</span>
+    <span class="n">I_nu</span> <span class="o">=</span> <span class="n">T_b</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nu</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kB</span> <span class="o">/</span> <span class="n">cc</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="c1"># convert to Jy/ster</span>
+    <span class="n">Jy_ster</span> <span class="o">=</span> <span class="n">I_nu</span> <span class="o">*</span> <span class="mf">1e23</span>
+
+    <span class="c1"># convert to Jy/arcsec^2</span>
+    <span class="n">Jy_arcsec2</span> <span class="o">=</span> <span class="n">Jy_ster</span> <span class="o">*</span> <span class="n">arcsec</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">Jy_arcsec2</span></div>
+
+
+<div class="viewcode-block" id="fftspace"><a class="viewcode-back" href="../../api.html#mpol.utils.fftspace">[docs]</a><span class="k">def</span> <span class="nf">fftspace</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        width (float): the width of the array</span>
+<span class="sd">        N (int): the number of elements in the array</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.float64 1D array: the fftspace array</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">N</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;N must be even.&quot;</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">N</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">xx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">width</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">dx</span>
+
+    <span class="k">return</span> <span class="n">xx</span></div>
+
+
+<div class="viewcode-block" id="fftshift"><a class="viewcode-back" href="../../api.html#mpol.utils.fftshift">[docs]</a><span class="k">def</span> <span class="nf">fftshift</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    `fftshift &lt;https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html&gt;`_ the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x : a torch tensor </span>
+<span class="sd">        axes : tuple selecting which axes to shift over. Default is all.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        x : an fftshift-ed tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
+
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="get_max_spatial_freq"><a class="viewcode-back" href="../../api.html#mpol.utils.get_max_spatial_freq">[docs]</a><span class="k">def</span> <span class="nf">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the maximum spatial frequency contained in the image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cell_size (float): the pixel size in arcseconds</span>
+<span class="sd">        npix (int): the number of pixels in the image</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        max_freq : the maximum spatial frequency contained in the image (in kilolambda)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized</span>
+    <span class="c1"># arrays, the highest *positive* spatial frequency is (npix/2 - 1) / (npix * cell_size)</span>
+    <span class="c1"># it is the most negative spatial frequency that goes to - 1/(2 * cell_size)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">npix</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">npix</span> <span class="o">*</span> <span class="n">cell_size</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-3</span>  <span class="c1"># kilolambda</span></div>
+
+
+<div class="viewcode-block" id="get_maximum_cell_size"><a class="viewcode-back" href="../../api.html#mpol.utils.get_maximum_cell_size">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_cell_size</span><span class="p">(</span><span class="n">uu_vv_point</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].</span>
+
+<span class="sd">    Returns: cell_size (in arcsec)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">uu_vv_point</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="n">arcsec</span></div>
+
+
+<div class="viewcode-block" id="sky_gaussian_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_radians">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_radians</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is rotated ``Omega`` degrees East of North.</span>
+<span class="sd">    </span>
+<span class="sd">    To evaluate the Gaussian, internally first we translate to center </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        l&#39; = l - \delta_l\\</span>
+<span class="sd">        m&#39; = m - \delta_m</span>
+
+<span class="sd">    then rotate coordinates</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        l&#39;&#39; = l&#39; \cos \phi - m&#39; \sin \phi \\</span>
+<span class="sd">        m&#39;&#39; = l&#39; \sin \phi + m&#39; \cos \phi</span>
+
+<span class="sd">    and then evaluate the Gaussian </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left [ \left (\frac{l&#39;&#39;}{\sigma_l} \right)^2 + \left( \frac{m&#39;&#39;}{\sigma_m} \right )^2 \right ] \right )</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        l: units of [radians]</span>
+<span class="sd">        m: units of [radians]</span>
+<span class="sd">        a : amplitude prefactor</span>
+<span class="sd">        delta_l : offset [radians]</span>
+<span class="sd">        delta_m : offset [radians]</span>
+<span class="sd">        sigma_l : width [radians]</span>
+<span class="sd">        sigma_M : width [radians]</span>
+<span class="sd">        Omega : position angle of ascending node [degrees] east of north.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        2D Gaussian evaluated at input args with peak amplitude :math:`a`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># translate</span>
+    <span class="n">lt</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="n">delta_l</span>
+    <span class="n">mt</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="n">delta_m</span>
+
+    <span class="c1"># rotate</span>
+    <span class="n">lp</span> <span class="o">=</span> <span class="n">lt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span> <span class="o">-</span> <span class="n">mt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span>
+    <span class="n">mp</span> <span class="o">=</span> <span class="n">lt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">mt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">lp</span> <span class="o">/</span> <span class="n">sigma_l</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">mp</span> <span class="o">/</span> <span class="n">sigma_m</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="sky_gaussian_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_arcsec">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_arcsec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts from arcsec to radians.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: equivalent to l, but in units of [arcsec]</span>
+<span class="sd">        y: equivalent to m, but in units of [arcsec]</span>
+<span class="sd">        a : amplitude prefactor</span>
+<span class="sd">        delta_x : offset [arcsec]</span>
+<span class="sd">        delta_y : offset [arcsec]</span>
+<span class="sd">        sigma_x : width [arcsec]</span>
+<span class="sd">        sigma_y : width [arcsec]</span>
+<span class="sd">        Omega : position angle of ascending node [degrees] east of north.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        2D Gaussian evaluated at input args with peak amplitude :math:`a`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sky_gaussian_radians</span><span class="p">(</span>
+        <span class="n">x</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">,</span>
+        <span class="n">delta_x</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">delta_y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">sigma_x</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">sigma_y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">Omega</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fourier_gaussian_lambda_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_lambda_radians">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_lambda_radians</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u: l in units of [lambda]</span>
+<span class="sd">        v: m in units of [lambda]</span>
+<span class="sd">        a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{steradian}`.</span>
+<span class="sd">        delta_x : offset [radians]</span>
+<span class="sd">        delta_y : offset [radians]</span>
+<span class="sd">        sigma_x : width [radians]</span>
+<span class="sd">        sigma_y : width [radians]</span>
+<span class="sd">        Omega : position angle of ascending node [degrees] east of north.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        2D Gaussian evaluated at input args</span>
+
+<span class="sd">    The following is a description of how we derived the analytical relationships. In what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units of :math:`\lambda`.</span>
+<span class="sd">    </span>
+<span class="sd">    We start from Fourier dual relationships in Bracewell&#39;s `The Fourier Transform and Its Applications &lt;https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract&gt;`_</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_0(l, m) \leftrightharpoons F_0(u, v)</span>
+
+<span class="sd">    where the sky-plane and Fourier-plane Gaussians are</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_0(l,m) = a \exp \left ( -\pi [l^2 + m^2] \right)</span>
+
+<span class="sd">    and </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        F_0(u,v) = a \exp \left ( -\pi [u^2 + v^2] \right),</span>
+
+<span class="sd">    respectively. The sky-plane Gaussian has a maximum value of :math:`a`.</span>
+<span class="sd">    </span>
+<span class="sd">    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into :math:`F_\mathrm{g}(u,v)`.</span>
+
+<span class="sd">    The similarity theorem states that (in 1D)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f(bl) = \frac{1}{|b|}F\left(\frac{u}{b}\right).</span>
+
+<span class="sd">    First, we scale :math:`f_0` to include sigmas. Let</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 + \left( \frac{m}{\sigma_m} \right)^2 \right] \right).</span>
+
+<span class="sd">    i.e., something we might call a normalized Gaussian function. Phrased in terms of :math:`f_0`, :math:`f_1` is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, \frac{m}{\sigma_m \sqrt{2 \pi}}\right).</span>
+
+<span class="sd">    Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\, \sigma_m \sqrt{2 \pi} v \right),</span>
+
+<span class="sd">    or</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + \sigma_m^2 v^2] \right).</span>
+
+<span class="sd">    Next, we rotate the Gaussian to match the sky plane rotation. A rotation :math:`\Omega` in the sky plane is carried out in the same direction in the Fourier plane,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        u&#39; = u \cos \Omega - v \sin \Omega \\</span>
+<span class="sd">        v&#39; = u \sin \Omega + v \cos \Omega</span>
+
+<span class="sd">    such that </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_2(l, m) = f_1(l&#39;, m&#39;) \\</span>
+<span class="sd">        F_2(u, v) = F_1(u&#39;, m&#39;)</span>
+
+<span class="sd">    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is </span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_3(l,m) = f_2(l - \delta_l, m - \delta_m)</span>
+
+<span class="sd">    According to the shift theorem, the equivalent :math:`F_3(u,v)` is </span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)</span>
+
+<span class="sd">    We have arrived at the corresponding Fourier Gaussian, :math:`F_\mathrm{g}(u,v) = F_3(u,v)`. The simplified equation is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u&#39;^2 + \sigma_m^2 v&#39;^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).</span>
+
+<span class="sd">    N.B. that we have mixed primed (:math:`u&#39;`) and unprimed (:math:`u`) coordinates in the same equation for brevity. </span>
+
+<span class="sd">    Finally, the same Fourier dual relationship holds</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        f_\mathrm{g}(l,m) \leftrightharpoons F_\mathrm{g}(u,v)</span>
+
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># calculate primed rotated coordinates</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span>
+    <span class="n">vp</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">deg</span><span class="p">)</span>
+
+    <span class="c1"># calculate the Fourier Gaussian</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">a</span>
+        <span class="o">*</span> <span class="n">sigma_l</span>
+        <span class="o">*</span> <span class="n">sigma_m</span>
+        <span class="o">*</span> <span class="mi">2</span>
+        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sigma_l</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">up</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">sigma_m</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">vp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">-</span> <span class="mf">2.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta_l</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="n">delta_m</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fourier_gaussian_klambda_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_klambda_arcsec">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_klambda_arcsec</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        u: l in units of [klambda]</span>
+<span class="sd">        v: m in units of [klambda]</span>
+<span class="sd">        a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.</span>
+<span class="sd">        delta_x : offset [arcsec]</span>
+<span class="sd">        delta_y : offset [arcsec]</span>
+<span class="sd">        sigma_x : width [arcsec]</span>
+<span class="sd">        sigma_y : width [arcsec]</span>
+<span class="sd">        Omega : position angle of ascending node [degrees] east of north.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        2D Fourier Gaussian evaluated at input args</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># convert the parameters and feed to the core routine</span>
+    <span class="k">return</span> <span class="n">fourier_gaussian_lambda_radians</span><span class="p">(</span>
+        <span class="mf">1e3</span> <span class="o">*</span> <span class="n">u</span><span class="p">,</span>
+        <span class="mf">1e3</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span>
+        <span class="n">a</span> <span class="o">/</span> <span class="n">arcsec</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">delta_x</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">delta_y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">sigma_x</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">sigma_y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
+        <span class="n">Omega</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

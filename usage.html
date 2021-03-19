@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Usage Overview &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="Gridding visibilities and making diagnostic images" href="tutorials/gridder.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image-model">Image Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizer">Optimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#losses">Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-loop">Training loop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#saving-output">Saving output</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
+    
+  <li class="breadcrumb">Usage Overview</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="usage-overview">
+<h1>Usage Overview<a class="headerlink" href="#usage-overview" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can try out MPoL in your browser using this example <a class="reference external" href="https://colab.research.google.com/drive/1CDLlDwIDHzhsqSdzZM112lY2x_L8ETcV">Google Colaboratory Notebook</a>. This notebook also includes an example of how to run on a GPU.</p>
+</div>
+<p>MPoL is a Regularized Maximum Likelihood (RML) imaging package built on top of the machine learning framework <a class="reference external" href="https://pytorch.org/">PyTorch</a>. The key ingredient that MPoL provides is the <a class="reference internal" href="api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a> module. This is a PyTorch layer that links the base parameter set (the image cube pixels) to the dataset (the complex visibilities) through the FFT and band-limited interpolation routines used in the radio astronomy community. The MPoL package is designed such that you use the native infrastructure of PyTorch to write custom optimization routines to interact with <a class="reference internal" href="api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>. You don’t need to know PyTorch to use MPoL, but it doesn’t hurt to spend a little time browsing the <a class="reference external" href="https://pytorch.org/tutorials/">tutorials</a>.</p>
+<p>This document will give you an idea of one workflow to generate an image from a set of visibilities, and in the process demonstrate some of the core functionality of the package.</p>
+<p>Typically, you’ll want to import the following depedencies</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">mpol.losses</span> <span class="kn">import</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">loss_fn_sparsity</span>
+<span class="kn">from</span> <span class="nn">mpol.images</span> <span class="kn">import</span> <span class="n">ImageCube</span>
+<span class="kn">from</span> <span class="nn">mpol.datasets</span> <span class="kn">import</span> <span class="n">UVDataset</span>
+<span class="kn">from</span> <span class="nn">mpol.constants</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>The fundamental dataset is the set of complex-valued visibility measurements: lists of the <span class="math notranslate nohighlight">\(u\)</span>, <span class="math notranslate nohighlight">\(v\)</span> coordinates, real and imaginary visibility values (<span class="math notranslate nohighlight">\(\Re\)</span> and <span class="math notranslate nohighlight">\(\Im\)</span>), and visibility weights (<span class="math notranslate nohighlight">\(w \propto \frac{1}{\sigma^2}\)</span>). If you have a CASA measurement set, you’ll want to export these quantities. You can achieve this by writing a CASA script yourself or using the <a class="reference external" href="https://github.com/AstroChem/UVHDF5">UVHDF5 package</a>. It goes without saying that you should make sure the data are correctly calibrated, particularly the <a class="reference external" href="https://casaguides.nrao.edu/index.php/DataWeightsAndCombination">weights</a>.</p>
+<p>One important thing to note is that the effective CASA (and AIPS) baseline convention is opposite that of the interferometric coordinate system typically presented in textbooks, e.g., <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract">TMS</a>, Fig. 3.2. Urvashi Rao has a very <a class="reference external" href="https://casa.nrao.edu/casadocs/casa-5.6.0/memo-series/casa-memos/casa_memo2_coordconvention_rau.pdf">helpful memo</a> explaining the baseline convention in CASA. Essentially, this means you’ll want to take the complex conjugate of your visibilities to have your images show up in the correct orientation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uu</span> <span class="o">=</span> <span class="c1"># your data here in [kilolam]</span>
+<span class="n">vv</span> <span class="o">=</span> <span class="c1"># your data here in [kilolam]</span>
+<span class="n">data_re</span> <span class="o">=</span> <span class="c1"># your data here in [Jy]</span>
+<span class="c1"># perform the complex conjugate by multiplying the imaginaries by -1</span>
+<span class="n">data_im</span> <span class="o">=</span> <span class="c1"># -1.0 * (your data here) in [Jy]</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="c1"># your data here in [1/Jy^2]</span>
+</pre></div>
+</div>
+<p>To test out the package, you can play with a mock dataset of Saturn available <a class="reference external" href="https://zenodo.org/record/3634225#.XjeyDBNKiL8">here</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npzfile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data.npz&quot;</span><span class="p">)</span>
+<span class="n">uu</span> <span class="o">=</span> <span class="n">npzfile</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">]</span> <span class="c1"># [kilolambda]</span>
+<span class="n">vv</span> <span class="o">=</span> <span class="n">npzfile</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">]</span> <span class="c1"># [kilolambda]</span>
+<span class="n">data_re</span> <span class="o">=</span> <span class="n">npzfile</span><span class="p">[</span><span class="s2">&quot;re&quot;</span><span class="p">]</span> <span class="c1"># [Jy]</span>
+<span class="c1"># perform the complex conjugate by multiplying the imaginaries by -1</span>
+<span class="n">data_im</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">npzfile</span><span class="p">[</span><span class="s2">&quot;im&quot;</span><span class="p">]</span> <span class="c1"># [Jy]</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">npzfile</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="c1"># [1/Jy]</span>
+</pre></div>
+</div>
+<p>For convenience, we provide a dataset wrapper for these quantities, <a class="reference internal" href="api.html#mpol.datasets.UVDataset" title="mpol.datasets.UVDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.UVDataset</span></code></a>. After loading your data, you can initialize this with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">UVDataset</span><span class="p">(</span><span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, if we already know the image dimensions that we would like to use, the optimization loop can be greatly sped up if we pre-grid the dataset to the RFFT output grid. You can do this by providing both of the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code> optional keywords to <code class="docutils literal notranslate"><span class="pre">UVDataset</span></code>. If you don’t know apriori how big your source is on the sky, it’s always a good idea to make as large an image as possible. Otherwise, if you make a very small image, you will alias emission back into your map. To save you some time, the dataset was made with a (512x512) image of Saturn scaled to 8 arcseconds wide (this is actually smaller than it appears from Earth), so anything larger and more finely gridded than this should be fine</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># pre-grid visibilities to anticipated output RFFT grid</span>
+<span class="n">npix</span> <span class="o">=</span> <span class="mi">800</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">UVDataset</span><span class="p">(</span><span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">8.0</span><span class="o">/</span><span class="n">npix</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="image-model">
+<h2>Image Model<a class="headerlink" href="#image-model" title="Permalink to this headline">¶</a></h2>
+<p>If you didn’t already set them in the <code class="docutils literal notranslate"><span class="pre">UVDataset</span></code> stage, you will need to decide how many pixels (<code class="docutils literal notranslate"><span class="pre">npix</span></code>) to use in your image and how large each pixel will be (<code class="docutils literal notranslate"><span class="pre">cell_size</span></code>, in arcseconds). You will want to make an image that is large enough to contain all of the emission in the dataset, because otherwise you will alias bright sources into your image. You will also want to make <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> small enough so that you can capture the highest spatial frequency visibility sampled by your dataset.</p>
+<p>The <a class="reference internal" href="api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a> requires the following options</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">ImageCube</span><span class="p">(</span>
+    <span class="n">cell_size</span><span class="o">=</span><span class="mf">8.0</span> <span class="o">/</span> <span class="n">npix</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>We set the number of channels to 1, since we just have a single channel map.</p>
+<p>The main functionility of the Image class is to forward-model the visibilities starting from an image, done using the <code class="docutils literal notranslate"><span class="pre">Image.forward</span></code> method. This method is called automatically when you use <code class="docutils literal notranslate"><span class="pre">model()</span></code>. To save computation, the core image representation is actually stored <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html">pre-fftshifted</a> in the <code class="docutils literal notranslate"><span class="pre">model._cube</span></code> variable, but you can query the de-shifted version using <code class="docutils literal notranslate"><span class="pre">model.cube</span></code>.</p>
+<p>Since we have just initialized the model, we can see that <code class="docutils literal notranslate"><span class="pre">model.cube</span></code> is blank. If you have a better starting image, you can pass this as a PyTorch tensor to the <code class="docutils literal notranslate"><span class="pre">cube</span></code> parameter.</p>
+</div>
+<div class="section" id="optimizer">
+<h2>Optimizer<a class="headerlink" href="#optimizer" title="Permalink to this headline">¶</a></h2>
+<p>Define an optimizer</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As we’ll see in a moment, this optimizer will advance the parameters (in this case, the pixel values of the image cube) based upon the gradient of the loss function with respect to those parameters. PyTorch has many different <a class="reference external" href="https://pytorch.org/docs/stable/optim.html#module-torch.optim">optimizers</a> available, and it would be worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The <code class="docutils literal notranslate"><span class="pre">lr</span></code> parameter is the ‘loss rate,’ or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the loss rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.</p>
+</div>
+<div class="section" id="losses">
+<h2>Losses<a class="headerlink" href="#losses" title="Permalink to this headline">¶</a></h2>
+<p>In the parlance of the machine learning community, one can define loss functions against the model image and visibilities. For regularized maximum likelihood imaging, one key loss function that we are interested in is the data likelihood (<a class="reference internal" href="api.html#mpol.losses.loss_fn" title="mpol.losses.loss_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses.loss_fn()</span></code></a>), which is just the <span class="math notranslate nohighlight">\(\chi^2\)</span> of the visibilities. Because imaging is an ill-defined inverse problem, however, the visibility likelihood function is not sufficient. We also need to apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The <a class="reference internal" href="api.html#module-mpol.losses" title="mpol.losses"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mpol.losses</span></code></a> module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.</p>
+</div>
+<div class="section" id="training-loop">
+<h2>Training loop<a class="headerlink" href="#training-loop" title="Permalink to this headline">¶</a></h2>
+<p>Next, we’ll set up a loop that will</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>evaluate the current <code class="docutils literal notranslate"><span class="pre">model</span></code> (i.e., the image cube) against the loss functions</p></li>
+<li><p>calculate the gradients of the loss w.r.t. the model</p></li>
+<li><p>advance the <code class="docutils literal notranslate"><span class="pre">model</span></code> so as to minimize the loss</p></li>
+</ol>
+</div></blockquote>
+<p>Here is a minimal loop that will accomplish this and track the value of the loss with each iteration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loss_log</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="c1"># clears the gradients of all optimized tensors</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+    <span class="c1"># query the model for the new model visibilities</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="c1"># calculate the losses</span>
+    <span class="n">loss_nll</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">re</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">im</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">weights</span><span class="p">))</span>
+    <span class="n">loss_sparse</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">loss_fn_sparsity</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_nll</span> <span class="o">+</span> <span class="n">loss_sparse</span>
+    <span class="n">loss_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+    <span class="c1"># compute the intermediate gradients that go into</span>
+    <span class="c1"># calculating the loss and attach them to the image</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+    <span class="c1"># advance the optimizer</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="c1"># you can also query the current cube value as `model.cube`</span>
+</pre></div>
+</div>
+<p>It is an excellent idea to track and plot diagnostics like the loss values while optimizing. This will help gain intuition for how the penalty terms (the scale factor in front of the sparsity regularization) affect the image quality. You can also query and save the image cube values and RFFT output during optimization as well.</p>
+<p>Moreover, you can compose many intricate optimization strategies using the tools available in PyTorch.</p>
+</div>
+<div class="section" id="saving-output">
+<h2>Saving output<a class="headerlink" href="#saving-output" title="Permalink to this headline">¶</a></h2>
+<p>When you are finished optimizing, you can save the output</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;cube.npy&quot;</span><span class="p">,</span> <span class="n">cube</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Image bounds for <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> are available in <code class="docutils literal notranslate"><span class="pre">model.extent</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorials/gridder.html" class="btn btn-neutral float-left" title="Gridding visibilities and making diagnostic images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

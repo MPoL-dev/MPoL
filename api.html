@@ -1,0 +1,1128 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Units and Conventions" href="units-and-conventions.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.utils">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.coordinates">Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.gridding">Gridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.images">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.connectors">Connectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mpol.losses">Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#precomposed-modules">Precomposed Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
+    
+  <li class="breadcrumb">API</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>This page documents all of the available components of the MPoL package. If you do not see something that you think should be documented, please raise an <a class="reference external" href="https://github.com/iancze/MPoL/issues">issue</a>.</p>
+<div class="section" id="module-mpol.utils">
+<span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-mpol.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="mpol.utils.fftshift">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">fftshift</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#fftshift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fftshift" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html">fftshift</a> the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – a torch tensor</p></li>
+<li><p><strong>axes</strong> – tuple selecting which axes to shift over. Default is all.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an fftshift-ed tensor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>x</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.fftspace">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">fftspace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#fftspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fftspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delivers a (nearly) symmetric coordinate array that spans <span class="math notranslate nohighlight">\(N\)</span> elements (where <span class="math notranslate nohighlight">\(N\)</span> is even) from <cite>-width</cite> to <cite>+width</cite>, but ensures that the middle point lands on <span class="math notranslate nohighlight">\(0\)</span>. The array indices go from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(N -1.\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> (<em>float</em>) – the width of the array</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – the number of elements in the array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the fftspace array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.float64 1D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.fourier_gaussian_klambda_arcsec">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">fourier_gaussian_klambda_arcsec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#fourier_gaussian_klambda_arcsec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fourier_gaussian_klambda_arcsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the Fourier plane Gaussian <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span> corresponding to the Sky plane Gaussian <span class="math notranslate nohighlight">\(f_\mathrm{g}(l,m)\)</span> in <a class="reference internal" href="#mpol.utils.sky_gaussian_arcsec" title="mpol.utils.sky_gaussian_arcsec"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_arcsec()</span></code></a>, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (<code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>), widths (<code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>) and rotation (<code class="docutils literal notranslate"><span class="pre">Omega</span></code>). Assumes that <code class="docutils literal notranslate"><span class="pre">a</span></code> was in units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – l in units of [klambda]</p></li>
+<li><p><strong>v</strong> – m in units of [klambda]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor, units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>.</p></li>
+<li><p><strong>delta_x</strong> – offset [arcsec]</p></li>
+<li><p><strong>delta_y</strong> – offset [arcsec]</p></li>
+<li><p><strong>sigma_x</strong> – width [arcsec]</p></li>
+<li><p><strong>sigma_y</strong> – width [arcsec]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D Fourier Gaussian evaluated at input args</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.fourier_gaussian_lambda_radians">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">fourier_gaussian_lambda_radians</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#fourier_gaussian_lambda_radians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fourier_gaussian_lambda_radians" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the Fourier plane Gaussian <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span> corresponding to the Sky plane Gaussian <span class="math notranslate nohighlight">\(f_\mathrm{g}(l,m)\)</span> in <a class="reference internal" href="#mpol.utils.sky_gaussian_radians" title="mpol.utils.sky_gaussian_radians"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a>, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (<code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>), widths (<code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>) and rotation (<code class="docutils literal notranslate"><span class="pre">Omega</span></code>). Assumes that <code class="docutils literal notranslate"><span class="pre">a</span></code> was in units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{steradian}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – l in units of [lambda]</p></li>
+<li><p><strong>v</strong> – m in units of [lambda]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor, units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{steradian}\)</span>.</p></li>
+<li><p><strong>delta_x</strong> – offset [radians]</p></li>
+<li><p><strong>delta_y</strong> – offset [radians]</p></li>
+<li><p><strong>sigma_x</strong> – width [radians]</p></li>
+<li><p><strong>sigma_y</strong> – width [radians]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args</p>
+</dd>
+</dl>
+<p>The following is a description of how we derived the analytical relationships. In what follows, all <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> coordinates are assumed to be in units of radians and all <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span> coordinates are assumed to be in units of <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p>We start from Fourier dual relationships in Bracewell’s <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract">The Fourier Transform and Its Applications</a></p>
+<div class="math notranslate nohighlight">
+\[f_0(l, m) \leftrightharpoons F_0(u, v)\]</div>
+<p>where the sky-plane and Fourier-plane Gaussians are</p>
+<div class="math notranslate nohighlight">
+\[f_0(l,m) = a \exp \left ( -\pi [l^2 + m^2] \right)\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[F_0(u,v) = a \exp \left ( -\pi [u^2 + v^2] \right),\]</div>
+<p>respectively. The sky-plane Gaussian has a maximum value of <span class="math notranslate nohighlight">\(a\)</span>.</p>
+<p>We will use the similarity, rotation, and shift theorems to turn <span class="math notranslate nohighlight">\(f_0\)</span> into a form matching <span class="math notranslate nohighlight">\(f_\mathrm{g}\)</span>, which simultaneously turns <span class="math notranslate nohighlight">\(F_0\)</span> into <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span>.</p>
+<p>The similarity theorem states that (in 1D)</p>
+<div class="math notranslate nohighlight">
+\[f(bl) = \frac{1}{|b|}F\left(\frac{u}{b}\right).\]</div>
+<p>First, we scale <span class="math notranslate nohighlight">\(f_0\)</span> to include sigmas. Let</p>
+<div class="math notranslate nohighlight">
+\[f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 + \left( \frac{m}{\sigma_m} \right)^2 \right] \right).\]</div>
+<p>i.e., something we might call a normalized Gaussian function. Phrased in terms of <span class="math notranslate nohighlight">\(f_0\)</span>, <span class="math notranslate nohighlight">\(f_1\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, \frac{m}{\sigma_m \sqrt{2 \pi}}\right).\]</div>
+<p>Therefore, according to the similarity theorem, the equivalent <span class="math notranslate nohighlight">\(F_1(u,v)\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\, \sigma_m \sqrt{2 \pi} v \right),\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + \sigma_m^2 v^2] \right).\]</div>
+<p>Next, we rotate the Gaussian to match the sky plane rotation. A rotation <span class="math notranslate nohighlight">\(\Omega\)</span> in the sky plane is carried out in the same direction in the Fourier plane,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}u' = u \cos \Omega - v \sin \Omega \\
+v' = u \sin \Omega + v \cos \Omega\end{split}\]</div>
+<p>such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f_2(l, m) = f_1(l', m') \\
+F_2(u, v) = F_1(u', m')\end{split}\]</div>
+<p>Finally, we translate the sky plane Gaussian by amounts <span class="math notranslate nohighlight">\(\delta_l\)</span>, <span class="math notranslate nohighlight">\(\delta_m\)</span>, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is</p>
+<div class="math notranslate nohighlight">
+\[f_3(l,m) = f_2(l - \delta_l, m - \delta_m)\]</div>
+<p>According to the shift theorem, the equivalent <span class="math notranslate nohighlight">\(F_3(u,v)\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)\]</div>
+<p>We have arrived at the corresponding Fourier Gaussian, <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v) = F_3(u,v)\)</span>. The simplified equation is</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).\]</div>
+<p>N.B. that we have mixed primed (<span class="math notranslate nohighlight">\(u'\)</span>) and unprimed (<span class="math notranslate nohighlight">\(u\)</span>) coordinates in the same equation for brevity.</p>
+<p>Finally, the same Fourier dual relationship holds</p>
+<div class="math notranslate nohighlight">
+\[f_\mathrm{g}(l,m) \leftrightharpoons F_\mathrm{g}(u,v)\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.get_Jy_arcsec2">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">get_Jy_arcsec2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">230000000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_Jy_arcsec2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_Jy_arcsec2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T_b</strong> – brightness temperature in [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>nu</strong> – frequency (in Hz)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>specific intensity (in [<span class="math notranslate nohighlight">\(\mathrm{Jy}\, \mathrm{arcsec}^2]\)</span>)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.get_max_spatial_freq">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">get_max_spatial_freq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_max_spatial_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_max_spatial_freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the maximum spatial frequency contained in the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the pixel size in arcseconds</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels in the image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the maximum spatial frequency contained in the image (in kilolambda)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>max_freq</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.get_maximum_cell_size">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">get_maximum_cell_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uu_vv_point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_maximum_cell_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_maximum_cell_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>uu_vv_point</strong> (<em>float</em>) – a single spatial frequency. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p>
+</dd>
+</dl>
+<p>Returns: cell_size (in arcsec)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.sky_gaussian_arcsec">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">sky_gaussian_arcsec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#sky_gaussian_arcsec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_gaussian_arcsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience wrapper to <a class="reference internal" href="#mpol.utils.sky_gaussian_radians" title="mpol.utils.sky_gaussian_radians"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a> that automatically converts from arcsec to radians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – equivalent to l, but in units of [arcsec]</p></li>
+<li><p><strong>y</strong> – equivalent to m, but in units of [arcsec]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor</p></li>
+<li><p><strong>delta_x</strong> – offset [arcsec]</p></li>
+<li><p><strong>delta_y</strong> – offset [arcsec]</p></li>
+<li><p><strong>sigma_x</strong> – width [arcsec]</p></li>
+<li><p><strong>sigma_y</strong> – width [arcsec]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args with peak amplitude <span class="math notranslate nohighlight">\(a\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.sky_gaussian_radians">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">sky_gaussian_radians</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#sky_gaussian_radians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_gaussian_radians" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at <code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>, has widths of <code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>, and is rotated <code class="docutils literal notranslate"><span class="pre">Omega</span></code> degrees East of North.</p>
+<p>To evaluate the Gaussian, internally first we translate to center</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}l' = l - \delta_l\\
+m' = m - \delta_m\end{split}\]</div>
+<p>then rotate coordinates</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}l'' = l' \cos \phi - m' \sin \phi \\
+m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
+<p>and then evaluate the Gaussian</p>
+<div class="math notranslate nohighlight">
+\[f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left [ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m} \right )^2 \right ] \right )\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> – units of [radians]</p></li>
+<li><p><strong>m</strong> – units of [radians]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor</p></li>
+<li><p><strong>delta_l</strong> – offset [radians]</p></li>
+<li><p><strong>delta_m</strong> – offset [radians]</p></li>
+<li><p><strong>sigma_l</strong> – width [radians]</p></li>
+<li><p><strong>sigma_M</strong> – width [radians]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args with peak amplitude <span class="math notranslate nohighlight">\(a\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.coordinates">
+<span id="coordinates"></span><h2>Coordinates<a class="headerlink" href="#module-mpol.coordinates" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="mpol.coordinates.GridCoords">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.coordinates.</span></code><code class="sig-name descname"><span class="pre">GridCoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/coordinates.html#GridCoords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.coordinates.GridCoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>The GridCoords object uses desired image dimensions (via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code> arguments) to define a corresponding Fourier plane grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – width of a single square pixel in [arcsec]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – number of pixels in the width of the image</p></li>
+</ul>
+</dd>
+</dl>
+<p>The Fourier grid is defined over the domain <span class="math notranslate nohighlight">\([-u,+u]\)</span>, <span class="math notranslate nohighlight">\([-v,+v]\)</span>, even though for real images, technically we could use an RFFT grid from <span class="math notranslate nohighlight">\([0,+u]\)</span> to <span class="math notranslate nohighlight">\([-v,+v]\)</span>. The reason we opt for a full FFT grid in this instance is implementation simplicity.</p>
+<p>Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as <code class="docutils literal notranslate"><span class="pre">[y,</span> <span class="pre">x]</span></code> and <code class="docutils literal notranslate"><span class="pre">[v,</span> <span class="pre">u]</span></code>.  This means that an image with dimensions <code class="docutils literal notranslate"><span class="pre">(npix,</span> <span class="pre">npix)</span></code> will also have a corresponding FFT Fourier grid with shape <code class="docutils literal notranslate"><span class="pre">(npix,</span> <span class="pre">npix)</span></code>. The native <code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code> representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no <code class="docutils literal notranslate"><span class="pre">np.fft.fftshift</span></code> has been applied).</p>
+<p>After the object is initialized, instance variables can be accessed, for example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myCoords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myCoords</span><span class="o">.</span><span class="n">img_ext</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dl</strong> – image-plane cell spacing in RA direction (assumed to be positive) [radians]</p></li>
+<li><p><strong>dm</strong> – image-plane cell spacing in DEC direction [radians]</p></li>
+<li><p><strong>img_ext</strong> – The length-4 list of (left, right, bottom, top) expected by routines like <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> in the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter assuming <code class="docutils literal notranslate"><span class="pre">origin='lower'</span></code>. Units of [arcsec]</p></li>
+<li><p><strong>du</strong> – Fourier-plane cell spacing in East-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>dv</strong> – Fourier-plane cell spacing in North-South direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>u_centers</strong> – 1D array of cell centers in East-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p></li>
+<li><p><strong>v_centers</strong> – 1D array of cell centers in North-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p></li>
+<li><p><strong>u_edges</strong> – 1D array of cell edges in East-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p></li>
+<li><p><strong>v_edges</strong> – 1D array of cell edges in North-South direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p></li>
+<li><p><strong>u_bin_min</strong> – minimum u edge [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>u_bin_max</strong> – maximum u edge [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>v_bin_min</strong> – minimum v edge [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>v_bin_max</strong> – maximum v edge [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>max_grid</strong> – maximum spatial frequency enclosed by Fourier grid [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vis_ext</strong> – length-4 list of (left, right, bottom, top) expected by routines like <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> in the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter assuming <code class="docutils literal notranslate"><span class="pre">origin='lower'</span></code>. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.coordinates.GridCoords.check_data_fit">
+<code class="sig-name descname"><span class="pre">check_data_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/coordinates.html#GridCoords.check_data_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.coordinates.GridCoords.check_data_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uu</strong> (<em>np.array</em>) – array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<em>np.array</em>) – array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: <code class="docutils literal notranslate"><span class="pre">True</span></code> if all visibilities fit within the Fourier grid defined by <code class="docutils literal notranslate"><span class="pre">[u_bin_min,</span> <span class="pre">u_bin_max,</span> <span class="pre">v_bin_min,</span> <span class="pre">v_bin_max]</span></code>. Otherwise an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> is raised on the first violated boundary.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.gridding">
+<span id="gridding"></span><h2>Gridding<a class="headerlink" href="#module-mpol.gridding" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="mpol.gridding.Gridder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.gridding.</span></code><code class="sig-name descname"><span class="pre">Gridder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_re</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_im</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/gridding.html#Gridder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.gridding.Gridder" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Gridder object uses desired image dimensions (via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code> arguments) to define a corresponding Fourier plane grid as a <a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object. A pre-computed <a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> can be supplied in lieu of <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code>, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the <a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> documentation.</p>
+<p>The <a class="reference internal" href="#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object accepts “loose” <em>ungridded</em> visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full <span class="math notranslate nohighlight">\([-u,u]\)</span> and <span class="math notranslate nohighlight">\([-v,v]\)</span> domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">nvis)</span></code>. Like the <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel ‘continuum’ visibilities, they will just have nchan = 1 in the first dimension of most products.</p>
+<p>Once the loose visibilities are attached, the user can decide how to ‘grid’, or average, them to a more compact representation on the Fourier grid using the <a class="reference internal" href="#mpol.gridding.Gridder.grid_visibilities" title="mpol.gridding.Gridder.grid_visibilities"><code class="xref py py-func docutils literal notranslate"><span class="pre">grid_visibilities()</span></code></a> routine.</p>
+<p>If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the <a class="reference internal" href="#mpol.gridding.Gridder.to_pytorch_dataset" title="mpol.gridding.Gridder.to_pytorch_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_pytorch_dataset()</span></code></a> routine. Note that you must average the visiblities with <code class="docutils literal notranslate"><span class="pre">weighting='uniform'</span></code>, otherwise the probabilistic interpretation is invalid.</p>
+<p>If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the ‘dirty image’ and the point spread function or ‘dirty beam’. After the visibilities have been gridded with <a class="reference internal" href="#mpol.gridding.Gridder.grid_visibilities" title="mpol.gridding.Gridder.grid_visibilities"><code class="xref py py-func docutils literal notranslate"><span class="pre">grid_visibilities()</span></code></a>, these are available via the <a class="reference internal" href="#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_image()</span></code></a> and <a class="reference internal" href="#mpol.gridding.Gridder.get_dirty_beam" title="mpol.gridding.Gridder.get_dirty_beam"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_beam()</span></code></a> methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – width of a single square pixel in [arcsec]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – number of pixels in the width of the image</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>uu</strong> (<em>numpy array</em>) – array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<em>numpy array</em>) – (nchan, nvis) length array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>weight</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of thermal weights. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
+<li><p><strong>data_re</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the real part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+<li><p><strong>data_im</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.gridding.Gridder.get_dirty_beam">
+<code class="sig-name descname"><span class="pre">get_dirty_beam</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/gridding.html#Gridder.get_dirty_beam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.gridding.Gridder.get_dirty_beam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dirty beam corresponding to the gridded visibilities.</p>
+<p>Returns: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.gridding.Gridder.get_dirty_image">
+<code class="sig-name descname"><span class="pre">get_dirty_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Jy/beam'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/gridding.html#Gridder.get_dirty_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.gridding.Gridder.get_dirty_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the dirty image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>unit</strong> (<em>string</em>) – what unit should the image be in. Default is <code class="docutils literal notranslate"><span class="pre">&quot;Jy/beam&quot;</span></code>. If <code class="docutils literal notranslate"><span class="pre">&quot;Jy/arcsec^2&quot;</span></code>, then the effective area of the dirty beam will be used to convert from <code class="docutils literal notranslate"><span class="pre">&quot;Jy/beam&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;Jy/arcsec^2&quot;</span></code>.</p>
+</dd>
+</dl>
+<p>Returns: (nchan, npix, npix) numpy array of the dirty image cube.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.gridding.Gridder.grid_visibilities">
+<code class="sig-name descname"><span class="pre">grid_visibilities</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/gridding.html#Gridder.grid_visibilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.gridding.Gridder.grid_visibilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grid the loose data visibilities to the Fourier grid in preparation for imaging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weighting</strong> (<em>string</em>) – The type of cell averaging to perform. Choices of <code class="docutils literal notranslate"><span class="pre">&quot;natural&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;uniform&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;briggs&quot;</span></code>, following CASA tclean. If <code class="docutils literal notranslate"><span class="pre">&quot;briggs&quot;</span></code>, also specify a robust value.</p></li>
+<li><p><strong>robust</strong> (<em>float</em>) – If <code class="docutils literal notranslate"><span class="pre">weighting='briggs'</span></code>, specify a robust value in the range [-2, 2]. <code class="docutils literal notranslate"><span class="pre">robust=-2</span></code> approxmately corresponds to uniform weighting and <code class="docutils literal notranslate"><span class="pre">robust=2</span></code> approximately corresponds to natural weighting.</p></li>
+<li><p><strong>taper_function</strong> (<em>function reference</em>) – a function assumed to be of the form <span class="math notranslate nohighlight">\(f(u,v)\)</span> which calculates a prefactor in the range <span class="math notranslate nohighlight">\([0,1]\)</span> and premultiplies the visibility data. The function must assume that <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span> will be supplied in units of <span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>. By default no taper is applied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.gridding.Gridder.to_pytorch_dataset">
+<code class="sig-name descname"><span class="pre">to_pytorch_dataset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/gridding.html#Gridder.to_pytorch_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.gridding.Gridder.to_pytorch_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export gridded visibilities to a PyTorch dataset object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> with gridded visibilities.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.datasets">
+<span id="datasets"></span><h2>Datasets<a class="headerlink" href="#module-mpol.datasets" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="mpol.datasets.GriddedDataset">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></code><code class="sig-name descname"><span class="pre">GriddedDataset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_gridded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_gridded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the width of a pixel [arcseconds]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the image (default = 1).</p></li>
+<li><p><strong>vis_gridded</strong> (<em>torch complex</em>) – the gridded visibility data</p></li>
+<li><p><strong>weight_gridded</strong> (<em>torch double</em>) – the weights corresponding to the gridded visibility data</p></li>
+<li><p><strong>mask</strong> (<em>torch boolean</em>) – a boolean mask to index the non-zero locations of <code class="docutils literal notranslate"><span class="pre">vis_gridded</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_gridded</span></code>.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
+</ul>
+</dd>
+</dl>
+<p>After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vis_indexed</strong> – 1D complex tensor of visibility data</p></li>
+<li><p><strong>weight_indexd</strong> – 1D tensor of weight values</p></li>
+</ul>
+</dd>
+</dl>
+<p>If you index the output of the Fourier layer in the same manner using <code class="docutils literal notranslate"><span class="pre">self.mask</span></code> (as done internally within <code class="xref py py-class docutils literal notranslate"><span class="pre">DataConnector</span></code>), then the model and data visibilities can be directly compared using a loss function.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="mpol.datasets.UVDataset">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></code><code class="sig-name descname"><span class="pre">UVDataset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#UVDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.UVDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container for loose interferometric visibilities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uu</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>data_re</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the real part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+<li><p><strong>data_im</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+<li><p><strong>weights</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of thermal weights. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
+<li><p><strong>cell_size</strong> (<em>float</em>) – the image pixel size in arcsec. Defaults to None, but if both <cite>cell_size</cite> and <cite>npix</cite> are set, the visibilities will be pre-gridded to the RFFT output dimensions.</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side (square images only). Defaults to None, but if both <cite>cell_size</cite> and <cite>npix</cite> are set, the visibilities will be pre-gridded to the RFFT output dimensions.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
+</ul>
+</dd>
+</dl>
+<p>If both <cite>cell_size</cite> and <cite>npix</cite> are set, the dataset will be automatically pre-gridded to the RFFT output grid. This will greatly speed up performance.</p>
+<p>If you have just a single channel, you can pass 1D numpy arrays for <cite>uu</cite>, <cite>vv</cite>, <cite>weights</cite>, <cite>data_re</cite>, and <cite>data_im</cite> and they will automatically be promoted to 2D with a leading dimension of 1 (i.e., <code class="docutils literal notranslate"><span class="pre">nchan=1</span></code>).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.images">
+<span id="images"></span><h2>Images<a class="headerlink" href="#module-mpol.images" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">images</span></code> module provides the core functionality of MPoL via <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>.</p>
+<dl class="py class">
+<dt id="mpol.images.BaseCube">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.images.</span></code><code class="sig-name descname"><span class="pre">BaseCube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#BaseCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.BaseCube" title="Permalink to this definition">¶</a></dt>
+<dd><p>A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function <span class="math notranslate nohighlight">\(f_\mathrm{map}\)</span> from the base cube values to the ImageCube domain.</p>
+<div class="math notranslate nohighlight">
+\[I = f_\mathrm{map}(b)\]</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">base_cube</span></code> pixel values are set as PyTorch <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html">parameters</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the width of a pixel [arcseconds]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the base cube. Default = 1.</p></li>
+<li><p><strong>pixel_mapping</strong> (<em>torch.nn</em>) – a PyTorch function mapping the base pixel representation to the cube representation. If <cite>None</cite>, defaults to <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus">torch.nn.Softplus()</a>. Output of the function should be in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>].</p></li>
+<li><p><strong>base_cube</strong> (<em>torch.double tensor</em><em>, </em><em>optional</em>) – a pre-packed base cube to initialize the model with. If None, assumes <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.images.BaseCube.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#BaseCube.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.BaseCube.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the image representation from the <code class="docutils literal notranslate"><span class="pre">base_cube</span></code> using the pixel mapping</p>
+<div class="math notranslate nohighlight">
+\[I = f_\mathrm{map}(b)\]</div>
+<p>Returns : an image cube in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="mpol.images.FourierCube">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.images.</span></code><code class="sig-name descname"><span class="pre">FourierCube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#FourierCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.FourierCube" title="Permalink to this definition">¶</a></dt>
+<dd><p>A layer holding the cube corresponding to the FFT of ImageCube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the width of an image-plane pixel [arcseconds]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.images.FourierCube.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#FourierCube.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.FourierCube.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the FFT of the image cube for each channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cube</strong> (torch.double tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – a prepacked image cube, for example, from ImageCube.forward()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the FFT of the image cube, in packed format.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(torch.complex tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.images.FourierCube.psd">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">psd</span></code><a class="headerlink" href="#mpol.images.FourierCube.psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>The power spectral density of the cube, in packed format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>power spectral density cube</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.images.FourierCube.sky_vis">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_vis</span></code><a class="headerlink" href="#mpol.images.FourierCube.sky_vis" title="Permalink to this definition">¶</a></dt>
+<dd><p>The visibility FFT cube fftshifted for plotting with <code class="docutils literal notranslate"><span class="pre">imshow</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the FFT of the image cube, in sky plane format.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(torch.complex tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="mpol.images.ImageCube">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.images.</span></code><code class="sig-name descname"><span class="pre">ImageCube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passthrough</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#ImageCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.ImageCube" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>].</p>
+<p>All keyword arguments are required unless noted. The passthrough argument is essential for specifying whether the ImageCube object is the set of root parameters (<code class="docutils literal notranslate"><span class="pre">passthrough==False</span></code>) or if its simply a passthrough layer (<code class="docutils literal notranslate"><span class="pre">pasthrough==True</span></code>). In either case, ImageCube is essentially an identity layer, since no transformations are applied to the <code class="docutils literal notranslate"><span class="pre">cube</span></code> tensor. The main purpose of the ImageCube layer is to provide useful functionality around the <code class="docutils literal notranslate"><span class="pre">cube</span></code> tensor, such as returning a sky_cube representation and providing FITS writing functionility. In the case of <code class="docutils literal notranslate"><span class="pre">passthrough==False</span></code>, the ImageCube layer also acts as a container for the trainable parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the width of a pixel [arcseconds]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the image</p></li>
+<li><p><strong>passthrough</strong> (<em>bool</em>) – if passthrough, assume ImageCube is just a layer as opposed to parameter base.</p></li>
+<li><p><strong>cube</strong> (torch.double tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – (optional) a prepacked image cube to initialize the model with. If None, assumes starting <code class="docutils literal notranslate"><span class="pre">cube</span></code> is <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.images.ImageCube.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#ImageCube.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.ImageCube.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the ImageCube object was initialized with <code class="docutils literal notranslate"><span class="pre">passthrough=True</span></code>, the <code class="docutils literal notranslate"><span class="pre">cube</span></code> argument is required. <code class="docutils literal notranslate"><span class="pre">forward</span></code> essentially just passes this on as an identity operation.</p>
+<p>If the ImageCube object was initialized with <code class="docutils literal notranslate"><span class="pre">passthrough=False</span></code>, the <code class="docutils literal notranslate"><span class="pre">cube</span></code> argument is not permitted, and <code class="docutils literal notranslate"><span class="pre">forward</span></code> passes on the stored <code class="docutils literal notranslate"><span class="pre">nn.Parameter</span></code> cube as an identity operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cube</strong> (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – only permitted if the ImageCube object was initialized with <code class="docutils literal notranslate"><span class="pre">passthrough=True</span></code>.</p>
+</dd>
+</dl>
+<p>Returns: (3D torch.double tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) as identity operation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.images.ImageCube.sky_cube">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_cube</span></code><a class="headerlink" href="#mpol.images.ImageCube.sky_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>The image cube arrange as it would appear on the sky.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.images.ImageCube.to_FITS">
+<code class="sig-name descname"><span class="pre">to_FITS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cube.fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#ImageCube.to_FITS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.ImageCube.to_FITS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export the image cube to a FITS file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<em>str</em>) – the name of the FITS file to export to.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – if the file already exists, overwrite?</p></li>
+<li><p><strong>header_kwargs</strong> (<em>dict</em>) – Extra keyword arguments to write to the FITS header.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.connectors">
+<span id="connectors"></span><h2>Connectors<a class="headerlink" href="#module-mpol.connectors" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="mpol.connectors.DatasetConnector">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.connectors.</span></code><code class="sig-name descname"><span class="pre">DatasetConnector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FourierCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GriddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#DatasetConnector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.DatasetConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect a FourierCube to the data, and return indexed model visibilities for calculating the loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FourierCube</strong> – instantiated <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> object</p></li>
+<li><p><strong>GriddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mpol.connectors.DatasetConnector.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#DatasetConnector.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.DatasetConnector.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return model samples for evaluation with a likelihood function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> shape to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>.</p>
+</dd>
+</dl>
+<p>Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like <code class="docutils literal notranslate"><span class="pre">vis_indexed</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_indexed</span></code> of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mpol.losses">
+<span id="losses"></span><h2>Losses<a class="headerlink" href="#module-mpol.losses" title="Permalink to this headline">¶</a></h2>
+<p>The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, including the regularization strength, <span class="math notranslate nohighlight">\(\zeta\)</span>, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.</p>
+<p>If you don’t see a loss function you need, it’s easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!</p>
+<dl class="py function">
+<dt id="mpol.losses.loss_fn">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the weighted <span class="math notranslate nohighlight">\(\chi^2\)</span> loss between data and model visibilities. Visibilities may be any shape as long as all
+quantities have the same shape. Following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, we apply
+the prefactor <span class="math notranslate nohighlight">\(1/(2 N_V)\)</span>, where <span class="math notranslate nohighlight">\(N_V\)</span> is the number of visibilities. The factor of 2 comes in because we must count real
+and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</span> sum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> – 2-tuple of (real, imaginary) values of the model</p></li>
+<li><p><strong>data_vis</strong> – 3-tuple of (real, imaginary, weights) of the data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2\)</span> likelihood loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(w\)</span> are the visibility weights, <span class="math notranslate nohighlight">\(D_\Re\)</span> and <span class="math notranslate nohighlight">\(D_\Im\)</span> are the real and imaginary components of the data visibilities, respectively, and <span class="math notranslate nohighlight">\(M_\Re\)</span> and <span class="math notranslate nohighlight">\(M_\Im\)</span> are the real and imaginary components of the model visibilities, respectively.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_PSD">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_PSD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_PSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.</p>
+<p>Assumes an image plane kernel of</p>
+<div class="math notranslate nohighlight">
+\[k(r) = exp(-\frac{r^2}{2 \ell^2})\]</div>
+<p>The corresponding power spectral density is</p>
+<div class="math notranslate nohighlight">
+\[P(q) = (2 \pi \ell^2) exp(- 2 \pi^2 \ell^2 q^2)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qs</strong> (<em>torch.double</em>) – the radial UV coordinate (in kilolambda)</p></li>
+<li><p><strong>psd</strong> (<em>torch.double</em>) – the power spectral density cube</p></li>
+<li><p><strong>l</strong> (<em>torch.double</em>) – the correlation length in the image plane (in arcsec)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the loss calculated using the power spectral density</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_TV_channel">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_TV_channel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_TV_channel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_TV_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the total variation (TV) loss in the channel dimension. Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>any 3D tensor</em>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span></p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – a softening parameter in [<span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>]. Any channel-to-channel pixel variations greater than this parameter will have a significant penalty.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>total variation loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[L = \sum_{l,m,v} \sqrt{(I_{l, m, v + 1} - I_{l,m,v})^2 + \epsilon}\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_TV_image">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_TV_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_TV_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_TV_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a> Promotes the image to be piecewise smooth and the gradient of the image to be sparse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>any 3D tensor</em>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span>, where <span class="math notranslate nohighlight">\(l\)</span> is R.A., <span class="math notranslate nohighlight">\(m\)</span> is DEC, and <span class="math notranslate nohighlight">\(v\)</span> is the channel (velocity or frequency) dimension</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – a softening parameter in [<span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>total variation loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 + (I_{l, m+1, v} - I_{l, m, v})^2 + \epsilon}\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_UV_sparsity">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_UV_sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_UV_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_UV_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce a sparsity prior for all <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span> points larger than <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vis</strong> (<em>torch.double</em>) – visibility cube of (nchan, npix, npix//2 +1, 2)</p></li>
+<li><p><strong>qs</strong> – numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2)</p></li>
+<li><p><strong>q_max</strong> (<em>float</em>) – maximum radial baseline</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>UV sparsity loss above <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_edge_clamp">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_edge_clamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_edge_clamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_edge_clamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Promote all pixels at the edge of the image to be zero using an <span class="math notranslate nohighlight">\(L_2\)</span> norm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cube</strong> (<em>any 3D tensor</em>) – the array and pixel values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>edge loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_entropy">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_entropy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the entropy loss of a set of pixels following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>any tensor</em>) – pixel values must be positive <span class="math notranslate nohighlight">\(I_i &gt; 0\)</span> for all <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><strong>prior_intensity</strong> (<em>any tensor</em>) – the prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against. Could be a single constant or an array the same shape as image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>entropy loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<p>The entropy loss is calculated as</p>
+<div class="math notranslate nohighlight">
+\[L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.loss_fn_sparsity">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce a sparsity prior on the image cube using the <span class="math notranslate nohighlight">\(L_1\)</span> norm. Optionally provide a boolean mask to apply the prior to only the <code class="docutils literal notranslate"><span class="pre">True</span></code> locations. Typically you might want this mask to be <code class="docutils literal notranslate"><span class="pre">True</span></code> for background regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>nchan</em><em>, </em><em>npix</em><em>, </em><em>npix</em>) – tensor image cube</p></li>
+<li><p><strong>mask</strong> (<em>boolean</em>) – tensor array the same shape as <code class="docutils literal notranslate"><span class="pre">cube</span></code>. The sparsity prior will be applied to those pixels where the mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sparsity loss calculated where <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">==</span> <span class="pre">True</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<p>The sparsity loss calculated as</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_i | I_i |\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.nll">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">nll</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#nll"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.nll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the weighted <span class="math notranslate nohighlight">\(\chi^2\)</span> loss between data and model visibilities. Visibilities may be any shape as long as all
+quantities have the same shape. Following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, we apply
+the prefactor <span class="math notranslate nohighlight">\(1/(2 N_V)\)</span>, where <span class="math notranslate nohighlight">\(N_V\)</span> is the number of visibilities. The factor of 2 comes in because we must count real
+and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</span> sum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> – 1-tuple of the model</p></li>
+<li><p><strong>data_vis</strong> – 1-tuple of the data</p></li>
+<li><p><strong>weight</strong> – 1-tuple of weight values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2\)</span> likelihood loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(w\)</span> are the visibility weights, <span class="math notranslate nohighlight">\(D_\Re\)</span> and <span class="math notranslate nohighlight">\(D_\Im\)</span> are the real and imaginary components of the data visibilities, respectively, and <span class="math notranslate nohighlight">\(M_\Re\)</span> and <span class="math notranslate nohighlight">\(M_\Im\)</span> are the real and imaginary components of the model visibilities, respectively.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="precomposed-modules">
+<h2>Precomposed Modules<a class="headerlink" href="#precomposed-modules" title="Permalink to this headline">¶</a></h2>
+<p>For convenience, we provide some “precomposed” <a class="reference external" href="https://pytorch.org/docs/stable/notes/modules.html">modules</a> which may be useful for simple imaging or modeling applications. In general, though, we encourage you to compose your own set of layers if your application requires it. The source code for a precomposed network can provide useful a starting point. We also recommend checking out the PyTorch documentation on <a class="reference external" href="https://pytorch.org/docs/stable/notes/modules.html">modules</a>.</p>
+<span class="target" id="module-mpol.precomposed"></span><dl class="py class">
+<dt id="mpol.precomposed.SimpleNet">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.precomposed.</span></code><code class="sig-name descname"><span class="pre">SimpleNet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>A basic but fully functional network for RML imaging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the width of a pixel [arcseconds]</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the base cube. Default = 1.</p></li>
+<li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
+<li><p><strong>base_cube</strong> – a pre-packed base cube to initialize the model with. If None, assumes <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>After the object is initialized, instance variables can be accessed, for example</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bcube</strong> – the <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> instance</p></li>
+<li><p><strong>icube</strong> – the <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> instance</p></li>
+</ul>
+</dd>
+</dl>
+<p>For example, you’ll likely want to access the <code class="docutils literal notranslate"><span class="pre">self.icube.sky_model</span></code> at some point.</p>
+<p>The idea is that <a class="reference internal" href="#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> can save you some keystrokes composing models by connecting the most commonly used layers together.</p>
+<script>mermaid.initialize({startOnLoad:true});</script><div class="mermaid">
+            graph TD
+    subgraph SimpleNet
+    BaseCube --&gt; ImageCube 
+    ImageCube --&gt; FourierLayer
+    FourierLayer --&gt; DataConnector 
+    end
+    Dataset --&gt; DataConnector 
+    DataConnector --&gt; Loss    
+        </div><dl class="py method">
+<dt id="mpol.precomposed.SimpleNet.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Feed forward to calculate the model visibilities. In this step, a <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.connectors.DatasetConnector" title="mpol.connectors.DatasetConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetConnector</span></code></a> to calculate the model visibilities at the indexed locations of the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object that was used to instantiate the class.</p>
+<p>Returns: 1D complex torch tensor of model visibilities.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="units-and-conventions.html" class="btn btn-neutral float-right" title="Units and Conventions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

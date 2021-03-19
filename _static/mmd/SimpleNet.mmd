@@ -1,0 +1,8 @@
+graph TD
+    subgraph SimpleNet
+    BaseCube --> ImageCube 
+    ImageCube --> FourierLayer
+    FourierLayer --> DataConnector 
+    end
+    Dataset --> DataConnector 
+    DataConnector --> Loss    

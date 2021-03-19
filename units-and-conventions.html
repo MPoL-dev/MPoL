@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Units and Conventions &mdash; MPoL 0.0.1.dev1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer Documentation" href="developer-documentation.html" />
+    <link rel="prev" title="API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+  
+    <a class="heading heading-extra-margin" href="index.html">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="_static/logo.png"/>
+      </div>
+      
+        <span class="icon icon-home"> MPoL</span>
+      
+    </a>
+  
+
+  
+    
+    
+      <div class="version">0.0.1.dev1</div>
+    
+  
+
+  
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Units and Conventions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fourier-transform-conventions">Fourier transform conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-representation-of-interferometry">Continuous representation of interferometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discretized-representation">Discretized representation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pixel-fluxes">Pixel fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#angular-units">Angular units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-discrete-fourier-transform">The discrete Fourier transform</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Overview</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MPoL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+  
+
+  
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
+    
+  <li class="breadcrumb">Units and Conventions</li>
+
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/units-and-conventions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="units-and-conventions">
+<h1>Units and Conventions<a class="headerlink" href="#units-and-conventions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fourier-transform-conventions">
+<h2>Fourier transform conventions<a class="headerlink" href="#fourier-transform-conventions" title="Permalink to this headline">¶</a></h2>
+<p>We follow the (reasonably standard) conventions of the Fourier transform (e.g., <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract">Bracewell’s</a> “system 1”).</p>
+<p><strong>Forward transform</strong>:</p>
+<div class="math notranslate nohighlight">
+\[F(s) = \int_{-\infty}^\infty f(x) e^{-i 2 \pi  x s} \mathrm{d}x\]</div>
+<p><strong>Inverse transform</strong>:</p>
+<div class="math notranslate nohighlight">
+\[f(x) = \int_{-\infty}^\infty F(s) e^{i 2 \pi  x s} \mathrm{d}s\]</div>
+</div>
+<div class="section" id="continuous-representation-of-interferometry">
+<h2>Continuous representation of interferometry<a class="headerlink" href="#continuous-representation-of-interferometry" title="Permalink to this headline">¶</a></h2>
+<p>Consider some astronomical source parameterized by its sky brightness distribution <span class="math notranslate nohighlight">\(I\)</span>. The sky brightness is a function of position on the sky. For small fields of view (typical to single-pointing ALMA or VLA observations) we parameterize the sky direction using the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span>, which correspond to R.A. and Dec, respectively. In that case, we would have a function <span class="math notranslate nohighlight">\(I(l,m)\)</span>. The sky brightness is an <em>intensity</em>, so it has units of <span class="math notranslate nohighlight">\(\mathrm{Jy\,arcsec}^{-2}\)</span> (equivalently <span class="math notranslate nohighlight">\(\mathrm{Jy\, beam}^{-1}\)</span>, where <span class="math notranslate nohighlight">\(\mathrm{beam}\)</span> is the effective area of the synthesized beam).</p>
+<p>The real domain is linked to the Fourier domain, also called the visibility domain, via the Fourier transform</p>
+<div class="math notranslate nohighlight">
+\[{\cal V}(u,v) = \int \int I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.\]</div>
+<p>This integral demonstrates that the units of visibility function (and samples of it) are <span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>.</p>
+</div>
+<div class="section" id="discretized-representation">
+<h2>Discretized representation<a class="headerlink" href="#discretized-representation" title="Permalink to this headline">¶</a></h2>
+<p>There are several annoying pitfalls that can arise when dealing with discretized images and Fourier transforms, and most relate back to confusing or ill-specified conventions. The purpose of this page is to explicitly define the conventions used throughout MPoL and make clear how each transformation relates back to the continuous equations.</p>
+<div class="section" id="pixel-fluxes">
+<h3>Pixel fluxes<a class="headerlink" href="#pixel-fluxes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of <span class="math notranslate nohighlight">\(\mathrm{Jy\,arcsec}^{-2}\)</span>.</p></li>
+<li><p>The image cubes are packed as 3D arrays <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>.</p></li>
+<li><p>The “rows” of the image cube (axis=1) correspond to the <span class="math notranslate nohighlight">\(m\)</span> or Dec axis</p></li>
+<li><p>The “columns” of the image cube (axis=2) correspond to the <span class="math notranslate nohighlight">\(l\)</span> or R.A. axis</p></li>
+</ul>
+</div>
+<div class="section" id="angular-units">
+<h3>Angular units<a class="headerlink" href="#angular-units" title="Permalink to this headline">¶</a></h3>
+<p>For nearly all user-facing routines, the angular axes (the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. Internally, these quantities are represented in radians. The sample rate of the image cube is set via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> parameter, in units of arcsec.</p>
+</div>
+<div class="section" id="the-discrete-fourier-transform">
+<h3>The discrete Fourier transform<a class="headerlink" href="#the-discrete-fourier-transform" title="Permalink to this headline">¶</a></h3>
+<p>Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or pytorch: they are mathematically the same, but pytorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that <code class="docutils literal notranslate"><span class="pre">norm='backward'</span></code>, the default setting. This means we don’t need to keep account for the <span class="math notranslate nohighlight">\(L\)</span> or <span class="math notranslate nohighlight">\(M\)</span> prefactors for the forward transform, but we do need to account for the <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> prefactors in the inverse transform.</p>
+<p><strong>Forward transform</strong>: As before, we use the forward transform to go from the image plane (sky brightness distribution) to the Fourier plane (visibility function). This is the most common transform used in MPoL because RML can be thought of as a type of forward modeling procedure: we’re proposing an image and carrying it to the visibility plane to check its fit with the data. In numpy, the forward FFT is <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/routines.fft.html#module-numpy.fft">defined as</a></p>
+<div class="math notranslate nohighlight">
+\[\mathtt{FFT}(I_{l,m}) = \sum_{l=0}^{L-1} \sum_{m=0}^{M-1} I_{l,m} \exp \left \{- 2 \pi i (ul/L + vm/M) \right \}\]</div>
+<p>To make the FFT output an appropriate representation of the continuous forward Fourier transform, we need to account for the spacing of the input samples. The FFT knows only that it was served a sequence of numbers, it does not know that the samples in <span class="math notranslate nohighlight">\(I_{l,m}\)</span> are spaced <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> apart. To do this, we just need to account for the spacing as a prefactor (i.e., converting the <span class="math notranslate nohighlight">\(\mathrm{d}l\)</span> to <span class="math notranslate nohighlight">\(\Delta l\)</span>), following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract">TMS Eqn A8.18</a></p>
+<div class="math notranslate nohighlight">
+\[V_{u,v} = (\Delta l)(\Delta m) \mathtt{FFT}(I_{l,m})\]</div>
+<p>In this context, the <span class="math notranslate nohighlight">\(u,v\)</span> subscripts indicate the elements of the <span class="math notranslate nohighlight">\(V\)</span> array. As long as <span class="math notranslate nohighlight">\(I_{l,m}\)</span> is in units of <span class="math notranslate nohighlight">\(\mathrm{Jy} / (\Delta l \Delta m)\)</span>, then <span class="math notranslate nohighlight">\(V\)</span> will be in the correct output units (flux, or Jy).</p>
+<p><strong>Inverse transform</strong>: The inverse transform is used within MPoL to produce a quick diagnostic image from the visibilities (called the “dirty image”). As you might expect, this is the inverse operation of the forward transform.</p>
+<div class="math notranslate nohighlight">
+\[\mathtt{iFFT}({\cal V}_{u,v}) = \frac{1}{U} \frac{1}{V} \sum_{l=0}^{U-1} \sum_{m=0}^{V-1} {\cal V}_{u,v} \exp \left \{2 \pi i (ul/L + vm/M) \right \}\]</div>
+<p>If we had a fully sampled grid of <span class="math notranslate nohighlight">\({\cal V}_{u,v}\)</span> values, then the operation we’d want to carry out to produce an image needs to correct for both the cell spacing and the counting terms</p>
+<div class="math notranslate nohighlight">
+\[I_{l,m} = U V (\Delta u)(\Delta v) \mathtt{iFFT}({\cal V}_{u,v})\]</div>
+<p>For more information on this procedure as implmented in MPoL, see the <a class="reference internal" href="api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> class and the source code of its <a class="reference internal" href="api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_image()</span></code></a> method. When the grid of <span class="math notranslate nohighlight">\({\cal V}_{u,v}\)</span> values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> of Daniel Briggs.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="developer-documentation.html" class="btn btn-neutral float-right" title="Developer Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019-21, Ian Czekala
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
