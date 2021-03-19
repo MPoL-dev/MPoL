@@ -14,6 +14,11 @@ jobs:
     - name: Install doc deps 
       run: |
         pip install .[docs]
+    - name: Set up node 
+      uses: actions/setup-node@v2
+    - name: Install mermaid-cli 
+      run: | 
+        npm install @mermaid-js/mermaid-cli
     - name: Build notebooks for the docs
       run: |
         jupytext --to ipynb --execute docs/tutorials/*.py
@@ -21,7 +26,6 @@ jobs:
       with:
         name: notebooks-for-${{ github.sha }}
         path: docs/tutorials
-        
     - name: Trigger RTDs build
       uses: dfm/rtds-action@v1
       with:

@@ -24,7 +24,7 @@ except DistributionNotFound:
     __version__ = "unknown version"
 
 project = "MPoL"
-copyright = "2019, Ian Czekala"
+copyright = "2019-21, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
@@ -44,6 +44,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx_copybutton",
+    "sphinxcontrib.mermaid",
 ]
 
 autodoc_mock_imports = ["torch", "torchvision"]
@@ -81,6 +82,9 @@ master_doc = "index"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# Mermaid configuration
+mermaid_output_format = "svg"
 
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:
