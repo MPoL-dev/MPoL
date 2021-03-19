@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "dated-kitty",
+   "id": "measured-hindu",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:28:18.233362Z",
-     "iopub.status.busy": "2021-03-19T19:28:18.232847Z",
-     "iopub.status.idle": "2021-03-19T19:28:18.246231Z",
-     "shell.execute_reply": "2021-03-19T19:28:18.246643Z"
+     "iopub.execute_input": "2021-03-19T19:38:19.056755Z",
+     "iopub.status.busy": "2021-03-19T19:38:19.055622Z",
+     "iopub.status.idle": "2021-03-19T19:38:19.059089Z",
+     "shell.execute_reply": "2021-03-19T19:38:19.059556Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "wicked-valuable",
+   "id": "casual-growth",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "animated-dressing",
+   "id": "weighted-allowance",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:28:18.258957Z",
-     "iopub.status.busy": "2021-03-19T19:28:18.257749Z",
-     "iopub.status.idle": "2021-03-19T19:28:18.259537Z",
-     "shell.execute_reply": "2021-03-19T19:28:18.259968Z"
+     "iopub.execute_input": "2021-03-19T19:38:19.072287Z",
+     "iopub.status.busy": "2021-03-19T19:38:19.070982Z",
+     "iopub.status.idle": "2021-03-19T19:38:19.072895Z",
+     "shell.execute_reply": "2021-03-19T19:38:19.073321Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "complex-diameter",
+   "id": "little-costume",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:28:18.263575Z",
-     "iopub.status.busy": "2021-03-19T19:28:18.262834Z",
-     "iopub.status.idle": "2021-03-19T19:28:18.543337Z",
-     "shell.execute_reply": "2021-03-19T19:28:18.542328Z"
+     "iopub.execute_input": "2021-03-19T19:38:19.077208Z",
+     "iopub.status.busy": "2021-03-19T19:38:19.076689Z",
+     "iopub.status.idle": "2021-03-19T19:38:19.365406Z",
+     "shell.execute_reply": "2021-03-19T19:38:19.364415Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "mental-entrance",
+   "id": "chicken-ratio",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:28:18.549528Z",
-     "iopub.status.busy": "2021-03-19T19:28:18.548976Z",
-     "iopub.status.idle": "2021-03-19T19:28:18.552608Z",
-     "shell.execute_reply": "2021-03-19T19:28:18.552128Z"
+     "iopub.execute_input": "2021-03-19T19:38:19.371416Z",
+     "iopub.status.busy": "2021-03-19T19:38:19.370872Z",
+     "iopub.status.idle": "2021-03-19T19:38:19.374877Z",
+     "shell.execute_reply": "2021-03-19T19:38:19.373882Z"
     }
    },
    "outputs": [],
