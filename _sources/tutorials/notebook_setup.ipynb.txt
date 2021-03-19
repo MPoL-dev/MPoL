@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "catholic-indicator",
+   "id": "encouraging-ethics",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:17:38.183757Z",
-     "iopub.status.busy": "2021-03-19T21:17:38.183059Z",
-     "iopub.status.idle": "2021-03-19T21:17:38.187371Z",
-     "shell.execute_reply": "2021-03-19T21:17:38.187792Z"
+     "iopub.execute_input": "2021-03-19T22:21:07.091125Z",
+     "iopub.status.busy": "2021-03-19T22:21:07.088384Z",
+     "iopub.status.idle": "2021-03-19T22:21:07.097061Z",
+     "shell.execute_reply": "2021-03-19T22:21:07.096453Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fifteen-malaysia",
+   "id": "civic-croatia",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "paperback-terrain",
+   "id": "plastic-geography",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:17:38.198556Z",
-     "iopub.status.busy": "2021-03-19T21:17:38.197273Z",
-     "iopub.status.idle": "2021-03-19T21:17:38.199148Z",
-     "shell.execute_reply": "2021-03-19T21:17:38.199583Z"
+     "iopub.execute_input": "2021-03-19T22:21:07.112395Z",
+     "iopub.status.busy": "2021-03-19T22:21:07.111805Z",
+     "iopub.status.idle": "2021-03-19T22:21:07.115685Z",
+     "shell.execute_reply": "2021-03-19T22:21:07.115179Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "cooperative-determination",
+   "id": "nuclear-atlanta",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:17:38.203262Z",
-     "iopub.status.busy": "2021-03-19T21:17:38.202740Z",
-     "iopub.status.idle": "2021-03-19T21:17:38.471848Z",
-     "shell.execute_reply": "2021-03-19T21:17:38.471301Z"
+     "iopub.execute_input": "2021-03-19T22:21:07.121486Z",
+     "iopub.status.busy": "2021-03-19T22:21:07.119415Z",
+     "iopub.status.idle": "2021-03-19T22:21:07.418994Z",
+     "shell.execute_reply": "2021-03-19T22:21:07.418431Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "racial-message",
+   "id": "abroad-packing",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:17:38.477541Z",
-     "iopub.status.busy": "2021-03-19T21:17:38.476944Z",
-     "iopub.status.idle": "2021-03-19T21:17:38.480372Z",
-     "shell.execute_reply": "2021-03-19T21:17:38.480827Z"
+     "iopub.execute_input": "2021-03-19T22:21:07.424820Z",
+     "iopub.status.busy": "2021-03-19T22:21:07.424260Z",
+     "iopub.status.idle": "2021-03-19T22:21:07.429290Z",
+     "shell.execute_reply": "2021-03-19T22:21:07.429725Z"
     }
    },
    "outputs": [],
