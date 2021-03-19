@@ -28,6 +28,9 @@ jobs:
       - name: Install mermaid.js dependency 
         run: | 
           npm install @mermaid-js/mermaid-cli
+      - name: ls directory
+        run: | 
+          ls -lha
       - name: Build the docs
         run: | 
           make -C docs clean
