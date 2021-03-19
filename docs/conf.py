@@ -88,7 +88,10 @@ html_static_path = ["_static"]
 mermaid_output_format = "svg"
 
 if os.getenv("CI"):
+    # if True, we're running on github actions and need
+    # to use the path of the installed mmdc
     # relative to docs/ directory!
+    # (mmdc itself not in $PATH automatically, like local)
     mermaid_cmd = "../node_modules/.bin/mmdc"
 
 # RTDs-action
