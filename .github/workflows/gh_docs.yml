@@ -28,6 +28,7 @@ jobs:
       - name: Install mermaid.js dependency 
         run: | 
           npm install @mermaid-js/mermaid-cli
+          alias mmdc="./node_modules/.bin/mmdc"
       - name: Build the docs
         run: | 
           make -C docs clean
