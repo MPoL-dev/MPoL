@@ -29,6 +29,9 @@ jobs:
         run: | 
           npm install @mermaid-js/mermaid-cli
           echo "{./node_modules/.bin/mmdc}" >> $GITHUB_PATH
+      - name: Test mmdc 
+        run: | 
+          mmdc -h 
       - name: Build the docs
         run: | 
           make -C docs clean
