@@ -14,6 +14,13 @@ jobs:
     - name: Install doc deps 
       run: |
         pip install .[docs]
+    - name: Install mermaid-cli 
+      uses: actions/checkout@v2
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+      run: | 
+        npm install @mermaid-js/mermaid-cli
     - name: Build notebooks for the docs
       run: |
         jupytext --to ipynb --execute docs/tutorials/*.py

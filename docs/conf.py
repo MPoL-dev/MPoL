@@ -83,6 +83,8 @@ master_doc = "index"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+# Mermaid configuration
+mermaid_output_format = "svg"
 
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:

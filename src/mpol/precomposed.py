@@ -25,16 +25,8 @@ class SimpleNet(torch.nn.Module):
 
     The idea is that :class:`~mpol.precomposed.SimpleNet` can save you some keystrokes composing models by connecting the most commonly used layers together.
     
-    .. mermaid:: 
+    .. mermaid:: _static/mmd/SimpleNet.mmd
     
-        graph TD
-            subgraph SimpleNet
-            BaseCube --> ImageCube 
-            ImageCube --> FourierLayer
-            FourierLayer --> DataConnector 
-            end
-            Dataset --> DataConnector 
-            DataConnector --> Loss    
     """
 
     def __init__(
