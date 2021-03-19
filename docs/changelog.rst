@@ -11,7 +11,8 @@ v0.1.0
 * Removed ``mpol.dirty_image`` module.
 * Migrated prolate spheroidal wavefunctions to ``mpol.spheroidal_gridding`` module.
 * Added Jupyter notebook tutorial build process using `RTD-action <https://rtds-action.readthedocs.io/en/latest/>`_
-* Added SimpleNet precomposed module.
+* Added SimpleNet precomposed module
+* Added Mermaid.js charting ability (for flowcharts)
 
 v0.0.5
 ------
