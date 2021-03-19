@@ -15,10 +15,7 @@ jobs:
       run: |
         pip install .[docs]
     - name: Install mermaid-cli 
-      uses: actions/checkout@v2
       uses: actions/setup-node@v2
-      with:
-        node-version: '14'
       run: | 
         npm install @mermaid-js/mermaid-cli
     - name: Build notebooks for the docs
@@ -28,7 +25,6 @@ jobs:
       with:
         name: notebooks-for-${{ github.sha }}
         path: docs/tutorials
-        
     - name: Trigger RTDs build
       uses: dfm/rtds-action@v1
       with:
