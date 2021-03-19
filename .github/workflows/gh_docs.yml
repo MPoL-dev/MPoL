@@ -33,7 +33,8 @@ jobs:
           ls -lha node_modules
       - name: test mmdc 
         run: |
-          node_modules/.bin/mmdc -h
+          alias mmdc="node_modules/.bin/mmdc"
+          mmdc -h
       - name: Build the docs
         run: |
           alias mmdc="node_modules/.bin/mmdc"
