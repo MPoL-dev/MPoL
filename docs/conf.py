@@ -87,7 +87,6 @@ html_static_path = ["_static"]
 # only works locally
 mermaid_output_format = "svg"
 
-
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:
     extensions.append("rtds_action")
