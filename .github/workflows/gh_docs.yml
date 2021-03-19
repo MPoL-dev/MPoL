@@ -20,10 +20,9 @@ jobs:
       - name: Build notebooks for the docs
         run: |
           jupytext --to ipynb --execute docs/tutorials/*.py
-      - uses: actions/upload-artifact@v2
-        with:
-          name: notebooks-for-${{ github.sha }}
-          path: docs/tutorials
+      - name: Install Pandoc dependency 
+        run: | 
+        sudo apt-get install pandoc
       - name: Build the docs
         run: | 
           make -C docs clean
