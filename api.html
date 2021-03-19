@@ -1053,16 +1053,14 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dl>
 <p>For example, you’ll likely want to access the <code class="docutils literal notranslate"><span class="pre">self.icube.sky_model</span></code> at some point.</p>
 <p>The idea is that <a class="reference internal" href="#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> can save you some keystrokes composing models by connecting the most commonly used layers together.</p>
-<script>mermaid.initialize({startOnLoad:true});</script><div class="mermaid">
-            graph TD
+graph TD
     subgraph SimpleNet
     BaseCube --&gt; ImageCube 
     ImageCube --&gt; FourierLayer
     FourierLayer --&gt; DataConnector 
     end
     Dataset --&gt; DataConnector 
-    DataConnector --&gt; Loss    
-        </div><dl class="py method">
+    DataConnector --&gt; Loss    <dl class="py method">
 <dt id="mpol.precomposed.SimpleNet.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Feed forward to calculate the model visibilities. In this step, a <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.connectors.DatasetConnector" title="mpol.connectors.DatasetConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetConnector</span></code></a> to calculate the model visibilities at the indexed locations of the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object that was used to instantiate the class.</p>

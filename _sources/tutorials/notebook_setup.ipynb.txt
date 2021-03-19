@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "measured-hindu",
+   "id": "substantial-brass",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:38:19.056755Z",
-     "iopub.status.busy": "2021-03-19T19:38:19.055622Z",
-     "iopub.status.idle": "2021-03-19T19:38:19.059089Z",
-     "shell.execute_reply": "2021-03-19T19:38:19.059556Z"
+     "iopub.execute_input": "2021-03-19T20:03:43.714280Z",
+     "iopub.status.busy": "2021-03-19T20:03:43.713596Z",
+     "iopub.status.idle": "2021-03-19T20:03:43.727168Z",
+     "shell.execute_reply": "2021-03-19T20:03:43.727870Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "casual-growth",
+   "id": "particular-consideration",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "weighted-allowance",
+   "id": "martial-shirt",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:38:19.072287Z",
-     "iopub.status.busy": "2021-03-19T19:38:19.070982Z",
-     "iopub.status.idle": "2021-03-19T19:38:19.072895Z",
-     "shell.execute_reply": "2021-03-19T19:38:19.073321Z"
+     "iopub.execute_input": "2021-03-19T20:03:43.740022Z",
+     "iopub.status.busy": "2021-03-19T20:03:43.738585Z",
+     "iopub.status.idle": "2021-03-19T20:03:43.740676Z",
+     "shell.execute_reply": "2021-03-19T20:03:43.741111Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "little-costume",
+   "id": "introductory-bottle",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:38:19.077208Z",
-     "iopub.status.busy": "2021-03-19T19:38:19.076689Z",
-     "iopub.status.idle": "2021-03-19T19:38:19.365406Z",
-     "shell.execute_reply": "2021-03-19T19:38:19.364415Z"
+     "iopub.execute_input": "2021-03-19T20:03:43.745462Z",
+     "iopub.status.busy": "2021-03-19T20:03:43.744835Z",
+     "iopub.status.idle": "2021-03-19T20:03:44.024583Z",
+     "shell.execute_reply": "2021-03-19T20:03:44.023929Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "chicken-ratio",
+   "id": "subject-lebanon",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T19:38:19.371416Z",
-     "iopub.status.busy": "2021-03-19T19:38:19.370872Z",
-     "iopub.status.idle": "2021-03-19T19:38:19.374877Z",
-     "shell.execute_reply": "2021-03-19T19:38:19.373882Z"
+     "iopub.execute_input": "2021-03-19T20:03:44.031095Z",
+     "iopub.status.busy": "2021-03-19T20:03:44.030448Z",
+     "iopub.status.idle": "2021-03-19T20:03:44.035332Z",
+     "shell.execute_reply": "2021-03-19T20:03:44.035902Z"
     }
    },
    "outputs": [],
