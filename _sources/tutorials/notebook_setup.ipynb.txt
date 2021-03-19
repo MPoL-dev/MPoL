@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "fancy-direction",
+   "id": "fatty-value",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:09:04.126580Z",
-     "iopub.status.busy": "2021-03-19T21:09:04.126101Z",
-     "iopub.status.idle": "2021-03-19T21:09:04.137684Z",
-     "shell.execute_reply": "2021-03-19T21:09:04.138065Z"
+     "iopub.execute_input": "2021-03-19T21:13:05.955309Z",
+     "iopub.status.busy": "2021-03-19T21:13:05.954646Z",
+     "iopub.status.idle": "2021-03-19T21:13:05.969897Z",
+     "shell.execute_reply": "2021-03-19T21:13:05.970433Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "modern-approval",
+   "id": "disturbed-confidentiality",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "classical-space",
+   "id": "natural-tractor",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:09:04.146196Z",
-     "iopub.status.busy": "2021-03-19T21:09:04.145129Z",
-     "iopub.status.idle": "2021-03-19T21:09:04.148776Z",
-     "shell.execute_reply": "2021-03-19T21:09:04.147910Z"
+     "iopub.execute_input": "2021-03-19T21:13:05.979028Z",
+     "iopub.status.busy": "2021-03-19T21:13:05.978396Z",
+     "iopub.status.idle": "2021-03-19T21:13:05.983672Z",
+     "shell.execute_reply": "2021-03-19T21:13:05.984157Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "absolute-spirit",
+   "id": "vanilla-facing",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:09:04.151962Z",
-     "iopub.status.busy": "2021-03-19T21:09:04.151460Z",
-     "iopub.status.idle": "2021-03-19T21:09:04.373725Z",
-     "shell.execute_reply": "2021-03-19T21:09:04.372963Z"
+     "iopub.execute_input": "2021-03-19T21:13:05.988416Z",
+     "iopub.status.busy": "2021-03-19T21:13:05.987793Z",
+     "iopub.status.idle": "2021-03-19T21:13:06.249065Z",
+     "shell.execute_reply": "2021-03-19T21:13:06.248591Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "terminal-round",
+   "id": "hungry-banner",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:09:04.378812Z",
-     "iopub.status.busy": "2021-03-19T21:09:04.378294Z",
-     "iopub.status.idle": "2021-03-19T21:09:04.381709Z",
-     "shell.execute_reply": "2021-03-19T21:09:04.381074Z"
+     "iopub.execute_input": "2021-03-19T21:13:06.254266Z",
+     "iopub.status.busy": "2021-03-19T21:13:06.253747Z",
+     "iopub.status.idle": "2021-03-19T21:13:06.256988Z",
+     "shell.execute_reply": "2021-03-19T21:13:06.257404Z"
     }
    },
    "outputs": [],
