@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "solid-democracy",
+   "id": "continent-williams",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:08:58.271109Z",
-     "iopub.status.busy": "2021-03-19T23:08:58.270429Z",
-     "iopub.status.idle": "2021-03-19T23:09:00.368273Z",
-     "shell.execute_reply": "2021-03-19T23:09:00.368941Z"
+     "iopub.execute_input": "2021-03-19T23:24:00.277299Z",
+     "iopub.status.busy": "2021-03-19T23:24:00.276798Z",
+     "iopub.status.idle": "2021-03-19T23:24:00.952599Z",
+     "shell.execute_reply": "2021-03-19T23:24:00.951458Z"
     },
     "nbsphinx": "hidden"
    },
@@ -21,13 +21,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "entitled-cream",
+   "id": "compatible-arrow",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:00.383924Z",
-     "iopub.status.busy": "2021-03-19T23:09:00.379631Z",
-     "iopub.status.idle": "2021-03-19T23:09:00.387322Z",
-     "shell.execute_reply": "2021-03-19T23:09:00.386812Z"
+     "iopub.execute_input": "2021-03-19T23:24:00.961504Z",
+     "iopub.status.busy": "2021-03-19T23:24:00.956363Z",
+     "iopub.status.idle": "2021-03-19T23:24:00.967521Z",
+     "shell.execute_reply": "2021-03-19T23:24:00.967098Z"
     },
     "nbsphinx": "hidden"
    },
@@ -38,7 +38,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "detected-express",
+   "id": "entire-armstrong",
    "metadata": {},
    "source": [
     "# Gridding visibilities and making diagnostic images\n",
@@ -52,7 +52,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "pregnant-growth",
+   "id": "prescription-hayes",
    "metadata": {},
    "source": [
     "If you're fine working in Python 3.6 and you have [visread](https://visread.readthedocs.io/) installed, you can read the visibility data from the measurement set by\n",
@@ -76,13 +76,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "urban-desperate",
+   "id": "assumed-swedish",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:00.391995Z",
-     "iopub.status.busy": "2021-03-19T23:09:00.390656Z",
-     "iopub.status.idle": "2021-03-19T23:09:00.471532Z",
-     "shell.execute_reply": "2021-03-19T23:09:00.470575Z"
+     "iopub.execute_input": "2021-03-19T23:24:00.971565Z",
+     "iopub.status.busy": "2021-03-19T23:24:00.971036Z",
+     "iopub.status.idle": "2021-03-19T23:24:01.050244Z",
+     "shell.execute_reply": "2021-03-19T23:24:01.049369Z"
     }
    },
    "outputs": [],
@@ -95,7 +95,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "casual-crazy",
+   "id": "continued-radiation",
    "metadata": {},
    "source": [
     "For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file."
@@ -104,13 +104,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "indian-medicine",
+   "id": "threaded-morris",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:00.479270Z",
-     "iopub.status.busy": "2021-03-19T23:09:00.478640Z",
-     "iopub.status.idle": "2021-03-19T23:09:07.456614Z",
-     "shell.execute_reply": "2021-03-19T23:09:07.455740Z"
+     "iopub.execute_input": "2021-03-19T23:24:01.056032Z",
+     "iopub.status.busy": "2021-03-19T23:24:01.054935Z",
+     "iopub.status.idle": "2021-03-19T23:24:10.280730Z",
+     "shell.execute_reply": "2021-03-19T23:24:10.279381Z"
     }
    },
    "outputs": [],
@@ -126,13 +126,13 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "secret-determination",
+   "id": "static-billy",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:07.462361Z",
-     "iopub.status.busy": "2021-03-19T23:09:07.460853Z",
-     "iopub.status.idle": "2021-03-19T23:09:07.665531Z",
-     "shell.execute_reply": "2021-03-19T23:09:07.666237Z"
+     "iopub.execute_input": "2021-03-19T23:24:10.284984Z",
+     "iopub.status.busy": "2021-03-19T23:24:10.284496Z",
+     "iopub.status.idle": "2021-03-19T23:24:10.466022Z",
+     "shell.execute_reply": "2021-03-19T23:24:10.465447Z"
     }
    },
    "outputs": [],
@@ -149,7 +149,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "desperate-state",
+   "id": "alpine-information",
    "metadata": {},
    "source": [
     "## GridCoords"
@@ -158,13 +158,13 @@
   {
    "cell_type": "code",
    "execution_count": 6,
-   "id": "competitive-powder",
+   "id": "secret-involvement",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:07.670693Z",
-     "iopub.status.busy": "2021-03-19T23:09:07.669673Z",
-     "iopub.status.idle": "2021-03-19T23:09:08.166446Z",
-     "shell.execute_reply": "2021-03-19T23:09:08.165484Z"
+     "iopub.execute_input": "2021-03-19T23:24:10.469659Z",
+     "iopub.status.busy": "2021-03-19T23:24:10.469126Z",
+     "iopub.status.idle": "2021-03-19T23:24:10.840590Z",
+     "shell.execute_reply": "2021-03-19T23:24:10.840095Z"
     }
    },
    "outputs": [],
@@ -175,7 +175,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "broad-vatican",
+   "id": "handled-jones",
    "metadata": {},
    "source": [
     " The first MPoL object we'll familiarize ourselves with is GridCoords. Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and Fourier space."
@@ -184,13 +184,13 @@
   {
    "cell_type": "code",
    "execution_count": 7,
-   "id": "attractive-credits",
+   "id": "spoken-huntington",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:08.171198Z",
-     "iopub.status.busy": "2021-03-19T23:09:08.170246Z",
-     "iopub.status.idle": "2021-03-19T23:09:08.203757Z",
-     "shell.execute_reply": "2021-03-19T23:09:08.202823Z"
+     "iopub.execute_input": "2021-03-19T23:24:10.844522Z",
+     "iopub.status.busy": "2021-03-19T23:24:10.843910Z",
+     "iopub.status.idle": "2021-03-19T23:24:10.878263Z",
+     "shell.execute_reply": "2021-03-19T23:24:10.877402Z"
     }
    },
    "outputs": [],
@@ -200,7 +200,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "uniform-desert",
+   "id": "flying-registrar",
    "metadata": {},
    "source": [
     "The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the [GridCoords](../api.rst#mpol.gridding.GridCoords) API documentation. The information you'll most likely want to access are the image dimensions"
@@ -209,13 +209,13 @@
   {
    "cell_type": "code",
    "execution_count": 8,
-   "id": "opposed-foster",
+   "id": "identical-jamaica",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:08.210176Z",
-     "iopub.status.busy": "2021-03-19T23:09:08.209408Z",
-     "iopub.status.idle": "2021-03-19T23:09:08.215556Z",
-     "shell.execute_reply": "2021-03-19T23:09:08.216046Z"
+     "iopub.execute_input": "2021-03-19T23:24:10.885227Z",
+     "iopub.status.busy": "2021-03-19T23:24:10.884655Z",
+     "iopub.status.idle": "2021-03-19T23:24:10.888254Z",
+     "shell.execute_reply": "2021-03-19T23:24:10.888710Z"
     }
    },
    "outputs": [
@@ -236,7 +236,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "narrative-composition",
+   "id": "productive-strip",
    "metadata": {},
    "source": [
     "which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow`."
@@ -244,7 +244,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "similar-england",
+   "id": "popular-orange",
    "metadata": {},
    "source": [
     "## Gridder\n",
@@ -255,13 +255,13 @@
   {
    "cell_type": "code",
    "execution_count": 9,
-   "id": "outdoor-donor",
+   "id": "composite-terry",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:08.220101Z",
-     "iopub.status.busy": "2021-03-19T23:09:08.219557Z",
-     "iopub.status.idle": "2021-03-19T23:09:08.806517Z",
-     "shell.execute_reply": "2021-03-19T23:09:08.805825Z"
+     "iopub.execute_input": "2021-03-19T23:24:10.892418Z",
+     "iopub.status.busy": "2021-03-19T23:24:10.891887Z",
+     "iopub.status.idle": "2021-03-19T23:24:11.462831Z",
+     "shell.execute_reply": "2021-03-19T23:24:11.461983Z"
     }
    },
    "outputs": [],
@@ -273,7 +273,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "infectious-exploration",
+   "id": "inappropriate-marathon",
    "metadata": {},
    "source": [
     "Note that the `uu`, `vv`, `weight`, `data_re`, and `data_im` arrays are all two-dimensional numpy arrays of shape `(nchan, nvis)`. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape `(1, nvis)`.\n",
@@ -283,13 +283,13 @@
   {
    "cell_type": "code",
    "execution_count": 10,
-   "id": "successful-married",
+   "id": "hindu-republican",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:08.811480Z",
-     "iopub.status.busy": "2021-03-19T23:09:08.810669Z",
-     "iopub.status.idle": "2021-03-19T23:09:09.440187Z",
-     "shell.execute_reply": "2021-03-19T23:09:09.439329Z"
+     "iopub.execute_input": "2021-03-19T23:24:11.467655Z",
+     "iopub.status.busy": "2021-03-19T23:24:11.467115Z",
+     "iopub.status.idle": "2021-03-19T23:24:12.064687Z",
+     "shell.execute_reply": "2021-03-19T23:24:12.063849Z"
     }
    },
    "outputs": [],
@@ -307,7 +307,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "variable-separate",
+   "id": "promotional-handy",
    "metadata": {},
    "source": [
     "if you don't want to specify your GridCoords object separately."
@@ -315,7 +315,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "processed-tracy",
+   "id": "vertical-calibration",
    "metadata": {},
    "source": [
     "## Gridding the visibilities\n",
@@ -325,13 +325,13 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "suitable-birthday",
+   "id": "particular-queensland",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:09.444681Z",
-     "iopub.status.busy": "2021-03-19T23:09:09.443981Z",
-     "iopub.status.idle": "2021-03-19T23:09:11.121387Z",
-     "shell.execute_reply": "2021-03-19T23:09:11.121837Z"
+     "iopub.execute_input": "2021-03-19T23:24:12.068214Z",
+     "iopub.status.busy": "2021-03-19T23:24:12.067716Z",
+     "iopub.status.idle": "2021-03-19T23:24:13.805507Z",
+     "shell.execute_reply": "2021-03-19T23:24:13.804784Z"
     }
    },
    "outputs": [],
@@ -341,7 +341,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "common-essence",
+   "id": "hearing-maria",
    "metadata": {},
    "source": [
     "## Visualizing the images\n",
@@ -351,13 +351,13 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "natural-principle",
+   "id": "spiritual-spank",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:11.125787Z",
-     "iopub.status.busy": "2021-03-19T23:09:11.125240Z",
-     "iopub.status.idle": "2021-03-19T23:09:11.924819Z",
-     "shell.execute_reply": "2021-03-19T23:09:11.924308Z"
+     "iopub.execute_input": "2021-03-19T23:24:13.809656Z",
+     "iopub.status.busy": "2021-03-19T23:24:13.809085Z",
+     "iopub.status.idle": "2021-03-19T23:24:14.502394Z",
+     "shell.execute_reply": "2021-03-19T23:24:14.501937Z"
     }
    },
    "outputs": [],
@@ -368,7 +368,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "overhead-envelope",
+   "id": "junior-cisco",
    "metadata": {},
    "source": [
     "Note that these are three dimensional image cubes with the same `nchan` as the input visibility data."
@@ -377,13 +377,13 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "impressive-schema",
+   "id": "historic-shame",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:11.930918Z",
-     "iopub.status.busy": "2021-03-19T23:09:11.930128Z",
-     "iopub.status.idle": "2021-03-19T23:09:11.935704Z",
-     "shell.execute_reply": "2021-03-19T23:09:11.935065Z"
+     "iopub.execute_input": "2021-03-19T23:24:14.507536Z",
+     "iopub.status.busy": "2021-03-19T23:24:14.507040Z",
+     "iopub.status.idle": "2021-03-19T23:24:14.511521Z",
+     "shell.execute_reply": "2021-03-19T23:24:14.510487Z"
     }
    },
    "outputs": [
@@ -403,7 +403,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "naked-sensitivity",
+   "id": "perceived-debut",
    "metadata": {},
    "source": [
     "And the image has units of \"Jy/beam\". Now let's visualize the central channel of these cubes"
@@ -412,13 +412,13 @@
   {
    "cell_type": "code",
    "execution_count": 14,
-   "id": "alpha-angle",
+   "id": "indonesian-comparison",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T23:09:11.976718Z",
-     "iopub.status.busy": "2021-03-19T23:09:11.962433Z",
-     "iopub.status.idle": "2021-03-19T23:09:12.678956Z",
-     "shell.execute_reply": "2021-03-19T23:09:12.679485Z"
+     "iopub.execute_input": "2021-03-19T23:24:14.550348Z",
+     "iopub.status.busy": "2021-03-19T23:24:14.549815Z",
+     "iopub.status.idle": "2021-03-19T23:24:15.193500Z",
+     "shell.execute_reply": "2021-03-19T23:24:15.193912Z"
     }
    },
    "outputs": [
@@ -459,7 +459,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "banned-acrylic",
+   "id": "enabling-detroit",
    "metadata": {
     "lines_to_next_cell": 2
    },
