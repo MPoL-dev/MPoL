@@ -14,8 +14,9 @@ jobs:
     - name: Install doc deps 
       run: |
         pip install .[docs]
-    - name: Install mermaid-cli 
+    - name: Set up node 
       uses: actions/setup-node@v2
+    - name: Install mermaid-cli 
       run: | 
         npm install @mermaid-js/mermaid-cli
     - name: Build notebooks for the docs
