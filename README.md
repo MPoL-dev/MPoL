@@ -8,7 +8,7 @@ A Million Points of Light are needed to synthesize image cubes from interferomet
 
 MPoL is a flexible Python package designed for Regularized Maximum Likelihood imaging. We focus on supporting spectral line and continuum observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and kernel phase interferometry.
 
-Documentation and installation instructions: [https://mpol.readthedocs.io/](https://mpol.readthedocs.io/)
+Documentation and installation instructions: [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
 
 ## Citation 
 
