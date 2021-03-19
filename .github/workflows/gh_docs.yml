@@ -22,7 +22,7 @@ jobs:
           jupytext --to ipynb --execute docs/tutorials/*.py
       - name: Install Pandoc dependency 
         run: | 
-        sudo apt-get install pandoc
+          sudo apt-get install pandoc
       - name: Build the docs
         run: | 
           make -C docs clean
