@@ -1,0 +1,35 @@
+name: gh-pages docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install doc deps 
+        run: |
+          pip install .[docs]
+      - name: Build notebooks for the docs
+        run: |
+          jupytext --to ipynb --execute docs/tutorials/*.py
+      - uses: actions/upload-artifact@v2
+        with:
+          name: notebooks-for-${{ github.sha }}
+          path: docs/tutorials
+      - name: Build the docs
+        run: | 
+          make -C docs clean
+          make -C docs html
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
