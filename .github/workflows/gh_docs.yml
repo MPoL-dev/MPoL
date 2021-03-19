@@ -35,7 +35,8 @@ jobs:
         run: |
           node_modules/.bin/mmdc -h
       - name: Build the docs
-        run: | 
+        run: |
+          alias mmdc="node_modules/.bin/mmdc"
           make -C docs clean
           make -C docs html
       - name: Deploy
