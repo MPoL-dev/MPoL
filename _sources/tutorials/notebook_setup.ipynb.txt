@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "wooden-syracuse",
+   "id": "fancy-direction",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:05:03.360896Z",
-     "iopub.status.busy": "2021-03-19T21:05:03.360059Z",
-     "iopub.status.idle": "2021-03-19T21:05:03.363000Z",
-     "shell.execute_reply": "2021-03-19T21:05:03.363461Z"
+     "iopub.execute_input": "2021-03-19T21:09:04.126580Z",
+     "iopub.status.busy": "2021-03-19T21:09:04.126101Z",
+     "iopub.status.idle": "2021-03-19T21:09:04.137684Z",
+     "shell.execute_reply": "2021-03-19T21:09:04.138065Z"
     }
    },
    "outputs": [
@@ -31,7 +31,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "lined-freeware",
+   "id": "modern-approval",
    "metadata": {},
    "source": [
     "set some plotting styles, inspired by DFM\n",
@@ -41,13 +41,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "random-bottle",
+   "id": "classical-space",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:05:03.378492Z",
-     "iopub.status.busy": "2021-03-19T21:05:03.377871Z",
-     "iopub.status.idle": "2021-03-19T21:05:03.380933Z",
-     "shell.execute_reply": "2021-03-19T21:05:03.380399Z"
+     "iopub.execute_input": "2021-03-19T21:09:04.146196Z",
+     "iopub.status.busy": "2021-03-19T21:09:04.145129Z",
+     "iopub.status.idle": "2021-03-19T21:09:04.148776Z",
+     "shell.execute_reply": "2021-03-19T21:09:04.147910Z"
     }
    },
    "outputs": [],
@@ -58,13 +58,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "virgin-fields",
+   "id": "absolute-spirit",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:05:03.385059Z",
-     "iopub.status.busy": "2021-03-19T21:05:03.384478Z",
-     "iopub.status.idle": "2021-03-19T21:05:03.663516Z",
-     "shell.execute_reply": "2021-03-19T21:05:03.662579Z"
+     "iopub.execute_input": "2021-03-19T21:09:04.151962Z",
+     "iopub.status.busy": "2021-03-19T21:09:04.151460Z",
+     "iopub.status.idle": "2021-03-19T21:09:04.373725Z",
+     "shell.execute_reply": "2021-03-19T21:09:04.372963Z"
     }
    },
    "outputs": [],
@@ -75,13 +75,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "faced-scottish",
+   "id": "terminal-round",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-03-19T21:05:03.675597Z",
-     "iopub.status.busy": "2021-03-19T21:05:03.674726Z",
-     "iopub.status.idle": "2021-03-19T21:05:03.676584Z",
-     "shell.execute_reply": "2021-03-19T21:05:03.676111Z"
+     "iopub.execute_input": "2021-03-19T21:09:04.378812Z",
+     "iopub.status.busy": "2021-03-19T21:09:04.378294Z",
+     "iopub.status.idle": "2021-03-19T21:09:04.381709Z",
+     "shell.execute_reply": "2021-03-19T21:09:04.381074Z"
     }
    },
    "outputs": [],
