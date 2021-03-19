@@ -24,18 +24,9 @@ class SimpleNet(torch.nn.Module):
     For example, you'll likely want to access the ``self.icube.sky_model`` at some point.
 
     The idea is that :class:`~mpol.precomposed.SimpleNet` can save you some keystrokes composing models by connecting the most commonly used layers together.
-
-    .. mermaid:: 
-
-        graph TD
-            subgraph SimpleNet
-            BaseCube --> ImageCube 
-            ImageCube --> FourierLayer
-            FourierLayer --> DataConnector 
-            end
-            Dataset --> DataConnector 
-            DataConnector --> Loss    
-
+    
+    .. mermaid:: _static/mmd/SimpleNet.mmd
+    
     """
 
     def __init__(

@@ -24,7 +24,7 @@ except DistributionNotFound:
     __version__ = "unknown version"
 
 project = "MPoL"
-copyright = "2019, Ian Czekala"
+copyright = "2019-21, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
@@ -76,7 +76,6 @@ html_favicon = "favicon.ico"
 #     ]
 # }
 
-
 master_doc = "index"
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -84,9 +83,8 @@ master_doc = "index"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-html_js_files = ["js/mermaid.min.js"]
-mermaid_version = ""
-
+# Mermaid configuration
+mermaid_output_format = "svg"
 
 # RTDs-action
 if "GITHUB_TOKEN" in os.environ:
