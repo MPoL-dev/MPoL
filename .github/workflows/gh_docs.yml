@@ -30,7 +30,10 @@ jobs:
           npm install @mermaid-js/mermaid-cli
       - name: ls directory
         run: | 
-          ls -lha
+          ls -lha node_modules
+      - name: test mmdc 
+        run: |
+          node_modules/.bin/mmdc -h
       - name: Build the docs
         run: | 
           make -C docs clean
