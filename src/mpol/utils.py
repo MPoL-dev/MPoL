@@ -28,6 +28,19 @@ def get_Jy_arcsec2(T_b, nu=230e9):
     return Jy_arcsec2
 
 
+def log_stretch(x):
+    r"""
+    Apply a log stretch to the tensor.
+
+    Args: 
+        tensor (PyTorch tensor): input tensor :math:`x`
+
+    Returns: :math:`\ln(1 + |x|)`
+    """
+
+    return torch.log(1 + torch.abs(x))
+
+
 def fftspace(width, N):
     """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
     

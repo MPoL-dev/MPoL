@@ -3,27 +3,30 @@ import torch
 from torch import nn
 
 from .constants import arcsec
+from . import images
 from . import utils
 
 
-class DatasetConnector(nn.Module):
+class GriddedDatasetConnector(nn.Module):
     r"""
-    Connect a FourierCube to the data, and return indexed model visibilities for calculating the loss. 
+    Connect a FourierCube to the gridded dataset, and return indexed model visibilities for calculating the loss. 
 
     Args:
-        FourierCube: instantiated :class:`~mpol.images.FourierCube` object
-        GriddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+        fourierCube: instantiated :class:`~mpol.images.FourierCube` object
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
     """
 
-    def __init__(self, FourierCube, GriddedDataset):
+    def __init__(self, fourierCube, griddedDataset):
         super().__init__()
 
         # check to make sure that the FourierCube and GriddedDataset
         # were both initialized with the same GridCoords settings.
-        assert FourierCube.coords == GriddedDataset.coords
+        assert fourierCube.coords == griddedDataset.coords
+
+        self.coords = fourierCube.coords
 
         # take the mask
-        self.mask = GriddedDataset.mask
+        self.mask = griddedDataset.mask
 
     def forward(self, vis):
         r"""
@@ -50,3 +53,55 @@ class DatasetConnector(nn.Module):
         # but for some reason torch.complex seems to work OK.
         return torch.complex(re, im)
 
+
+class GriddedResidualConnector(GriddedDatasetConnector):
+    r"""
+    Calculate residual gridded products.
+    """
+
+    def forward(self, model, data):
+        r"""Calculate the residuals as 
+        
+        ..math::
+        
+            \mathrm{data} - \mathrm{model}
+
+        And produce a dictionary of image cube products. Cubes is pre-packed.
+
+        Returns: None
+
+        Residual products are available as PyTorch tensor instance attributes after forward call.
+
+        :ivar cube: pre-packed image cube
+        :ivar residuals: pre-packed (complex) residuals
+        :ivar amp: pre-packed amplitude
+        :ivar phase: pre-packed phase
+        
+        Real and imaginary components of the residuals can be accessed directly via ``residuals.real`` and ``residuals.imag``.
+
+        """
+
+        self.residuals = data - model
+
+        self.amp = torch.abs(self.residuals)
+        self.phase = torch.angle(self.residuals)
+
+        # calculate the correpsonding residual dirty image (under uniform weighting)
+        cube = self.coords.npix ** 2 * torch.fft.ifftn(self.residuals, dim=(1, 2))
+
+        assert (
+            np.max(cube.imag) < 1e-10
+        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+
+        self.cube = cube.real
+
+    @property
+    def sky_cube(self):
+        """
+        The image cube arranged as it would appear on the sky.
+
+        Returns:
+            torch.double : 3D image cube of shape ``(nchan, npix, npix)``
+            
+        """
+        return images.packed_cube_to_sky_cube(self.cube)

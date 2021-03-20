@@ -29,7 +29,7 @@ def test_instantiate_connector(coords, dataset):
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
-    dcon = connectors.DatasetConnector(flayer, dataset)
+    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
 
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
@@ -44,7 +44,7 @@ def test_connector_grad(coords, dataset):
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
-    dcon = connectors.DatasetConnector(flayer, dataset)
+    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
 
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))

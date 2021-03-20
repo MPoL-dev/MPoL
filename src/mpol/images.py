@@ -175,7 +175,7 @@ class ImageCube(nn.Module):
     @property
     def sky_cube(self):
         """
-        The image cube arrange as it would appear on the sky.
+        The image cube arranged as it would appear on the sky.
 
         Returns:
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
