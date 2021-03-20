@@ -13,13 +13,13 @@ from . import utils
 def sky_cube_to_packed_cube(sky_cube):
     # If it's an identity layer, just set parameters to cube
     flipped = torch.flip(sky_cube, (2,))
-    shifted = utils.fftshift(flipped, axes=(1, 2))
+    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
     return shifted
 
 
 def packed_cube_to_sky_cube(packed_cube):
     # fftshift the image cube to the correct quadrants
-    shifted = utils.fftshift(packed_cube, axes=(1, 2))
+    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
     # flip so that east points left
     flipped = torch.flip(shifted, (2,))
     return flipped
@@ -297,7 +297,7 @@ class FourierCube(nn.Module):
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
         """
 
-        return utils.fftshift(self.vis, axes=(1, 2))
+        return torch.fft.fftshift(self.vis, dim=(1, 2))
 
 
 # class ImageCubeOld(nn.Module):

@@ -327,6 +327,6 @@ def test_grid_cont(mock_visibility_data_cont):
     gridder.grid_visibilities(weighting="uniform")
 
 
-def test_export_grid_comparison(gridder, tmp_path):
+# def test_export_grid_comparison(gridder, tmp_path):
 
-    # calculate the image from the gridder
+#     # calculate the image from the gridder
