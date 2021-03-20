@@ -93,16 +93,3 @@ if os.getenv("CI"):
     # relative to docs/ directory!
     # (mmdc itself not in $PATH automatically, like local)
     mermaid_cmd = "../node_modules/.bin/mmdc"
-
-# RTDs-action
-if "GITHUB_TOKEN" in os.environ:
-    extensions.append("rtds_action")
-
-    rtds_action_github_repo = "MPoL-dev/MPoL"
-    # The path where the artifact should be extracted
-    # Note: this is relative to the conf.py file!
-    rtds_action_path = "tutorials"
-    # The "prefix" used in the `upload-artifact` step of the action
-    rtds_action_artifact_prefix = "notebooks-for-"
-    rtds_action_github_token = os.environ["GITHUB_TOKEN"]
-

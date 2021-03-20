@@ -1,7 +1,7 @@
 # MPoL
 
-![Tests](https://github.com/MPoL-dev/MPoL/workflows/Tests/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/mpol/badge/?version=latest)](https://mpol.readthedocs.io/en/latest/?badge=latest)
+[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
+[![gh-pages docs](https://github.com/MPoL-dev/MPoL/actions/workflows/gh_docs.yml/badge.svg)](https://mpol-dev.github.io/MPoL/)
 [![DOI](https://zenodo.org/badge/224543208.svg)](https://zenodo.org/badge/latestdoi/224543208)
 
 A Million Points of Light are needed to synthesize image cubes from interferometers.
@@ -27,4 +27,4 @@ If you use this package or derivatives of it, please cite
     }
 
 ---
-Copyright Ian Czekala and contributors 2019-20
+Copyright Ian Czekala and contributors 2019-21
