@@ -23,6 +23,8 @@ class GriddedDatasetConnector(nn.Module):
         # were both initialized with the same GridCoords settings.
         assert fourierCube.coords == griddedDataset.coords
 
+        self.fourierCube = fourierCube
+        self.griddedDataset = griddedDataset
         self.coords = fourierCube.coords
 
         # take the mask
@@ -59,7 +61,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
     Calculate residual gridded products.
     """
 
-    def forward(self, model, data):
+    def forward(self):
         r"""Calculate the residuals as 
         
         ..math::
@@ -80,8 +82,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         Real and imaginary components of the residuals can be accessed directly via ``residuals.real`` and ``residuals.imag``.
 
         """
-
-        self.residuals = data - model
+        self.residuals = self.griddedDataset.vis_gridded - self.fourierCube.vis
 
         self.amp = torch.abs(self.residuals)
         self.phase = torch.angle(self.residuals)
@@ -90,7 +91,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         cube = self.coords.npix ** 2 * torch.fft.ifftn(self.residuals, dim=(1, 2))
 
         assert (
-            np.max(cube.imag) < 1e-10
+            torch.max(cube.imag) < 1e-10
         ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
 
         self.cube = cube.real
