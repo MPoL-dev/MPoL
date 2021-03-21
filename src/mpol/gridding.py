@@ -134,7 +134,7 @@ class Gridder:
 
     def _histogram_cube(self, weight):
         r"""
-        Perform a 2D histogram over the  Fourier grid defined by ``coords``, for all channels..
+        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..
 
         Args:
             weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.
@@ -171,7 +171,7 @@ class Gridder:
         cell_weight = self._histogram_cube(self.weight)
 
         # boolean index for cells that *contain* visibilities
-        self.mask = cell_weight > 0.0
+        mask = cell_weight > 0.0
 
         # calculate the density weights
         # the density weights have the same shape as the re, im samples.
@@ -210,7 +210,7 @@ class Gridder:
 
             # zero out cells that have no visibilities
             # to prevent normalization error in next step
-            cell_robust_weight[~self.mask] = 0
+            cell_robust_weight[~mask] = 0
 
             # now assign the cell robust weight to each visibility within that cell
             density_weight = np.array(
@@ -231,25 +231,31 @@ class Gridder:
         self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
-        self.data_re_gridded = self._histogram_cube(
+        # outputs from _histogram_cube are *not* pre-packed
+        data_re_gridded = self._histogram_cube(
             self.data_re * tapering_weight * density_weight * self.weight
         )
 
-        self.data_im_gridded = self._histogram_cube(
+        data_im_gridded = self._histogram_cube(
             self.data_im * tapering_weight * density_weight * self.weight
         )
 
-        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
-        self.re_gridded_beam = self._histogram_cube(
+        re_gridded_beam = self._histogram_cube(
             tapering_weight * density_weight * self.weight
         )
 
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask)
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+        self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
+
         # instantiate uncertainties for each averaged visibility.
         if weighting == "uniform" and robust == None and taper_function is None:
-            self.weight_gridded = cell_weight
+            self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
         else:
             self.weight_gridded = None
 
@@ -271,10 +277,7 @@ class Gridder:
             np.fft.fftshift(
                 self.coords.npix ** 2
                 * np.fft.ifft2(
-                    np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
-                        axes=(1, 2),
-                    )
+                    self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
                 ),
                 axes=(1, 2),
             )
@@ -304,12 +307,7 @@ class Gridder:
         img = self._fliplr_cube(
             np.fft.fftshift(
                 self.coords.npix ** 2
-                * np.fft.ifft2(
-                    np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.vis_gridded,
-                        axes=(1, 2),
-                    )
-                ),
+                * np.fft.ifft2(self.C[:, np.newaxis, np.newaxis] * self.vis_gridded,),
                 axes=(1, 2),
             )
         )  # Jy/beam
@@ -341,4 +339,15 @@ class Gridder:
             weight_gridded=self.weight_gridded,
             mask=self.mask,
         )
+
+    @property
+    def sky_vis_gridded(self):
+        r"""
+        The visibility FFT cube fftshifted for plotting with ``imshow``.
+
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
+        """
+
+        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
 
