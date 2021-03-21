@@ -291,6 +291,87 @@ class Gridder:
 
         return self.beam
 
+    def _null_dirty_beam(self, ntheta=24, single_channel_estimate=True):
+        r"""Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.
+        
+        Args:
+            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
+            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
+
+        Returns: a cube like the dirty beam, but with all pixels exterior to the first null set to 0.
+        """
+
+        try:
+            self.beam
+        except AttributeError:
+            self.get_dirty_beam()
+
+        # consider the 2D beam for each channel described by polar coordinates r, theta.
+        #
+        # this routine works by finding the smallest r for which the beam goes negative (the first null)
+        # as a function of theta. Then, for this same theta, all pixels (negative or not) with values of r larger than
+        # this are set to 0.
+
+        # the end product of this routine will be a "nulled" beam, which can be used in the calculation
+        # of dirty beam area.
+
+        # the angular extent for each "slice"
+        # the smaller the slice, the more accurate the area estimate, but also the
+        # longer it takes
+        da = 2 * np.pi / ntheta  # radians
+        azimuths = np.arange(0, 2 * np.pi, da)
+
+        # calculate a meshgrid (same for all channels)
+        ll, mm = np.meshgrid(self.coords.l_centers, self.coords.m_centers)
+        rr = np.sqrt(ll ** 2 + mm ** 2)
+        theta = np.arctan2(mm, ll) + np.pi  # radians in range [0, 2pi]
+
+        nulled_beam = self.beam.copy()
+        # for each channel,
+        # find the first occurrence of a non-zero value, such that we end up with a continuous
+        # ring of masked values.
+        for i in range(self.nchan):
+            nb = nulled_beam[i]
+            ind_neg = nb < 0
+
+            for a in azimuths:
+                # examine values between a, a+da with some overlap
+                ind_azimuth = (theta >= a - 0.3 * da) & (theta <= (a + 1.3 * da))
+
+                # find all negative values within azimuth slice
+                ind_neg_and_az = ind_neg & ind_azimuth
+
+                # find the smallest r within this slice
+                min_r = np.min(rr[ind_neg_and_az])
+
+                # null all pixels within this slice with radii r or greater
+                ind_r = rr >= min_r
+                ind_r_and_az = ind_r & ind_azimuth
+                nb[ind_r_and_az] = 0
+
+            if single_channel_estimate:
+                # just copy the mask from the first channel to all channels
+                ind_0 = nb == 0
+                nulled_beam[:, ind_0] = 0
+                break
+
+        return nulled_beam
+
+    def get_dirty_beam_area(self, ntheta=24, single_channel_estimate=True):
+        """
+        Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
+
+        Args:
+            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
+            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
+
+        Returns: (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`
+        """
+        nulled = self._null_dirty_beam(
+            ntheta=ntheta, single_channel_estimate=single_channel_estimate
+        )
+        return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
+
     def get_dirty_image(self, unit="Jy/beam"):
         """
         Calculate the dirty image.
@@ -307,10 +388,22 @@ class Gridder:
         img = self._fliplr_cube(
             np.fft.fftshift(
                 self.coords.npix ** 2
-                * np.fft.ifft2(self.C[:, np.newaxis, np.newaxis] * self.vis_gridded,),
+                * np.fft.ifft2(self.C[:, np.newaxis, np.newaxis] * self.vis_gridded),
                 axes=(1, 2),
             )
         )  # Jy/beam
+
+        # for units of Jy/arcsec^2, we could just leave out the C constant *if* we were doing
+        # uniform weighting. The relationships get more complex for robust or natural weighting, however,
+        # so it's safer to calculate the number of arcseconds^2 per beam
+        if unit == "Jy/arcsec^2":
+            beam_area_per_chan = self.get_dirty_beam_area()  # [arcsec^2]
+
+            # convert image
+            # (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)
+            # beam_area_per_chan is the n of arcsec^2 per 1 beam
+
+            img /= beam_area_per_chan[:, np.newaxis, np.newaxis]
 
         assert (
             np.max(img.imag) < 1e-10

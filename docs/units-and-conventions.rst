@@ -43,21 +43,36 @@ Pixel fluxes
 
 * Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of :math:`\mathrm{Jy\,arcsec}^{-2}`. 
 * The image cubes are packed as 3D arrays ``(nchan, npix, npix)``. 
-* The "rows" of the image cube (axis=1) correspond to the :math:`m` or Dec axis 
-* The "columns" of the image cube (axis=2) correspond to the :math:`l` or R.A. axis
+* The "rows" of the image cube (axis=1) correspond to the :math:`m` or Dec axis. There are :math:`M` number of pixels in the Dec axis.
+* The "columns" of the image cube (axis=2) correspond to the :math:`l` or R.A. axis. There are :math:`L` number of pixels in the R.A. axis.
 
 
 -------------
 Angular units
 -------------
 
-For nearly all user-facing routines, the angular axes (the direction cosines :math:`l` and :math:`m` corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. Internally, these quantities are represented in radians. The sample rate of the image cube is set via the ``cell_size`` parameter, in units of arcsec.
+For nearly all user-facing routines, the angular axes (the direction cosines :math:`l` and :math:`m` corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. The sample rate of the image cube is set via the ``cell_size`` parameter, in units of arcsec. Internally, these quantities are represented in radians.  Let the pixel spacing be represented by :math:`\Delta l` and :math:`\Delta m`, respectively.
+
+-------------
+Fourier units
+-------------
+
+The sampling rate in the Fourier domain is inversely related to the number of samples and the sampling rate in the image domain. I.e., the grid spacing is 
+
+.. math::
+
+    \Delta u = \frac{1}{L \Delta l} \\
+    \Delta v = \frac{1}{M \Delta m} 
+
+If :math:`\Delta l` and :math:`\Delta m` are in units of radians, then :math:`\Delta u` and :math:`\Delta v` are in units of cycles per radian. Thanks to the geometric relationship of the interferometer, the spatial frequency units can equivalently be expressed as the baseline lengths measured in multiples of the observing wavelength :math:`\lambda`. For more information on their relationship, see `TMS Eqn Chapter 2.3, equations 2.13 and 2.14 <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`_. Internally, MPoL usually represents spatial frequencies in units of :math:`\mathrm{k}\lambda` (i.e. muliples of :math:`1000\times` the baseline lengths measured in multiples of the observing wavelength).
+
+
 
 ------------------------------
 The discrete Fourier transform
 ------------------------------
 
-Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or pytorch: they are mathematically the same, but pytorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that ``norm='backward'``, the default setting. This means we don't need to keep account for the :math:`L` or :math:`M` prefactors for the forward transform, but we do need to account for the :math:`U` and :math:`V` prefactors in the inverse transform.
+Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or PyTorch: they are mathematically the same, but PyTorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that ``norm='backward'``, the default setting. This means we don't need to keep account for the :math:`L` or :math:`M` prefactors for the forward transform, but we do need to account for the :math:`U` and :math:`V` prefactors in the inverse transform.
 
 **Forward transform**: As before, we use the forward transform to go from the image plane (sky brightness distribution) to the Fourier plane (visibility function). This is the most common transform used in MPoL because RML can be thought of as a type of forward modeling procedure: we're proposing an image and carrying it to the visibility plane to check its fit with the data. In numpy, the forward FFT is `defined as <https://docs.scipy.org/doc/numpy/reference/routines.fft.html#module-numpy.fft>`_ 
 

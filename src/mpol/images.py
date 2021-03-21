@@ -108,7 +108,7 @@ class ImageCube(nn.Module):
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
         passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.
-        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. 
     """
 
     def __init__(

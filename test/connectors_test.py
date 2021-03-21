@@ -85,23 +85,44 @@ def test_residual_connector(coords, dataset_cont, tmp_path):
     rcon.forward()
 
     # plot residual image compared to imagecube.image
-    fig, ax = plt.subplots(ncols=2)
-    im = ax[0].imshow(
+    fig, ax = plt.subplots(ncols=2, nrows=2)
+    im = ax[0, 0].imshow(
         np.squeeze(imagecube.sky_cube.detach().numpy()),
         origin="lower",
         interpolation="none",
         extent=imagecube.coords.img_ext,
     )
-    ax[0].set_title("ImageCube")
-    plt.colorbar(im, ax=ax[0])
-    im = ax[1].imshow(
+    ax[0, 0].set_title("ImageCube")
+    plt.colorbar(im, ax=ax[0, 0])
+
+    im = ax[0, 1].imshow(
         np.squeeze(rcon.sky_cube.detach().numpy()),
         origin="lower",
         interpolation="none",
         extent=rcon.coords.img_ext,
     )
-    ax[1].set_title("ResidualImage")
-    plt.colorbar(im, ax=ax[1])
+    ax[0, 1].set_title("ResidualImage")
+    plt.colorbar(im, ax=ax[0, 1])
+
+    im = ax[1, 0].imshow(
+        np.squeeze(rcon.sky_amp.detach().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=imagecube.coords.vis_ext,
+    )
+    ax[1, 0].set_title("Amplitude")
+    plt.colorbar(im, ax=ax[1, 0])
+
+    im = ax[1, 1].imshow(
+        np.squeeze(rcon.sky_phase.detach().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=imagecube.coords.vis_ext,
+    )
+    ax[1, 1].set_title("Phase")
+    plt.colorbar(im, ax=ax[1, 1])
+
+    fig.subplots_adjust(left=0.1, right=0.9, wspace=0.3, hspace=0.3, top=0.9)
     fig.savefig(tmp_path / "residual.png", dpi=300)
     plt.close("all")
 

@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from mpol import gridding
 from mpol import coordinates
@@ -158,6 +159,87 @@ def test_beam_normalized(gridder):
             assert pytest.approx(np.max(beam[i]), 1.0)
 
 
+def test_beam_null(gridder, tmp_path):
+    r = -0.5
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam = gridder.get_dirty_beam()
+    nulled = gridder._null_dirty_beam()
+
+    chan = 4
+    fig, ax = plt.subplots(ncols=2)
+
+    cmap = matplotlib.cm.get_cmap("viridis")
+    cmap.set_under("r")
+    norm = matplotlib.colors.Normalize(vmin=0)
+
+    im = ax[0].imshow(
+        beam[chan],
+        origin="lower",
+        interpolation="none",
+        extent=gridder.coords.img_ext,
+        cmap=cmap,
+        norm=norm,
+    )
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(
+        nulled[chan] - 1e-6,
+        origin="lower",
+        interpolation="none",
+        extent=gridder.coords.img_ext,
+        cmap=cmap,
+        norm=norm,
+    )
+    plt.colorbar(im, ax=ax[1])
+
+    fig.savefig(tmp_path / "beam_v_nulled.png", dpi=300)
+    plt.close("all")
+
+
+def test_beam_null_full(gridder, tmp_path):
+    r = -0.5
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam = gridder.get_dirty_beam()
+    nulled = gridder._null_dirty_beam(single_channel_estimate=False)
+
+    chan = 4
+    fig, ax = plt.subplots(ncols=2)
+
+    cmap = matplotlib.cm.get_cmap("viridis")
+    cmap.set_under("r")
+    norm = matplotlib.colors.Normalize(vmin=0)
+
+    im = ax[0].imshow(
+        beam[chan],
+        origin="lower",
+        interpolation="none",
+        extent=gridder.coords.img_ext,
+        cmap=cmap,
+        norm=norm,
+    )
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(
+        nulled[chan] - 1e-6,
+        origin="lower",
+        interpolation="none",
+        extent=gridder.coords.img_ext,
+        cmap=cmap,
+        norm=norm,
+    )
+    plt.colorbar(im, ax=ax[1])
+
+    fig.savefig(tmp_path / "beam_v_nulled.png", dpi=300)
+    plt.close("all")
+
+
+def test_beam_area_before_beam(gridder):
+    r = -0.5
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    area = gridder.get_dirty_beam_area()
+    print(area)
+
+
 # compare uniform and robust = -2.0
 def test_grid_uniform(gridder, tmp_path):
 
@@ -201,6 +283,51 @@ def test_grid_uniform(gridder, tmp_path):
     plt.close("all")
 
 
+# compare uniform and robust = -2.0
+def test_grid_uniform_arcsec2(gridder, tmp_path):
+
+    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+
+    chan = 4
+
+    gridder.grid_visibilities(weighting="uniform")
+    beam_uniform = gridder.get_dirty_beam()
+    img_uniform = gridder.get_dirty_image(unit="Jy/arcsec^2")
+
+    r = -2
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam_robust = gridder.get_dirty_beam()
+    img_robust = gridder.get_dirty_image(unit="Jy/arcsec^2")
+
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
+
+    ax[0, 0].imshow(beam_uniform[chan], **kw)
+    ax[0, 0].set_title("uniform")
+    im = ax[1, 0].imshow(img_uniform[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 0])
+
+    ax[0, 1].imshow(beam_robust[chan], **kw)
+    ax[0, 1].set_title("robust={:}".format(r))
+    im = ax[1, 1].imshow(img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 1])
+
+    # the differences
+    im = ax[0, 2].imshow(beam_uniform[chan] - beam_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[0, 2])
+    ax[0, 2].set_title("difference")
+    im = ax[1, 2].imshow(img_uniform[chan] - img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 2])
+
+    fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
+
+    fig.savefig(tmp_path / "uniform_v_robust_arcsec2.png", dpi=300)
+
+    assert np.all(np.abs(beam_uniform - beam_robust) < 1e-4)
+    assert np.all(np.abs(img_uniform - img_robust) < 1e-3)
+
+    plt.close("all")
+
+
 def test_grid_natural(gridder, tmp_path):
 
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
@@ -239,6 +366,50 @@ def test_grid_natural(gridder, tmp_path):
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
     assert np.all(np.abs(img_natural - img_robust) < 1e-3)
+
+    plt.close("all")
+
+
+def test_grid_natural_arcsec2(gridder, tmp_path):
+
+    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+
+    chan = 4
+
+    gridder.grid_visibilities(weighting="natural")
+    beam_natural = gridder.get_dirty_beam()
+    img_natural = gridder.get_dirty_image(unit="Jy/arcsec^2")
+
+    r = 2
+    gridder.grid_visibilities(weighting="briggs", robust=r)
+    beam_robust = gridder.get_dirty_beam()
+    img_robust = gridder.get_dirty_image(unit="Jy/arcsec^2")
+
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
+
+    ax[0, 0].imshow(beam_natural[chan], **kw)
+    ax[0, 0].set_title("natural")
+    im = ax[1, 0].imshow(img_natural[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 0])
+
+    ax[0, 1].imshow(beam_robust[chan], **kw)
+    ax[0, 1].set_title("robust={:}".format(r))
+    im = ax[1, 1].imshow(img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 1])
+
+    # the differences
+    im = ax[0, 2].imshow(beam_natural[chan] - beam_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[0, 2])
+    ax[0, 2].set_title("difference")
+    im = ax[1, 2].imshow(img_natural[chan] - img_robust[chan], **kw)
+    plt.colorbar(im, ax=ax[1, 2])
+
+    fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
+
+    fig.savefig(tmp_path / "natural_v_robust_arcsec2.png", dpi=300)
+
+    assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
+    assert np.all(np.abs(img_natural - img_robust) < 5e-3)
 
     plt.close("all")
 
@@ -326,7 +497,3 @@ def test_grid_cont(mock_visibility_data_cont):
 
     gridder.grid_visibilities(weighting="uniform")
 
-
-# def test_export_grid_comparison(gridder, tmp_path):
-
-#     # calculate the image from the gridder
