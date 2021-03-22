@@ -188,13 +188,13 @@
 <span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
     <span class="c1"># If it&#39;s an identity layer, just set parameters to cube</span>
     <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
-    <span class="n">shifted</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">shifted</span>
 
 
 <span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
-    <span class="n">shifted</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="c1"># flip so that east points left</span>
     <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">shifted</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
     <span class="k">return</span> <span class="n">flipped</span>
@@ -283,7 +283,7 @@
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the image</span>
 <span class="sd">        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.</span>
-<span class="sd">        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. </span>
+<span class="sd">        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -350,7 +350,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The image cube arrange as it would appear on the sky.</span>
+<span class="sd">        The image cube arranged as it would appear on the sky.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double : 3D image cube of shape ``(nchan, npix, npix)``</span>
@@ -472,7 +472,7 @@
 <span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
 
 <span class="c1"># class ImageCubeOld(nn.Module):</span>

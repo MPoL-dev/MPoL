@@ -106,6 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#discretized-representation">Discretized representation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pixel-fluxes">Pixel fluxes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#angular-units">Angular units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fourier-units">Fourier units</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#the-discrete-fourier-transform">The discrete Fourier transform</a></li>
 </ul>
 </li>
@@ -216,17 +217,25 @@
 <ul class="simple">
 <li><p>Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of <span class="math notranslate nohighlight">\(\mathrm{Jy\,arcsec}^{-2}\)</span>.</p></li>
 <li><p>The image cubes are packed as 3D arrays <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>.</p></li>
-<li><p>The “rows” of the image cube (axis=1) correspond to the <span class="math notranslate nohighlight">\(m\)</span> or Dec axis</p></li>
-<li><p>The “columns” of the image cube (axis=2) correspond to the <span class="math notranslate nohighlight">\(l\)</span> or R.A. axis</p></li>
+<li><p>The “rows” of the image cube (axis=1) correspond to the <span class="math notranslate nohighlight">\(m\)</span> or Dec axis. There are <span class="math notranslate nohighlight">\(M\)</span> number of pixels in the Dec axis.</p></li>
+<li><p>The “columns” of the image cube (axis=2) correspond to the <span class="math notranslate nohighlight">\(l\)</span> or R.A. axis. There are <span class="math notranslate nohighlight">\(L\)</span> number of pixels in the R.A. axis.</p></li>
 </ul>
 </div>
 <div class="section" id="angular-units">
 <h3>Angular units<a class="headerlink" href="#angular-units" title="Permalink to this headline">¶</a></h3>
-<p>For nearly all user-facing routines, the angular axes (the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. Internally, these quantities are represented in radians. The sample rate of the image cube is set via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> parameter, in units of arcsec.</p>
+<p>For nearly all user-facing routines, the angular axes (the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. The sample rate of the image cube is set via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> parameter, in units of arcsec. Internally, these quantities are represented in radians.  Let the pixel spacing be represented by <span class="math notranslate nohighlight">\(\Delta l\)</span> and <span class="math notranslate nohighlight">\(\Delta m\)</span>, respectively.</p>
+</div>
+<div class="section" id="fourier-units">
+<h3>Fourier units<a class="headerlink" href="#fourier-units" title="Permalink to this headline">¶</a></h3>
+<p>The sampling rate in the Fourier domain is inversely related to the number of samples and the sampling rate in the image domain. I.e., the grid spacing is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Delta u = \frac{1}{L \Delta l} \\
+\Delta v = \frac{1}{M \Delta m}\end{split}\]</div>
+<p>If <span class="math notranslate nohighlight">\(\Delta l\)</span> and <span class="math notranslate nohighlight">\(\Delta m\)</span> are in units of radians, then <span class="math notranslate nohighlight">\(\Delta u\)</span> and <span class="math notranslate nohighlight">\(\Delta v\)</span> are in units of cycles per radian. Thanks to the geometric relationship of the interferometer, the spatial frequency units can equivalently be expressed as the baseline lengths measured in multiples of the observing wavelength <span class="math notranslate nohighlight">\(\lambda\)</span>. For more information on their relationship, see <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract">TMS Eqn Chapter 2.3, equations 2.13 and 2.14</a>. Internally, MPoL usually represents spatial frequencies in units of <span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span> (i.e. muliples of <span class="math notranslate nohighlight">\(1000\times\)</span> the baseline lengths measured in multiples of the observing wavelength).</p>
 </div>
 <div class="section" id="the-discrete-fourier-transform">
 <h3>The discrete Fourier transform<a class="headerlink" href="#the-discrete-fourier-transform" title="Permalink to this headline">¶</a></h3>
-<p>Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or pytorch: they are mathematically the same, but pytorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that <code class="docutils literal notranslate"><span class="pre">norm='backward'</span></code>, the default setting. This means we don’t need to keep account for the <span class="math notranslate nohighlight">\(L\)</span> or <span class="math notranslate nohighlight">\(M\)</span> prefactors for the forward transform, but we do need to account for the <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> prefactors in the inverse transform.</p>
+<p>Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or PyTorch: they are mathematically the same, but PyTorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that <code class="docutils literal notranslate"><span class="pre">norm='backward'</span></code>, the default setting. This means we don’t need to keep account for the <span class="math notranslate nohighlight">\(L\)</span> or <span class="math notranslate nohighlight">\(M\)</span> prefactors for the forward transform, but we do need to account for the <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> prefactors in the inverse transform.</p>
 <p><strong>Forward transform</strong>: As before, we use the forward transform to go from the image plane (sky brightness distribution) to the Fourier plane (visibility function). This is the most common transform used in MPoL because RML can be thought of as a type of forward modeling procedure: we’re proposing an image and carrying it to the visibility plane to check its fit with the data. In numpy, the forward FFT is <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/routines.fft.html#module-numpy.fft">defined as</a></p>
 <div class="math notranslate nohighlight">
 \[\mathtt{FFT}(I_{l,m}) = \sum_{l=0}^{L-1} \sum_{m=0}^{M-1} I_{l,m} \exp \left \{- 2 \pi i (ul/L + vm/M) \right \}\]</div>

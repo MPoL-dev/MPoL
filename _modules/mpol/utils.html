@@ -203,6 +203,19 @@
     <span class="k">return</span> <span class="n">Jy_arcsec2</span></div>
 
 
+<div class="viewcode-block" id="log_stretch"><a class="viewcode-back" href="../../api.html#mpol.utils.log_stretch">[docs]</a><span class="k">def</span> <span class="nf">log_stretch</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a log stretch to the tensor.</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        tensor (PyTorch tensor): input tensor :math:`x`</span>
+
+<span class="sd">    Returns: :math:`\ln(1 + |x|)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
+
+
 <div class="viewcode-block" id="fftspace"><a class="viewcode-back" href="../../api.html#mpol.utils.fftspace">[docs]</a><span class="k">def</span> <span class="nf">fftspace</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
 <span class="sd">    </span>
@@ -222,25 +235,6 @@
         <span class="n">xx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">width</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">dx</span>
 
     <span class="k">return</span> <span class="n">xx</span></div>
-
-
-<div class="viewcode-block" id="fftshift"><a class="viewcode-back" href="../../api.html#mpol.utils.fftshift">[docs]</a><span class="k">def</span> <span class="nf">fftshift</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    `fftshift &lt;https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html&gt;`_ the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations. </span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        x : a torch tensor </span>
-<span class="sd">        axes : tuple selecting which axes to shift over. Default is all.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        x : an fftshift-ed tensor</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">axes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
-
-    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span></div>
 
 
 <div class="viewcode-block" id="get_max_spatial_freq"><a class="viewcode-back" href="../../api.html#mpol.utils.get_max_spatial_freq">[docs]</a><span class="k">def</span> <span class="nf">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">):</span>

@@ -10,9 +10,11 @@ v0.1.0
 * Added :class:`~mpol.gridding.Gridder` and :class:`~mpol.gridding.GridCoords` objects.
 * Removed ``mpol.dirty_image`` module.
 * Migrated prolate spheroidal wavefunctions to ``mpol.spheroidal_gridding`` module.
-* Added Jupyter notebook tutorial build process using `RTD-action <https://rtds-action.readthedocs.io/en/latest/>`_
+* Added Jupyter notebook tutorial build process using Jupytext
 * Added SimpleNet precomposed module
 * Added Mermaid.js charting ability (for flowcharts)
+* Moved docs to github.io pages instead of Read the docs
+* Added Jy/arcsec^2 units to Gridder output.
 
 v0.0.5
 ------

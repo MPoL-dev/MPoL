@@ -309,7 +309,7 @@
 
     <span class="k">def</span> <span class="nf">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform a 2D histogram over the  Fourier grid defined by ``coords``, for all channels..</span>
+<span class="sd">        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.</span>
@@ -346,7 +346,7 @@
         <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 
         <span class="c1"># boolean index for cells that *contain* visibilities</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">cell_weight</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">cell_weight</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
 
         <span class="c1"># calculate the density weights</span>
         <span class="c1"># the density weights have the same shape as the re, im samples.</span>
@@ -385,7 +385,7 @@
 
             <span class="c1"># zero out cells that have no visibilities</span>
             <span class="c1"># to prevent normalization error in next step</span>
-            <span class="n">cell_robust_weight</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">cell_robust_weight</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="c1"># now assign the cell robust weight to each visibility within that cell</span>
             <span class="n">density_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -406,25 +406,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># grid the reals and imaginaries separately</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="c1"># outputs from _histogram_cube are *not* pre-packed</span>
+        <span class="n">data_re_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_re</span> <span class="o">*</span> <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="n">data_im_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_im</span> <span class="o">*</span> <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span> <span class="o">*</span> <span class="mf">1.0</span><span class="n">j</span>
-
         <span class="c1"># the beam is the response to a point source, which is data_re = constant, data_im = 0</span>
         <span class="c1"># so we save time and only calculate the reals, because gridded_beam_im = 0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
             <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
+        <span class="c1"># store the pre-packed FFT products for access by outside routines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">data_re_gridded</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">data_im_gridded</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span> <span class="o">*</span> <span class="mf">1.0</span><span class="n">j</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">re_gridded_beam</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
         <span class="c1"># instantiate uncertainties for each averaged visibility.</span>
         <span class="k">if</span> <span class="n">weighting</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span> <span class="ow">and</span> <span class="n">robust</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">taper_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">cell_weight</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="kc">None</span></div>
 
@@ -446,10 +452,7 @@
             <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span> <span class="o">**</span> <span class="mi">2</span>
                 <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span><span class="p">,</span>
-                        <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="p">)</span>
@@ -462,6 +465,87 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">beam</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">real</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span></div>
+
+    <span class="k">def</span> <span class="nf">_null_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.</span>
+<span class="sd">            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.</span>
+
+<span class="sd">        Returns: a cube like the dirty beam, but with all pixels exterior to the first null set to 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam</span><span class="p">()</span>
+
+        <span class="c1"># consider the 2D beam for each channel described by polar coordinates r, theta.</span>
+        <span class="c1">#</span>
+        <span class="c1"># this routine works by finding the smallest r for which the beam goes negative (the first null)</span>
+        <span class="c1"># as a function of theta. Then, for this same theta, all pixels (negative or not) with values of r larger than</span>
+        <span class="c1"># this are set to 0.</span>
+
+        <span class="c1"># the end product of this routine will be a &quot;nulled&quot; beam, which can be used in the calculation</span>
+        <span class="c1"># of dirty beam area.</span>
+
+        <span class="c1"># the angular extent for each &quot;slice&quot;</span>
+        <span class="c1"># the smaller the slice, the more accurate the area estimate, but also the</span>
+        <span class="c1"># longer it takes</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">ntheta</span>  <span class="c1"># radians</span>
+        <span class="n">azimuths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
+
+        <span class="c1"># calculate a meshgrid (same for all channels)</span>
+        <span class="n">ll</span><span class="p">,</span> <span class="n">mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">l_centers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">m_centers</span><span class="p">)</span>
+        <span class="n">rr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ll</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">mm</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">mm</span><span class="p">,</span> <span class="n">ll</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c1"># radians in range [0, 2pi]</span>
+
+        <span class="n">nulled_beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># for each channel,</span>
+        <span class="c1"># find the first occurrence of a non-zero value, such that we end up with a continuous</span>
+        <span class="c1"># ring of masked values.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">):</span>
+            <span class="n">nb</span> <span class="o">=</span> <span class="n">nulled_beam</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ind_neg</span> <span class="o">=</span> <span class="n">nb</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">azimuths</span><span class="p">:</span>
+                <span class="c1"># examine values between a, a+da with some overlap</span>
+                <span class="n">ind_azimuth</span> <span class="o">=</span> <span class="p">(</span><span class="n">theta</span> <span class="o">&gt;=</span> <span class="n">a</span> <span class="o">-</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">da</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">theta</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="mf">1.3</span> <span class="o">*</span> <span class="n">da</span><span class="p">))</span>
+
+                <span class="c1"># find all negative values within azimuth slice</span>
+                <span class="n">ind_neg_and_az</span> <span class="o">=</span> <span class="n">ind_neg</span> <span class="o">&amp;</span> <span class="n">ind_azimuth</span>
+
+                <span class="c1"># find the smallest r within this slice</span>
+                <span class="n">min_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rr</span><span class="p">[</span><span class="n">ind_neg_and_az</span><span class="p">])</span>
+
+                <span class="c1"># null all pixels within this slice with radii r or greater</span>
+                <span class="n">ind_r</span> <span class="o">=</span> <span class="n">rr</span> <span class="o">&gt;=</span> <span class="n">min_r</span>
+                <span class="n">ind_r_and_az</span> <span class="o">=</span> <span class="n">ind_r</span> <span class="o">&amp;</span> <span class="n">ind_azimuth</span>
+                <span class="n">nb</span><span class="p">[</span><span class="n">ind_r_and_az</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">single_channel_estimate</span><span class="p">:</span>
+                <span class="c1"># just copy the mask from the first channel to all channels</span>
+                <span class="n">ind_0</span> <span class="o">=</span> <span class="n">nb</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="n">nulled_beam</span><span class="p">[:,</span> <span class="n">ind_0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">nulled_beam</span>
+
+<div class="viewcode-block" id="Gridder.get_dirty_beam_area"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_beam_area">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_beam_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.</span>
+<span class="sd">            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.</span>
+
+<span class="sd">        Returns: (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nulled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_dirty_beam</span><span class="p">(</span>
+            <span class="n">ntheta</span><span class="o">=</span><span class="n">ntheta</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="n">single_channel_estimate</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nulled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># arcsec^2</span></div>
 
 <div class="viewcode-block" id="Gridder.get_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -479,15 +563,22 @@
         <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fliplr_cube</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span> <span class="o">**</span> <span class="mi">2</span>
-                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">,</span>
-                        <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                    <span class="p">)</span>
-                <span class="p">),</span>
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">),</span>
                 <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>  <span class="c1"># Jy/beam</span>
+
+        <span class="c1"># for units of Jy/arcsec^2, we could just leave out the C constant *if* we were doing</span>
+        <span class="c1"># uniform weighting. The relationships get more complex for robust or natural weighting, however,</span>
+        <span class="c1"># so it&#39;s safer to calculate the number of arcseconds^2 per beam</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">:</span>
+            <span class="n">beam_area_per_chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam_area</span><span class="p">()</span>  <span class="c1"># [arcsec^2]</span>
+
+            <span class="c1"># convert image</span>
+            <span class="c1"># (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)</span>
+            <span class="c1"># beam_area_per_chan is the n of arcsec^2 per 1 beam</span>
+
+            <span class="n">img</span> <span class="o">/=</span> <span class="n">beam_area_per_chan</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
         <span class="k">assert</span> <span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span>
@@ -515,7 +606,18 @@
             <span class="n">vis_gridded</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">,</span>
             <span class="n">weight_gridded</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">,</span>
             <span class="n">mask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sky_vis_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The visibility FFT cube fftshifted for plotting with ``imshow``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
 </pre></div>
 

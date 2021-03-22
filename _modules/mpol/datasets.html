@@ -188,9 +188,9 @@
 <span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the image (default = 1).</span>
-<span class="sd">        vis_gridded (torch complex): the gridded visibility data</span>
-<span class="sd">        weight_gridded (torch double): the weights corresponding to the gridded visibility data</span>
-<span class="sd">        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded``.</span>
+<span class="sd">        vis_gridded (torch complex): the gridded visibility data stored in a &quot;packed&quot; format (pre-shifted for fft)</span>
+<span class="sd">        weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format</span>
+<span class="sd">        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.</span>
 <span class="sd">        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
 
 
