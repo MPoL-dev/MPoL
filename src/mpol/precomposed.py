@@ -51,7 +51,7 @@ class SimpleNet(torch.nn.Module):
         self.flayer = images.FourierCube(coords=self.coords)
 
         assert griddedDataset is not None, "Please provide a GriddedDataset instance."
-        self.dcon = connectors.DatasetConnector(self.flayer, griddedDataset)
+        self.dcon = connectors.GriddedDatasetConnector(self.flayer, griddedDataset)
 
     def forward(self):
         r"""

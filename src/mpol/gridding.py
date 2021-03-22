@@ -134,7 +134,7 @@ class Gridder:
 
     def _histogram_cube(self, weight):
         r"""
-        Perform a 2D histogram over the  Fourier grid defined by ``coords``, for all channels..
+        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..
 
         Args:
             weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.
@@ -171,7 +171,7 @@ class Gridder:
         cell_weight = self._histogram_cube(self.weight)
 
         # boolean index for cells that *contain* visibilities
-        self.mask = cell_weight > 0.0
+        mask = cell_weight > 0.0
 
         # calculate the density weights
         # the density weights have the same shape as the re, im samples.
@@ -210,7 +210,7 @@ class Gridder:
 
             # zero out cells that have no visibilities
             # to prevent normalization error in next step
-            cell_robust_weight[~self.mask] = 0
+            cell_robust_weight[~mask] = 0
 
             # now assign the cell robust weight to each visibility within that cell
             density_weight = np.array(
@@ -231,25 +231,31 @@ class Gridder:
         self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
-        self.data_re_gridded = self._histogram_cube(
+        # outputs from _histogram_cube are *not* pre-packed
+        data_re_gridded = self._histogram_cube(
             self.data_re * tapering_weight * density_weight * self.weight
         )
 
-        self.data_im_gridded = self._histogram_cube(
+        data_im_gridded = self._histogram_cube(
             self.data_im * tapering_weight * density_weight * self.weight
         )
 
-        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
-        self.re_gridded_beam = self._histogram_cube(
+        re_gridded_beam = self._histogram_cube(
             tapering_weight * density_weight * self.weight
         )
 
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask)
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+        self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
+
         # instantiate uncertainties for each averaged visibility.
         if weighting == "uniform" and robust == None and taper_function is None:
-            self.weight_gridded = cell_weight
+            self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
         else:
             self.weight_gridded = None
 
@@ -271,10 +277,7 @@ class Gridder:
             np.fft.fftshift(
                 self.coords.npix ** 2
                 * np.fft.ifft2(
-                    np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
-                        axes=(1, 2),
-                    )
+                    self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
                 ),
                 axes=(1, 2),
             )
@@ -287,6 +290,87 @@ class Gridder:
         self.beam = beam.real
 
         return self.beam
+
+    def _null_dirty_beam(self, ntheta=24, single_channel_estimate=True):
+        r"""Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.
+        
+        Args:
+            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
+            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
+
+        Returns: a cube like the dirty beam, but with all pixels exterior to the first null set to 0.
+        """
+
+        try:
+            self.beam
+        except AttributeError:
+            self.get_dirty_beam()
+
+        # consider the 2D beam for each channel described by polar coordinates r, theta.
+        #
+        # this routine works by finding the smallest r for which the beam goes negative (the first null)
+        # as a function of theta. Then, for this same theta, all pixels (negative or not) with values of r larger than
+        # this are set to 0.
+
+        # the end product of this routine will be a "nulled" beam, which can be used in the calculation
+        # of dirty beam area.
+
+        # the angular extent for each "slice"
+        # the smaller the slice, the more accurate the area estimate, but also the
+        # longer it takes
+        da = 2 * np.pi / ntheta  # radians
+        azimuths = np.arange(0, 2 * np.pi, da)
+
+        # calculate a meshgrid (same for all channels)
+        ll, mm = np.meshgrid(self.coords.l_centers, self.coords.m_centers)
+        rr = np.sqrt(ll ** 2 + mm ** 2)
+        theta = np.arctan2(mm, ll) + np.pi  # radians in range [0, 2pi]
+
+        nulled_beam = self.beam.copy()
+        # for each channel,
+        # find the first occurrence of a non-zero value, such that we end up with a continuous
+        # ring of masked values.
+        for i in range(self.nchan):
+            nb = nulled_beam[i]
+            ind_neg = nb < 0
+
+            for a in azimuths:
+                # examine values between a, a+da with some overlap
+                ind_azimuth = (theta >= a - 0.3 * da) & (theta <= (a + 1.3 * da))
+
+                # find all negative values within azimuth slice
+                ind_neg_and_az = ind_neg & ind_azimuth
+
+                # find the smallest r within this slice
+                min_r = np.min(rr[ind_neg_and_az])
+
+                # null all pixels within this slice with radii r or greater
+                ind_r = rr >= min_r
+                ind_r_and_az = ind_r & ind_azimuth
+                nb[ind_r_and_az] = 0
+
+            if single_channel_estimate:
+                # just copy the mask from the first channel to all channels
+                ind_0 = nb == 0
+                nulled_beam[:, ind_0] = 0
+                break
+
+        return nulled_beam
+
+    def get_dirty_beam_area(self, ntheta=24, single_channel_estimate=True):
+        """
+        Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
+
+        Args:
+            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
+            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
+
+        Returns: (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`
+        """
+        nulled = self._null_dirty_beam(
+            ntheta=ntheta, single_channel_estimate=single_channel_estimate
+        )
+        return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
 
     def get_dirty_image(self, unit="Jy/beam"):
         """
@@ -304,15 +388,22 @@ class Gridder:
         img = self._fliplr_cube(
             np.fft.fftshift(
                 self.coords.npix ** 2
-                * np.fft.ifft2(
-                    np.fft.fftshift(
-                        self.C[:, np.newaxis, np.newaxis] * self.vis_gridded,
-                        axes=(1, 2),
-                    )
-                ),
+                * np.fft.ifft2(self.C[:, np.newaxis, np.newaxis] * self.vis_gridded),
                 axes=(1, 2),
             )
         )  # Jy/beam
+
+        # for units of Jy/arcsec^2, we could just leave out the C constant *if* we were doing
+        # uniform weighting. The relationships get more complex for robust or natural weighting, however,
+        # so it's safer to calculate the number of arcseconds^2 per beam
+        if unit == "Jy/arcsec^2":
+            beam_area_per_chan = self.get_dirty_beam_area()  # [arcsec^2]
+
+            # convert image
+            # (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)
+            # beam_area_per_chan is the n of arcsec^2 per 1 beam
+
+            img /= beam_area_per_chan[:, np.newaxis, np.newaxis]
 
         assert (
             np.max(img.imag) < 1e-10
@@ -341,4 +432,15 @@ class Gridder:
             weight_gridded=self.weight_gridded,
             mask=self.mask,
         )
+
+    @property
+    def sky_vis_gridded(self):
+        r"""
+        The visibility FFT cube fftshifted for plotting with ``imshow``.
+
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
+        """
+
+        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
 

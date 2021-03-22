@@ -13,13 +13,13 @@ from . import utils
 def sky_cube_to_packed_cube(sky_cube):
     # If it's an identity layer, just set parameters to cube
     flipped = torch.flip(sky_cube, (2,))
-    shifted = utils.fftshift(flipped, axes=(1, 2))
+    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
     return shifted
 
 
 def packed_cube_to_sky_cube(packed_cube):
     # fftshift the image cube to the correct quadrants
-    shifted = utils.fftshift(packed_cube, axes=(1, 2))
+    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
     # flip so that east points left
     flipped = torch.flip(shifted, (2,))
     return flipped
@@ -108,7 +108,7 @@ class ImageCube(nn.Module):
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
         passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.
-        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. 
     """
 
     def __init__(
@@ -175,7 +175,7 @@ class ImageCube(nn.Module):
     @property
     def sky_cube(self):
         """
-        The image cube arrange as it would appear on the sky.
+        The image cube arranged as it would appear on the sky.
 
         Returns:
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
@@ -297,7 +297,7 @@ class FourierCube(nn.Module):
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
         """
 
-        return utils.fftshift(self.vis, axes=(1, 2))
+        return torch.fft.fftshift(self.vis, dim=(1, 2))
 
 
 # class ImageCubeOld(nn.Module):

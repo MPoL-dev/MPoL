@@ -28,6 +28,19 @@ def get_Jy_arcsec2(T_b, nu=230e9):
     return Jy_arcsec2
 
 
+def log_stretch(x):
+    r"""
+    Apply a log stretch to the tensor.
+
+    Args: 
+        tensor (PyTorch tensor): input tensor :math:`x`
+
+    Returns: :math:`\ln(1 + |x|)`
+    """
+
+    return torch.log(1 + torch.abs(x))
+
+
 def fftspace(width, N):
     """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
     
@@ -47,25 +60,6 @@ def fftspace(width, N):
         xx[i] = -width + i * dx
 
     return xx
-
-
-def fftshift(x, axes=None):
-    """
-    `fftshift <https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftshift.html>`_ the input array along each axis. For even-length arrays, fftshift and ifftshift are equivalent operations. 
-
-    Args:
-        x : a torch tensor 
-        axes : tuple selecting which axes to shift over. Default is all.
-
-    Returns:
-        x : an fftshift-ed tensor
-    """
-    if axes is None:
-        axes = range(0, len(x.size()))
-
-    for dim in axes:
-        x = torch.roll(x, x.size(dim) // 2, dims=dim)
-    return x
 
 
 def get_max_spatial_freq(cell_size, npix):

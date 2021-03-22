@@ -34,7 +34,6 @@ EXTRA_REQUIRES = {
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",
-        "rtds-action",
         "requests",
         "matplotlib",
         "sphinxcontrib-mermaid",
@@ -55,7 +54,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
-    install_requires=["numpy", "scipy", "torch>=1.7.0", "torchvision"],
+    install_requires=["numpy", "scipy", "torch>=1.8.0", "torchvision"],
     extras_require=EXTRA_REQUIRES,
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
@@ -64,5 +63,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.6",
 )

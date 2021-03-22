@@ -13,9 +13,9 @@ class GriddedDataset:
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image (default = 1).
-        vis_gridded (torch complex): the gridded visibility data
-        weight_gridded (torch double): the weights corresponding to the gridded visibility data
-        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded``.
+        vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
+        weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
+        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
         device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
 
 
