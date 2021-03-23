@@ -25,7 +25,7 @@ class SimpleNet(torch.nn.Module):
 
     The idea is that :class:`~mpol.precomposed.SimpleNet` can save you some keystrokes composing models by connecting the most commonly used layers together.
     
-    .. mermaid:: _static/mmd/SimpleNet.mmd
+    .. mermaid:: _static/mmd/src/SimpleNet.mmd
     
     """
 
