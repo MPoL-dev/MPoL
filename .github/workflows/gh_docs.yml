@@ -28,7 +28,7 @@ jobs:
       - name: Build the docs
         run: |
           make -C docs clean
-          make -C docs html
+          make -C docs html MERMAID_PATH="../node_modules/.bin/"
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:

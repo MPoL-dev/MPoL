@@ -29,7 +29,7 @@ ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
 
 # mermaid.js files
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
-	mmdc -i $^ -o $@
+	${MERMAID_PATH}mmdc -i $^ -o $@
 
 html: ${NOTEBOOKS} ${CHARTS}
 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
