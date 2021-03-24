@@ -19,7 +19,7 @@
 # %run notebook_setup
 # -
 
-# # Gridding visibilities and making diagnostic images
+# # Gridding and diagnostic images
 #
 # This tutorial covers how to read visibility data, average it to a "grid", and make diagnostic images.
 #
@@ -67,7 +67,7 @@ data_im = -d[
     "data_im"
 ]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
 
-# ## GridCoords
+# ## The GridCoords object
 
 import mpol
 from mpol import gridding
@@ -82,7 +82,7 @@ coords.img_ext  # [arcsec]
 
 # which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow`.
 
-# ## Gridder
+# ## The Gridder object
 #
 # The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by
 
