@@ -14,16 +14,18 @@ help:
 
 .PHONY: help Makefile html clean 
 
-clean:
-	rm -rf _build 
-	rm -rf ci-tutorials/*.ipynb
-	rm -rf ci-tutorials/.ipynb_checkpoints
-
 NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 
-ci-tutorials/%.ipynb: ci-tutorials/%.py 
-	jupytext --to ipynb --execute $^
+clean:
+	rm -rf _build 
+	rm -rf ${NOTEBOOKS}
+	rm -rf ci-tutorials/.ipynb_checkpoints
+	rm -rf ${CHARTS}
+
+
+ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
+	jupytext --to ipynb --execute $<
 
 # mermaid.js files
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
