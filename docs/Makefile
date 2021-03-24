@@ -16,7 +16,7 @@ help:
 
 clean:
 	rm -rf _build 
-	rm ci-tutorials/*.ipynb
+	rm -rf ci-tutorials/*.ipynb
 	rm -rf ci-tutorials/.ipynb_checkpoints
 
 NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb
