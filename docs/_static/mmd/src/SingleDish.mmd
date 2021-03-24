@@ -1,0 +1,23 @@
+graph TD
+bc(BaseCube) --> ImageCube
+ad[[ALMA Dataset]] --> adc[ALMA DataConnector]
+ImageCube --> FourierCube
+FourierCube --> adc[ALMA DataConnector]
+FourierCube --> pl([PSD-Loss])
+ImageCube --> me([MaxEntropy])
+ImageCube --> idc[IRAM DataConnector]
+id[[IRAM-Dataset]] --> idc[IRAM DataConnector]
+adc[ALMA DataConnector] --> al([ALMA Loss])
+idc[IRAM DataConnector] --> il([IRAM Loss])
+subgraph Loss Calculations
+al([ALMA Loss]) --> tl([Total Loss])
+pl([PSD Loss]) --> tl([Total Loss])
+me([MaxEntropy]) --> tl([Total Loss])
+il([IRAM Loss]) --> tl([Total Loss])
+end
+
+
+#Rounded rectangles have trainable parameters.
+#(static) Datasets are double rectangles.
+#Passthrough layers are rectangles (no trainable parameters)
+#Loss calculations are stadium rectangles.

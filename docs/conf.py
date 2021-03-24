@@ -57,6 +57,19 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+# nbsphinx configuration
+suppress_warnings = [
+    "nbsphinx",
+]
+
+nbsphinx_execute_arguments = [
+    "--InlineBackend.figure_format='retina'",
+    # "--InlineBackend.figure_format={'svg', 'pdf'}",
+    "--InlineBackend.rc={'figure.dpi': 200}",
+]
+
+# get_ipython().magic('config InlineBackend.figure_format = "retina"')
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

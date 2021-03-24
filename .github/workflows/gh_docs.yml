@@ -17,9 +17,6 @@ jobs:
       - name: Install doc deps 
         run: |
           pip install .[docs]
-      - name: Build notebooks for the docs
-        run: |
-          jupytext --to ipynb --execute docs/tutorials/*.py
       - name: Install Pandoc dependency 
         run: | 
           sudo apt-get install pandoc

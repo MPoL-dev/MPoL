@@ -19,7 +19,7 @@
 # %run notebook_setup
 # -
 
-# # Gridding visibilities and making diagnostic images
+# # Gridding and diagnostic images
 #
 # This tutorial covers how to read visibility data, average it to a "grid", and make diagnostic images.
 #
@@ -67,7 +67,7 @@ data_im = -d[
     "data_im"
 ]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
 
-# ## GridCoords
+# ## The GridCoords object
 
 import mpol
 from mpol import gridding
@@ -76,13 +76,13 @@ from mpol import gridding
 
 coords = gridding.GridCoords(cell_size=0.005, npix=800)
 
-# The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the [GridCoords](../api.rst#mpol.gridding.GridCoords) API documentation. The information you'll most likely want to access are the image dimensions
+# The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the [GridCoords](../api.rst#mpol.coordinates.GridCoords) API documentation. The information you'll most likely want to access are the image dimensions
 
 coords.img_ext  # [arcsec]
 
 # which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow`.
 
-# ## Gridder
+# ## The Gridder object
 #
 # The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by
 
@@ -106,7 +106,7 @@ gridder = gridding.Gridder(
 # if you don't want to specify your GridCoords object separately.
 
 # ## Gridding the visibilities
-# The next step is to average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords using the [grid_visibilities](../api.rst#mpol.gridding.Gridder.grid_visibilities) routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
+# The next step is to average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords using the [Gridder.grid_visibilities](../api.rst#mpol.gridding.Gridder.grid_visibilities) routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
 
 gridder.grid_visibilities(weighting="uniform")
 
