@@ -37,6 +37,7 @@ EXTRA_REQUIRES = {
         "requests",
         "matplotlib",
         "sphinxcontrib-mermaid",
+        "astropy",
     ],
 }
 
