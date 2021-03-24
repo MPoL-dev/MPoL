@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Gridding visibilities and making diagnostic images &mdash; MPoL 0.1.0.dev1 documentation</title>
+  <title>Gridding and diagnostic images &mdash; MPoL 0.1.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Usage Overview" href="../usage.html" />
+    <link rel="next" title="Optimization Loop" href="optimization.html" />
     <link rel="prev" title="Developer Documentation" href="../developer-documentation.html" /> 
 </head>
 
@@ -71,7 +71,7 @@
   
     
     
-      <div class="version">0.1.0.dev1</div>
+      <div class="version">0.1.0</div>
     
   
 
@@ -103,15 +103,15 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Gridding visibilities and making diagnostic images</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Gridding and diagnostic images</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Importing-data">Importing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#GridCoords">GridCoords</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Gridder">Gridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-GridCoords-object">The GridCoords object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-Gridder-object">The Gridder object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Gridding-the-visibilities">Gridding the visibilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Visualizing-the-images">Visualizing the images</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -164,13 +164,13 @@
     
   <li class="breadcrumb"><a href="../index.html">MPoL</a> &raquo;</li>
     
-  <li class="breadcrumb">Gridding visibilities and making diagnostic images</li>
+  <li class="breadcrumb">Gridding and diagnostic images</li>
 
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/gridder.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/gridder.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -431,8 +431,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Gridding-visibilities-and-making-diagnostic-images">
-<h1>Gridding visibilities and making diagnostic images<a class="headerlink" href="#Gridding-visibilities-and-making-diagnostic-images" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Gridding-and-diagnostic-images">
+<h1>Gridding and diagnostic images<a class="headerlink" href="#Gridding-and-diagnostic-images" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial covers how to read visibility data, average it to a “grid”, and make diagnostic images.</p>
 <div class="section" id="Importing-data">
 <h2>Importing data<a class="headerlink" href="#Importing-data" title="Permalink to this headline">¶</a></h2>
@@ -497,8 +497,8 @@ vis.data_im  # imaginary components of visibilities in Jy
 </div>
 </div>
 </div>
-<div class="section" id="GridCoords">
-<h2>GridCoords<a class="headerlink" href="#GridCoords" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="The-GridCoords-object">
+<h2>The GridCoords object<a class="headerlink" href="#The-GridCoords-object" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -519,7 +519,7 @@ vis.data_im  # imaginary components of visibilities in Jy
 </pre></div>
 </div>
 </div>
-<p>The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the GridCoords API documentation. The information you’ll most likely want to access are the image dimensions</p>
+<p>The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords"><span class="std std-ref">GridCoords</span></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -540,8 +540,8 @@ vis.data_im  # imaginary components of visibilities in Jy
 </div>
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
 </div>
-<div class="section" id="Gridder">
-<h2>Gridder<a class="headerlink" href="#Gridder" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="The-Gridder-object">
+<h2>The Gridder object<a class="headerlink" href="#The-Gridder-object" title="Permalink to this headline">¶</a></h2>
 <p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -577,8 +577,8 @@ GridCoords and Gridder object in one shot by</p>
 </div>
 <div class="section" id="Gridding-the-visibilities">
 <h2>Gridding the visibilities<a class="headerlink" href="#Gridding-the-visibilities" title="Permalink to this headline">¶</a></h2>
-<p>The next step is to average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords using the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.grid_visibilities"><span class="std std-ref">grid_visibilities</span></a> routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the
-difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>.</p>
+<p>The next step is to average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords using the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.grid_visibilities"><span class="std std-ref">Gridder.grid_visibilities</span></a> routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information
+on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -651,7 +651,7 @@ difference between these schemes, see the <a class="reference external" href="ht
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_gridder_27_0.png" class="no-scaled-link" src="../_images/tutorials_gridder_27_0.png" style="width: 654px; height: 344px;" />
+<img alt="../_images/ci-tutorials_gridder_27_0.png" class="no-scaled-link" src="../_images/ci-tutorials_gridder_27_0.png" style="width: 654px; height: 344px;" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the
@@ -667,7 +667,7 @@ regular TMS convention.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../usage.html" class="btn btn-neutral float-right" title="Usage Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="optimization.html" class="btn btn-neutral float-right" title="Optimization Loop" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../developer-documentation.html" class="btn btn-neutral float-left" title="Developer Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

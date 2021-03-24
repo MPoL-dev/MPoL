@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API &mdash; MPoL 0.1.0.dev1 documentation</title>
+  <title>API &mdash; MPoL 0.1.0 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
   
     
     
-      <div class="version">0.1.0.dev1</div>
+      <div class="version">0.1.0</div>
     
   
 
@@ -115,8 +115,8 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding visibilities and making diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -1139,15 +1139,15 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dl>
 <p>For example, you’ll likely want to access the <code class="docutils literal notranslate"><span class="pre">self.icube.sky_model</span></code> at some point.</p>
 <p>The idea is that <a class="reference internal" href="#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> can save you some keystrokes composing models by connecting the most commonly used layers together.</p>
-<object data="_images/mermaid-0e94bba4842f395cd1bebaa2f7fd703a66b17996.svg" type="image/svg+xml">
+<object data="_images/mermaid-15709f1bbc7bb9b2910d1f2016a947cc444baf77.svg" type="image/svg+xml">
             <p class="warning">graph TD
     subgraph SimpleNet
-    BaseCube --&gt; ImageCube 
+    bc(BaseCube) --&gt; ImageCube 
     ImageCube --&gt; FourierLayer
     FourierLayer --&gt; DataConnector 
     end
-    Dataset --&gt; DataConnector 
-    DataConnector --&gt; Loss</p></object>
+    ad[[Dataset]] --&gt; DataConnector 
+    DataConnector --&gt; il([Loss])</p></object>
 <dl class="py method">
 <dt id="mpol.precomposed.SimpleNet.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet.forward" title="Permalink to this definition">¶</a></dt>
