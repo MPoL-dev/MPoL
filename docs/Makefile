@@ -29,6 +29,7 @@ ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
 
 # mermaid.js files
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
+	mkdir -p _static/mmd/build
 	${MERMAID_PATH}mmdc -i $^ -o $@
 
 html: ${NOTEBOOKS} ${CHARTS}
