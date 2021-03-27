@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from .constants import *
 from .coordinates import GridCoords, _setup_coords
+import .utils import loglinspace
 
 
 class GriddedDataset:
@@ -157,3 +158,123 @@ class UVDataset(Dataset):
 
     def __len__(self):
         return len(self.uu)
+
+
+class GriddedDartboard:
+    r"""
+    Args:
+        nq (int): number of radial bins
+        qmax (float): maximum baseline (in klambda)
+        nphi (int): number of azimuthal bins
+    """
+
+    def __init__(
+        self, cell_size=None, npix=None, coords=None, nchan=None, nq=None, nphi=32
+    ):
+
+        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        # set q_max to the max q in coords
+        self.q_max = self.coords.q_max  # [klambda]
+
+        # set q edges approximately following Petry et al. scheme: https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
+        # first two bins set to 7m width
+        # after third bin, bin width increases linearly until it is 700m at 16km baseline.
+        # From 16m to 16km, bin width goes from 7m to 700m.
+        
+        # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
+        self.q_edges = loglinspace(0, self.q_max, N_log=nq-2, M_linear=2)
+
+        # set phi edges
+        self.phi_edges = np.linspace(0, 2 * np.pi, num=nphi + 1)
+        self.phi_centers = np.diff(self.phi_edges) + self.phi_edges[:-1]
+
+        # create an index of cells q, phi.
+
+    def data_cells(self, datamask):
+        r"""
+        Calculate the cell indices that contain data
+        """
+        pass
+# Dartboard (init w/ nr, nphi, rmax):
+#             store cell centers, cell edges
+#             store coords obj
+#         Dartboard data_cells(uv_pixel_mask or loose visibilities):
+#             calculate cell index pairs that have data
+#         Dartboard create_uv_mask(r_phi_indices):
+#             given a list of r, phi indices, create a uv_pixel_mask
+#             for cells that *have data* *and* are in these indices
+
+
+# class KFoldCrossValidatorGridded:
+#     r"""
+#     Split a GriddeDataset into k non-overlapping chunks.
+
+#     Split radially.
+
+#     Args:
+#         k (int): the number of subpartitions
+
+
+#     """
+
+#     def __init__(self, griddedDataset, k, npseed=None):
+
+#         assert k > 0, "k must be a positive integer"
+#         self.k = k
+
+#         if npseed is not None:
+#             np.random.seed(npseed)
+
+#         # setup the dartboard to create r, phi polar cells (meshgrid?)
+#         #
+#         # compare dataset mask to dartboard and determine which polar cells have data
+#         # store these as cell indices
+#         #
+#         # split this list of cells into k groups
+
+
+#         # we really want pixel masks
+#             # of which (r, phi) cells have (any) data
+#             # of which cells are
+
+
+#         # store the reference to the original dataset
+#         self.griddedDataset = griddedDataset
+
+#     def create_masks_from_cells(k_cell_list):
+#         """
+
+#         """
+#         # modify the mask
+#         # to create one with only those k cells
+#         # and another with (k-1) cells
+#         self.mask = torch.tensor(mask, device=device)
+
+#         return train_mask, test_mask
+
+#     def _get_nth_datasets(self, n):
+#         """
+#         Return the train and test datasets corresponding to the n-th slice through the k-folds.
+#         """
+
+#         # index the k cell list
+
+#         #
+#         # create a dataset with mask indexes only if they fall within the k group
+#         # create a dataset containing all k-1 mask indices *except* those in the k group
+#         pass
+
+#     def __iter__(self):
+#         self.n = 0  # the current k-slice we're on
+#         return self
+
+#     def __next__(self):
+#         if self.n < k:
+#             # TODO: index the k_cell_list
+#             # TODO: calculate the train and test datasets
+#             return train, test
+#             self.n += 1
+#         else:
+#             raise StopIteration
+
