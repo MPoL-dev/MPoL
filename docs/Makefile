@@ -22,17 +22,25 @@ clean:
 	rm -rf ${NOTEBOOKS}
 	rm -rf ci-tutorials/.ipynb_checkpoints
 	rm -rf ${CHARTS}
+	rm -rf _static/baselines/build/baselines.csv
+
 
 
 ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
+
+# baseline table 
+_static/baselines/build/baselines.csv: 
+	mkdir -p _static/baselines/build
+	python _static/baselines/src/print_conversions.py $@
+
 
 # mermaid.js files
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
 	mkdir -p _static/mmd/build
 	${MERMAID_PATH}mmdc -i $^ -o $@
 
-html: ${NOTEBOOKS} ${CHARTS}
+html: ${NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv
 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
 
 # Catch-all target: route all unknown targets to Sphinx using the new

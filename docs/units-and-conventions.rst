@@ -62,11 +62,25 @@ The sampling rate in the Fourier domain is inversely related to the number of sa
 .. math::
 
     \Delta u = \frac{1}{L \Delta l} \\
-    \Delta v = \frac{1}{M \Delta m} 
+    \Delta v = \frac{1}{M \Delta m}. 
 
-If :math:`\Delta l` and :math:`\Delta m` are in units of radians, then :math:`\Delta u` and :math:`\Delta v` are in units of cycles per radian. Thanks to the geometric relationship of the interferometer, the spatial frequency units can equivalently be expressed as the baseline lengths measured in multiples of the observing wavelength :math:`\lambda`. For more information on their relationship, see `TMS Eqn Chapter 2.3, equations 2.13 and 2.14 <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`_. Internally, MPoL usually represents spatial frequencies in units of :math:`\mathrm{k}\lambda` (i.e. muliples of :math:`1000\times` the baseline lengths measured in multiples of the observing wavelength).
+If :math:`\Delta l` and :math:`\Delta m` are in units of radians, then :math:`\Delta u` and :math:`\Delta v` are in units of cycles per radian. Thanks to the geometric relationship of the interferometer, the spatial frequency units can equivalently be expressed as the baseline lengths measured in multiples of the observing wavelength :math:`\lambda`. 
 
+For example, take an observation with ALMA band 6 at an observing frequency of 230 GHz, corresponding to a wavelength of 1.3mm. A 100 meter baseline between antennas will measure a spatial frequency of :math:`\frac{100\,\mathrm{m} }{ 1.3 \times 10^{-3}\,\mathrm{m}} \approx 77 \mathrm{k}\lambda` or 77,000 cycles per radian.
 
+For more information on the relationship between baselines and spatial frequencies, see `TMS Eqn Chapter 2.3, equations 2.13 and 2.14 <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`_. Internally, MPoL usually represents spatial frequencies in units of :math:`\mathrm{k}\lambda`.
+
+For reference, here are some typical ALMA baseline lengths and their corresponding spatial frequencies at common observing frequencies
+
+.. csv-table::
+    :file: _static/baselines/build/baselines.csv
+
+Occasionally, it is useful to represent the cartesian Fourier coordinates :math:`u`, :math:`v` in polar coordinates :math:`q`, :math:`\phi`
+
+.. math::
+
+    q = \sqrt{u^2 + v^2}\\
+    \phi = \mathrm{atan2}(v,u).
 
 ------------------------------
 The discrete Fourier transform
@@ -88,7 +102,7 @@ To make the FFT output an appropriate representation of the continuous forward F
 
 In this context, the :math:`u,v` subscripts indicate the elements of the :math:`V` array. As long as :math:`I_{l,m}` is in units of :math:`\mathrm{Jy} / (\Delta l \Delta m)`, then :math:`V` will be in the correct output units (flux, or Jy).
 
-**Inverse transform**: The inverse transform is used within MPoL to produce a quick diagnostic image from the visibilities (called the "dirty image"). As you might expect, this is the inverse operation of the forward transform.
+**Inverse transform**: The inverse transform is used within MPoL to produce a quick diagnostic image from the visibilities (called the "dirty image"). As you might expect, this is the inverse operation of the forward transform. Numpy and PyTorch define the inverse transform as
 
 .. math::
 

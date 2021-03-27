@@ -125,4 +125,4 @@ def test_loglinspace():
     array = utils.loglinspace(0, 10, 5, 3)
     print(array)
     print(np.diff(array))
-    assert len(array) == 10
+    assert len(array) == 5 + 3

@@ -1,10 +1,11 @@
 import numpy as np
+from numpy.lib.twodim_base import histogram2d
 import torch
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from .constants import *
 from .coordinates import GridCoords, _setup_coords
-import .utils import loglinspace
+from .utils import loglinspace
 
 
 class GriddedDataset:
@@ -160,45 +161,84 @@ class UVDataset(Dataset):
         return len(self.uu)
 
 
-class GriddedDartboard:
+class Dartboard:
     r"""
+    Work with a grid in polar coordinates relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout.
+
     Args:
-        nq (int): number of radial bins
-        qmax (float): maximum baseline (in klambda)
+        cell_size (float): the width of a pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nq (int): number of radial bins stretching from 0 to :math:`q_\mathrm{max}` represented by ``coords``
         nphi (int): number of azimuthal bins
+
     """
 
-    def __init__(
-        self, cell_size=None, npix=None, coords=None, nchan=None, nq=None, nphi=32
-    ):
+    def __init__(self, cell_size=None, npix=None, coords=None, nq=16, nphi=16):
 
-        _setup_coords(self, cell_size, npix, coords, nchan)
+        _setup_coords(self, cell_size, npix, coords)
 
         # set q_max to the max q in coords
         self.q_max = self.coords.q_max  # [klambda]
 
-        # set q edges approximately following Petry et al. scheme: https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
+        # set q edges approximately following inspriation from Petry et al. scheme:
+        # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
         # first two bins set to 7m width
         # after third bin, bin width increases linearly until it is 700m at 16km baseline.
         # From 16m to 16km, bin width goes from 7m to 700m.
-        
+
         # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
-        self.q_edges = loglinspace(0, self.q_max, N_log=nq-2, M_linear=2)
+        self.q_edges = loglinspace(0, self.q_max, N_log=nq - 2, M_linear=2)
 
         # set phi edges
-        self.phi_edges = np.linspace(0, 2 * np.pi, num=nphi + 1)
+        self.phi_edges = np.linspace(0, 2 * np.pi, num=nphi + 1)  # [radians]
         self.phi_centers = np.diff(self.phi_edges) + self.phi_edges[:-1]
 
-        # create an index of cells q, phi.
+        # "average" the pixel mask along the channel dimension, taking np.any().
+        # index dataset.q_centers and theta_centers to have a datastream to give to data_cells
 
-    def data_cells(self, datamask):
+    def get_polar_histogram(self, qs, thetas):
         r"""
-        Calculate the cell indices that contain data
+        Calculate the polar histogram.
+        
+        Args:
+            qs: 1d array of q values [klambda]
+            thetas: 1d array of azimuths [radians]
         """
+
+        # make a polar histogram
+        H, x_edges, y_edges = np.histogram2d(
+            qs, thetas, bins=[self.q_edges, self.phi_edges]
+        )
+
+        return H
+
+    def get_nonzero_cells(self, qs, thetas):
+        r"""
+        Return a list of the cell indices that contain data points.
+
+        Args:
+            qs: 1d array of q values [klambda]
+            thetas: 1d array of azimuths [radians]
+        """
+
+        # make a polar histogram
+        H = self.get_polar_histogram(qs, thetas)
+
+        indices = np.argwhere(H > 0)  # [i,j] indexes to go to q, phi
+
+        return indices
+
+    def data_mask_from_cell_indices(self, cell_index_list):
+        r"""
+        Convert a list of cell indices into a 2D pixel mask
+        """
+
+        # get q, phi center coordinates for pixel mask
+
         pass
-# Dartboard (init w/ nr, nphi, rmax):
-#             store cell centers, cell edges
-#             store coords obj
+
+
 #         Dartboard data_cells(uv_pixel_mask or loose visibilities):
 #             calculate cell index pairs that have data
 #         Dartboard create_uv_mask(r_phi_indices):
@@ -241,6 +281,11 @@ class GriddedDartboard:
 
 #         # store the reference to the original dataset
 #         self.griddedDataset = griddedDataset
+
+# dataset.q_centers
+# TODO: make
+# dataset.phi_centers
+# dartboard.get_nonzero_cells(q_centers, phi_centers)
 
 #     def create_masks_from_cells(k_cell_list):
 #         """

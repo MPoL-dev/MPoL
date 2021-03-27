@@ -107,10 +107,17 @@ class GridCoords:
             self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
         )  # [kλ]
 
+        self.sky_phi_centers_2D = (
+            np.arctan2(self.sky_v_centers_2D, self.sky_u_centers_2D) + np.pi
+        )  # [0, 2pi]
+
         # for evaluating a packed vis... uu, vv increasing + fftshifted
         self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
         self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
+
+        # and in polar coordinates too
         self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
+        self.packed_phi_centers_2D = np.fft.fftshift(self.sky_phi_centers_2D)
 
         self.q_max = (
             np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
