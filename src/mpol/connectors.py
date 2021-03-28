@@ -66,7 +66,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
     """
 
-    def forward(self):
+    def forward(self, warn=True):
         r"""Calculate the residuals as 
         
         .. math::
@@ -91,15 +91,16 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             * torch.fft.ifftn(self.residuals, dim=(1, 2))
         )  # Jy/arcsec^2
 
-        assert (
-            torch.max(cube.imag) < 1e-10
-        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        if warn:
+            assert (
+                torch.max(cube.imag) < 1e-10
+            ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
 
         self.cube = cube.real
 
     @property
     def sky_cube(self):
-        """
+        r"""
         The image cube arranged as it would appear on the sky. Array dimensions for plotting given by ``self.coords.img_ext``.
 
         Returns:
@@ -110,7 +111,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
     @property
     def sky_amp(self):
-        """
+        r"""
         The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
@@ -120,7 +121,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
     @property
     def sky_phase(self):
-        """
+        r"""
         The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
@@ -130,7 +131,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
     @property
     def sky_residuals(self):
-        """
+        r"""
         The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
