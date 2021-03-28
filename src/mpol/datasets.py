@@ -180,6 +180,11 @@ class Dartboard:
 
         _setup_coords(self, cell_size, npix, coords)
 
+        # copy over relevant quantities from coords
+        # these are in packed format
+        self.cartesian_qs = self.coords.packed_q_centers_2D
+        self.cartesian_phis = self.coords.packed_phi_centers_2D
+
         # set q_max to the max q in coords
         self.q_max = self.coords.q_max  # [klambda]
 
@@ -221,7 +226,7 @@ class Dartboard:
 
         return H
 
-    def get_nonzero_cells(self, qs, phis):
+    def get_nonzero_cell_indices(self, qs, phis):
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -240,21 +245,29 @@ class Dartboard:
 
         return indices
 
-    def data_mask_from_cell_indices(self, cell_index_list):
+    def build_mask_from_cells(self, cell_index_list):
         r"""
-        Convert a list of cell indices into a 2D pixel mask
+        Create masks in *packed* format
         """
+        mask = np.zeros_like(self.cartesian_qs, dtype="bool")
 
-        # get q, phi center coordinates for pixel mask
+        # uses about a Gb..., and this only 256x256
+        for cell_index in cell_index_list:
 
-        pass
+            qi, pi = cell_index
+            q_min, q_max = self.q_edges[qi : qi + 2]
+            p_min, p_max = self.phi_edges[pi : pi + 2]
 
+            ind = (
+                (self.cartesian_qs >= q_min)
+                & (self.cartesian_qs <= q_max)
+                & (self.cartesian_phis >= p_min)
+                & (self.cartesian_phis <= p_max)
+            )
 
-#         Dartboard data_cells(uv_pixel_mask or loose visibilities):
-#             calculate cell index pairs that have data
-#         Dartboard create_uv_mask(r_phi_indices):
-#             given a list of r, phi indices, create a uv_pixel_mask
-#             for cells that *have data* *and* are in these indices
+            mask[ind] = True
+
+        return mask
 
 
 # class KFoldCrossValidatorGridded:
