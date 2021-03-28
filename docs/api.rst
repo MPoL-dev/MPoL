@@ -22,8 +22,8 @@ Gridding
 .. automodule:: mpol.gridding
     :members:
 
-Datasets 
---------
+Datasets and Cross-Validation
+-----------------------------
 
 .. automodule:: mpol.datasets
     :members:

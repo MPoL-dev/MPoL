@@ -70,10 +70,11 @@ For example, take an observation with ALMA band 6 at an observing frequency of 2
 
 For more information on the relationship between baselines and spatial frequencies, see `TMS Eqn Chapter 2.3, equations 2.13 and 2.14 <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`_. Internally, MPoL usually represents spatial frequencies in units of :math:`\mathrm{k}\lambda`.
 
-For reference, here are some typical ALMA baseline lengths and their corresponding spatial frequencies at common observing frequencies
+For reference, here are some typical ALMA baseline lengths and their (approximate) corresponding spatial frequencies at common observing frequencies
 
 .. csv-table::
     :file: _static/baselines/build/baselines.csv
+    :header-rows: 1
 
 Occasionally, it is useful to represent the cartesian Fourier coordinates :math:`u`, :math:`v` in polar coordinates :math:`q`, :math:`\phi`
 

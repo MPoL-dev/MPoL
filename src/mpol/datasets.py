@@ -163,67 +163,78 @@ class UVDataset(Dataset):
 
 class Dartboard:
     r"""
-    Work with a grid in polar coordinates relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout.
+    Work with a grid in polar coordinates relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. Useful for splitting up a dataset for k-fold cross validation.
 
     Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nq (int): number of radial bins stretching from 0 to :math:`q_\mathrm{max}` represented by ``coords``
-        nphi (int): number of azimuthal bins
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 16 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 16 equal-spaced azimuthal bins stretched from :math:`0` to :math:`2 \pi`.
 
     """
 
-    def __init__(self, cell_size=None, npix=None, coords=None, nq=16, nphi=16):
+    def __init__(
+        self, cell_size=None, npix=None, coords=None, q_edges=None, phi_edges=None
+    ):
 
         _setup_coords(self, cell_size, npix, coords)
 
         # set q_max to the max q in coords
         self.q_max = self.coords.q_max  # [klambda]
 
-        # set q edges approximately following inspriation from Petry et al. scheme:
-        # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
-        # first two bins set to 7m width
-        # after third bin, bin width increases linearly until it is 700m at 16km baseline.
-        # From 16m to 16km, bin width goes from 7m to 700m.
+        if q_edges is not None:
+            self.q_edges = q_edges
+        else:
+            # set q edges approximately following inspriation from Petry et al. scheme:
+            # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
+            # first two bins set to 7m width
+            # after third bin, bin width increases linearly until it is 700m at 16km baseline.
+            # From 16m to 16km, bin width goes from 7m to 700m.
 
-        # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
-        self.q_edges = loglinspace(0, self.q_max, N_log=nq - 2, M_linear=2)
+            # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
+            self.q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
 
-        # set phi edges
-        self.phi_edges = np.linspace(0, 2 * np.pi, num=nphi + 1)  # [radians]
-        self.phi_centers = np.diff(self.phi_edges) + self.phi_edges[:-1]
+        if phi_edges is not None:
+            self.phi_edges = phi_edges
+        else:
+            # set phi edges
+            self.phi_edges = np.linspace(0, 2 * np.pi, num=16 + 1)  # [radians]
 
-        # "average" the pixel mask along the channel dimension, taking np.any().
-        # index dataset.q_centers and theta_centers to have a datastream to give to data_cells
-
-    def get_polar_histogram(self, qs, thetas):
+    def get_polar_histogram(self, qs, phis):
         r"""
-        Calculate the polar histogram.
+        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
         
         Args:
-            qs: 1d array of q values [klambda]
-            thetas: 1d array of azimuths [radians]
+            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
+        Returns:
+            2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.
+
         """
 
         # make a polar histogram
         H, x_edges, y_edges = np.histogram2d(
-            qs, thetas, bins=[self.q_edges, self.phi_edges]
+            qs, phis, bins=[self.q_edges, self.phi_edges]
         )
 
         return H
 
-    def get_nonzero_cells(self, qs, thetas):
+    def get_nonzero_cells(self, qs, phis):
         r"""
-        Return a list of the cell indices that contain data points.
+        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
         Args:
-            qs: 1d array of q values [klambda]
-            thetas: 1d array of azimuths [radians]
+            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
+        Returns:
+            list of cell indices where cell contains at least one datapoint.
         """
 
         # make a polar histogram
-        H = self.get_polar_histogram(qs, thetas)
+        H = self.get_polar_histogram(qs, phis)
 
         indices = np.argwhere(H > 0)  # [i,j] indexes to go to q, phi
 

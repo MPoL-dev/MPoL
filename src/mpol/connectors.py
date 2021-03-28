@@ -59,7 +59,7 @@ class GriddedDatasetConnector(nn.Module):
 
 class GriddedResidualConnector(GriddedDatasetConnector):
     r"""
-    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging. The products are available as instance and property attributes after the ``forward`` call.
+    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.
 
     Args:
         fourierCube: instantiated :class:`~mpol.images.FourierCube` object
@@ -127,4 +127,14 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
         """
         return images.packed_cube_to_sky_cube(self.phase)
+
+    @property
+    def sky_residuals(self):
+        """
+        The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
+
+        Returns:
+            torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``
+        """
+        return images.packed_cube_to_sky_cube(self.residuals)
 
