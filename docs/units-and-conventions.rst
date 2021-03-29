@@ -83,6 +83,8 @@ Occasionally, it is useful to represent the cartesian Fourier coordinates :math:
     q = \sqrt{u^2 + v^2}\\
     \phi = \mathrm{atan2}(v,u).
 
+:math:`\phi` represents the angle between the :math:`+u` axis and the ray drawn from the origin to the point :math:`(u,v)`. Following the `numerical conventions <https://en.wikipedia.org/wiki/Atan2>`__ of the ``arctan2`` function, :math:`\phi` is defined over the range :math:`(-\pi, \pi]`.
+
 ------------------------------
 The discrete Fourier transform
 ------------------------------

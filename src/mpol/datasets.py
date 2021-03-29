@@ -63,21 +63,20 @@ class GriddedDataset:
             device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
         """
 
-        # TODO: verify mask is Hermitian
-
         new_2D_mask = torch.tensor(mask, device=device)
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
 
-        # update mask via an AND operation, meaning we will keep visibilities that are
+        # update mask via an AND operation, meaning we will only keep visibilities that are
         # 1) part of the original dataset
         # 2) valid within the new mask
         self.mask = torch.logical_and(self.mask, new_3D_mask)
 
-        # zero out vis_gridded and weight_gridded
-        # (only important for routines that grab these quantities directly, like
-        # residual grid imager)
-        self.vis_gridded[self.mask] = 0.0
-        self.weight_gridded[self.mask] = 0.0
+        # zero out vis_gridded and weight_gridded that may have existed
+        # but are no longer valid
+        # These operations on the gridded quantities are only important for routines
+        # that grab these quantities directly, like residual grid imager
+        self.vis_gridded[~self.mask] = 0.0
+        self.weight_gridded[~self.mask] = 0.0
 
         # update pre-indexed values
         self.vis_indexed = self.vis_gridded[self.mask]
@@ -193,14 +192,14 @@ class UVDataset(Dataset):
 
 class Dartboard:
     r"""
-    Work with a grid in polar coordinates relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. Useful for splitting up a dataset for k-fold cross validation.
+    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
 
     Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 16 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[\pi, 2 \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`. 
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`. 
 
     """
 
@@ -284,7 +283,12 @@ class Dartboard:
 
     def build_grid_mask_from_cells(self, cell_index_list):
         r"""
-        Create masks in *packed* format
+        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` . 
+
+        Args:
+            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
+
+        Returns: (numpy array) 2D boolean mask in packed format.
         """
         mask = np.zeros_like(self.cartesian_qs, dtype="bool")
 
@@ -295,18 +299,16 @@ class Dartboard:
             q_min, q_max = self.q_edges[qi : qi + 2]
             p0_min, p0_max = self.phi_edges[pi : pi + 2]
             # also include Hermitian values
-            p1_min, p1_max = self.phi_edges[pi : pi + 2] + np.pi
+            p1_min, p1_max = self.phi_edges[pi : pi + 2] - np.pi
 
-            # fits in the q cell and *either of* the regular or Hermitian phi cell
+            # whether or not the q and phi values of the coordinate array
+            # fit in the q cell and *either of* the regular or Hermitian phi cell
             ind = (
                 (self.cartesian_qs >= q_min)
-                & (self.cartesian_qs <= q_max)
+                & (self.cartesian_qs < q_max)
                 & (
-                    ((self.cartesian_phis >= p0_min) & (self.cartesian_phis <= p0_max))
-                    | (
-                        (self.cartesian_phis >= p1_min)
-                        & (self.cartesian_phis <= p1_max)
-                    )
+                    ((self.cartesian_phis > p0_min) & (self.cartesian_phis <= p0_max))
+                    | ((self.cartesian_phis > p1_min) & (self.cartesian_phis <= p1_max))
                 )
             )
 
@@ -317,16 +319,23 @@ class Dartboard:
 
 class KFoldCrossValidatorGridded:
     r"""
-    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset.
+    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.
 
     Args:
         griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
         k (int): the number of subpartitions of the dataset
-        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 16 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 16 equal-spaced azimuthal bins stretched from :math:`0` to :math:`2 \pi`.
+        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
         npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
 
-    Once initialized, iterate through the datasets.
+    Once initialized, iterate through the datasets like 
+
+    >>> cv = datasets.KFoldCrossValidatorGridded(dataset, k)
+    >>> for (train, test) in cv: # iterate among k datasets
+    >>> ... # working with the n-th slice of k datasets
+    >>> ... # do operations with train dataset
+    >>> ... # do operations with test dataset
 
     """
 

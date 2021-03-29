@@ -3,9 +3,7 @@ import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
-from .constants import arcsec
 from . import images
-from . import utils
 
 
 class GriddedDatasetConnector(nn.Module):
@@ -66,7 +64,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
     """
 
-    def forward(self, warn=True):
+    def forward(self):
         r"""Calculate the residuals as 
         
         .. math::
@@ -74,6 +72,8 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 
         And store residual products as PyTorch tensor instance and property attributes. 
+
+        Returns (torch tensor complex): full packed cube
         """
         self.residuals = self.griddedDataset.vis_gridded - self.fourierCube.vis
 
@@ -91,12 +91,13 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             * torch.fft.ifftn(self.residuals, dim=(1, 2))
         )  # Jy/arcsec^2
 
-        if warn:
-            assert (
-                torch.max(cube.imag) < 1e-10
-            ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        assert (
+            torch.max(cube.imag) < 1e-10
+        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
 
         self.cube = cube.real
+
+        return cube
 
     @property
     def sky_cube(self):

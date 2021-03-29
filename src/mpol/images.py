@@ -5,9 +5,7 @@ import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
-from .constants import arcsec
 from .gridding import GridCoords, _setup_coords
-from . import utils
 
 
 def sky_cube_to_packed_cube(sky_cube):

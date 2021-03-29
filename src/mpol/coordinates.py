@@ -107,9 +107,10 @@ class GridCoords:
             self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
         )  # [kλ]
 
-        self.sky_phi_centers_2D = (
-            np.arctan2(self.sky_v_centers_2D, self.sky_u_centers_2D) + np.pi
-        )  # [0, 2pi]
+        # https://en.wikipedia.org/wiki/Atan2
+        self.sky_phi_centers_2D = np.arctan2(
+            self.sky_v_centers_2D, self.sky_u_centers_2D
+        )  # (pi, pi]
 
         # for evaluating a packed vis... uu, vv increasing + fftshifted
         self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
