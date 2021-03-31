@@ -1,0 +1,9 @@
+baseline,100 GHz (Band 3),230 GHz (Band 6),340 GHz (Band 7)
+10 m,3 :math:`\mathrm{k}\lambda`,8 :math:`\mathrm{k}\lambda`,11 :math:`\mathrm{k}\lambda`
+50 m,17 :math:`\mathrm{k}\lambda`,38 :math:`\mathrm{k}\lambda`,57 :math:`\mathrm{k}\lambda`
+100 m,33 :math:`\mathrm{k}\lambda`,77 :math:`\mathrm{k}\lambda`,113 :math:`\mathrm{k}\lambda`
+500 m,167 :math:`\mathrm{k}\lambda`,384 :math:`\mathrm{k}\lambda`,567 :math:`\mathrm{k}\lambda`
+1 km,334 :math:`\mathrm{k}\lambda`,767 :math:`\mathrm{k}\lambda`,1 :math:`\mathrm{M}\lambda`
+5 km,2 :math:`\mathrm{M}\lambda`,4 :math:`\mathrm{M}\lambda`,6 :math:`\mathrm{M}\lambda`
+10 km,3 :math:`\mathrm{M}\lambda`,8 :math:`\mathrm{M}\lambda`,11 :math:`\mathrm{M}\lambda`
+16 km,5 :math:`\mathrm{M}\lambda`,12 :math:`\mathrm{M}\lambda`,18 :math:`\mathrm{M}\lambda`

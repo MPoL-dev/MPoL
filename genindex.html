@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; MPoL 0.1.0 documentation</title>
+  <title>Index &mdash; MPoL 0.1.1.dev0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
   
     
     
-      <div class="version">0.1.0</div>
+      <div class="version">0.1.1.dev0</div>
     
   
 
@@ -176,11 +176,14 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#B"><strong>B</strong></a>
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -190,10 +193,22 @@
  | <a href="#U"><strong>U</strong></a>
  
 </div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.datasets.GriddedDataset.add_mask">add_mask() (mpol.datasets.GriddedDataset method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.images.BaseCube">BaseCube (class in mpol.images)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.datasets.Dartboard.build_grid_mask_from_cells">build_grid_mask_from_cells() (mpol.datasets.Dartboard method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -202,6 +217,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.coordinates.GridCoords.check_data_fit">check_data_fit() (mpol.coordinates.GridCoords method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.datasets.Dartboard">Dartboard (class in mpol.datasets)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -251,8 +274,12 @@
 </li>
       <li><a href="api.html#mpol.utils.get_maximum_cell_size">get_maximum_cell_size() (in module mpol.utils)</a>
 </li>
+      <li><a href="api.html#mpol.datasets.Dartboard.get_nonzero_cell_indices">get_nonzero_cell_indices() (mpol.datasets.Dartboard method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.datasets.Dartboard.get_polar_histogram">get_polar_histogram() (mpol.datasets.Dartboard method)</a>
+</li>
       <li><a href="api.html#mpol.gridding.Gridder.grid_visibilities">grid_visibilities() (mpol.gridding.Gridder method)</a>
 </li>
       <li><a href="api.html#mpol.coordinates.GridCoords">GridCoords (class in mpol.coordinates)</a>
@@ -276,10 +303,20 @@
   </ul></td>
 </tr></table>
 
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.datasets.KFoldCrossValidatorGridded">KFoldCrossValidatorGridded (class in mpol.datasets)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.log_stretch">log_stretch() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.utils.loglinspace">loglinspace() (in module mpol.utils)</a>
 </li>
       <li><a href="api.html#mpol.losses.loss_fn">loss_fn() (in module mpol.losses)</a>
 </li>
@@ -416,13 +453,15 @@
         <li><a href="api.html#mpol.images.ImageCube.sky_cube">(mpol.images.ImageCube property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.sky_gaussian_arcsec">sky_gaussian_arcsec() (in module mpol.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.sky_gaussian_radians">sky_gaussian_radians() (in module mpol.utils)</a>
 </li>
       <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_phase">sky_phase() (mpol.connectors.GriddedResidualConnector property)</a>
+</li>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_residuals">sky_residuals() (mpol.connectors.GriddedResidualConnector property)</a>
 </li>
       <li><a href="api.html#mpol.images.FourierCube.sky_vis">sky_vis() (mpol.images.FourierCube property)</a>
 </li>
@@ -490,6 +529,18 @@
 
   
   
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-5472810-8', 'auto');
+    ga('send', 'pageview');
+    </script>
+
     
    
 

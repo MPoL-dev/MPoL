@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mpol.connectors &mdash; MPoL 0.1.0 documentation</title>
+  <title>mpol.connectors &mdash; MPoL 0.1.1.dev0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
   
     
     
-      <div class="version">0.1.0</div>
+      <div class="version">0.1.1.dev0</div>
     
   
 
@@ -178,9 +178,7 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
 
-<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">images</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
 <div class="viewcode-block" id="GriddedDatasetConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedDatasetConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedDatasetConnector</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -234,7 +232,7 @@
 
 <div class="viewcode-block" id="GriddedResidualConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedResidualConnector</span><span class="p">(</span><span class="n">GriddedDatasetConnector</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging. The products are available as instance and property attributes after the ``forward`` call.</span>
+<span class="sd">    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fourierCube: instantiated :class:`~mpol.images.FourierCube` object</span>
@@ -249,6 +247,8 @@
 <span class="sd">            \mathrm{residuals} = \mathrm{data} - \mathrm{model}</span>
 
 <span class="sd">        And store residual products as PyTorch tensor instance and property attributes. </span>
+
+<span class="sd">        Returns (torch tensor complex): full packed cube</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourierCube</span><span class="o">.</span><span class="n">vis</span>
 
@@ -270,11 +270,13 @@
             <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span>
         <span class="p">),</span> <span class="s2">&quot;Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue.&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">real</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="k">return</span> <span class="n">cube</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The image cube arranged as it would appear on the sky. Array dimensions for plotting given by ``self.coords.img_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -285,7 +287,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -295,13 +297,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double : 3D phase cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sky_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -342,6 +354,18 @@
 
   
   
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-5472810-8', 'auto');
+    ga('send', 'pageview');
+    </script>
+
     
    
 
