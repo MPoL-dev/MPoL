@@ -3,9 +3,7 @@ import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
-from .constants import arcsec
 from . import images
-from . import utils
 
 
 class GriddedDatasetConnector(nn.Module):
@@ -59,7 +57,7 @@ class GriddedDatasetConnector(nn.Module):
 
 class GriddedResidualConnector(GriddedDatasetConnector):
     r"""
-    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging. The products are available as instance and property attributes after the ``forward`` call.
+    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.
 
     Args:
         fourierCube: instantiated :class:`~mpol.images.FourierCube` object
@@ -74,6 +72,8 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 
         And store residual products as PyTorch tensor instance and property attributes. 
+
+        Returns (torch tensor complex): full packed cube
         """
         self.residuals = self.griddedDataset.vis_gridded - self.fourierCube.vis
 
@@ -97,9 +97,11 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
         self.cube = cube.real
 
+        return cube
+
     @property
     def sky_cube(self):
-        """
+        r"""
         The image cube arranged as it would appear on the sky. Array dimensions for plotting given by ``self.coords.img_ext``.
 
         Returns:
@@ -110,7 +112,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
     @property
     def sky_amp(self):
-        """
+        r"""
         The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
@@ -120,11 +122,21 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
     @property
     def sky_phase(self):
-        """
+        r"""
         The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
             torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
         """
         return images.packed_cube_to_sky_cube(self.phase)
+
+    @property
+    def sky_residuals(self):
+        r"""
+        The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
+
+        Returns:
+            torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``
+        """
+        return images.packed_cube_to_sky_cube(self.residuals)
 

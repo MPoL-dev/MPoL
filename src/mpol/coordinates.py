@@ -94,7 +94,7 @@ class GridCoords:
             self.v_bin_max,
         ]  # [kλ]
 
-        # max freq supported by current grid
+        # max u or v freq supported by current grid
         self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
 
         # only useful for plotting a sky_vis... uu, vv increasing, no fftshift
@@ -107,10 +107,22 @@ class GridCoords:
             self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
         )  # [kλ]
 
+        # https://en.wikipedia.org/wiki/Atan2
+        self.sky_phi_centers_2D = np.arctan2(
+            self.sky_v_centers_2D, self.sky_u_centers_2D
+        )  # (pi, pi]
+
         # for evaluating a packed vis... uu, vv increasing + fftshifted
         self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
         self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
+
+        # and in polar coordinates too
         self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
+        self.packed_phi_centers_2D = np.fft.fftshift(self.sky_phi_centers_2D)
+
+        self.q_max = (
+            np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
+        )  # outer edge [klambda]
 
         # x_centers_2D and y_centers_2D are just l and m in units of arcsec
         x_centers_2D, y_centers_2D = np.meshgrid(

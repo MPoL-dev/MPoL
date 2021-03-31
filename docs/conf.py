@@ -77,6 +77,8 @@ nbsphinx_execute_arguments = [
 
 html_theme = "faculty-sphinx-theme"
 
+html_theme_options = {"analytics_id": "UA-5472810-8"}
+
 html_logo = "logo.png"
 html_favicon = "favicon.ico"
 # html_sidebars = {

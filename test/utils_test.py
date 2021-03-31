@@ -119,3 +119,10 @@ def test_analytic_plot(tmp_path):
 
     assert np.all(np.abs(diff_real) < 1e-12)
     assert np.all(np.abs(diff_imag) < 1e-12)
+
+
+def test_loglinspace():
+    array = utils.loglinspace(0, 10, 5, 3)
+    print(array)
+    print(np.diff(array))
+    assert len(array) == 5 + 3

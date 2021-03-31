@@ -41,6 +41,34 @@ def log_stretch(x):
     return torch.log(1 + torch.abs(x))
 
 
+def loglinspace(start, end, N_log, M_linear=3):
+    r"""
+    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``. 
+
+    Args:
+        start (float): starting cell left edge
+        end (float): ending cell right edge
+        N_log (int): number of logarithmically spaced bins
+        M_linear (int): number of linearly (equally) spaced bins
+    """
+
+    # transition cell left edge
+    a = end / 10 ** (N_log * np.log10(M_linear / (M_linear - 1)))
+    delta = a / (M_linear - 1)  # linear cell width
+
+    # logspace = 10^(log10(a) + i * Delta)
+    Delta = np.log10(end / a) / N_log  # log cell width exponent
+
+    cell_walls = []
+    for i in range(M_linear):
+        cell_walls.append(start + delta * i)
+
+    for j in range(1, N_log + 1):
+        cell_walls.append(10 ** (np.log10(a) + Delta * j))
+
+    return np.array(cell_walls)
+
+
 def fftspace(width, N):
     """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
     
