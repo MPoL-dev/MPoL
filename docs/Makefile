@@ -29,6 +29,7 @@ clean:
 ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
 
+
 # baseline table 
 _static/baselines/build/baselines.csv: 
 	mkdir -p _static/baselines/build

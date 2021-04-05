@@ -71,9 +71,9 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         
             \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 
-        And store residual products as PyTorch tensor instance and property attributes. 
+        And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.
 
-        Returns (torch tensor complex): full packed cube
+        Returns (torch tensor complex): full packed cube (including imaginaries), mainly for debugging purposes.
         """
         self.residuals = self.griddedDataset.vis_gridded - self.fourierCube.vis
 
@@ -97,6 +97,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
 
         self.cube = cube.real
 
+        # return the full thing for debugging purposes
         return cube
 
     @property
@@ -111,32 +112,43 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         return images.packed_cube_to_sky_cube(self.cube)
 
     @property
-    def sky_amp(self):
+    def ground_mask(self):
+        r"""
+        The boolean mask, arranged in ground format.
+
+        Returns:
+            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``
+
+        """
+        return images.packed_cube_to_ground_cube(self.mask)
+
+    @property
+    def ground_amp(self):
         r"""
         The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
             torch.double : 3D amplitude cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_sky_cube(self.amp)
+        return images.packed_cube_to_ground_cube(self.amp)
 
     @property
-    def sky_phase(self):
+    def ground_phase(self):
         r"""
         The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
             torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_sky_cube(self.phase)
+        return images.packed_cube_to_ground_cube(self.phase)
 
     @property
-    def sky_residuals(self):
+    def ground_residuals(self):
         r"""
         The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
         Returns:
             torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_sky_cube(self.residuals)
+        return images.packed_cube_to_ground_cube(self.residuals)
 

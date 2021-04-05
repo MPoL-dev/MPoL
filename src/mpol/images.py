@@ -8,14 +8,36 @@ import torch.fft  # to avoid conflicts with old torch.fft *function*
 from .gridding import GridCoords, _setup_coords
 
 
+def ground_cube_to_packed_cube(ground_cube):
+    r"""
+    For visibility-plane work.
+    """
+    shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
+    return shifted
+
+
+def packed_cube_to_ground_cube(packed_cube):
+    r"""
+    For visibility-plane work.
+    """
+    # fftshift the image cube to the correct quadrants
+    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
+    return shifted
+
+
 def sky_cube_to_packed_cube(sky_cube):
-    # If it's an identity layer, just set parameters to cube
+    r"""
+    For image-plane work.
+    """
     flipped = torch.flip(sky_cube, (2,))
     shifted = torch.fft.fftshift(flipped, dim=(1, 2))
     return shifted
 
 
 def packed_cube_to_sky_cube(packed_cube):
+    r"""
+    For image-plane work.
+    """
     # fftshift the image cube to the correct quadrants
     shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
     # flip so that east points left
@@ -277,19 +299,19 @@ class FourierCube(nn.Module):
         return self.vis
 
     @property
-    def psd(self):
+    def ground_psd(self):
         r"""
-        The power spectral density of the cube, in packed format.
+        The power spectral density of the cube, in ground format.
 
         Returns:
             torch.double: power spectral density cube
         """
-        return np.abs(self.vis) ** 2
+        return torch.abs(self.ground_vis) ** 2
 
     @property
-    def sky_vis(self):
+    def ground_vis(self):
         r"""
-        The visibility FFT cube fftshifted for plotting with ``imshow``.
+        The visibility cube in ground format cube fftshifted for plotting with ``imshow``.
 
         Returns:
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.

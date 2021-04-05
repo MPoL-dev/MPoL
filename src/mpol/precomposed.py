@@ -20,6 +20,7 @@ class SimpleNet(torch.nn.Module):
     
     :ivar bcube: the :class:`~mpol.images.BaseCube` instance
     :ivar icube: the :class:`~mpol.images.ImageCube` instance
+    :ivar fcube: the :class:`~mpol.images.FourierCube` instance
 
     For example, you'll likely want to access the ``self.icube.sky_model`` at some point.
 
@@ -48,10 +49,10 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
-        self.flayer = images.FourierCube(coords=self.coords)
+        self.fcube = images.FourierCube(coords=self.coords)
 
         assert griddedDataset is not None, "Please provide a GriddedDataset instance."
-        self.dcon = connectors.GriddedDatasetConnector(self.flayer, griddedDataset)
+        self.dcon = connectors.GriddedDatasetConnector(self.fcube, griddedDataset)
 
     def forward(self):
         r"""
@@ -61,6 +62,6 @@ class SimpleNet(torch.nn.Module):
         """
         x = self.bcube.forward()
         x = self.icube.forward(x)
-        vis = self.flayer.forward(x)
+        vis = self.fcube.forward(x)
         model_samples = self.dcon.forward(vis)
         return model_samples

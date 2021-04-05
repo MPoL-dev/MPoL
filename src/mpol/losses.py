@@ -70,12 +70,12 @@ def entropy(cube, prior_intensity):
     return (1 / tot) * torch.sum(cube * torch.log(cube / prior_intensity))
 
 
-def TV_image(cube, epsilon=1e-10):
+def TV_image(sky_cube, epsilon=1e-10):
     r"""
     Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
 
     Args:
-        cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension. Should be in sky format representation.
         epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.
 
     Returns:
@@ -88,10 +88,10 @@ def TV_image(cube, epsilon=1e-10):
     """
 
     # diff the cube in ll and remove the last row
-    diff_ll = cube[:, 0:-1, 1:] - cube[:, 0:-1, 0:-1]
+    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
 
     # diff the cube in mm and remove the last column
-    diff_mm = cube[:, 1:, 0:-1] - cube[:, 0:-1, 0:-1]
+    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
 
     loss = torch.sum(torch.sqrt(diff_ll ** 2 + diff_mm ** 2 + epsilon))
 
