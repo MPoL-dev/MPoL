@@ -4,10 +4,10 @@ import torch
 import copy
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
+from . import utils
 from .constants import *
 from .coordinates import GridCoords, _setup_coords
 from .utils import loglinspace
-from .images import packed_cube_to_ground_cube
 
 
 class GriddedDataset:
@@ -92,7 +92,7 @@ class GriddedDataset:
             torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``
 
         """
-        return packed_cube_to_ground_cube(self.mask)
+        return utils.packed_cube_to_ground_cube(self.mask)
 
 
 # custom dataset loader

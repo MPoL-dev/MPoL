@@ -6,43 +6,7 @@ from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from .gridding import GridCoords, _setup_coords
-
-
-def ground_cube_to_packed_cube(ground_cube):
-    r"""
-    For visibility-plane work.
-    """
-    shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
-    return shifted
-
-
-def packed_cube_to_ground_cube(packed_cube):
-    r"""
-    For visibility-plane work.
-    """
-    # fftshift the image cube to the correct quadrants
-    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
-    return shifted
-
-
-def sky_cube_to_packed_cube(sky_cube):
-    r"""
-    For image-plane work.
-    """
-    flipped = torch.flip(sky_cube, (2,))
-    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
-    return shifted
-
-
-def packed_cube_to_sky_cube(packed_cube):
-    r"""
-    For image-plane work.
-    """
-    # fftshift the image cube to the correct quadrants
-    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
-    # flip so that east points left
-    flipped = torch.flip(shifted, (2,))
-    return flipped
+from . import utils
 
 
 class BaseCube(nn.Module):
@@ -201,7 +165,7 @@ class ImageCube(nn.Module):
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
             
         """
-        return packed_cube_to_sky_cube(self.cube)
+        return utils.packed_cube_to_sky_cube(self.cube)
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """

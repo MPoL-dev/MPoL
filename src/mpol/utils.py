@@ -4,6 +4,43 @@ import numpy as np
 from .constants import arcsec, cc, kB, deg
 
 
+def ground_cube_to_packed_cube(ground_cube):
+    r"""
+    For visibility-plane work.
+    """
+    shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
+    return shifted
+
+
+def packed_cube_to_ground_cube(packed_cube):
+    r"""
+    For visibility-plane work.
+    """
+    # fftshift the image cube to the correct quadrants
+    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
+    return shifted
+
+
+def sky_cube_to_packed_cube(sky_cube):
+    r"""
+    For image-plane work.
+    """
+    flipped = torch.flip(sky_cube, (2,))
+    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
+    return shifted
+
+
+def packed_cube_to_sky_cube(packed_cube):
+    r"""
+    For image-plane work.
+    """
+    # fftshift the image cube to the correct quadrants
+    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
+    # flip so that east points left
+    flipped = torch.flip(shifted, (2,))
+    return flipped
+
+
 def get_Jy_arcsec2(T_b, nu=230e9):
     r"""
     Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.

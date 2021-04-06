@@ -4,6 +4,7 @@ from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from . import images
+from . import utils
 
 
 class GriddedDatasetConnector(nn.Module):
@@ -109,7 +110,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             torch.double : 3D image cube of shape ``(nchan, npix, npix)`` in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
             
         """
-        return images.packed_cube_to_sky_cube(self.cube)
+        return utils.packed_cube_to_sky_cube(self.cube)
 
     @property
     def ground_mask(self):
@@ -120,7 +121,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
             torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``
 
         """
-        return images.packed_cube_to_ground_cube(self.mask)
+        return utils.packed_cube_to_ground_cube(self.mask)
 
     @property
     def ground_amp(self):
@@ -130,7 +131,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         Returns:
             torch.double : 3D amplitude cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_ground_cube(self.amp)
+        return utils.packed_cube_to_ground_cube(self.amp)
 
     @property
     def ground_phase(self):
@@ -140,7 +141,7 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         Returns:
             torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_ground_cube(self.phase)
+        return utils.packed_cube_to_ground_cube(self.phase)
 
     @property
     def ground_residuals(self):
@@ -150,5 +151,5 @@ class GriddedResidualConnector(GriddedDatasetConnector):
         Returns:
             torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``
         """
-        return images.packed_cube_to_ground_cube(self.residuals)
+        return utils.packed_cube_to_ground_cube(self.residuals)
 
