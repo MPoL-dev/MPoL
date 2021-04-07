@@ -3,13 +3,38 @@ import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
-from . import images
 from . import utils
 
 
-class GriddedDatasetConnector(nn.Module):
+def index_vis(vis, griddedDataset):
     r"""
-    Connect a FourierCube to the gridded dataset, and return indexed model visibilities for calculating the loss. 
+    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is "packed" just like the :class:`~mpol.datasets.GriddedDataset`
+
+    Args:
+        vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+
+    Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
+    """
+    assert (
+        vis.size()[0] == griddedDataset.mask.size()[0]
+    ), "vis and dataset mask do not have the same number of channels."
+
+    # As of Pytorch 1.7.0, complex numbers are partially supported.
+    # However, masked_select does not yet work (with gradients)
+    # on the complex vis, so hence this awkward step of selecting
+    # the reals and imaginaries separately
+    re = vis.real.masked_select(griddedDataset.mask)
+    im = vis.imag.masked_select(griddedDataset.mask)
+
+    # we had trouble returning things as re + 1.0j * im,
+    # but for some reason torch.complex seems to work OK.
+    return torch.complex(re, im)
+
+
+class GriddedResidualConnector(nn.Module):
+    r"""
+    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.
 
     Args:
         fourierCube: instantiated :class:`~mpol.images.FourierCube` object
@@ -29,41 +54,6 @@ class GriddedDatasetConnector(nn.Module):
 
         # take the mask
         self.mask = griddedDataset.mask
-
-    def forward(self, vis):
-        r"""
-        Return model samples for evaluation with a likelihood function.
-
-        Args: 
-            vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
-
-        Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
-        """
-
-        assert (
-            vis.size()[0] == self.mask.size()[0]
-        ), "vis and dataset mask do not have the same number of channels."
-
-        # As of Pytorch 1.7.0, complex numbers are partially supported.
-        # However, masked_select does not yet work (with gradients)
-        # on the complex vis, so hence this awkward step of selecting
-        # the reals and imaginaries separately
-        re = vis.real.masked_select(self.mask)
-        im = vis.imag.masked_select(self.mask)
-
-        # we had trouble returning things as re + 1.0j * im,
-        # but for some reason torch.complex seems to work OK.
-        return torch.complex(re, im)
-
-
-class GriddedResidualConnector(GriddedDatasetConnector):
-    r"""
-    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.
-
-    Args:
-        fourierCube: instantiated :class:`~mpol.images.FourierCube` object
-        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
-    """
 
     def forward(self):
         r"""Calculate the residuals as 

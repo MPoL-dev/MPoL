@@ -13,14 +13,14 @@ from mpol.constants import *
 def test_init_train_class(coords, dataset):
 
     nchan = dataset.nchan
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, griddedDataset=dataset)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
-    model_visibilities = rml.forward()
+    vis = rml.forward()
 
     rml.zero_grad()
 
     # calculate a loss
-    loss = losses.nll(model_visibilities, dataset.vis_indexed, dataset.weight_indexed)
+    loss = losses.nll_gridded(vis, dataset)
 
     # calculate gradients of parameters
     loss.backward()
@@ -33,7 +33,7 @@ def test_train_loop(coords, dataset_cont, tmp_path):
     # set everything up to run on a single channel
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, griddedDataset=dataset_cont)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
@@ -41,12 +41,10 @@ def test_train_loop(coords, dataset_cont, tmp_path):
         rml.zero_grad()
 
         # get the predicted model
-        model_visibilities = rml.forward()
+        vis = rml.forward()
 
         # calculate a loss
-        loss = losses.nll(
-            model_visibilities, dataset_cont.vis_indexed, dataset_cont.weight_indexed
-        )
+        loss = losses.nll_gridded(vis, dataset_cont)
 
         # calculate gradients of parameters
         loss.backward()

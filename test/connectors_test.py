@@ -29,13 +29,11 @@ def test_instantiate_connector(coords, dataset):
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
-    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
-
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
 
     # take a basecube, imagecube, and dataset and predict
-    dcon.forward(vis)
+    connectors.index_vis(vis, dataset)
 
 
 def test_connector_grad(coords, dataset):
@@ -44,11 +42,10 @@ def test_connector_grad(coords, dataset):
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
-    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
 
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
-    samples = dcon.forward(vis)
+    samples = connectors.index_vis(vis, dataset)
 
     print(samples)
     loss = torch.sum(torch.abs(samples))

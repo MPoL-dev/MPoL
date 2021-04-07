@@ -2,7 +2,6 @@ graph TD
     subgraph SimpleNet
     bc(BaseCube) --> ImageCube 
     ImageCube --> FourierLayer
-    FourierLayer --> DataConnector 
     end
-    ad[[Dataset]] --> DataConnector 
-    DataConnector --> il([Loss])
+    FourierLayer --> il([Loss])
+    ad[[Dataset]] --> il([Loss])

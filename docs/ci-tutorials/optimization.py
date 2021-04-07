@@ -31,11 +31,9 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import mpol
-from mpol import gridding, coordinates, precomposed, losses, images
-import requests
+from mpol import gridding, precomposed, losses, images, utils
 from astropy.utils.data import download_file
 from IPython.display import SVG, display
-import os
 
 # +
 # load the mock dataset of the ALMA logo
@@ -89,7 +87,7 @@ display(SVG(filename="../_static/mmd/build/SimpleNet.svg"))
 
 # We then initialize SimpleNet with the relevant information
 
-rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan, griddedDataset=dset)
+rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
 
 # ### Breaking down the training loop
 #
@@ -118,7 +116,7 @@ rml.state_dict()
 #
 # For demonstration purposes, lets access and plot the base cube with matplotlib. In a normal workflow you probably won't need to do this, but to access the basecube in sky orientation, we do
 
-bcube_pytorch = images.packed_cube_to_sky_cube(rml.bcube.base_cube)
+bcube_pytorch = utils.packed_cube_to_sky_cube(rml.bcube.base_cube)
 
 # ``bcube`` is still a PyTorch tensor, but matplotlib requires numpy arrays. To convert back, we need to first ["detach" the computational graph](https://stackoverflow.com/questions/63582590/why-do-we-call-detach-before-calling-numpy-on-a-pytorch-tensor) from the PyTorch tensor (used to propagate gradients) and then call the numpy conversion routine.
 
@@ -142,17 +140,17 @@ plt.colorbar(im)
 
 rml.zero_grad()
 
-# Most modules in MPoL are designed to work in a "feed forward" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the model visibilities corresponding to the current pixel values of the [BaseCube](../api.html#mpol.images.BaseCube)
+# Most modules in MPoL are designed to work in a "feed forward" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the [BaseCube](../api.html#mpol.images.BaseCube)
 
-model_visibilities = rml.forward()
-print(model_visibilities)
+vis = rml.forward()
+print(vis)
 
 # Of course, these aren't that exciting since they just reflect the constant value image.
 #
 # But, exciting things are about to happen! We can calculate the loss between these model visibilities and the data
 
 # calculate a loss
-loss = losses.nll(model_visibilities, dset.vis_indexed, dset.weight_indexed)
+loss = losses.nll_gridded(vis, dset)
 print(loss.item())
 
 # and then we can calculate the gradient of the loss function with respect to the parameters
@@ -164,7 +162,7 @@ loss.backward()
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
     np.squeeze(
-        images.packed_cube_to_sky_cube(rml.bcube.base_cube.grad).detach().numpy()
+        utils.packed_cube_to_sky_cube(rml.bcube.base_cube.grad).detach().numpy()
     ),
     origin="lower",
     interpolation="none",
@@ -184,7 +182,7 @@ rml.state_dict()
 
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
-    np.squeeze(images.packed_cube_to_sky_cube(rml.bcube.base_cube).detach().numpy()),
+    np.squeeze(utils.packed_cube_to_sky_cube(rml.bcube.base_cube).detach().numpy()),
     origin="lower",
     interpolation="none",
     extent=rml.icube.coords.img_ext,
@@ -206,10 +204,10 @@ for i in range(300):
     rml.zero_grad()
 
     # get the predicted model
-    model_visibilities = rml.forward()
+    vis = rml.forward()
 
     # calculate a loss
-    loss = losses.nll(model_visibilities, dset.vis_indexed, dset.weight_indexed)
+    loss = losses.nll_gridded(vis, dset)
 
     loss_tracker.append(loss.item())
 
