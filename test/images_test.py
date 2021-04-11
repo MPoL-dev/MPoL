@@ -196,3 +196,61 @@ def test_basecube_imagecube(coords, tmp_path):
     fig.savefig(tmp_path / "imagecube.png", dpi=300)
 
     plt.close("all")
+
+
+def test_base_cube_conv_cube(coords, tmp_path):
+
+    # create a mock cube that includes negative values
+    nchan = 1
+    mean = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
+    )
+    std = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
+    )
+
+    # tensor
+    test_cube = torch.normal(mean=mean, std=std)
+
+    # layer
+    conv_layer = images.HannConvCube(nchan=nchan)
+
+    conv_output = conv_layer(test_cube)
+
+    fig, ax = plt.subplots(ncols=2, nrows=1)
+
+    im = ax[0].imshow(
+        np.squeeze(test_cube.detach().numpy()), origin="lower", interpolation="none"
+    )
+    plt.colorbar(im, ax=ax[0])
+    ax[0].set_title("input")
+
+    im = ax[1].imshow(
+        np.squeeze(conv_output.detach().numpy()), origin="lower", interpolation="none"
+    )
+    plt.colorbar(im, ax=ax[1])
+    ax[1].set_title("convolved")
+
+    fig.savefig(tmp_path / "convcube.png", dpi=300)
+
+    plt.close("all")
+
+
+def test_multi_chan_conv(coords, tmp_path):
+    # create a mock cube that includes negative values
+    nchan = 10
+    mean = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
+    )
+    std = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
+    )
+
+    # tensor
+    test_cube = torch.normal(mean=mean, std=std)
+
+    # layer
+    conv_layer = images.HannConvCube(nchan=nchan)
+
+    conv_layer(test_cube)
+

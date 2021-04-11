@@ -5,6 +5,7 @@ import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
+from . import utils
 from .gridding import GridCoords, _setup_coords
 
 
@@ -92,6 +93,74 @@ class BaseCube(nn.Module):
         """
 
         return self.pixel_mapping(self.base_cube)
+
+
+class HannConvCube(nn.Module):
+    r"""
+    A convolution layer to effectively implement a Hann window in the Fourier domain by convolution in the image domain.
+
+    Args:
+        nchan
+        requires_grad (bool): keep kernel fixed
+    """
+
+    def __init__(self, nchan, requires_grad=False):
+
+        super().__init__()
+        # simple convolutional filter operates on per-channel basis
+        # 3x3 Hann filter
+        self.m = nn.Conv2d(
+            in_channels=nchan,
+            out_channels=nchan,
+            kernel_size=3,
+            stride=1,
+            groups=nchan,
+            padding=1,  # required to get same sized output for 3x3 kernel
+        )
+
+        # weights has size (nchan, 1, 3, 3)
+        # bias has shape (nchan)
+
+        # build out the Hann kernel
+        spec = torch.tensor([0.25, 0.5, 0.25], dtype=torch.double)
+        nugget = torch.outer(spec, spec)  # shape (3,3) 2D Hann kernel
+        exp = torch.unsqueeze(torch.unsqueeze(nugget, 0), 0)  # shape (1, 1, 3, 3)
+        weight = exp.repeat(nchan, 1, 1, 1)  # shape (nchan, 1, 3, 3)
+
+        # set the weight and bias
+        self.m.weight = nn.Parameter(
+            weight, requires_grad=requires_grad
+        )  # set the (untunable) weight
+
+        # set the bias to zero
+        self.m.bias = nn.Parameter(
+            torch.zeros(nchan, dtype=torch.double), requires_grad=requires_grad
+        )
+
+    def forward(self, cube):
+        r"""Args:
+            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
+
+        Returns: 
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format. 
+        """
+        # Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.
+        # Additionally, the convolution must be done on the *sky-oriented* cube
+        sky_cube = packed_cube_to_sky_cube(cube)
+
+        # augment extra "batch" dimension to cube, to make it (1, nchan, npix, npix)
+        aug_sky_cube = torch.unsqueeze(sky_cube, dim=0)
+
+        # do convolution
+        conv_aug_sky_cube = self.m(aug_sky_cube)
+
+        # remove extra "batch" dimension
+        # we're not using unsqueeze here, since there's a possibility that nchan=1
+        # and we want to keep that dimension
+        conv_sky_cube = conv_aug_sky_cube[0]
+
+        # return in packed format
+        return sky_cube_to_packed_cube(conv_sky_cube)
 
 
 class ImageCube(nn.Module):
