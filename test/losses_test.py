@@ -11,13 +11,13 @@ def test_nll_1D_zero():
 
     model_re = torch.randn_like(weights)
     model_im = torch.randn_like(weights)
-    model_vis = (model_re, model_im)
+    model_vis = torch.complex(model_re, model_im)
 
     data_re = model_re
     data_im = model_im
-    data_vis = (data_re, data_im, weights)
+    data_vis = torch.complex(data_re, data_im)
 
-    loss = losses.loss_fn(model_vis, data_vis)
+    loss = losses.nll(model_vis, data_vis, weights)
     assert loss.item() == 0.0
 
 
@@ -28,13 +28,13 @@ def test_nll_1D_random():
 
     model_re = torch.randn_like(weights)
     model_im = torch.randn_like(weights)
-    model_vis = (model_re, model_im)
+    model_vis = torch.complex(model_re, model_im)
 
     data_re = torch.randn_like(weights)
     data_im = torch.randn_like(weights)
-    data_vis = (data_re, data_im, weights)
+    data_vis = torch.complex(data_re, data_im)
 
-    losses.loss_fn(model_vis, data_vis)
+    losses.nll(model_vis, data_vis, weights)
 
 
 def test_nll_2D_zero():
@@ -46,13 +46,13 @@ def test_nll_2D_zero():
 
     model_re = torch.randn_like(weights)
     model_im = torch.randn_like(weights)
-    model_vis = (model_re, model_im)
+    model_vis = torch.complex(model_re, model_im)
 
     data_re = model_re
     data_im = model_im
-    data_vis = (data_re, data_im, weights)
+    data_vis = torch.complex(data_re, data_im)
 
-    loss = losses.loss_fn(model_vis, data_vis)
+    loss = losses.nll(model_vis, data_vis, weights)
     assert loss.item() == 0.0
 
 
@@ -65,13 +65,13 @@ def test_nll_2D_random():
 
     model_re = torch.randn_like(weights)
     model_im = torch.randn_like(weights)
-    model_vis = (model_re, model_im)
+    model_vis = torch.complex(model_re, model_im)
 
     data_re = torch.randn_like(weights)
     data_im = torch.randn_like(weights)
-    data_vis = (data_re, data_im, weights)
+    data_vis = torch.complex(data_re, data_im)
 
-    losses.loss_fn(model_vis, data_vis)
+    losses.nll(model_vis, data_vis, weights)
 
 
 def test_entropy_raise_error_negative():
@@ -79,7 +79,7 @@ def test_entropy_raise_error_negative():
     npix = 512
     with pytest.raises(AssertionError):
         cube = torch.randn((nchan, npix, npix), dtype=torch.float64)
-        losses.loss_fn_entropy(cube, 0.01)
+        losses.entropy(cube, 0.01)
 
 
 def test_entropy_raise_error_negative_prior():
@@ -87,7 +87,7 @@ def test_entropy_raise_error_negative_prior():
     npix = 512
     with pytest.raises(AssertionError):
         cube = torch.ones((nchan, npix, npix), dtype=torch.float64)
-        losses.loss_fn_entropy(cube, -0.01)
+        losses.entropy(cube, -0.01)
 
 
 def test_entropy_cube():
@@ -95,4 +95,4 @@ def test_entropy_cube():
     npix = 512
 
     cube = torch.ones((nchan, npix, npix), dtype=torch.float64)
-    losses.loss_fn_entropy(cube, 0.01)
+    losses.entropy(cube, 0.01)

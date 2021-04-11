@@ -14,20 +14,22 @@ help:
 
 .PHONY: help Makefile html clean 
 
-NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb
+NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb large-tutorials/crossvalidation.ipynb
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 
 clean:
 	rm -rf _build 
 	rm -rf ${NOTEBOOKS}
 	rm -rf ci-tutorials/.ipynb_checkpoints
+	rm -rf large-tutorials/.ipynb_checkpoints
 	rm -rf ${CHARTS}
 	rm -rf _static/baselines/build/baselines.csv
 
-
-
 ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
+
+large-tutorials/%.ipynb: large-tutorials/%.py
+	$(MAKE) -C large-tutorials
 
 # baseline table 
 _static/baselines/build/baselines.csv: 

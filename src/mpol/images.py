@@ -7,21 +7,7 @@ import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from . import utils
 from .gridding import GridCoords, _setup_coords
-
-
-def sky_cube_to_packed_cube(sky_cube):
-    # If it's an identity layer, just set parameters to cube
-    flipped = torch.flip(sky_cube, (2,))
-    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
-    return shifted
-
-
-def packed_cube_to_sky_cube(packed_cube):
-    # fftshift the image cube to the correct quadrants
-    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
-    # flip so that east points left
-    flipped = torch.flip(shifted, (2,))
-    return flipped
+from . import utils
 
 
 class BaseCube(nn.Module):
@@ -146,7 +132,7 @@ class HannConvCube(nn.Module):
         """
         # Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.
         # Additionally, the convolution must be done on the *sky-oriented* cube
-        sky_cube = packed_cube_to_sky_cube(cube)
+        sky_cube = utils.packed_cube_to_sky_cube(cube)
 
         # augment extra "batch" dimension to cube, to make it (1, nchan, npix, npix)
         aug_sky_cube = torch.unsqueeze(sky_cube, dim=0)
@@ -160,7 +146,7 @@ class HannConvCube(nn.Module):
         conv_sky_cube = conv_aug_sky_cube[0]
 
         # return in packed format
-        return sky_cube_to_packed_cube(conv_sky_cube)
+        return utils.sky_cube_to_packed_cube(conv_sky_cube)
 
 
 class ImageCube(nn.Module):
@@ -248,7 +234,7 @@ class ImageCube(nn.Module):
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
             
         """
-        return packed_cube_to_sky_cube(self.cube)
+        return utils.packed_cube_to_sky_cube(self.cube)
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
@@ -346,19 +332,19 @@ class FourierCube(nn.Module):
         return self.vis
 
     @property
-    def psd(self):
+    def ground_psd(self):
         r"""
-        The power spectral density of the cube, in packed format.
+        The power spectral density of the cube, in ground format.
 
         Returns:
             torch.double: power spectral density cube
         """
-        return np.abs(self.vis) ** 2
+        return torch.abs(self.ground_vis) ** 2
 
     @property
-    def sky_vis(self):
+    def ground_vis(self):
         r"""
-        The visibility FFT cube fftshifted for plotting with ``imshow``.
+        The visibility cube in ground format cube fftshifted for plotting with ``imshow``.
 
         Returns:
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.

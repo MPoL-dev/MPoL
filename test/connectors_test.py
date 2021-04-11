@@ -29,13 +29,11 @@ def test_instantiate_connector(coords, dataset):
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
-    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
-
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
 
     # take a basecube, imagecube, and dataset and predict
-    dcon.forward(vis)
+    connectors.index_vis(vis, dataset)
 
 
 def test_connector_grad(coords, dataset):
@@ -44,11 +42,10 @@ def test_connector_grad(coords, dataset):
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
-    dcon = connectors.GriddedDatasetConnector(flayer, dataset)
 
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
-    samples = dcon.forward(vis)
+    samples = connectors.index_vis(vis, dataset)
 
     print(samples)
     loss = torch.sum(torch.abs(samples))
@@ -105,7 +102,7 @@ def test_residual_connector(coords, dataset_cont, tmp_path):
     plt.colorbar(im, ax=ax[0, 1])
 
     im = ax[1, 0].imshow(
-        np.squeeze(rcon.sky_amp.detach().numpy()),
+        np.squeeze(rcon.ground_amp.detach().numpy()),
         origin="lower",
         interpolation="none",
         extent=imagecube.coords.vis_ext,
@@ -114,7 +111,7 @@ def test_residual_connector(coords, dataset_cont, tmp_path):
     plt.colorbar(im, ax=ax[1, 0])
 
     im = ax[1, 1].imshow(
-        np.squeeze(rcon.sky_phase.detach().numpy()),
+        np.squeeze(rcon.ground_phase.detach().numpy()),
         origin="lower",
         interpolation="none",
         extent=imagecube.coords.vis_ext,

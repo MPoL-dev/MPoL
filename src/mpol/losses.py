@@ -7,6 +7,7 @@ import numpy as np
 import torch
 
 from .constants import *
+from . import connectors
 
 
 def nll(model_vis, data_vis, weight):
@@ -17,9 +18,9 @@ def nll(model_vis, data_vis, weight):
     and imaginaries in the :math:`\chi^2` sum.
 
     Args:
-        model_vis: 1-tuple of the model
-        data_vis: 1-tuple of the data
-        weight: 1-tuple of weight values
+        model_vis (PyTorch complex): array tuple of the model
+        data_vis (PyTorch complex): array of the data values
+        weight (PyTorch real): array of weight values
 
     Returns:
         torch.double: the :math:`\chi^2` likelihood loss
@@ -45,16 +46,17 @@ def nll(model_vis, data_vis, weight):
     )
 
 
-def loss_fn(model_vis, data_vis):
+def nll_gridded(vis, datasetGridded):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all 
+    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all 
     quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply 
     the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real 
     and imaginaries in the :math:`\chi^2` sum.
 
     Args:
-        model_vis: 2-tuple of (real, imaginary) values of the model
-        data_vis: 3-tuple of (real, imaginary, weights) of the data
+        model_vis (PyTorch complex): array tuple of the model
+        data_vis (PyTorch complex): array of the data values
+        weight (PyTorch real): array of weight values
 
     Returns:
         torch.double: the :math:`\chi^2` likelihood loss
@@ -66,21 +68,12 @@ def loss_fn(model_vis, data_vis):
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
     """
-    model_re, model_im = model_vis
-    data_re, data_im, data_weights = data_vis
-    nvis = data_re.size()[0]
+    model_vis = connectors.index_vis(vis, datasetGridded)
 
-    return (
-        1
-        / (2 * nvis)
-        * (
-            torch.sum(data_weights * (data_re - model_re) ** 2)
-            + torch.sum(data_weights * (data_im - model_im) ** 2)
-        )
-    )
+    return nll(model_vis, datasetGridded.vis_indexed, datasetGridded.weight_indexed)
 
 
-def loss_fn_entropy(cube, prior_intensity):
+def entropy(cube, prior_intensity):
     r"""
     Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_. 
 
@@ -105,12 +98,12 @@ def loss_fn_entropy(cube, prior_intensity):
     return (1 / tot) * torch.sum(cube * torch.log(cube / prior_intensity))
 
 
-def loss_fn_TV_image(cube, epsilon=1e-10):
+def TV_image(sky_cube, epsilon=1e-10):
     r"""
     Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
 
     Args:
-        cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension. Should be in sky format representation.
         epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.
 
     Returns:
@@ -123,17 +116,17 @@ def loss_fn_TV_image(cube, epsilon=1e-10):
     """
 
     # diff the cube in ll and remove the last row
-    diff_ll = cube[:, 0:-1, 1:] - cube[:, 0:-1, 0:-1]
+    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
 
     # diff the cube in mm and remove the last column
-    diff_mm = cube[:, 1:, 0:-1] - cube[:, 0:-1, 0:-1]
+    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
 
     loss = torch.sum(torch.sqrt(diff_ll ** 2 + diff_mm ** 2 + epsilon))
 
     return loss
 
 
-def loss_fn_TV_channel(cube, epsilon=1e-10):
+def TV_channel(cube, epsilon=1e-10):
     r"""
     Calculate the total variation (TV) loss in the channel dimension. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
@@ -156,7 +149,7 @@ def loss_fn_TV_channel(cube, epsilon=1e-10):
     return loss
 
 
-def loss_fn_edge_clamp(cube):
+def edge_clamp(cube):
     r"""
     Promote all pixels at the edge of the image to be zero using an :math:`L_2` norm.
 
@@ -178,13 +171,13 @@ def loss_fn_edge_clamp(cube):
     return loss
 
 
-def loss_fn_sparsity(cube, mask=None):
+def sparsity(cube, mask=None):
     r"""
-    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. Typically you might want this mask to be ``True`` for background regions.
+    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. For example, you might want this mask to be ``True`` for background regions.
 
     Args:
         cube (nchan, npix, npix): tensor image cube
-        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``.
+        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``. Default is to apply prior to all pixels.
 
     Returns:
         torch.double: sparsity loss calculated where ``mask == True``
@@ -204,7 +197,7 @@ def loss_fn_sparsity(cube, mask=None):
     return loss
 
 
-def loss_fn_UV_sparsity(vis, qs, q_max):
+def UV_sparsity(vis, qs, q_max):
     r"""
     Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. 
 
@@ -233,7 +226,7 @@ def loss_fn_UV_sparsity(vis, qs, q_max):
     return loss
 
 
-def loss_fn_PSD(qs, psd, l):
+def PSD(qs, psd, l):
     r"""
     Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
 

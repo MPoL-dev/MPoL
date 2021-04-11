@@ -4,6 +4,7 @@ import torch
 import copy
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
+from . import utils
 from .constants import *
 from .coordinates import GridCoords, _setup_coords
 from .utils import loglinspace
@@ -81,6 +82,17 @@ class GriddedDataset:
         # update pre-indexed values
         self.vis_indexed = self.vis_gridded[self.mask]
         self.weight_indexed = self.weight_gridded[self.mask]
+
+    @property
+    def ground_mask(self):
+        r"""
+        The boolean mask, arranged in ground format.
+
+        Returns:
+            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``
+
+        """
+        return utils.packed_cube_to_ground_cube(self.mask)
 
 
 # custom dataset loader

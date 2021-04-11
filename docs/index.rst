@@ -36,6 +36,7 @@ For more information about the constellation of packages supporting RML imaging 
 
    ci-tutorials/gridder
    ci-tutorials/optimization
+   large-tutorials/crossvalidation
 
 .. toctree::
    :hidden:

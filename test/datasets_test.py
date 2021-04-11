@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from mpol import datasets, images, connectors
+from mpol import datasets, images, connectors, utils
 import matplotlib
 import matplotlib.pyplot as plt
 import copy
@@ -251,8 +251,8 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
         rtrain = connectors.GriddedResidualConnector(flayer, train)
         rtest = connectors.GriddedResidualConnector(flayer, test)
 
-        train_chan = images.packed_cube_to_sky_cube(rtrain.forward())[chan]
-        test_chan = images.packed_cube_to_sky_cube(rtest.forward())[chan]
+        train_chan = utils.packed_cube_to_sky_cube(rtrain.forward())[chan]
+        test_chan = utils.packed_cube_to_sky_cube(rtest.forward())[chan]
 
         im = ax[k, 0].imshow(
             train_chan.real.detach().numpy(), interpolation="none", origin="lower"
