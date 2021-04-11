@@ -1,6 +1,7 @@
 graph TD
     subgraph SimpleNet
-    bc(BaseCube) --> ImageCube 
+    bc(BaseCube) --> HannConvCube
+    HannConvCube --> ImageCube 
     ImageCube --> FourierLayer
     FourierLayer --> DataConnector 
     end
