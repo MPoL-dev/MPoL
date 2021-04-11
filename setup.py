@@ -38,6 +38,7 @@ EXTRA_REQUIRES = {
         "matplotlib",
         "sphinxcontrib-mermaid",
         "astropy",
+        "tensorboardx",
     ],
 }
 
