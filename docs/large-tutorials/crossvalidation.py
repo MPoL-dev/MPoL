@@ -62,8 +62,9 @@ data_im = -d["data_im"][
     chan
 ]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
 
-# define the image dimensions, as in the previous tutorial
-coords = gridding.GridCoords(cell_size=0.03, npix=256)
+# define the image dimensions, making sure they are big enough to fit all
+# of the expected emission
+coords = gridding.GridCoords(cell_size=0.03, npix=180)
 gridder = gridding.Gridder(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
 )
@@ -72,6 +73,15 @@ gridder = gridding.Gridder(
 gridder.grid_visibilities(weighting="uniform")
 dset = gridder.to_pytorch_dataset()
 # -
+
+# Show the dirty image
+img = gridder.get_dirty_image()
+kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+fig, ax = plt.subplots(ncols=1)
+ax.imshow(np.squeeze(img), **kw)
+ax.set_title("image")
+ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 
 # ### K-fold cross validation
 #
@@ -111,12 +121,13 @@ ax.invert_xaxis()
 # 1. there are no samples at very low spatial frequencies (the center of the image, $< 10$ k$\lambda$)
 # 2. most samples like at intermediate spatial frequencies (100 k$\lambda$ to 800 k$\lambda$)
 # 3. there are very few samples at high spatial frequencies ($>$ 1000 k$\lambda$)
-# 4. there are many gaps in the $u$,$v$ coverage at high spatial frequencies
+# 4. there are large gaps in the $u$,$v$ coverage where there are no visibilities, especially at high spatial frequencies
 #
-# If we were to just randomly draw chunks from these visibilities, because there are so many visibilities, we would end up mostly replicating the same structured pattern. For example, here is what random training set would look like for $K=10$
+# If we were to just draw randomly from these visibilities, because there are so many ($>$ 500,000 just in this single-channel figure), we would end up mostly replicating the same structured pattern in $u$,$v$. For example, here is what random training set might look like if $K=10$
 
 # +
 nvis = len(uu)
+print(2 * nvis, "visibilities total")
 ind = np.random.choice(np.arange(nvis), size=int(9 * nvis / 10), replace=False)
 
 uk = uu[ind]
@@ -133,30 +144,30 @@ ax.set_title("randomly drawn 9/10 dataset")
 ax.invert_xaxis()
 # -
 
-# As you can see, this training set looks very similar to the full dataset, with the same holes in $u$,$v$ coverage and the same sampling densities. So, randomly generated training datasets don't really stress test the model in any new or interesting ways relative to the full dataset.
+# As you can see, this training set looks very similar to the full dataset, with the same holes in $u$,$v$ coverage and similar sampling densities.
 #
-# But, the missing holes in the real dataset are quite important to image fidelity---if we had complete $u$,$v$ coverage, we wouldn't need to be worrying about CLEAN or RML imaging techniques in the first place. When we make a new interferometric observation, it will have it's own (different) set of missing holes depending on array configuration, observation duration, and hour angle coverage. We would like our cross validation slices to simulate the distribution of possible new datasets, and, at least for ALMA, random sampling doesn't accomplish this.
+# It turns out that the missing holes in the real dataset are quite important to image fidelity---if we had complete $u$,$v$ coverage, we wouldn't need to be worrying about CLEAN or RML imaging techniques in the first place! When we make a new interferometric observation, it will have it's own (different) set of missing holes depending on array configuration, observation duration, and hour angle coverage. We would like our cross validation slices to simulate the $u$,$v$ distribution of possible *new datasets*, and, at least for ALMA, random sampling doesn't probe this very well.
 #
-# Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a subselection of these cells. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your goals.
+# Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a $K$-fold subselection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.
 
 # +
-# create a partition
+# create a radial and azimuthal partition
 dartboard = datasets.Dartboard(coords=coords)
 
-# create cross validator through passing dartboard
+# create cross validator using this "dartboard"
 k = 5
 cv = datasets.KFoldCrossValidatorGridded(dset, k, dartboard=dartboard, npseed=42)
 
-# store output into a list for now, since we'll use it a bunch
+# ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.
+# Because we'll want to revisit the individual datasets
+# several times in this tutorial, we're storeing them into a list
 k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
-
-# Visualize the grid itself. Make a plot of the polar cells and locations in both linear and log space.
 
 flayer = images.FourierCube(coords=coords)
 flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
 
-# Visualize the gridded locations (non-zero histogram). UV in $\mathrm{k}\lambda$ and image is in arcseconds.
+# The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities, the dirty image corresponding to those training visibilities, and the "test" visibilities which will be used to evaluate the predictive ability of the model.
 
 # +
 fig, ax = plt.subplots(nrows=k, ncols=3, figsize=(6, 10))
@@ -186,18 +197,11 @@ for i, (train, test) in enumerate(k_fold_datasets):
     )
 
     ax[i, 1].imshow(
-        train_chan.detach().numpy(),
-        interpolation="none",
-        origin="lower",
-        extent=img_ext,
+        train_chan.detach().numpy(), origin="lower", extent=img_ext,
     )
 
     ax[i, 2].imshow(
-        test_mask.detach().numpy(),
-        interpolation="none",
-        origin="lower",
-        extent=vis_ext,
-        cmap="GnBu",
+        test_mask.detach().numpy(), origin="lower", extent=vis_ext, cmap="GnBu",
     )
 
     ax[i, 0].set_ylabel("k-fold {:}".format(i))
@@ -213,10 +217,15 @@ for a in ax.flatten():
 fig.subplots_adjust(left=0.15, hspace=0.0, wspace=0.2)
 # -
 
-# Following the previous optimization tutorial, let's create a training function.
+# Building on the previous optimization tutorial, we'll wrap the iterative optimization commands into a training function. This will come in handy, because we'll want to train the model on each of the varied $K$-fold training datasets. In this tutorial, we'll use a loss function of the form
+#
+# $$
+# f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity} + \lambda_{TSV} f_\mathrm{TSV}
+# $$
+# where the $\lambda$ prefactors are the strength of the regularization terms.
 
 
-def train(model, dset, config, optimizer):
+def train(model, dset, config, optimizer, writer=None):
     model.train()  # set to training mode
 
     for i in range(config["epochs"]):
@@ -235,13 +244,17 @@ def train(model, dset, config, optimizer):
             + config["lambda_TV"] * losses.TV_image(sky_cube)
         )
 
-        # writer.add_scalar("loss", loss.item(), i)
+        if writer is not None:
+            writer.add_scalar("loss", loss.item(), i)
 
         # calculate gradients of parameters
         loss.backward()
 
         # update the model parameters
         optimizer.step()
+
+
+# We also create a separate "test" function to evaluate the trained model against a set of witheld "test" visibilities.
 
 
 def test(model, dset):
@@ -252,19 +265,13 @@ def test(model, dset):
     return loss.item()
 
 
-# Design a cross validation training loop, reporting the key metric of cross validated score.
-# Make sure we can iterate through the same datasets (keeping random seed).
-
-# Restart the training loop idea, first using only chi^2 to get CV score benchmark
-
-# Then try with sparsity, and try out a low and medium value to see if CV score improves, hopefully landing somewhere at a minimum.
-
-
-# We want to test a loss function of the form
+# Finally, we put the $K$-fold iterator, the training function, and test function together into a cross validation training loop. For each $K$-fold, we
 #
-# $$
-# f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity} + \lambda_{TSV} f_\mathrm{TSV}
-# $$
+# 1. initialize the model and optimizer from scratch
+# 2. fully train the model on the "train" slice
+# 3. calculate the predictive power of that model on the "test" slice via a cross-validation metric
+#
+# when all $K$-folds have been iterated through, we sum the individual cross validations scores into a total cross-validation metric for those hyperparameters.
 
 
 def cross_validate(config):
@@ -290,29 +297,41 @@ def cross_validate(config):
     return test_score
 
 
-# nll_hparams = {"lr": 500, "lambda_sparsity": 0, "lambda_TV": 0, "epochs": 400}
-
-# print(cross_validate(nll_hparams))
-pars = {"lr": 1.0, "lambda_sparsity": 0.0, "lambda_TV": 1e-4, "epochs": 1000}
-cross_validate(pars)
+# Finally, we'll write one more function to train the model using the full dataset.
 
 
-# +
-# now calculate test_score for as many settings of sparsity and TSV as you want, starting from 0 at each.
-# Assuming that the iterations actually converge.
-# -
+def train_and_image(pars):
+    rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+    optimizer = torch.optim.Adam(rml.parameters(), lr=pars["lr"])
+    writer = SummaryWriter()
+    train(rml, dset, pars, optimizer, writer=writer)
+    writer.close()
 
-# train a full model and see what it looks like
-rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
-optimizer = torch.optim.Adam(rml.parameters(), lr=pars["lr"])
-train(rml, dset, pars, optimizer)
+    img_ext = rml.coords.img_ext
+    fig, ax = plt.subplots()
+    ax.imshow(
+        np.squeeze(rml.icube.sky_cube.detach().numpy()), origin="lower", extent=img_ext,
+    )
+    return fig, ax
 
-img_ext = rml.coords.img_ext
-fig, ax = plt.subplots()
-ax.imshow(
-    np.squeeze(rml.icube.sky_cube.detach().numpy()),
-    interpolation="none",
-    origin="lower",
-    extent=img_ext,
-)
+
+# As a starting point, we'll try cross-validating without any regularization.
+
+pars = {"lr": 0.5, "lambda_sparsity": 0, "lambda_TV": 0, "epochs": 600}
+print("Cross validation score:", cross_validate(pars))
+train_and_image(pars)
+
+# This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let's try a small level of regularization
+
+pars = {"lr": 0.5, "lambda_sparsity": 1e-5, "lambda_TV": 1e-5, "epochs": 600}
+print("Cross validation score:", cross_validate(pars))
+train_and_image(pars)
+
+# We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.
+
+pars = {"lr": 0.5, "lambda_sparsity": 1e-4, "lambda_TV": 1e-4, "epochs": 600}
+print("Cross validation score:", cross_validate(pars))
+train_and_image(pars)
+
+# More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``nll_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
 
