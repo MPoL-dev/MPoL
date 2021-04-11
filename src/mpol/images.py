@@ -132,7 +132,7 @@ class HannConvCube(nn.Module):
         """
         # Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.
         # Additionally, the convolution must be done on the *sky-oriented* cube
-        sky_cube = packed_cube_to_sky_cube(cube)
+        sky_cube = utils.packed_cube_to_sky_cube(cube)
 
         # augment extra "batch" dimension to cube, to make it (1, nchan, npix, npix)
         aug_sky_cube = torch.unsqueeze(sky_cube, dim=0)
@@ -146,7 +146,7 @@ class HannConvCube(nn.Module):
         conv_sky_cube = conv_aug_sky_cube[0]
 
         # return in packed format
-        return sky_cube_to_packed_cube(conv_sky_cube)
+        return utils.sky_cube_to_packed_cube(conv_sky_cube)
 
 
 class ImageCube(nn.Module):

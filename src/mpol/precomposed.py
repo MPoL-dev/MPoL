@@ -39,6 +39,9 @@ class SimpleNet(torch.nn.Module):
         self.bcube = images.BaseCube(
             coords=self.coords, nchan=self.nchan, base_cube=base_cube
         )
+
+        self.conv_layer = images.HannConvCube(nchan=self.nchan)
+
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
@@ -46,11 +49,12 @@ class SimpleNet(torch.nn.Module):
 
     def forward(self):
         r"""
-        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.images.FourierCube` to produce the visibility cube. 
+        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.images.FourierCube` to produce the visibility cube. 
         
         Returns: 1D complex torch tensor of model visibilities.
         """
         x = self.bcube.forward()
+        x = self.conv_layer(x)
         x = self.icube.forward(x)
         vis = self.fcube.forward(x)
         return vis

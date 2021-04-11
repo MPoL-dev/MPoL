@@ -63,7 +63,7 @@ data_im = -d["data_im"][
 ]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
 
 # define the image dimensions, as in the previous tutorial
-coords = gridding.GridCoords(cell_size=0.04, npix=128)
+coords = gridding.GridCoords(cell_size=0.03, npix=256)
 gridder = gridding.Gridder(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
 )
@@ -293,7 +293,7 @@ def cross_validate(config):
 # nll_hparams = {"lr": 500, "lambda_sparsity": 0, "lambda_TV": 0, "epochs": 400}
 
 # print(cross_validate(nll_hparams))
-pars = {"lr": 1.0, "lambda_sparsity": 1e-3, "lambda_TV": 1e-4, "epochs": 1000}
+pars = {"lr": 1.0, "lambda_sparsity": 0.0, "lambda_TV": 1e-4, "epochs": 1000}
 cross_validate(pars)
 
 
