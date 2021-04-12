@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
@@ -179,6 +180,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spheroidal_gridding</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span><span class="p">,</span> <span class="n">_setup_coords</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">loglinspace</span>
@@ -255,7 +257,18 @@
 
         <span class="c1"># update pre-indexed values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The boolean mask, arranged in ground format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span></div>
 
 
 <span class="c1"># custom dataset loader</span>

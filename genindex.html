@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -180,6 +181,7 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
@@ -230,16 +232,26 @@
   </ul></td>
 </tr></table>
 
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.losses.edge_clamp">edge_clamp() (in module mpol.losses)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.losses.entropy">entropy() (in module mpol.losses)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.fftspace">fftspace() (in module mpol.utils)</a>
 </li>
-      <li><a href="api.html#mpol.connectors.GriddedDatasetConnector.forward">forward() (mpol.connectors.GriddedDatasetConnector method)</a>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.forward">forward() (mpol.connectors.GriddedResidualConnector method)</a>
 
       <ul>
-        <li><a href="api.html#mpol.connectors.GriddedResidualConnector.forward">(mpol.connectors.GriddedResidualConnector method)</a>
-</li>
         <li><a href="api.html#mpol.images.BaseCube.forward">(mpol.images.BaseCube method)</a>
 </li>
         <li><a href="api.html#mpol.images.FourierCube.forward">(mpol.images.FourierCube method)</a>
@@ -279,21 +291,37 @@
 </li>
       <li><a href="api.html#mpol.datasets.Dartboard.get_nonzero_cell_indices">get_nonzero_cell_indices() (mpol.datasets.Dartboard method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.datasets.Dartboard.get_polar_histogram">get_polar_histogram() (mpol.datasets.Dartboard method)</a>
 </li>
       <li><a href="api.html#mpol.gridding.Gridder.grid_visibilities">grid_visibilities() (mpol.gridding.Gridder method)</a>
 </li>
       <li><a href="api.html#mpol.coordinates.GridCoords">GridCoords (class in mpol.coordinates)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.datasets.GriddedDataset">GriddedDataset (class in mpol.datasets)</a>
-</li>
-      <li><a href="api.html#mpol.connectors.GriddedDatasetConnector">GriddedDatasetConnector (class in mpol.connectors)</a>
 </li>
       <li><a href="api.html#mpol.connectors.GriddedResidualConnector">GriddedResidualConnector (class in mpol.connectors)</a>
 </li>
       <li><a href="api.html#mpol.gridding.Gridder">Gridder (class in mpol.gridding)</a>
+</li>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.ground_amp">ground_amp() (mpol.connectors.GriddedResidualConnector property)</a>
+</li>
+      <li><a href="api.html#mpol.utils.ground_cube_to_packed_cube">ground_cube_to_packed_cube() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.ground_mask">ground_mask() (mpol.connectors.GriddedResidualConnector property)</a>
+
+      <ul>
+        <li><a href="api.html#mpol.datasets.GriddedDataset.ground_mask">(mpol.datasets.GriddedDataset property)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.ground_phase">ground_phase() (mpol.connectors.GriddedResidualConnector property)</a>
+</li>
+      <li><a href="api.html#mpol.images.FourierCube.ground_psd">ground_psd() (mpol.images.FourierCube property)</a>
+</li>
+      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.ground_residuals">ground_residuals() (mpol.connectors.GriddedResidualConnector property)</a>
+</li>
+      <li><a href="api.html#mpol.images.FourierCube.ground_vis">ground_vis() (mpol.images.FourierCube property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -312,6 +340,10 @@
       <li><a href="api.html#mpol.images.ImageCube">ImageCube (class in mpol.images)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.connectors.index_vis">index_vis() (in module mpol.connectors)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="K">K</h2>
@@ -327,25 +359,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.log_stretch">log_stretch() (in module mpol.utils)</a>
 </li>
-      <li><a href="api.html#mpol.utils.loglinspace">loglinspace() (in module mpol.utils)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn">loss_fn() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_edge_clamp">loss_fn_edge_clamp() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_entropy">loss_fn_entropy() (in module mpol.losses)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mpol.losses.loss_fn_PSD">loss_fn_PSD() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_sparsity">loss_fn_sparsity() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_TV_channel">loss_fn_TV_channel() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_TV_image">loss_fn_TV_image() (in module mpol.losses)</a>
-</li>
-      <li><a href="api.html#mpol.losses.loss_fn_UV_sparsity">loss_fn_UV_sparsity() (in module mpol.losses)</a>
+      <li><a href="api.html#mpol.utils.loglinspace">loglinspace() (in module mpol.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -441,12 +457,22 @@
       <li><a href="api.html#mpol.losses.nll">nll() (in module mpol.losses)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.losses.nll_gridded">nll_gridded() (in module mpol.losses)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mpol.images.FourierCube.psd">psd() (mpol.images.FourierCube property)</a>
+      <li><a href="api.html#mpol.utils.packed_cube_to_ground_cube">packed_cube_to_ground_cube() (in module mpol.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.utils.packed_cube_to_sky_cube">packed_cube_to_sky_cube() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.losses.PSD">PSD() (in module mpol.losses)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -456,27 +482,23 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.precomposed.SimpleNet">SimpleNet (class in mpol.precomposed)</a>
 </li>
-      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_amp">sky_amp() (mpol.connectors.GriddedResidualConnector property)</a>
-</li>
       <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_cube">sky_cube() (mpol.connectors.GriddedResidualConnector property)</a>
 
       <ul>
         <li><a href="api.html#mpol.images.ImageCube.sky_cube">(mpol.images.ImageCube property)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#mpol.utils.sky_gaussian_arcsec">sky_gaussian_arcsec() (in module mpol.utils)</a>
+      <li><a href="api.html#mpol.utils.sky_cube_to_packed_cube">sky_cube_to_packed_cube() (in module mpol.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.utils.sky_gaussian_arcsec">sky_gaussian_arcsec() (in module mpol.utils)</a>
+</li>
       <li><a href="api.html#mpol.utils.sky_gaussian_radians">sky_gaussian_radians() (in module mpol.utils)</a>
 </li>
-      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_phase">sky_phase() (mpol.connectors.GriddedResidualConnector property)</a>
-</li>
-      <li><a href="api.html#mpol.connectors.GriddedResidualConnector.sky_residuals">sky_residuals() (mpol.connectors.GriddedResidualConnector property)</a>
-</li>
-      <li><a href="api.html#mpol.images.FourierCube.sky_vis">sky_vis() (mpol.images.FourierCube property)</a>
-</li>
       <li><a href="api.html#mpol.gridding.Gridder.sky_vis_gridded">sky_vis_gridded() (mpol.gridding.Gridder property)</a>
+</li>
+      <li><a href="api.html#mpol.losses.sparsity">sparsity() (in module mpol.losses)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -486,15 +508,23 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.images.ImageCube.to_FITS">to_FITS() (mpol.images.ImageCube method)</a>
 </li>
+      <li><a href="api.html#mpol.gridding.Gridder.to_pytorch_dataset">to_pytorch_dataset() (mpol.gridding.Gridder method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mpol.gridding.Gridder.to_pytorch_dataset">to_pytorch_dataset() (mpol.gridding.Gridder method)</a>
+      <li><a href="api.html#mpol.losses.TV_channel">TV_channel() (in module mpol.losses)</a>
+</li>
+      <li><a href="api.html#mpol.losses.TV_image">TV_image() (in module mpol.losses)</a>
 </li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.losses.UV_sparsity">UV_sparsity() (in module mpol.losses)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.datasets.UVDataset">UVDataset (class in mpol.datasets)</a>
 </li>

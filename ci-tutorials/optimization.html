@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Optimization Loop &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -46,7 +45,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="next" title="Cross validation" href="../large-tutorials/crossvalidation.html" />
     <link rel="prev" title="Gridding and diagnostic images" href="gridder.html" /> 
 </head>
 
@@ -97,14 +96,14 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Optimization Loop</a><ul>
@@ -119,6 +118,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#Wrapup">Wrapup</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -438,10 +438,10 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<section id="Optimization-Loop">
+<div class="section" id="Optimization-Loop">
 <h1>Optimization Loop<a class="headerlink" href="#Optimization-Loop" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial, we’ll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We’ll continue with the dataset described in the <a class="reference external" href="gridder.html">Gridding and Diagnostic Images</a> tutorial.</p>
-<section id="Gridding-recap">
+<div class="section" id="Gridding-recap">
 <h2>Gridding recap<a class="headerlink" href="#Gridding-recap" title="Permalink to this headline">¶</a></h2>
 <p>Let’s set up the gridder and coordinates as before</p>
 <div class="nbinput nblast docutils container">
@@ -453,11 +453,9 @@ div.rendered_html tbody tr:hover {
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">mpol</span>
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">images</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">import</span> <span class="nn">os</span>
 </pre></div>
 </div>
 </div>
@@ -505,8 +503,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-</section>
-<section id="The-PyTorch-dataset">
+</div>
+<div class="section" id="The-PyTorch-dataset">
 <h2>The PyTorch dataset<a class="headerlink" href="#The-PyTorch-dataset" title="Permalink to this headline">¶</a></h2>
 <p>Now we will export the gridded visibilities to a PyTorch dataset to use in the imaging loop. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.</p>
 <div class="nbinput docutils container">
@@ -527,8 +525,8 @@ div.rendered_html tbody tr:hover {
 this dataset has 1 channel
 </pre></div></div>
 </div>
-</section>
-<section id="Building-an-image-model">
+</div>
+<div class="section" id="Building-an-image-model">
 <h2>Building an image model<a class="headerlink" href="#Building-an-image-model" title="Permalink to this headline">¶</a></h2>
 <p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We’ve bundled the most common modules for imaging together in a <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a> meta-module, which we’ll use here.</p>
 <p>This diagram shows how the primitive modules, like <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>, <a class="reference external" href="../api.html#mpol.images.ImageCube">ImageCube</a>, etc… are connected together to form <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>. In this workflow, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> are the core model parameters representing the image. More information about all of these components is available in the <a class="reference external" href="../api.html">API documentation</a>.</p>
@@ -554,12 +552,12 @@ this dataset has 1 channel
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rml</span> <span class="o">=</span> <span class="n">precomposed</span><span class="o">.</span><span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">=</span><span class="n">dset</span><span class="p">)</span>
+<span></span><span class="n">rml</span> <span class="o">=</span> <span class="n">precomposed</span><span class="o">.</span><span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-</section>
-<section id="Breaking-down-the-training-loop">
+</div>
+<div class="section" id="Breaking-down-the-training-loop">
 <h2>Breaking down the training loop<a class="headerlink" href="#Breaking-down-the-training-loop" title="Permalink to this headline">¶</a></h2>
 <p>Our goal for the rest of the tutorial is to set up a loop that will</p>
 <ol class="arabic simple">
@@ -579,13 +577,13 @@ this dataset has 1 channel
 </div>
 <p>The role of the optimizer is to advance the parameters (in this case, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>) using the gradient of the loss function with respect to those parameters. PyTorch has many different <a class="reference external" href="https://pytorch.org/docs/stable/optim.html#module-torch.optim">optimizers</a> available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The <code class="docutils literal notranslate"><span class="pre">lr</span></code> parameter is the
 ‘learning rate,’ or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.</p>
-</section>
-<section id="Loss-functions">
+</div>
+<div class="section" id="Loss-functions">
 <h2>Loss functions<a class="headerlink" href="#Loss-functions" title="Permalink to this headline">¶</a></h2>
 <p>In the parlance of the machine learning community, one defines “loss” functions comparing models to data. For regularized maximum likelihood imaging, the most fundamental loss function we’ll use is the <a class="reference external" href="../api.html#mpol.losses.loss_fn">data likelihood</a> or the <span class="math notranslate nohighlight">\(\chi^2\)</span> value comparing the model visibilities to the data visibilities. For this introductory tutorial, we’ll use only the data likelihood loss function to start, but you should know that because imaging is an ill-defined inverse
 problem, this is not a sufficient constraint by itself. In later tutorials, we will apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The <a class="reference external" href="../api.html#module-mpol.losses">mpol.losses</a> module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.</p>
-</section>
-<section id="Gradient-descent">
+</div>
+<div class="section" id="Gradient-descent">
 <h2>Gradient descent<a class="headerlink" href="#Gradient-descent" title="Permalink to this headline">¶</a></h2>
 <p>Let’s walk through how we calculate a loss value and optimize the parameters. To start, let’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/saving_loading_models.html">examine the parameters of the model</a></p>
 <div class="nbinput docutils container">
@@ -611,7 +609,12 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
                        [0.0500, 0.0500, 0.0500,  ..., 0.0500, 0.0500, 0.0500],
                        [0.0500, 0.0500, 0.0500,  ..., 0.0500, 0.0500, 0.0500],
                        [0.0500, 0.0500, 0.0500,  ..., 0.0500, 0.0500, 0.0500]]],
-                     dtype=torch.float64))])
+                     dtype=torch.float64)),
+             (&#39;conv_layer.m.weight&#39;,
+              tensor([[[[0.0625, 0.1250, 0.0625],
+                        [0.1250, 0.2500, 0.1250],
+                        [0.0625, 0.1250, 0.0625]]]], dtype=torch.float64)),
+             (&#39;conv_layer.m.bias&#39;, tensor([0.], dtype=torch.float64))])
 </pre></div></div>
 </div>
 <p>These are the default values that were used to initialize the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> component of the <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>.</p>
@@ -621,7 +624,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">bcube_pytorch</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="p">)</span>
+<span></span><span class="n">bcube_pytorch</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -667,7 +670,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f708add7f40&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff8b8badf70&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -688,14 +691,14 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </pre></div>
 </div>
 </div>
-<p>Most modules in MPoL are designed to work in a “feed forward” manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the model visibilities corresponding to the current pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a></p>
+<p>Most modules in MPoL are designed to work in a “feed forward” manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">model_visibilities</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model_visibilities</span><span class="p">)</span>
+<span></span><span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vis</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -704,8 +707,32 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
-       dtype=torch.complex128, grad_fn=&lt;ComplexBackward&gt;)
+tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
+          -7.1797e-03-5.6390e-05j,  ...,
+           7.1791e-03-8.4581e-05j, -7.1797e-03+5.6390e-05j,
+           7.1800e-03-2.8196e-05j],
+         [ 7.1800e-03+2.8196e-05j,  4.4902e-06+3.5266e-08j,
+          -4.4899e-06-5.2898e-08j,  ...,
+           4.4899e-06-3.5264e-08j, -4.4902e-06+1.7633e-08j,
+           4.4903e-06+4.9217e-19j],
+         [-7.1797e-03-5.6390e-05j, -4.4899e-06-5.2898e-08j,
+           4.4895e-06+7.0527e-08j,  ...,
+          -4.4899e-06+1.7632e-08j,  4.4901e-06-6.4302e-19j,
+          -4.4902e-06-1.7633e-08j],
+         ...,
+         [ 7.1791e-03-8.4581e-05j,  4.4899e-06-3.5264e-08j,
+          -4.4899e-06+1.7632e-08j,  ...,
+           4.4885e-06-1.0578e-07j, -4.4891e-06+8.8154e-08j,
+           4.4895e-06-7.0526e-08j],
+         [-7.1797e-03+5.6390e-05j, -4.4902e-06+1.7633e-08j,
+           4.4901e-06+6.4011e-19j,  ...,
+          -4.4891e-06+8.8154e-08j,  4.4895e-06-7.0527e-08j,
+          -4.4899e-06+5.2898e-08j],
+         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-4.9292e-19j,
+          -4.4902e-06-1.7633e-08j,  ...,
+           4.4895e-06-7.0526e-08j, -4.4899e-06+5.2898e-08j,
+           4.4902e-06-3.5266e-08j]]], dtype=torch.complex128,
+       grad_fn=&lt;MulBackward0&gt;)
 </pre></div></div>
 </div>
 <p>Of course, these aren’t that exciting since they just reflect the constant value image.</p>
@@ -716,7 +743,7 @@ tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># calculate a loss</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll</span><span class="p">(</span><span class="n">model_visibilities</span><span class="p">,</span> <span class="n">dset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">dset</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -726,7 +753,7 @@ tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-22.11468972265907
+22.09555274683534
 </pre></div></div>
 </div>
 <p>and then we can calculate the gradient of the loss function with respect to the parameters</p>
@@ -757,7 +784,7 @@ tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
     <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
-        <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="p">),</span>
     <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
     <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
@@ -773,7 +800,7 @@ tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f7084256fd0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff8b20b1b50&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -810,14 +837,19 @@ tensor([0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 OrderedDict([(&#39;bcube.base_cube&#39;,
-              tensor([[[0.0927, 0.0925, 0.0919,  ..., 0.0917, 0.0923, 0.0927],
-                       [0.0885, 0.0882, 0.0876,  ..., 0.0877, 0.0882, 0.0885],
-                       [0.0844, 0.0840, 0.0834,  ..., 0.0838, 0.0842, 0.0844],
+              tensor([[[0.0925, 0.0923, 0.0917,  ..., 0.0915, 0.0921, 0.0925],
+                       [0.0883, 0.0880, 0.0874,  ..., 0.0875, 0.0881, 0.0883],
+                       [0.0842, 0.0839, 0.0832,  ..., 0.0837, 0.0841, 0.0842],
                        ...,
-                       [0.1057, 0.1056, 0.1051,  ..., 0.1038, 0.1048, 0.1054],
-                       [0.1013, 0.1012, 0.1006,  ..., 0.0998, 0.1006, 0.1011],
-                       [0.0970, 0.0968, 0.0962,  ..., 0.0957, 0.0964, 0.0969]]],
-                     dtype=torch.float64))])
+                       [0.1055, 0.1054, 0.1048,  ..., 0.1037, 0.1046, 0.1052],
+                       [0.1011, 0.1010, 0.1004,  ..., 0.0996, 0.1004, 0.1009],
+                       [0.0968, 0.0966, 0.0960,  ..., 0.0955, 0.0962, 0.0967]]],
+                     dtype=torch.float64)),
+             (&#39;conv_layer.m.weight&#39;,
+              tensor([[[[0.0625, 0.1250, 0.0625],
+                        [0.1250, 0.2500, 0.1250],
+                        [0.0625, 0.1250, 0.0625]]]], dtype=torch.float64)),
+             (&#39;conv_layer.m.bias&#39;, tensor([0.], dtype=torch.float64))])
 </pre></div></div>
 </div>
 <p>as has the base image</p>
@@ -828,7 +860,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">base_cube</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()),</span>
     <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
     <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
     <span class="n">extent</span><span class="o">=</span><span class="n">rml</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">,</span>
@@ -843,7 +875,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f7084195070&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff8b1ffb070&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -853,8 +885,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <img alt="../_images/ci-tutorials_optimization_42_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_42_1.png" style="width: 635px; height: 499px;" />
 </div>
 </div>
-</section>
-<section id="Iterating-the-training-Loop">
+</div>
+<div class="section" id="Iterating-the-training-Loop">
 <h2>Iterating the training Loop<a class="headerlink" href="#Iterating-the-training-Loop" title="Permalink to this headline">¶</a></h2>
 <p>Now that we’ve covered how to use gradient descent to optimize a set of image parameters, let’s wrap these steps into a training loop and iterate a few hundred times to converge to a final product.</p>
 <p>In addition to the steps just outlined, we’ll also track the loss values as we optimize.</p>
@@ -871,10 +903,10 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
     <span class="n">rml</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
     <span class="c1"># get the predicted model</span>
-    <span class="n">model_visibilities</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
 
     <span class="c1"># calculate a loss</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll</span><span class="p">(</span><span class="n">model_visibilities</span><span class="p">,</span> <span class="n">dset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">dset</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
 
     <span class="n">loss_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
@@ -891,8 +923,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 14.1 s, sys: 310 ms, total: 14.4 s
-Wall time: 7.26 s
+CPU times: user 56.8 s, sys: 7.71 s, total: 1min 4s
+Wall time: 36.6 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -924,8 +956,8 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
-</section>
-<section id="Visualizing-output">
+</div>
+<div class="section" id="Visualizing-output">
 <h2>Visualizing output<a class="headerlink" href="#Visualizing-output" title="Permalink to this headline">¶</a></h2>
 <p>Let’s visualize the final product. The bounds for <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> are available in the <code class="docutils literal notranslate"><span class="pre">img_ext</span></code> parameter.</p>
 <div class="nbinput docutils container">
@@ -951,7 +983,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f708411a370&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff8b8ba9190&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -961,15 +993,15 @@ Text(0, 0.5, &#39;loss&#39;)
 <img alt="../_images/ci-tutorials_optimization_48_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_48_1.png" style="width: 604px; height: 499px;" />
 </div>
 </div>
-</section>
-<section id="Wrapup">
+</div>
+<div class="section" id="Wrapup">
 <h2>Wrapup<a class="headerlink" href="#Wrapup" title="Permalink to this headline">¶</a></h2>
 <p>And there you have it, an image optimized to fit the data. Don’t be fooled into thinking that minimal regularization (like we’ve done here with only the data likelihood) yields the most conservative image estimates, however! With this setup, we’ve done <em>some</em> regularization because the functional basis set we chose automatically enforced image positivity (see the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> documentation), but in truth we aren’t too far off from the dirty image itself.</p>
 <p>Though the dirty image is easy to produce and is in fact a maximal likelihood image (with no regularization), we would argue that it’s far from a conservative image since it is generated by making some rather strong assumptions about the data—that unsampled spatial frequencies carry zero power. In future tutorials we’ll examine how to set up additional regularizer terms that can yield more desireable image characteristics.</p>
 <p>Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">GitHub discussion</a>. If you spot a bug or have an idea to improve these tutorials, please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">GitHub issue</a> or better yet <a class="reference external" href="file:///Users/ian/Documents/Research/Disks/RML/MPoL/docs/_build/html/developer-documentation.html">submit a pull
 request</a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -979,7 +1011,7 @@ request</a>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../large-tutorials/crossvalidation.html" class="btn btn-neutral float-right" title="Cross validation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="gridder.html" class="btn btn-neutral float-left" title="Gridding and diagnostic images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

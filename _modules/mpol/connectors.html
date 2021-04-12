@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
@@ -178,12 +179,38 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">images</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
-<div class="viewcode-block" id="GriddedDatasetConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedDatasetConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedDatasetConnector</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="index_vis"><a class="viewcode-back" href="../../api.html#mpol.connectors.index_vis">[docs]</a><span class="k">def</span> <span class="nf">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Connect a FourierCube to the gridded dataset, and return indexed model visibilities for calculating the loss. </span>
+<span class="sd">    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is &quot;packed&quot; just like the :class:`~mpol.datasets.GriddedDataset`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed.&quot;</span>
+<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
+
+<span class="sd">    Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">vis</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
+
+    <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
+    <span class="c1"># However, masked_select does not yet work (with gradients)</span>
+    <span class="c1"># on the complex vis, so hence this awkward step of selecting</span>
+    <span class="c1"># the reals and imaginaries separately</span>
+    <span class="n">re</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+
+    <span class="c1"># we had trouble returning things as re + 1.0j * im,</span>
+    <span class="c1"># but for some reason torch.complex seems to work OK.</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GriddedResidualConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedResidualConnector</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fourierCube: instantiated :class:`~mpol.images.FourierCube` object</span>
@@ -204,41 +231,6 @@
         <span class="c1"># take the mask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span>
 
-<div class="viewcode-block" id="GriddedDatasetConnector.forward"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedDatasetConnector.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vis</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return model samples for evaluation with a likelihood function.</span>
-
-<span class="sd">        Args: </span>
-<span class="sd">            vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed.&quot;</span>
-
-<span class="sd">        Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">vis</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
-
-        <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
-        <span class="c1"># However, masked_select does not yet work (with gradients)</span>
-        <span class="c1"># on the complex vis, so hence this awkward step of selecting</span>
-        <span class="c1"># the reals and imaginaries separately</span>
-        <span class="n">re</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-
-        <span class="c1"># we had trouble returning things as re + 1.0j * im,</span>
-        <span class="c1"># but for some reason torch.complex seems to work OK.</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="GriddedResidualConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedResidualConnector</span><span class="p">(</span><span class="n">GriddedDatasetConnector</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fourierCube: instantiated :class:`~mpol.images.FourierCube` object</span>
-<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
 <div class="viewcode-block" id="GriddedResidualConnector.forward"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the residuals as </span>
 <span class="sd">        </span>
@@ -246,9 +238,9 @@
 <span class="sd">        </span>
 <span class="sd">            \mathrm{residuals} = \mathrm{data} - \mathrm{model}</span>
 
-<span class="sd">        And store residual products as PyTorch tensor instance and property attributes. </span>
+<span class="sd">        And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.</span>
 
-<span class="sd">        Returns (torch tensor complex): full packed cube</span>
+<span class="sd">        Returns (torch tensor complex): full packed cube (including imaginaries), mainly for debugging purposes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourierCube</span><span class="o">.</span><span class="n">vis</span>
 
@@ -272,6 +264,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">real</span>
 
+        <span class="c1"># return the full thing for debugging purposes</span>
         <span class="k">return</span> <span class="n">cube</span></div>
 
     <span class="nd">@property</span>
@@ -283,37 +276,48 @@
 <span class="sd">            torch.double : 3D image cube of shape ``(nchan, npix, npix)`` in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sky_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The boolean mask, arranged in ground format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ground_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double : 3D amplitude cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amp</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sky_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double : 3D phase cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sky_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">images</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">)</span></div>
 
 </pre></div>
 

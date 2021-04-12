@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Changelog &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -30,6 +29,8 @@
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -44,7 +45,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Optimization Loop" href="ci-tutorials/optimization.html" /> 
+    <link rel="prev" title="Cross validation" href="large-tutorials/crossvalidation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,20 +95,22 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-1">v0.1.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0">v0.1.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-5">v0.0.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-4">v0.0.4</a></li>
@@ -183,41 +186,51 @@
             
   <blockquote>
 <div></div></blockquote>
-<section id="changelog">
+<div class="section" id="changelog">
 <span id="changelog-reference-label"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<section id="v0-1-0">
+<div class="section" id="v0-1-1">
+<h2>v0.1.1<a class="headerlink" href="#v0-1-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="api.html#mpol.images.HannConvCube" title="mpol.images.HannConvCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">HannConvCube</span></code></a>, incorporating Hann-like pixels and bundled it in the <a class="reference internal" href="api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> module</p></li>
+<li><p>Added <a class="reference internal" href="api.html#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dartboard</span></code></a> and <a class="reference internal" href="api.html#mpol.datasets.KFoldCrossValidatorGridded" title="mpol.datasets.KFoldCrossValidatorGridded"><code class="xref py py-class docutils literal notranslate"><span class="pre">KFoldCrossValidatorGridded</span></code></a> for cross validation</p></li>
+<li><p>Added cross validation tutorial</p></li>
+<li><p>Removed DatasetConnector in favor of <a class="reference internal" href="api.html#mpol.losses.nll_gridded" title="mpol.losses.nll_gridded"><code class="xref py py-func docutils literal notranslate"><span class="pre">nll_gridded()</span></code></a></p></li>
+<li><p>Added <a class="reference internal" href="api.html#mpol.utils.ground_cube_to_packed_cube" title="mpol.utils.ground_cube_to_packed_cube"><code class="xref py py-func docutils literal notranslate"><span class="pre">ground_cube_to_packed_cube()</span></code></a>, <a class="reference internal" href="api.html#mpol.utils.packed_cube_to_ground_cube" title="mpol.utils.packed_cube_to_ground_cube"><code class="xref py py-func docutils literal notranslate"><span class="pre">packed_cube_to_ground_cube()</span></code></a>, <a class="reference internal" href="api.html#mpol.utils.sky_cube_to_packed_cube" title="mpol.utils.sky_cube_to_packed_cube"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_cube_to_packed_cube()</span></code></a>, and <a class="reference internal" href="api.html#mpol.utils.packed_cube_to_sky_cube" title="mpol.utils.packed_cube_to_sky_cube"><code class="xref py py-func docutils literal notranslate"><span class="pre">packed_cube_to_sky_cube()</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="v0-1-0">
 <h2>v0.1.0<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Updated citations to include Brianna Zawadzki</p></li>
-<li><p>Added <a class="reference internal" href="api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> and <code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code> objects.</p></li>
-<li><p>Removed <code class="docutils literal notranslate"><span class="pre">mpol.dirty_image</span></code> module.</p></li>
-<li><p>Migrated prolate spheroidal wavefunctions to <code class="docutils literal notranslate"><span class="pre">mpol.spheroidal_gridding</span></code> module.</p></li>
+<li><p>Added <a class="reference internal" href="api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> and <code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code> objects</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">mpol.dirty_image</span></code> module</p></li>
+<li><p>Migrated prolate spheroidal wavefunctions to <code class="docutils literal notranslate"><span class="pre">mpol.spheroidal_gridding</span></code> module</p></li>
 <li><p>Added Jupyter notebook tutorial build process using Jupytext</p></li>
-<li><p>Added SimpleNet precomposed module</p></li>
+<li><p>Added <a class="reference internal" href="api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> precomposed module</p></li>
 <li><p>Added Mermaid.js charting ability (for flowcharts)</p></li>
 <li><p>Moved docs to github.io pages instead of Read the docs</p></li>
-<li><p>Added Jy/arcsec^2 units to Gridder output.</p></li>
+<li><p>Added <span class="math notranslate nohighlight">\(\mathrm{Jy\;arcsec}^{-2}\)</span> units to Gridder output</p></li>
 </ul>
-</section>
-<section id="v0-0-5">
+</div>
+<div class="section" id="v0-0-5">
 <h2>v0.0.5<a class="headerlink" href="#v0-0-5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Introduced this Changelog</p></li>
 <li><p>Updated citations to include Ryan Loomis</p></li>
-<li><p>Added <cite>dirty_image.get_dirty_image</cite> routine, which includes Briggs robust weighting.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">dirty_image.get_dirty_image</span></code> routine, which includes Briggs robust weighting.</p></li>
 <li><p>Added assert statements to catch if the user chooses <cite>cell_size</cite> too coarsely relative to the spatial frequencies in the dataset.</p></li>
 <li><p>Implemented preliminary power spectral density loss functions.</p></li>
 <li><p>The image cube is now natively stored (and optimized) using the natural logarithm of the pixel values. This defacto enforces positivity on all pixel values.</p></li>
 <li><p>Changed entropy function to follow EHT-IV.</p></li>
 </ul>
-</section>
-<section id="v0-0-4">
+</div>
+<div class="section" id="v0-0-4">
 <h2>v0.0.4<a class="headerlink" href="#v0-0-4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Made the package <code class="docutils literal notranslate"><span class="pre">pip</span></code> installable.</p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -228,7 +241,7 @@
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="ci-tutorials/optimization.html" class="btn btn-neutral float-left" title="Optimization Loop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="large-tutorials/crossvalidation.html" class="btn btn-neutral float-left" title="Cross validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

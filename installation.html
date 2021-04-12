@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Installation &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -95,7 +94,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#using-pip">Using pip</a></li>
@@ -108,10 +107,11 @@
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -183,17 +183,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="installation">
+  <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>MPoL requires <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">&gt;=</span> <span class="pre">3.5</span></code>.</p>
-<section id="using-pip">
+<div class="section" id="using-pip">
 <h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
 <p>Stable versions are hosted on PyPI and installable via</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install MPoL
 </pre></div>
 </div>
-</section>
-<section id="from-source">
+</div>
+<div class="section" id="from-source">
 <h2>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h2>
 <p>If you’d like to install the package from source to access the latest development version, download or <cite>git clone</cite> the MPoL repository and install</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/MPoL-dev/MPoL.git
@@ -202,8 +202,8 @@ $ pip install .
 </pre></div>
 </div>
 <p>If you have trouble installing please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">github issue</a>.</p>
-</section>
-<section id="upgrading">
+</div>
+<div class="section" id="upgrading">
 <h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
 <p>If you installed from PyPI, to upgrade to the latest stable version of MPoL, do</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade MPoL
@@ -221,12 +221,12 @@ $ pip install .
 &gt;&gt;&gt; print(mpol.__version__)
 </pre></div>
 </div>
-</section>
-<section id="other-considerations">
+</div>
+<div class="section" id="other-considerations">
 <h2>Other considerations<a class="headerlink" href="#other-considerations" title="Permalink to this headline">¶</a></h2>
 <p>If you would like to export your images to FITS files, you should also install the <cite>astropy</cite> package.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

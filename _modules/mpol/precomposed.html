@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
@@ -173,10 +174,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mpol.precomposed</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">images</span>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">images</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">connectors</span>
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">_setup_coords</span>
-<span class="kn">import</span> <span class="nn">torch</span>
 
 
 <div class="viewcode-block" id="SimpleNet"><a class="viewcode-back" href="../../api.html#mpol.precomposed.SimpleNet">[docs]</a><span class="k">class</span> <span class="nc">SimpleNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -188,13 +189,13 @@
 <span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the base cube. Default = 1.</span>
-<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 <span class="sd">        base_cube : a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``.</span>
 <span class="sd">    </span>
 <span class="sd">    After the object is initialized, instance variables can be accessed, for example</span>
 <span class="sd">    </span>
 <span class="sd">    :ivar bcube: the :class:`~mpol.images.BaseCube` instance</span>
 <span class="sd">    :ivar icube: the :class:`~mpol.images.ImageCube` instance</span>
+<span class="sd">    :ivar fcube: the :class:`~mpol.images.FourierCube` instance</span>
 
 <span class="sd">    For example, you&#39;ll likely want to access the ``self.icube.sky_model`` at some point.</span>
 
@@ -205,13 +206,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">griddedDataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">base_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -220,25 +215,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bcube</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">BaseCube</span><span class="p">(</span>
             <span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">base_cube</span><span class="o">=</span><span class="n">base_cube</span>
         <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">HannConvCube</span><span class="p">(</span><span class="n">nchan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">icube</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">ImageCube</span><span class="p">(</span>
             <span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">passthrough</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flayer</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">FourierCube</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">griddedDataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Please provide a GriddedDataset instance.&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dcon</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">GriddedDatasetConnector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flayer</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fcube</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">FourierCube</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SimpleNet.forward"><a class="viewcode-back" href="../../api.html#mpol.precomposed.SimpleNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.images.FourierCube` is fed to a :class:`~mpol.connectors.DatasetConnector` to calculate the model visibilities at the indexed locations of the :class:`~mpol.datasets.GriddedDataset` object that was used to instantiate the class.</span>
-
+<span class="sd">        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.images.FourierCube` to produce the visibility cube. </span>
+<span class="sd">        </span>
 <span class="sd">        Returns: 1D complex torch tensor of model visibilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bcube</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flayer</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">model_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dcon</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">vis</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">model_samples</span></div></div>
+        <span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fcube</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vis</span></div></div>
 </pre></div>
 
            </div>

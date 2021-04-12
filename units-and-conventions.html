@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Units and Conventions &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -97,7 +96,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -115,10 +114,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -190,9 +190,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="units-and-conventions">
+  <div class="section" id="units-and-conventions">
 <h1>Units and Conventions<a class="headerlink" href="#units-and-conventions" title="Permalink to this headline">¶</a></h1>
-<section id="fourier-transform-conventions">
+<div class="section" id="fourier-transform-conventions">
 <h2>Fourier transform conventions<a class="headerlink" href="#fourier-transform-conventions" title="Permalink to this headline">¶</a></h2>
 <p>We follow the (reasonably standard) conventions of the Fourier transform (e.g., <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract">Bracewell’s</a> “system 1”).</p>
 <p><strong>Forward transform</strong>:</p>
@@ -201,19 +201,19 @@
 <p><strong>Inverse transform</strong>:</p>
 <div class="math notranslate nohighlight">
 \[f(x) = \int_{-\infty}^\infty F(s) e^{i 2 \pi  x s} \mathrm{d}s\]</div>
-</section>
-<section id="continuous-representation-of-interferometry">
+</div>
+<div class="section" id="continuous-representation-of-interferometry">
 <h2>Continuous representation of interferometry<a class="headerlink" href="#continuous-representation-of-interferometry" title="Permalink to this headline">¶</a></h2>
 <p>Consider some astronomical source parameterized by its sky brightness distribution <span class="math notranslate nohighlight">\(I\)</span>. The sky brightness is a function of position on the sky. For small fields of view (typical to single-pointing ALMA or VLA observations) we parameterize the sky direction using the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span>, which correspond to R.A. and Dec, respectively. In that case, we would have a function <span class="math notranslate nohighlight">\(I(l,m)\)</span>. The sky brightness is an <em>intensity</em>, so it has units of <span class="math notranslate nohighlight">\(\mathrm{Jy\,arcsec}^{-2}\)</span> (equivalently <span class="math notranslate nohighlight">\(\mathrm{Jy\, beam}^{-1}\)</span>, where <span class="math notranslate nohighlight">\(\mathrm{beam}\)</span> is the effective area of the synthesized beam).</p>
 <p>The real domain is linked to the Fourier domain, also called the visibility domain, via the Fourier transform</p>
 <div class="math notranslate nohighlight">
 \[{\cal V}(u,v) = \int \int I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.\]</div>
 <p>This integral demonstrates that the units of visibility function (and samples of it) are <span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>.</p>
-</section>
-<section id="discretized-representation">
+</div>
+<div class="section" id="discretized-representation">
 <h2>Discretized representation<a class="headerlink" href="#discretized-representation" title="Permalink to this headline">¶</a></h2>
 <p>There are several annoying pitfalls that can arise when dealing with discretized images and Fourier transforms, and most relate back to confusing or ill-specified conventions. The purpose of this page is to explicitly define the conventions used throughout MPoL and make clear how each transformation relates back to the continuous equations.</p>
-<section id="pixel-fluxes">
+<div class="section" id="pixel-fluxes">
 <h3>Pixel fluxes<a class="headerlink" href="#pixel-fluxes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of <span class="math notranslate nohighlight">\(\mathrm{Jy\,arcsec}^{-2}\)</span>.</p></li>
@@ -221,12 +221,12 @@
 <li><p>The “rows” of the image cube (axis=1) correspond to the <span class="math notranslate nohighlight">\(m\)</span> or Dec axis. There are <span class="math notranslate nohighlight">\(M\)</span> number of pixels in the Dec axis.</p></li>
 <li><p>The “columns” of the image cube (axis=2) correspond to the <span class="math notranslate nohighlight">\(l\)</span> or R.A. axis. There are <span class="math notranslate nohighlight">\(L\)</span> number of pixels in the R.A. axis.</p></li>
 </ul>
-</section>
-<section id="angular-units">
+</div>
+<div class="section" id="angular-units">
 <h3>Angular units<a class="headerlink" href="#angular-units" title="Permalink to this headline">¶</a></h3>
 <p>For nearly all user-facing routines, the angular axes (the direction cosines <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> corresponding to R.A. and Dec, respectively) are expected to have units of arcseconds. The sample rate of the image cube is set via the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> parameter, in units of arcsec. Internally, these quantities are represented in radians.  Let the pixel spacing be represented by <span class="math notranslate nohighlight">\(\Delta l\)</span> and <span class="math notranslate nohighlight">\(\Delta m\)</span>, respectively.</p>
-</section>
-<section id="fourier-units">
+</div>
+<div class="section" id="fourier-units">
 <h3>Fourier units<a class="headerlink" href="#fourier-units" title="Permalink to this headline">¶</a></h3>
 <p>The sampling rate in the Fourier domain is inversely related to the number of samples and the sampling rate in the image domain. I.e., the grid spacing is</p>
 <div class="math notranslate nohighlight">
@@ -298,8 +298,8 @@
 \[\begin{split}q = \sqrt{u^2 + v^2}\\
 \phi = \mathrm{atan2}(v,u).\end{split}\]</div>
 <p><span class="math notranslate nohighlight">\(\phi\)</span> represents the angle between the <span class="math notranslate nohighlight">\(+u\)</span> axis and the ray drawn from the origin to the point <span class="math notranslate nohighlight">\((u,v)\)</span>. Following the <a class="reference external" href="https://en.wikipedia.org/wiki/Atan2">numerical conventions</a> of the <code class="docutils literal notranslate"><span class="pre">arctan2</span></code> function, <span class="math notranslate nohighlight">\(\phi\)</span> is defined over the range <span class="math notranslate nohighlight">\((-\pi, \pi]\)</span>.</p>
-</section>
-<section id="the-discrete-fourier-transform">
+</div>
+<div class="section" id="the-discrete-fourier-transform">
 <h3>The discrete Fourier transform<a class="headerlink" href="#the-discrete-fourier-transform" title="Permalink to this headline">¶</a></h3>
 <p>Since we are dealing with discrete quantities (pixels), we use the discrete versions of the Fourier transform (DFT), carried out by the Fast Fourier transform (FFT). Throughout the package we use the implementations in numpy or PyTorch: they are mathematically the same, but PyTorch provides the opportunities for autodifferentiation. For both the forward and inverse transforms, we assume that <code class="docutils literal notranslate"><span class="pre">norm='backward'</span></code>, the default setting. This means we don’t need to keep account for the <span class="math notranslate nohighlight">\(L\)</span> or <span class="math notranslate nohighlight">\(M\)</span> prefactors for the forward transform, but we do need to account for the <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> prefactors in the inverse transform.</p>
 <p><strong>Forward transform</strong>: As before, we use the forward transform to go from the image plane (sky brightness distribution) to the Fourier plane (visibility function). This is the most common transform used in MPoL because RML can be thought of as a type of forward modeling procedure: we’re proposing an image and carrying it to the visibility plane to check its fit with the data. In numpy, the forward FFT is <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/routines.fft.html#module-numpy.fft">defined as</a></p>
@@ -316,9 +316,9 @@
 <div class="math notranslate nohighlight">
 \[I_{l,m} = U V (\Delta u)(\Delta v) \mathtt{iFFT}({\cal V}_{u,v})\]</div>
 <p>For more information on this procedure as implmented in MPoL, see the <a class="reference internal" href="api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> class and the source code of its <a class="reference internal" href="api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_image()</span></code></a> method. When the grid of <span class="math notranslate nohighlight">\({\cal V}_{u,v}\)</span> values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> of Daniel Briggs.</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>

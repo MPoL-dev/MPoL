@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>API &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -97,7 +96,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
@@ -114,10 +113,11 @@
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -189,10 +189,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="api">
+  <div class="section" id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <p>This page documents all of the available components of the MPoL package. If you do not see something that you think should be documented, please raise an <a class="reference external" href="https://github.com/iancze/MPoL/issues">issue</a>.</p>
-<section id="module-mpol.utils">
+<div class="section" id="module-mpol.utils">
 <span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-mpol.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="mpol.utils.fftspace">
@@ -361,6 +361,12 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </dd></dl>
 
 <dl class="py function">
+<dt id="mpol.utils.ground_cube_to_packed_cube">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">ground_cube_to_packed_cube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#ground_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.ground_cube_to_packed_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>For visibility-plane work.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="mpol.utils.log_stretch">
 <code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">log_stretch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#log_stretch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.log_stretch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a log stretch to the tensor.</p>
@@ -386,6 +392,24 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.packed_cube_to_ground_cube">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">packed_cube_to_ground_cube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#packed_cube_to_ground_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_ground_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>For visibility-plane work.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.packed_cube_to_sky_cube">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">packed_cube_to_sky_cube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#packed_cube_to_sky_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_sky_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>For image-plane work.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.utils.sky_cube_to_packed_cube">
+<code class="sig-prename descclassname"><span class="pre">mpol.utils.</span></code><code class="sig-name descname"><span class="pre">sky_cube_to_packed_cube</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#sky_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_cube_to_packed_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>For image-plane work.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -445,8 +469,8 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dl>
 </dd></dl>
 
-</section>
-<section id="module-mpol.coordinates">
+</div>
+<div class="section" id="module-mpol.coordinates">
 <span id="coordinates"></span><h2>Coordinates<a class="headerlink" href="#module-mpol.coordinates" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="mpol.coordinates.GridCoords">
@@ -505,8 +529,8 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 
 </dd></dl>
 
-</section>
-<section id="module-mpol.gridding">
+</div>
+<div class="section" id="module-mpol.gridding">
 <span id="gridding"></span><h2>Gridding<a class="headerlink" href="#module-mpol.gridding" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="mpol.gridding.Gridder">
@@ -606,8 +630,8 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 
 </dd></dl>
 
-</section>
-<section id="module-mpol.datasets">
+</div>
+<div class="section" id="module-mpol.datasets">
 <span id="datasets-and-cross-validation"></span><h2>Datasets and Cross-Validation<a class="headerlink" href="#module-mpol.datasets" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="mpol.datasets.Dartboard">
@@ -715,6 +739,20 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="mpol.datasets.GriddedDataset.ground_mask">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_mask</span></code><a class="headerlink" href="#mpol.datasets.GriddedDataset.ground_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>The boolean mask, arranged in ground format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D mask cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -765,8 +803,8 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 <p>If you have just a single channel, you can pass 1D numpy arrays for <cite>uu</cite>, <cite>vv</cite>, <cite>weights</cite>, <cite>data_re</cite>, and <cite>data_im</cite> and they will automatically be promoted to 2D with a leading dimension of 1 (i.e., <code class="docutils literal notranslate"><span class="pre">nchan=1</span></code>).</p>
 </dd></dl>
 
-</section>
-<section id="module-mpol.images">
+</div>
+<div class="section" id="module-mpol.images">
 <span id="images"></span><h2>Images<a class="headerlink" href="#module-mpol.images" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">images</span></code> module provides the core functionality of MPoL via <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>.</p>
 <dl class="py class">
@@ -830,9 +868,9 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mpol.images.FourierCube.psd">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">psd</span></code><a class="headerlink" href="#mpol.images.FourierCube.psd" title="Permalink to this definition">¶</a></dt>
-<dd><p>The power spectral density of the cube, in packed format.</p>
+<dt id="mpol.images.FourierCube.ground_psd">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_psd</span></code><a class="headerlink" href="#mpol.images.FourierCube.ground_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>The power spectral density of the cube, in ground format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>power spectral density cube</p>
@@ -844,9 +882,9 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mpol.images.FourierCube.sky_vis">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_vis</span></code><a class="headerlink" href="#mpol.images.FourierCube.sky_vis" title="Permalink to this definition">¶</a></dt>
-<dd><p>The visibility FFT cube fftshifted for plotting with <code class="docutils literal notranslate"><span class="pre">imshow</span></code>.</p>
+<dt id="mpol.images.FourierCube.ground_vis">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_vis</span></code><a class="headerlink" href="#mpol.images.FourierCube.ground_vis" title="Permalink to this definition">¶</a></dt>
+<dd><p>The visibility cube in ground format cube fftshifted for plotting with <code class="docutils literal notranslate"><span class="pre">imshow</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>the FFT of the image cube, in sky plane format.</p>
@@ -953,35 +991,9 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 
 </dd></dl>
 
-</section>
-<section id="module-mpol.connectors">
+</div>
+<div class="section" id="module-mpol.connectors">
 <span id="connectors"></span><h2>Connectors<a class="headerlink" href="#module-mpol.connectors" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="mpol.connectors.GriddedDatasetConnector">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.connectors.</span></code><code class="sig-name descname"><span class="pre">GriddedDatasetConnector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fourierCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#GriddedDatasetConnector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.GriddedDatasetConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect a FourierCube to the gridded dataset, and return indexed model visibilities for calculating the loss.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fourierCube</strong> – instantiated <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> object</p></li>
-<li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="mpol.connectors.GriddedDatasetConnector.forward">
-<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#GriddedDatasetConnector.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.GriddedDatasetConnector.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return model samples for evaluation with a likelihood function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> shape to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed.”</p>
-</dd>
-</dl>
-<p>Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like <code class="docutils literal notranslate"><span class="pre">vis_indexed</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_indexed</span></code> of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py class">
 <dt id="mpol.connectors.GriddedResidualConnector">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.connectors.</span></code><code class="sig-name descname"><span class="pre">GriddedResidualConnector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fourierCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#GriddedResidualConnector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector" title="Permalink to this definition">¶</a></dt>
@@ -1000,13 +1012,13 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 <dd><p>Calculate the residuals as</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{residuals} = \mathrm{data} - \mathrm{model}\]</div>
-<p>And store residual products as PyTorch tensor instance and property attributes.</p>
-<p>Returns (torch tensor complex): full packed cube</p>
+<p>And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.</p>
+<p>Returns (torch tensor complex): full packed cube (including imaginaries), mainly for debugging purposes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mpol.connectors.GriddedResidualConnector.sky_amp">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_amp</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.sky_amp" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.connectors.GriddedResidualConnector.ground_amp">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_amp</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.ground_amp" title="Permalink to this definition">¶</a></dt>
 <dd><p>The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1014,6 +1026,48 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.connectors.GriddedResidualConnector.ground_mask">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_mask</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.ground_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>The boolean mask, arranged in ground format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D mask cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.connectors.GriddedResidualConnector.ground_phase">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_phase</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.ground_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D phase cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.connectors.GriddedResidualConnector.ground_residuals">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_residuals</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.ground_residuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D phase cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.complex</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1032,70 +1086,31 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="mpol.connectors.GriddedResidualConnector.sky_phase">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_phase</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.sky_phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.connectors.index_vis">
+<code class="sig-prename descclassname"><span class="pre">mpol.connectors.</span></code><code class="sig-name descname"><span class="pre">index_vis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/connectors.html#index_vis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.connectors.index_vis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index model visibilities to same locations as a <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes that vis is “packed” just like the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>3D phase cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>torch.double</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> shape to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed.”</p></li>
+<li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
+</ul>
 </dd>
 </dl>
+<p>Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like <code class="docutils literal notranslate"><span class="pre">vis_indexed</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_indexed</span></code> of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="mpol.connectors.GriddedResidualConnector.sky_residuals">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sky_residuals</span></code><a class="headerlink" href="#mpol.connectors.GriddedResidualConnector.sky_residuals" title="Permalink to this definition">¶</a></dt>
-<dd><p>The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>3D phase cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>torch.complex</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-mpol.losses">
+</div>
+<div class="section" id="module-mpol.losses">
 <span id="losses"></span><h2>Losses<a class="headerlink" href="#module-mpol.losses" title="Permalink to this headline">¶</a></h2>
 <p>The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, including the regularization strength, <span class="math notranslate nohighlight">\(\zeta\)</span>, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.</p>
 <p>If you don’t see a loss function you need, it’s easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!</p>
 <dl class="py function">
-<dt id="mpol.losses.loss_fn">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the weighted <span class="math notranslate nohighlight">\(\chi^2\)</span> loss between data and model visibilities. Visibilities may be any shape as long as all
-quantities have the same shape. Following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, we apply
-the prefactor <span class="math notranslate nohighlight">\(1/(2 N_V)\)</span>, where <span class="math notranslate nohighlight">\(N_V\)</span> is the number of visibilities. The factor of 2 comes in because we must count real
-and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</span> sum.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model_vis</strong> – 2-tuple of (real, imaginary) values of the model</p></li>
-<li><p><strong>data_vis</strong> – 3-tuple of (real, imaginary, weights) of the data</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2\)</span> likelihood loss</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.double</p>
-</dd>
-</dl>
-<div class="math notranslate nohighlight">
-\[L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(w\)</span> are the visibility weights, <span class="math notranslate nohighlight">\(D_\Re\)</span> and <span class="math notranslate nohighlight">\(D_\Im\)</span> are the real and imaginary components of the data visibilities, respectively, and <span class="math notranslate nohighlight">\(M_\Re\)</span> and <span class="math notranslate nohighlight">\(M_\Im\)</span> are the real and imaginary components of the model visibilities, respectively.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="mpol.losses.loss_fn_PSD">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_PSD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_PSD" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.PSD">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">PSD</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.PSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.</p>
 <p>Assumes an image plane kernel of</p>
 <div class="math notranslate nohighlight">
@@ -1121,8 +1136,8 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_TV_channel">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_TV_channel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_TV_channel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_TV_channel" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.TV_channel">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">TV_channel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#TV_channel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.TV_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the total variation (TV) loss in the channel dimension. Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1143,13 +1158,13 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_TV_image">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_TV_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_TV_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_TV_image" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.TV_image">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">TV_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#TV_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.TV_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a> Promotes the image to be piecewise smooth and the gradient of the image to be sparse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cube</strong> (<em>any 3D tensor</em>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span>, where <span class="math notranslate nohighlight">\(l\)</span> is R.A., <span class="math notranslate nohighlight">\(m\)</span> is DEC, and <span class="math notranslate nohighlight">\(v\)</span> is the channel (velocity or frequency) dimension</p></li>
+<li><p><strong>sky_cube</strong> (<em>any 3D tensor</em>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span>, where <span class="math notranslate nohighlight">\(l\)</span> is R.A., <span class="math notranslate nohighlight">\(m\)</span> is DEC, and <span class="math notranslate nohighlight">\(v\)</span> is the channel (velocity or frequency) dimension. Should be in sky format representation.</p></li>
 <li><p><strong>epsilon</strong> (<em>float</em>) – a softening parameter in [<span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.</p></li>
 </ul>
 </dd>
@@ -1165,8 +1180,8 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_UV_sparsity">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_UV_sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_UV_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_UV_sparsity" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.UV_sparsity">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">UV_sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#UV_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.UV_sparsity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enforce a sparsity prior for all <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span> points larger than <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1186,8 +1201,8 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_edge_clamp">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_edge_clamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_edge_clamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_edge_clamp" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.edge_clamp">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">edge_clamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#edge_clamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.edge_clamp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Promote all pixels at the edge of the image to be zero using an <span class="math notranslate nohighlight">\(L_2\)</span> norm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1203,8 +1218,8 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_entropy">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_entropy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_entropy" title="Permalink to this definition">¶</a></dt>
+<dt id="mpol.losses.entropy">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">entropy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.entropy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the entropy loss of a set of pixels following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1226,29 +1241,6 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dd></dl>
 
 <dl class="py function">
-<dt id="mpol.losses.loss_fn_sparsity">
-<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">loss_fn_sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#loss_fn_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.loss_fn_sparsity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enforce a sparsity prior on the image cube using the <span class="math notranslate nohighlight">\(L_1\)</span> norm. Optionally provide a boolean mask to apply the prior to only the <code class="docutils literal notranslate"><span class="pre">True</span></code> locations. Typically you might want this mask to be <code class="docutils literal notranslate"><span class="pre">True</span></code> for background regions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cube</strong> (<em>nchan</em><em>, </em><em>npix</em><em>, </em><em>npix</em>) – tensor image cube</p></li>
-<li><p><strong>mask</strong> (<em>boolean</em>) – tensor array the same shape as <code class="docutils literal notranslate"><span class="pre">cube</span></code>. The sparsity prior will be applied to those pixels where the mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>sparsity loss calculated where <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">==</span> <span class="pre">True</span></code></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.double</p>
-</dd>
-</dl>
-<p>The sparsity loss calculated as</p>
-<div class="math notranslate nohighlight">
-\[L = \sum_i | I_i |\]</div>
-</dd></dl>
-
-<dl class="py function">
 <dt id="mpol.losses.nll">
 <code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">nll</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#nll"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.nll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the weighted <span class="math notranslate nohighlight">\(\chi^2\)</span> loss between data and model visibilities. Visibilities may be any shape as long as all
@@ -1258,9 +1250,9 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_vis</strong> – 1-tuple of the model</p></li>
-<li><p><strong>data_vis</strong> – 1-tuple of the data</p></li>
-<li><p><strong>weight</strong> – 1-tuple of weight values</p></li>
+<li><p><strong>model_vis</strong> (<em>PyTorch complex</em>) – array tuple of the model</p></li>
+<li><p><strong>data_vis</strong> (<em>PyTorch complex</em>) – array of the data values</p></li>
+<li><p><strong>weight</strong> (<em>PyTorch real</em>) – array of weight values</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1275,13 +1267,63 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 <p>where <span class="math notranslate nohighlight">\(w\)</span> are the visibility weights, <span class="math notranslate nohighlight">\(D_\Re\)</span> and <span class="math notranslate nohighlight">\(D_\Im\)</span> are the real and imaginary components of the data visibilities, respectively, and <span class="math notranslate nohighlight">\(M_\Re\)</span> and <span class="math notranslate nohighlight">\(M_\Im\)</span> are the real and imaginary components of the model visibilities, respectively.</p>
 </dd></dl>
 
-</section>
-<section id="precomposed-modules">
+<dl class="py function">
+<dt id="mpol.losses.nll_gridded">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">nll_gridded</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasetGridded</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#nll_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.nll_gridded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the weighted <span class="math notranslate nohighlight">\(\chi^2\)</span> loss between gridded data and model visibilities. Visibilities may be any shape as long as all
+quantities have the same shape. Following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, we apply
+the prefactor <span class="math notranslate nohighlight">\(1/(2 N_V)\)</span>, where <span class="math notranslate nohighlight">\(N_V\)</span> is the number of visibilities. The factor of 2 comes in because we must count real
+and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</span> sum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> (<em>PyTorch complex</em>) – array tuple of the model</p></li>
+<li><p><strong>data_vis</strong> (<em>PyTorch complex</em>) – array of the data values</p></li>
+<li><p><strong>weight</strong> (<em>PyTorch real</em>) – array of weight values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2\)</span> likelihood loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<div class="math notranslate nohighlight">
+\[L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(w\)</span> are the visibility weights, <span class="math notranslate nohighlight">\(D_\Re\)</span> and <span class="math notranslate nohighlight">\(D_\Im\)</span> are the real and imaginary components of the data visibilities, respectively, and <span class="math notranslate nohighlight">\(M_\Re\)</span> and <span class="math notranslate nohighlight">\(M_\Im\)</span> are the real and imaginary components of the model visibilities, respectively.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mpol.losses.sparsity">
+<code class="sig-prename descclassname"><span class="pre">mpol.losses.</span></code><code class="sig-name descname"><span class="pre">sparsity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce a sparsity prior on the image cube using the <span class="math notranslate nohighlight">\(L_1\)</span> norm. Optionally provide a boolean mask to apply the prior to only the <code class="docutils literal notranslate"><span class="pre">True</span></code> locations. For example, you might want this mask to be <code class="docutils literal notranslate"><span class="pre">True</span></code> for background regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>nchan</em><em>, </em><em>npix</em><em>, </em><em>npix</em>) – tensor image cube</p></li>
+<li><p><strong>mask</strong> (<em>boolean</em>) – tensor array the same shape as <code class="docutils literal notranslate"><span class="pre">cube</span></code>. The sparsity prior will be applied to those pixels where the mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default is to apply prior to all pixels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sparsity loss calculated where <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">==</span> <span class="pre">True</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+<p>The sparsity loss calculated as</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_i | I_i |\]</div>
+</dd></dl>
+
+</div>
+<div class="section" id="precomposed-modules">
 <h2>Precomposed Modules<a class="headerlink" href="#precomposed-modules" title="Permalink to this headline">¶</a></h2>
 <p>For convenience, we provide some “precomposed” <a class="reference external" href="https://pytorch.org/docs/stable/notes/modules.html">modules</a> which may be useful for simple imaging or modeling applications. In general, though, we encourage you to compose your own set of layers if your application requires it. The source code for a precomposed network can provide useful a starting point. We also recommend checking out the PyTorch documentation on <a class="reference external" href="https://pytorch.org/docs/stable/notes/modules.html">modules</a>.</p>
 <span class="target" id="module-mpol.precomposed"></span><dl class="py class">
 <dt id="mpol.precomposed.SimpleNet">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.precomposed.</span></code><code class="sig-name descname"><span class="pre">SimpleNet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mpol.precomposed.</span></code><code class="sig-name descname"><span class="pre">SimpleNet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet" title="Permalink to this definition">¶</a></dt>
 <dd><p>A basic but fully functional network for RML imaging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1290,7 +1332,6 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 <li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
 <li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
 <li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the base cube. Default = 1.</p></li>
-<li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
 <li><p><strong>base_cube</strong> – a pre-packed base cube to initialize the model with. If None, assumes <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
 </ul>
 </dd>
@@ -1301,32 +1342,32 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bcube</strong> – the <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> instance</p></li>
 <li><p><strong>icube</strong> – the <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> instance</p></li>
+<li><p><strong>fcube</strong> – the <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> instance</p></li>
 </ul>
 </dd>
 </dl>
 <p>For example, you’ll likely want to access the <code class="docutils literal notranslate"><span class="pre">self.icube.sky_model</span></code> at some point.</p>
 <p>The idea is that <a class="reference internal" href="#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> can save you some keystrokes composing models by connecting the most commonly used layers together.</p>
-<object data="_images/mermaid-be1b4bc118c206aa60f6660197b8c2d01c5ce285.svg" type="image/svg+xml">
+<object data="_images/mermaid-70bfb464e19b60735ad9c022ff289b06a5b6eb54.svg" type="image/svg+xml">
             <p class="warning">graph TD
     subgraph SimpleNet
     bc(BaseCube) --&gt; HannConvCube
     HannConvCube --&gt; ImageCube 
     ImageCube --&gt; FourierLayer
-    FourierLayer --&gt; DataConnector 
     end
-    ad[[Dataset]] --&gt; DataConnector 
-    DataConnector --&gt; il([Loss])</p></object>
+    FourierLayer --&gt; il([Loss])
+    ad[[Dataset]] --&gt; il([Loss])</p></object>
 <dl class="py method">
 <dt id="mpol.precomposed.SimpleNet.forward">
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/precomposed.html#SimpleNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.precomposed.SimpleNet.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Feed forward to calculate the model visibilities. In this step, a <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> is fed to a <code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetConnector</span></code> to calculate the model visibilities at the indexed locations of the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object that was used to instantiate the class.</p>
+<dd><p>Feed forward to calculate the model visibilities. In this step, a <a class="reference internal" href="#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.HannConvCube" title="mpol.images.HannConvCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">HannConvCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> is fed to a <a class="reference internal" href="#mpol.images.FourierCube" title="mpol.images.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> to produce the visibility cube.</p>
 <p>Returns: 1D complex torch tensor of model visibilities.</p>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

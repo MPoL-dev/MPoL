@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
@@ -182,21 +183,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.gridding</span> <span class="kn">import</span> <span class="n">GridCoords</span><span class="p">,</span> <span class="n">_setup_coords</span>
-
-
-<span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
-    <span class="c1"># If it&#39;s an identity layer, just set parameters to cube</span>
-    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
-    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">shifted</span>
-
-
-<span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
-    <span class="c1"># fftshift the image cube to the correct quadrants</span>
-    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="c1"># flip so that east points left</span>
-    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">shifted</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
-    <span class="k">return</span> <span class="n">flipped</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
 <div class="viewcode-block" id="BaseCube"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube">[docs]</a><span class="k">class</span> <span class="nc">BaseCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -321,7 +308,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.</span>
         <span class="c1"># Additionally, the convolution must be done on the *sky-oriented* cube</span>
-        <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+        <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
 
         <span class="c1"># augment extra &quot;batch&quot; dimension to cube, to make it (1, nchan, npix, npix)</span>
         <span class="n">aug_sky_cube</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -335,7 +322,7 @@
         <span class="n">conv_sky_cube</span> <span class="o">=</span> <span class="n">conv_aug_sky_cube</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># return in packed format</span>
-        <span class="k">return</span> <span class="n">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">conv_sky_cube</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">conv_sky_cube</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ImageCube"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube">[docs]</a><span class="k">class</span> <span class="nc">ImageCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -423,7 +410,7 @@
 <span class="sd">            torch.double : 3D image cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ImageCube.to_FITS"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.to_FITS">[docs]</a>    <span class="k">def</span> <span class="nf">to_FITS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;cube.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -521,19 +508,19 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">psd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The power spectral density of the cube, in packed format.</span>
+<span class="sd">        The power spectral density of the cube, in ground format.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double: power spectral density cube</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ground_vis</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sky_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The visibility FFT cube fftshifted for plotting with ``imshow``.</span>
+<span class="sd">        The visibility cube in ground format cube fftshifted for plotting with ``imshow``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.</span>

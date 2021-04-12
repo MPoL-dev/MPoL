@@ -92,17 +92,18 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
@@ -177,6 +178,43 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">kB</span><span class="p">,</span> <span class="n">deg</span>
+
+
+<div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For visibility-plane work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">shifted</span></div>
+
+
+<div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For visibility-plane work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fftshift the image cube to the correct quadrants</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">shifted</span></div>
+
+
+<div class="viewcode-block" id="sky_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For image-plane work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">shifted</span></div>
+
+
+<div class="viewcode-block" id="packed_cube_to_sky_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_sky_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For image-plane work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fftshift the image cube to the correct quadrants</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># flip so that east points left</span>
+    <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">shifted</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">flipped</span></div>
 
 
 <div class="viewcode-block" id="get_Jy_arcsec2"><a class="viewcode-back" href="../../api.html#mpol.utils.get_Jy_arcsec2">[docs]</a><span class="k">def</span> <span class="nf">get_Jy_arcsec2</span><span class="p">(</span><span class="n">T_b</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">230e9</span><span class="p">):</span>
