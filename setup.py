@@ -34,11 +34,9 @@ EXTRA_REQUIRES = {
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",
-        "requests",
         "matplotlib",
         "sphinxcontrib-mermaid",
         "astropy",
-        "tensorboardx",
     ],
 }
 

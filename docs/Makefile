@@ -14,12 +14,14 @@ help:
 
 .PHONY: help Makefile html clean 
 
-NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb large-tutorials/crossvalidation.ipynb
+CI_NOTEBOOKS := ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb 
+LARGE_NOTEBOOKS := large-tutorials/crossvalidation.ipynb
+NOTEBOOKS := ${CI_NOTEBOOKS} ${LARGE_NOTEBOOKS}
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 
 clean:
 	rm -rf _build 
-	rm -rf ${NOTEBOOKS}
+	rm -rf ${CI_NOTEBOOKS}
 	rm -rf ci-tutorials/.ipynb_checkpoints
 	rm -rf large-tutorials/.ipynb_checkpoints
 	rm -rf ${CHARTS}
