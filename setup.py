@@ -24,7 +24,7 @@ version = get_version("src/mpol/__init__.py")
 
 
 EXTRA_REQUIRES = {
-    "test": ["pytest", "matplotlib", "requests", "astropy", "tensorboardx"],
+    "test": ["pytest", "matplotlib", "requests", "astropy", "tensorboard"],
     "docs": [
         "sphinx>=2.3.0",
         "numpy",
@@ -37,7 +37,7 @@ EXTRA_REQUIRES = {
         "matplotlib",
         "sphinxcontrib-mermaid",
         "astropy",
-        "tensorboardx",
+        "tensorboard",
     ],
 }
 
