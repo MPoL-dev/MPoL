@@ -1,9 +1,9 @@
-name: Tests
+name: tests
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  tests:
 
     runs-on: ubuntu-latest
     strategy:
@@ -36,3 +36,31 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+
+  # if all tests succeed, then 
+  # make sure the docs build OK 
+  # (but don't deploy to gh-pages)
+  docs:
+    needs: tests # don't bother running if a test failed
+    runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install doc deps 
+        run: |
+          pip install .[docs]
+      - name: Install Pandoc dependency 
+        run: | 
+          sudo apt-get install pandoc
+      - name: Set up node 
+        uses: actions/setup-node@v2
+      - name: Install mermaid.js dependency 
+        run: | 
+          npm install @mermaid-js/mermaid-cli
+      - name: Build the docs
+        run: |
+          make -C docs clean
+          make -C docs html MERMAID_PATH="../node_modules/.bin/"
