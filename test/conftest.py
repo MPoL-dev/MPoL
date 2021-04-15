@@ -96,3 +96,4 @@ def crossvalidation_products(mock_visibility_data):
     dataset = gridder.to_pytorch_dataset()
 
     return coords, dataset
+
