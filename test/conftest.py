@@ -1,7 +1,5 @@
 import pytest
 import numpy as np
-import requests
-import os
 from mpol import gridding
 from astropy.utils.data import download_file
 
@@ -78,8 +76,8 @@ def dataset_cont(mock_visibility_data, coords):
 
 @pytest.fixture
 def crossvalidation_products(mock_visibility_data):
-    # test this with a smaller set of coordinates than normal, better matched to
-    # the extremes of the mock dataset
+    # test the crossvalidation with a smaller set of coordinates than normal,
+    # better matched to the extremes of the mock dataset
     coords = gridding.GridCoords(cell_size=0.04, npix=256)
 
     d = mock_visibility_data

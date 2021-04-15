@@ -6,7 +6,7 @@ from mpol.constants import *
 
 
 def test_grid_coords_instantiate():
-    coords = coordinates.GridCoords(cell_size=0.01, npix=512)
+    coordinates.GridCoords(cell_size=0.01, npix=512)
 
 
 def test_grid_coords_equal():

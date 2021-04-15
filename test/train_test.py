@@ -8,9 +8,6 @@ from mpol.constants import *
 
 
 # configure a class to train with
-
-# currently segfaults on 3.9
-# https://github.com/pytorch/pytorch/issues/50014
 def test_init_train_class(coords, dataset):
 
     nchan = dataset.nchan
