@@ -21,8 +21,7 @@ clean:
 	rm -rf _build 
 	rm -rf ${NOTEBOOKS}
 	rm -rf tutorials/.ipynb_checkpoints
-	rm -rf tutorials/runs
-	rm -rf tutorials/viz.npz
+	rm -rf tutorials/runs 
 	rm -rf ${CHARTS}
 	rm -rf _static/baselines/build/baselines.csv
 
