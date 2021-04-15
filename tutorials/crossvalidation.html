@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changelog" href="../changelog.html" />
-    <link rel="prev" title="Optimization Loop" href="../ci-tutorials/optimization.html" /> 
+    <link rel="prev" title="Optimization Loop" href="optimization.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -105,8 +105,8 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Cross validation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Setup">Setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#K-fold-cross-validation">K-fold cross validation</a></li>
@@ -173,7 +173,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/large-tutorials/crossvalidation.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/crossvalidation.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -521,7 +521,7 @@ Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_3_1.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_3_1.png" style="width: 453px; height: 471px;" />
+<img alt="../_images/tutorials_crossvalidation_3_1.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_3_1.png" style="width: 462px; height: 481px;" />
 </div>
 </div>
 <div class="section" id="K-fold-cross-validation">
@@ -566,7 +566,7 @@ similar image even if our <span class="math notranslate nohighlight">\(u\)</span
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_8_0.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_8_0.png" style="width: 487px; height: 471px;" />
+<img alt="../_images/tutorials_crossvalidation_8_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_8_0.png" style="width: 502px; height: 480px;" />
 </div>
 </div>
 <p>As you can see, the <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> space is sampled in a very structured way:</p>
@@ -613,7 +613,7 @@ similar image even if our <span class="math notranslate nohighlight">\(u\)</span
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_10_1.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_10_1.png" style="width: 487px; height: 471px;" />
+<img alt="../_images/tutorials_crossvalidation_10_1.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_10_1.png" style="width: 502px; height: 480px;" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -722,7 +722,7 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_15_0.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_15_0.png" style="width: 598px; height: 953px;" />
+<img alt="../_images/tutorials_crossvalidation_15_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_15_0.png" style="width: 602px; height: 956px;" />
 </div>
 </div>
 <p>Building on the previous optimization tutorial, we’ll wrap the iterative optimization commands into a training function. This will come in handy, because we’ll want to train the model on each of the varied <span class="math notranslate nohighlight">\(K\)</span>-fold training datasets. In this tutorial, we’ll use a loss function of the form</p>
@@ -854,7 +854,7 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/ian/Documents/Research/Disks/RML/MPoL/venv/lib/python3.8/site-packages/torch/autograd/__init__.py:145: UserWarning: Casting complex values to real discards the imaginary part (Triggered internally at  ../aten/src/ATen/native/Copy.cpp:219.)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/torch/autograd/__init__.py:145: UserWarning: Casting complex values to real discards the imaginary part (Triggered internally at  /pytorch/aten/src/ATen/native/Copy.cpp:219.)
   Variable._execution_engine.run_backward(
 </pre></div></div>
 </div>
@@ -863,7 +863,7 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Cross validation score: 49.06716516993583
+Cross validation score: 49.06716516993585
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -872,15 +872,14 @@ Cross validation score: 49.06716516993583
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(&lt;Figure size 480x480 with 1 Axes&gt;,
- &lt;matplotlib.axes._subplots.AxesSubplot at 0x7fdfc9c61e50&gt;)
+(&lt;Figure size 480x480 with 1 Axes&gt;, &lt;AxesSubplot:&gt;)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_25_3.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_25_3.png" style="width: 429px; height: 421px;" />
+<img alt="../_images/tutorials_crossvalidation_25_3.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_25_3.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -900,7 +899,7 @@ Cross validation score: 49.06716516993583
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Cross validation score: 8.20217595158144
+Cross validation score: 8.202181115487862
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -909,15 +908,14 @@ Cross validation score: 8.20217595158144
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(&lt;Figure size 480x480 with 1 Axes&gt;,
- &lt;matplotlib.axes._subplots.AxesSubplot at 0x7fdfe93cb310&gt;)
+(&lt;Figure size 480x480 with 1 Axes&gt;, &lt;AxesSubplot:&gt;)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_27_2.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_27_2.png" style="width: 429px; height: 421px;" />
+<img alt="../_images/tutorials_crossvalidation_27_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_27_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -937,7 +935,7 @@ Cross validation score: 8.20217595158144
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Cross validation score: 5.415459859163382
+Cross validation score: 5.415210661003532
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -946,15 +944,14 @@ Cross validation score: 5.415459859163382
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(&lt;Figure size 480x480 with 1 Axes&gt;,
- &lt;matplotlib.axes._subplots.AxesSubplot at 0x7fdfc98209a0&gt;)
+(&lt;Figure size 480x480 with 1 Axes&gt;, &lt;AxesSubplot:&gt;)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/large-tutorials_crossvalidation_29_2.png" class="no-scaled-link" src="../_images/large-tutorials_crossvalidation_29_2.png" style="width: 429px; height: 421px;" />
+<img alt="../_images/tutorials_crossvalidation_29_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_29_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
@@ -973,7 +970,7 @@ Cross validation score: 5.415459859163382
         <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../ci-tutorials/optimization.html" class="btn btn-neutral float-left" title="Optimization Loop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="optimization.html" class="btn btn-neutral float-left" title="Optimization Loop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

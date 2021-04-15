@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Gridding and diagnostic images" href="ci-tutorials/gridder.html" />
+    <link rel="next" title="Gridding and diagnostic images" href="tutorials/gridder.html" />
     <link rel="prev" title="Units and Conventions" href="units-and-conventions.html" /> 
 </head>
 
@@ -107,11 +107,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#contributing-tutorials">Contributing tutorials</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#small-ish-tutorials-requiring-only-a-cpu">Small(ish) tutorials requiring only a CPU</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#larger-tutorials-requiring-substantial-computational-resources">Larger tutorials requiring substantial computational resources</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#developing-tutorials">Developing tutorials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tutorial-best-practices">Tutorial best practices</a></li>
 </ul>
 </li>
 </ul>
@@ -119,9 +116,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/crossvalidation.html">Cross validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/optimization.html">Optimization Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/crossvalidation.html">Cross validation</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -194,7 +191,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="developer-documentation">
-<h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<span id="developer-documentation-label"></span><h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
 <p>If you are new to contributing code to a project, we recommend a quick read through the excellent contributing guides of the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> and <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy</a> packages. What follows in this guide draws upon many of the suggestions from those two resources.</p>
 <div class="section" id="code-bugs-and-enhancements">
 <h2>Code Bugs and Enhancements<a class="headerlink" href="#code-bugs-and-enhancements" title="Permalink to this headline">¶</a></h2>
@@ -209,6 +206,10 @@
 </pre></div>
 </div>
 <p>after you’ve cloned the repository and changed to the root of the repository.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[test]'</span></code> instead.</p>
+</div>
 <p>To run all of the tests, from  the root of the repository, invoke</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m pytest
 </pre></div>
@@ -216,8 +217,7 @@
 <p>If a test errors on a stable branch, please report what went wrong as an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
 <div class="section" id="test-cache">
 <h3>Test cache<a class="headerlink" href="#test-cache" title="Permalink to this headline">¶</a></h3>
-<p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo. For continuous integration tests (e.g., on github workflows), mock data is downloaded with each run of the tests. Because the data is saved to a temporary system directory, it is cleaned up after each run.</p>
-<p>Frequent downloading of moderately sized files can be burdensome, especially for developers who might want to run tests frequently in the course of making changes to the package. If you want to cache downloaded files, set your shell environment variable <code class="docutils literal notranslate"><span class="pre">MPOL_CACHE_DIR</span></code> to a location of your choosing. After the files are downloaded during the first test, subsequent tests will load files from this directory.</p>
+<p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo and downloaded using astropy caching functions. If you run into trouble with the test cache becoming stale, you can delete it by deleting the <code class="docutils literal notranslate"><span class="pre">.mpol/cache</span></code> folder in home directory.</p>
 </div>
 <div class="section" id="viewing-test-and-debug-plots">
 <h3>Viewing test and debug plots<a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this headline">¶</a></h3>
@@ -239,47 +239,31 @@ $ pip install -e .[dev]
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'.[dev]'</span></code> instead.</p>
+<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code> instead.</p>
 </div>
-<p>Before starting to make any changes, it’s a good idea to first run the tests as described <a class="reference internal" href="#testing-reference-label"><span class="std std-ref">Testing</span></a> to make sure everything passes.</p>
-<p>Once you’re done making your changes, run the test suite again. If any tests fail, please address these issues before submitting a pull request. If you’ve changed a substantial amount of code or added new features, please write new tests covering these changes. Instructions on how to write new tests can be found in the <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html#toc">pytest documentation</a> and the <code class="docutils literal notranslate"><span class="pre">MPoL/tests/</span></code> directory contains many examples.</p>
+<p>Before starting to make any changes, you should first run the tests as described <a class="reference internal" href="#testing-reference-label"><span class="std std-ref">Testing</span></a> to make sure everything passes.</p>
+<p>Once you’re done making your changes, run the test suite again. If any tests fail, please address these issues before submitting a pull request. If you’ve changed a substantial amount of code or added new features, you should write new tests covering these changes. Instructions on how to write new tests can be found in the <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html#toc">pytest documentation</a> and the <code class="docutils literal notranslate"><span class="pre">MPoL/tests/</span></code> directory contains many examples.</p>
 <p>Once you are satisfied with your changes and all tests pass, initiate a pull request back to the main <a class="reference external" href="https://github.com/MPoL-dev/MPoL/">MPoL-dev/MPoL repository</a> as described in the Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. Thank you for your contribution!</p>
-<p>If you find that you’re making regular contributions to the package, consider contacting <a class="reference external" href="https://sites.psu.edu/iczekala/">Ian Czekala</a> to become a member of the MPoL-dev organization on Github.</p>
-<div class="section" id="contributing-tutorials">
-<h3>Contributing tutorials<a class="headerlink" href="#contributing-tutorials" title="Permalink to this headline">¶</a></h3>
-<p>If your tutorial is self-contained in scope and has limited computational needs (will complete on a single CPU in &lt; 30 seconds), we recommend you provide the source file as a Jupytext <code class="docutils literal notranslate"><span class="pre">.py</span></code> file so that we can continually build and test it as part of the continuous integration github workflow. If your tutorial requires more significant computational resources (e.g., a GPU, multiple CPS, or &gt; 30 seconds runtime), we suggest executing the notebook on your local computing resources and commiting the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> (with output cells) directly to the repository. Both types of tutorial formats are described in more detail below.</p>
-<div class="section" id="small-ish-tutorials-requiring-only-a-cpu">
-<h4>Small(ish) tutorials requiring only a CPU<a class="headerlink" href="#small-ish-tutorials-requiring-only-a-cpu" title="Permalink to this headline">¶</a></h4>
-<p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, smaller MPoL tutorials are written as <code class="docutils literal notranslate"><span class="pre">.py</span></code> python files and converted to Jupyter notebooks using <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a>. You can learn more about this neat plugin on the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a> page. You don’t need to worry about pairing notebooks—we’re only interested in keeping the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file up to date and committed to source control. For small tutorials, the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file you create is the only thing you need to commit to the github repo (don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file to the git repository in this case). This practice keeps the git diffs small.</p>
-<p>To write a small tutorial:</p>
+<div class="section" id="developing-tutorials">
+<h3>Developing tutorials<a class="headerlink" href="#developing-tutorials" title="Permalink to this headline">¶</a></h3>
+<p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, MPoL tutorials are written as <code class="docutils literal notranslate"><span class="pre">.py</span></code> python files and converted to Jupyter notebooks using <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a>. You can learn more about this neat plugin on the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a> page. You don’t need to worry about pairing notebooks—we’re only interested in keeping the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file up to date and committed to source control. For small tutorials, the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file you create is the only thing you need to commit to the github repo (don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.</p>
+<p>To write a tutorial:</p>
 <ol class="arabic simple">
-<li><p>copy and rename one of the existing <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in <code class="docutils literal notranslate"><span class="pre">docs/ci-tutorials/</span></code>, being sure to keep the header metadata</p></li>
+<li><p>copy and rename one of the existing <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in <code class="docutils literal notranslate"><span class="pre">docs/tutorials/</span></code> to <code class="docutils literal notranslate"><span class="pre">docs/tutorials/your-new-tutorial</span></code>, being sure to keep the header metadata</p></li>
 <li><p>start a Jupyter notebook kernel</p></li>
-<li><p>open the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file as a notebook and edit it like you would any other Jupyter notebook. If you’ve already installed the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytex</a> tool (as part of <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.[dev]</span></code>), your changes in the Jupyter notebook window should be automatically saved back to the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file. As you progress, make sure you commit your changes in the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file back to the repository (but don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file).</p></li>
+<li><p>open the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file as a notebook and edit it like you would any other Jupyter notebook. If you’ve already installed the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a> tool (as part of <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code>), your changes in the Jupyter notebook window should be automatically saved back to the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file. As you progress, make sure you commit your changes in the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file back to the repository (but don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file).</p></li>
 </ol>
-<p>When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder.py</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder</span></code> line to the tabel of contents.</p>
-<p>To build the docs locally, <code class="docutils literal notranslate"><span class="pre">cd</span></code> to the docs folder and run <code class="docutils literal notranslate"><span class="pre">build_html.sh</span></code>. This script includes the line</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupytext</span> <span class="o">--</span><span class="n">to</span> <span class="n">ipynb</span> <span class="o">--</span><span class="n">execute</span> <span class="n">ci</span><span class="o">-</span><span class="n">tutorials</span><span class="o">/*.</span><span class="n">py</span>
+<p>When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">tutorials/gridder.py</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">tutorials/gridder</span></code> line to the tabel of contents.</p>
+<p>To build the docs locally, <code class="docutils literal notranslate"><span class="pre">cd</span></code> to the docs folder and run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>. This script includes the line</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupytext</span> <span class="o">--</span><span class="n">to</span> <span class="n">ipynb</span> <span class="o">--</span><span class="n">execute</span> <span class="n">tutorials</span><span class="o">/*.</span><span class="n">py</span>
 </pre></div>
 </div>
-<p>which converts your <code class="docutils literal notranslate"><span class="pre">.py</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file and executes its contents, storing the cell output to the notebook. Then, when Sphinx builds the documention, the <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin sees a Jupyter notebook and incorporates it into the build.</p>
-<p>If you’re unsure about whether your tutorial should be contributed as a “small” or “large” tutorial, please raise an <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">issue</a> or <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">discussion</a> on the github repository asking for guidance. If possible, it’s better to simplify your tutorial so that it can be continuosly built and tested along with the rest of the package. However…</p>
+<p>which converts your <code class="docutils literal notranslate"><span class="pre">.py</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file and executes its contents, storing the cell output to the notebook. Then, when Sphinx builds the documention, the <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin sees a Jupyter notebook and incorporates it into the build. If you’ve added any extra documentation build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES['docs']</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
 </div>
-<div class="section" id="larger-tutorials-requiring-substantial-computational-resources">
-<h4>Larger tutorials requiring substantial computational resources<a class="headerlink" href="#larger-tutorials-requiring-substantial-computational-resources" title="Permalink to this headline">¶</a></h4>
-<p>Radio interferometric datasets are frequently large, and sometimes realistic tutorials with real data require substantial computational resources beyond those provided in github workflows. Though more burdensome to package, these “end-to-end” tutorials are often the most useful for users.</p>
-<p>Larger tutorials are not contributed in a continuosly-integrated fashion, but instead are built and executed using local computational resources (these could be your laptop or a university research cluster). Then, the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> containing the cell output is committed directly to the github repostory. The expectation is that these tutorials will only be rerun when the tutorial is updated, so the git diff issue is not as large a concern as it was with the continuously-integrated smaller tutorials. Like before, during the documentation build process the  <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin will see a Jupyter notebook and incorporate it into the build.</p>
-<p>Because the larger tutorials are not continuously integrated, however, there is some concern that the codebase could diverge from that used to generate the tutorial, rendering the tutorial stale. We believe this risk is acceptable given the benefit that these larger tutorials provide and we intend to check the tutorials for staleness with at least every minor release.</p>
-<p>To write a large tutorial:</p>
-<ol class="arabic simple">
-<li><p>create an <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> notebook  in the <code class="docutils literal notranslate"><span class="pre">docs/large-tutorials</span></code> folder.</p></li>
-<li><p>execute the notebook on your local resources</p></li>
-<li><p>commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> to the MPoL repository, if you haven’t already</p></li>
-<li><p>if you run your notebook is run on a cluster, please also commit your submission script (e.g., SLURM, torque, moab). You may also consider additionally pasting the contents of the build script as a text cell inside the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> for reference.</p></li>
-</ol>
-<p>When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">large-tutorials/gpus.py</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">large-tutorials/gpus</span></code> line to the tabel of contents.</p>
-<p>Large tutorials should still be self-contained. If the tutorial requires a dataset, the dataset should be publically available and downloaded in the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish as long as they have the computational resources.</p>
-</div>
+<div class="section" id="tutorial-best-practices">
+<h3>Tutorial best practices<a class="headerlink" href="#tutorial-best-practices" title="Permalink to this headline">¶</a></h3>
+<p>Tutorials should still be self-contained. If the tutorial requires a dataset, the dataset should be publically available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.</p>
+<p>If you’re thinking about contributing a tutorial and would like guidance on form or scope, please raise an <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">issue</a> or <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">discussion</a> on the github repository.</p>
 </div>
 </div>
 </div>
@@ -292,7 +276,7 @@ $ pip install -e .[dev]
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ci-tutorials/gridder.html" class="btn btn-neutral float-right" title="Gridding and diagnostic images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorials/gridder.html" class="btn btn-neutral float-right" title="Gridding and diagnostic images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="units-and-conventions.html" class="btn btn-neutral float-left" title="Units and Conventions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

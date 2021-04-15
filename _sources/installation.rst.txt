@@ -1,7 +1,7 @@
 Installation
 ============
 
-MPoL requires ``python >= 3.5``. 
+MPoL requires ``python >= 3.6``. 
 
 Using pip
 ---------
@@ -13,14 +13,15 @@ Stable versions are hosted on PyPI and installable via ::
 From source
 -----------
 
-If you'd like to install the package from source to access the latest development version, download or `git clone` the MPoL repository and install ::
+If you'd like to install the package from source to access the latest development version, download or ``git clone`` the MPoL repository and install ::
 
     $ git clone https://github.com/MPoL-dev/MPoL.git
     $ cd MPoL
     $ pip install .
 
-If you have trouble installing please raise a `github issue <https://github.com/MPoL-dev/MPoL/issues>`_.
+If you have trouble installing please raise a `github issue <https://github.com/MPoL-dev/MPoL/issues>`_ with the particulars of your system.
 
+If you're interested in contributing to the MPoL package, please see the :ref:`developer-documentation-label`.
 
 Upgrading
 ---------
@@ -40,8 +41,3 @@ You can determine your current installed version by ::
     $ python 
     >>> import mpol 
     >>> print(mpol.__version__)
-
-Other considerations 
---------------------
-
-If you would like to export your images to FITS files, you should also install the `astropy` package. 
