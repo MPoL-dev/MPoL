@@ -30,8 +30,7 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import mpol
-from mpol import gridding, precomposed, losses, images, utils
+from mpol import gridding, precomposed, losses, utils
 from astropy.utils.data import download_file
 from IPython.display import SVG, display
 

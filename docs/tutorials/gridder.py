@@ -46,17 +46,17 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import requests
-import os
+from astropy.utils.data import download_file
 
 # For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file.
 
-fname = "viz.npz"
-if not os.path.exists(fname):  # check if the file exists, otherwise, download it
-    url = "https://zenodo.org/record/4498439/files/logo_cube.npz"
-    r = requests.get(url)
-    with open(fname, "wb") as f:
-        f.write(r.content)
+# load the mock dataset of the ALMA logo
+fname = download_file(
+    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    cache=True,
+    show_progress=True,
+    pkgname="mpol",
+)
 
 d = np.load(fname)
 uu = d["uu"]
@@ -69,7 +69,6 @@ data_im = -d[
 
 # ## The GridCoords object
 
-import mpol
 from mpol import gridding
 
 #  The first MPoL object we'll familiarize ourselves with is GridCoords. Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and Fourier space.
