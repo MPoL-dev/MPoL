@@ -119,7 +119,6 @@ venv/
 
 # notebooks produced from jupytext 
 docs/tutorials/*.ipynb
-docs/tutorials/viz.npz
 
 # testing cache
 tmp_cache 
