@@ -1,3 +1,5 @@
+.. _developer-documentation-label:
+
 =======================
 Developer Documentation 
 =======================
@@ -19,6 +21,11 @@ MPoL includes a test suite written using `pytest <https://docs.pytest.org/>`_. Y
     $ pip install .[test]
 
 after you've cloned the repository and changed to the root of the repository. 
+
+.. note:: 
+
+    If you use the zsh shell, you might need to try ``$ pip install -e '.[test]'`` instead.
+
 
 To run all of the tests, from  the root of the repository, invoke ::
 
