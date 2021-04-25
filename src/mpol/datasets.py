@@ -107,7 +107,7 @@ class GriddedDataset:
         # pre-index the values
         # note that these are *collapsed* across all channels
         # 1D array
-        self.vis_indexed = self.vis_gridded.to(device)
+        self.vis_indexed = self.vis_indexed.to(device)
         self.weight_indexed = self.weight_indexed.to(device)
 
         return self
