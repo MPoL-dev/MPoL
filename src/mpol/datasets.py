@@ -1,12 +1,11 @@
 import numpy as np
-from numpy.lib.twodim_base import histogram2d
 import torch
 import copy
 from torch.utils.data import Dataset
 from . import spheroidal_gridding
 from . import utils
 from .constants import *
-from .coordinates import GridCoords, _setup_coords
+from .coordinates import _setup_coords
 from .utils import loglinspace
 
 
@@ -94,11 +93,29 @@ class GriddedDataset:
         """
         return utils.packed_cube_to_ground_cube(self.mask)
 
+    def to(self, device):
+        """
+        Moves the tensors of the dataset to specified device.
+
+        Args:
+            device (torch.device): the desired device
+        """
+        self.vis_gridded = self.vis_gridded.to(device)
+        self.weight_gridded = self.weight_gridded.to(device)
+        self.mask = self.mask.to(device)
+
+        # pre-index the values
+        # note that these are *collapsed* across all channels
+        # 1D array
+        self.vis_indexed = self.vis_gridded.to(device)
+        self.weight_indexed = self.weight_indexed.to(device)
+
+        return self
+
 
 # custom dataset loader
 class UVDataset(Dataset):
-
-    """
+    r"""
     Container for loose interferometric visibilities.
 
     Args:
@@ -110,7 +127,7 @@ class UVDataset(Dataset):
         cell_size (float): the image pixel size in arcsec. Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         npix (int): the number of pixels per image side (square images only). Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.
         device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
-    
+
     If both `cell_size` and `npix` are set, the dataset will be automatically pre-gridded to the RFFT output grid. This will greatly speed up performance.
 
     If you have just a single channel, you can pass 1D numpy arrays for `uu`, `vv`, `weights`, `data_re`, and `data_im` and they will automatically be promoted to 2D with a leading dimension of 1 (i.e., ``nchan=1``).
@@ -211,7 +228,7 @@ class Dartboard:
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`. 
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
 
     """
 
@@ -255,7 +272,7 @@ class Dartboard:
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
         Data coordinates should include the points for the Hermitian visibilities.
-        
+
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
@@ -295,7 +312,7 @@ class Dartboard:
 
     def build_grid_mask_from_cells(self, cell_index_list):
         r"""
-        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` . 
+        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
 
         Args:
             cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
@@ -341,7 +358,7 @@ class KFoldCrossValidatorGridded:
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
         npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
 
-    Once initialized, iterate through the datasets like 
+    Once initialized, iterate through the datasets like
 
     >>> cv = datasets.KFoldCrossValidatorGridded(dataset, k)
     >>> for (train, test) in cv: # iterate among k datasets
@@ -424,4 +441,3 @@ class KFoldCrossValidatorGridded:
             return train, test
         else:
             raise StopIteration
-

@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
@@ -56,10 +55,10 @@ class GriddedResidualConnector(nn.Module):
         self.mask = griddedDataset.mask
 
     def forward(self):
-        r"""Calculate the residuals as 
-        
+        r"""Calculate the residuals as
+
         .. math::
-        
+
             \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 
         And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.
@@ -98,7 +97,7 @@ class GriddedResidualConnector(nn.Module):
 
         Returns:
             torch.double : 3D image cube of shape ``(nchan, npix, npix)`` in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
-            
+
         """
         return utils.packed_cube_to_sky_cube(self.cube)
 
@@ -142,4 +141,3 @@ class GriddedResidualConnector(nn.Module):
             torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``
         """
         return utils.packed_cube_to_ground_cube(self.residuals)
-

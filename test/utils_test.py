@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mpol import gridding
+from mpol import coordinates
 from mpol import utils
 from mpol.constants import *
 
@@ -20,7 +20,7 @@ def imagekw():
 
 
 def test_sky_gaussian(imagekw, tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     ikw = {"origin": "lower"}
 
@@ -35,7 +35,7 @@ def test_sky_gaussian(imagekw, tmp_path):
 
 
 def test_packed_gaussian(imagekw, tmp_path):
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     ikw = {"origin": "lower"}
 
@@ -59,7 +59,7 @@ def test_analytic_plot(tmp_path):
         "Omega": 20,  # degrees
     }
 
-    coords = gridding.GridCoords(cell_size=0.005, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     img = utils.sky_gaussian_arcsec(
         coords.sky_x_centers_2D, coords.sky_y_centers_2D, **kw

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from mpol import gridding
+from mpol import gridding, coordinates
 from astropy.utils.data import download_file
 
 # We need a fixture which provides mock visibilities of the sort we'd
@@ -35,7 +35,7 @@ def mock_visibility_data_cont(mock_visibility_data):
 
 @pytest.fixture
 def coords():
-    return gridding.GridCoords(cell_size=0.005, npix=800)
+    return coordinates.GridCoords(cell_size=0.005, npix=800)
 
 
 @pytest.fixture
@@ -48,7 +48,12 @@ def dataset(mock_visibility_data, coords):
     data_im = -d["data_im"]  # CASA convention
 
     gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
     )
     gridder.grid_visibilities(weighting="uniform")
 
@@ -67,7 +72,12 @@ def dataset_cont(mock_visibility_data, coords):
     data_im = -d["data_im"][chan]  # CASA convention
 
     gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
     )
     gridder.grid_visibilities(weighting="uniform")
 
@@ -78,7 +88,7 @@ def dataset_cont(mock_visibility_data, coords):
 def crossvalidation_products(mock_visibility_data):
     # test the crossvalidation with a smaller set of coordinates than normal,
     # better matched to the extremes of the mock dataset
-    coords = gridding.GridCoords(cell_size=0.04, npix=256)
+    coords = coordinates.GridCoords(cell_size=0.04, npix=256)
 
     d = mock_visibility_data
     uu = d["uu"]
@@ -88,10 +98,14 @@ def crossvalidation_products(mock_visibility_data):
     data_im = -d["data_im"]  # CASA convention
 
     gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
     )
     gridder.grid_visibilities(weighting="uniform")
     dataset = gridder.to_pytorch_dataset()
 
     return coords, dataset
-

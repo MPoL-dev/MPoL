@@ -6,7 +6,8 @@ from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 
 from . import utils
-from .gridding import GridCoords, _setup_coords
+from .gridding import _setup_coords
+from .coordinates import GridCoords
 from . import utils
 
 
@@ -69,8 +70,8 @@ class BaseCube(nn.Module):
 
     def forward(self):
         r"""
-        Calculate the image representation from the ``base_cube`` using the pixel mapping 
-            
+        Calculate the image representation from the ``base_cube`` using the pixel mapping
+
         .. math::
 
             I = f_\mathrm{map}(b)
@@ -127,8 +128,8 @@ class HannConvCube(nn.Module):
         r"""Args:
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
 
-        Returns: 
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format. 
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
         """
         # Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.
         # Additionally, the convolution must be done on the *sky-oriented* cube
@@ -161,7 +162,7 @@ class ImageCube(nn.Module):
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
         passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.
-        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. 
+        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``.
     """
 
     def __init__(
@@ -208,7 +209,7 @@ class ImageCube(nn.Module):
 
         If the ImageCube object was initialized with ``passthrough=False``, the ``cube`` argument is not permitted, and ``forward`` passes on the stored ``nn.Parameter`` cube as an identity operation.
 
-        Args: 
+        Args:
             cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if the ImageCube object was initialized with ``passthrough=True``.
 
         Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity operation
@@ -232,13 +233,13 @@ class ImageCube(nn.Module):
 
         Returns:
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
-            
+
         """
         return utils.packed_cube_to_sky_cube(self.cube)
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
-        Export the image cube to a FITS file. 
+        Export the image cube to a FITS file.
 
         Args:
             fname (str): the name of the FITS file to export to.
@@ -313,12 +314,12 @@ class FourierCube(nn.Module):
     def forward(self, cube):
         """
         Perform the FFT of the image cube for each channel.
-        
+
         Args:
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
 
-        Returns: 
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format. 
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
         """
 
         # make sure the cube is 3D
