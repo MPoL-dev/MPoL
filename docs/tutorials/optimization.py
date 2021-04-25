@@ -30,7 +30,7 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from mpol import gridding, precomposed, losses, utils
+from mpol import gridding, coordinates, precomposed, losses, utils
 from astropy.utils.data import download_file
 from IPython.display import SVG, display
 
@@ -57,7 +57,7 @@ data_im = -d["data_im"][
 
 # +
 # define the image dimensions, as in the previous tutorial
-coords = gridding.GridCoords(cell_size=0.005, npix=800)
+coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 gridder = gridding.Gridder(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
 )

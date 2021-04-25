@@ -33,6 +33,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpol import (
     gridding,
+    coordinates,
     precomposed,
     losses,
     images,
@@ -64,7 +65,7 @@ data_im = -d["data_im"][
 
 # define the image dimensions, making sure they are big enough to fit all
 # of the expected emission
-coords = gridding.GridCoords(cell_size=0.03, npix=180)
+coords = coordinates.GridCoords(cell_size=0.03, npix=180)
 gridder = gridding.Gridder(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
 )
