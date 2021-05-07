@@ -1,8 +1,5 @@
 import numpy as np
-from numpy.fft import ifft2, fftfreq, fftshift, ifftshift, rfftfreq
-from .constants import arcsec
-from .utils import get_max_spatial_freq, get_maximum_cell_size
-from .coordinates import GridCoords, _setup_coords
+from .coordinates import _setup_coords
 from .datasets import GriddedDataset
 
 
@@ -142,7 +139,8 @@ class Gridder:
         """
         # calculate the histogrammed result for all channels
         cube = np.empty(
-            (self.nchan, self.coords.ncell_v, self.coords.ncell_u), dtype="float",
+            (self.nchan, self.coords.ncell_v, self.coords.ncell_u),
+            dtype="float",
         )
 
         for i in range(self.nchan):
@@ -156,7 +154,7 @@ class Gridder:
 
         Args:
             weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
-            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting. 
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
         """
 
@@ -293,7 +291,7 @@ class Gridder:
 
     def _null_dirty_beam(self, ntheta=24, single_channel_estimate=True):
         r"""Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.
-        
+
         Args:
             ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
             single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
@@ -358,7 +356,7 @@ class Gridder:
         return nulled_beam
 
     def get_dirty_beam_area(self, ntheta=24, single_channel_estimate=True):
-        """
+        r"""
         Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
 
         Args:
@@ -443,4 +441,3 @@ class Gridder:
         """
 
         return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
-

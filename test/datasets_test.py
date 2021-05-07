@@ -7,6 +7,14 @@ import matplotlib.pyplot as plt
 import copy
 
 
+def test_dataset_device(dataset):
+    if torch.cuda.is_available():
+        dataset = dataset.to("cuda")
+        dataset = dataset.to("cpu")
+    else:
+        pass
+
+
 def test_mask_dataset(dataset):
     updated_mask = np.ones_like(dataset.coords.packed_u_centers_2D)
     dataset.add_mask(updated_mask)
@@ -36,7 +44,7 @@ def test_dartboard_histogram(crossvalidation_products, tmp_path):
 
     fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
 
-    cmap = matplotlib.cm.get_cmap("plasma")
+    cmap = copy.copy(matplotlib.cm.get_cmap("plasma"))
     cmap.set_under("w")
     norm = matplotlib.colors.LogNorm(vmin=1)
 
@@ -218,10 +226,12 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
     for k, (train, test) in enumerate(cv):
 
         ax[k, 0].imshow(
-            np.fft.fftshift(train.mask[chan].detach().numpy()), interpolation="none",
+            np.fft.fftshift(train.mask[chan].detach().numpy()),
+            interpolation="none",
         )
         ax[k, 1].imshow(
-            np.fft.fftshift(test.mask[chan].detach().numpy()), interpolation="none",
+            np.fft.fftshift(test.mask[chan].detach().numpy()),
+            interpolation="none",
         )
 
     ax[0, 0].set_title("train")
@@ -277,4 +287,3 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
     ax[0, 0].set_title("train")
     ax[0, 2].set_title("test")
     fig.savefig(tmp_path / "images", dpi=300)
-

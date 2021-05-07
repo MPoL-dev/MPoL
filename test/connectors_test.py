@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
@@ -122,4 +121,3 @@ def test_residual_connector(coords, dataset_cont, tmp_path):
     fig.subplots_adjust(left=0.1, right=0.9, wspace=0.3, hspace=0.3, top=0.9)
     fig.savefig(tmp_path / "residual.png", dpi=300)
     plt.close("all")
-

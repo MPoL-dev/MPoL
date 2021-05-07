@@ -69,11 +69,11 @@ data_im = -d[
 
 # ## The GridCoords object
 
-from mpol import gridding
+from mpol import gridding, coordinates
 
 #  The first MPoL object we'll familiarize ourselves with is GridCoords. Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and Fourier space.
 
-coords = gridding.GridCoords(cell_size=0.005, npix=800)
+coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
 # The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the [GridCoords](../api.rst#mpol.coordinates.GridCoords) API documentation. The information you'll most likely want to access are the image dimensions
 

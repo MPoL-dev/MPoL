@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from mpol import gridding
 from mpol import coordinates
+import copy
 from mpol.constants import *
 
 
@@ -37,7 +38,12 @@ def test_gridder_instantiate_gridCoord(mock_visibility_data):
     mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     gridding.Gridder(
-        coords=mycoords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+        coords=mycoords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
     )
 
 
@@ -97,7 +103,12 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     data_im = np.zeros_like(uu)
 
     gridder = gridding.Gridder(
-        coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
     )
 
     # with uniform weighting, the gridded sheet should be uniform and = 1
@@ -168,7 +179,7 @@ def test_beam_null(gridder, tmp_path):
     chan = 4
     fig, ax = plt.subplots(ncols=2)
 
-    cmap = matplotlib.cm.get_cmap("viridis")
+    cmap = copy.copy(matplotlib.cm.get_cmap("viridis"))
     cmap.set_under("r")
     norm = matplotlib.colors.Normalize(vmin=0)
 
@@ -205,7 +216,7 @@ def test_beam_null_full(gridder, tmp_path):
     chan = 4
     fig, ax = plt.subplots(ncols=2)
 
-    cmap = matplotlib.cm.get_cmap("viridis")
+    cmap = copy.copy(matplotlib.cm.get_cmap("viridis"))
     cmap.set_under("r")
     norm = matplotlib.colors.Normalize(vmin=0)
 
@@ -496,4 +507,3 @@ def test_grid_cont(mock_visibility_data_cont):
     print(gridder.nchan)
 
     gridder.grid_visibilities(weighting="uniform")
-
