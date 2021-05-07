@@ -1376,11 +1376,11 @@ and imaginaries in the <span class="math notranslate nohighlight">\(\chi^2\)</sp
 </dl>
 <p>For example, you’ll likely want to access the <code class="docutils literal notranslate"><span class="pre">self.icube.sky_model</span></code> at some point.</p>
 <p>The idea is that <a class="reference internal" href="#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> can save you some keystrokes composing models by connecting the most commonly used layers together.</p>
-<object data="_images/mermaid-70bfb464e19b60735ad9c022ff289b06a5b6eb54.svg" type="image/svg+xml">
+<object data="_images/mermaid-ccd283206d7cec194b03764db2424ed06e36e44c.svg" type="image/svg+xml">
             <p class="warning">graph TD
     subgraph SimpleNet
     bc(BaseCube) --&gt; HannConvCube
-    HannConvCube --&gt; ImageCube 
+    HannConvCube --&gt; ImageCube
     ImageCube --&gt; FourierLayer
     end
     FourierLayer --&gt; il([Loss])

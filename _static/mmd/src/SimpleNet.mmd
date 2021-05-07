@@ -1,7 +1,7 @@
 graph TD
     subgraph SimpleNet
     bc(BaseCube) --> HannConvCube
-    HannConvCube --> ImageCube 
+    HannConvCube --> ImageCube
     ImageCube --> FourierLayer
     end
     FourierLayer --> il([Loss])

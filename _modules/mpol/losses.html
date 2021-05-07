@@ -182,15 +182,15 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">connectors</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
 
 
 <div class="viewcode-block" id="nll"><a class="viewcode-back" href="../../api.html#mpol.losses.nll">[docs]</a><span class="k">def</span> <span class="nf">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all </span>
-<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply </span>
-<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real </span>
+<span class="sd">    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all</span>
+<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
+<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real</span>
 <span class="sd">    and imaginaries in the :math:`\chi^2` sum.</span>
 
 <span class="sd">    Args:</span>
@@ -224,9 +224,9 @@
 
 <div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all </span>
-<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply </span>
-<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real </span>
+<span class="sd">    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all</span>
+<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
+<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real</span>
 <span class="sd">    and imaginaries in the :math:`\chi^2` sum.</span>
 
 <span class="sd">    Args:</span>
@@ -251,7 +251,7 @@
 
 <div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_. </span>
+<span class="sd">    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cube (any tensor): pixel values must be positive :math:`I_i &gt; 0` for all :math:`i`</span>
@@ -260,7 +260,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: entropy loss</span>
 
-<span class="sd">    The entropy loss is calculated as </span>
+<span class="sd">    The entropy loss is calculated as</span>
 
 <span class="sd">    .. math::</span>
 
@@ -358,7 +358,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: sparsity loss calculated where ``mask == True``</span>
 
-<span class="sd">    The sparsity loss calculated as </span>
+<span class="sd">    The sparsity loss calculated as</span>
 
 <span class="sd">    .. math::</span>
 
@@ -375,12 +375,12 @@
 
 <div class="viewcode-block" id="UV_sparsity"><a class="viewcode-back" href="../../api.html#mpol.losses.UV_sparsity">[docs]</a><span class="k">def</span> <span class="nf">UV_sparsity</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">q_max</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. </span>
+<span class="sd">    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)</span>
-<span class="sd">        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2) </span>
-<span class="sd">        q_max (float): maximum radial baseline </span>
+<span class="sd">        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2)</span>
+<span class="sd">        q_max (float): maximum radial baseline</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: UV sparsity loss above :math:`q_\mathrm{max}`</span>
@@ -406,13 +406,13 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.</span>
 
-<span class="sd">    Assumes an image plane kernel of </span>
+<span class="sd">    Assumes an image plane kernel of</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        k(r) = exp(-\frac{r^2}{2 \ell^2})</span>
 
-<span class="sd">    The corresponding power spectral density is </span>
+<span class="sd">    The corresponding power spectral density is</span>
 
 <span class="sd">    .. math::</span>
 

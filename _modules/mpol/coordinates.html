@@ -175,15 +175,16 @@
             
   <h1>Source code for mpol.coordinates</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">ifft2</span><span class="p">,</span> <span class="n">fftfreq</span><span class="p">,</span> <span class="n">fftshift</span><span class="p">,</span> <span class="n">ifftshift</span><span class="p">,</span> <span class="n">rfftfreq</span>
+<span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">fftfreq</span><span class="p">,</span> <span class="n">fftshift</span><span class="p">,</span> <span class="n">ifft2</span><span class="p">,</span> <span class="n">ifftshift</span><span class="p">,</span> <span class="n">rfftfreq</span>
+
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_max_spatial_freq</span><span class="p">,</span> <span class="n">get_maximum_cell_size</span>
 
 
 <div class="viewcode-block" id="GridCoords"><a class="viewcode-back" href="../../api.html#mpol.coordinates.GridCoords">[docs]</a><span class="k">class</span> <span class="nc">GridCoords</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. </span>
-<span class="sd">    </span>
+<span class="sd">    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): width of a single square pixel in [arcsec]</span>
 <span class="sd">        npix (int): number of pixels in the width of the image</span>
@@ -193,19 +194,19 @@
 <span class="sd">    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).</span>
 
 <span class="sd">    After the object is initialized, instance variables can be accessed, for example</span>
-<span class="sd">    </span>
+
 <span class="sd">    &gt;&gt;&gt; myCoords = GridCoords(cell_size=0.005, 512)</span>
 <span class="sd">    &gt;&gt;&gt; myCoords.img_ext</span>
-<span class="sd">    </span>
+
 <span class="sd">    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]</span>
 <span class="sd">    :ivar dm: image-plane cell spacing in DEC direction [radians]</span>
 <span class="sd">    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin=&#39;lower&#39;``. Units of [arcsec]</span>
 <span class="sd">    :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`]. </span>
-<span class="sd">    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`]. </span>
-<span class="sd">    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`]. </span>
-<span class="sd">    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`]. </span>
+<span class="sd">    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`].</span>
 <span class="sd">    :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]</span>
@@ -364,7 +365,7 @@
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the image</span>
 
-<span class="sd">    Returns: None. </span>
+<span class="sd">    Returns: None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">coords</span><span class="p">:</span>
         <span class="k">assert</span> <span class="p">(</span>

@@ -1,7 +1,7 @@
 Installation
 ============
 
-MPoL requires ``python >= 3.6``. 
+MPoL requires ``python >= 3.6``.
 
 Using pip
 ---------
@@ -33,11 +33,11 @@ If you installed from PyPI, to upgrade to the latest stable version of MPoL, do 
 If you installed from source, update the repository ::
 
     $ cd MPoL
-    $ git pull 
+    $ git pull
     $ pip install .
 
 You can determine your current installed version by ::
 
-    $ python 
-    >>> import mpol 
+    $ python
+    >>> import mpol
     >>> print(mpol.__version__)

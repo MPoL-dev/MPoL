@@ -1,6 +1,6 @@
 graph TD
-sm(SkyModel) --> ImageCube 
+sm(SkyModel) --> ImageCube
 ImageCube --> FourierLayer
-FourierLayer --> DataConnector 
-ad[[Dataset]] --> DataConnector 
+FourierLayer --> DataConnector
+ad[[Dataset]] --> DataConnector
 DataConnector --> il([Loss])

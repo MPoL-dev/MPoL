@@ -174,10 +174,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mpol.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">kB</span><span class="p">,</span> <span class="n">deg</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">kB</span>
 
 
 <div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
@@ -245,7 +245,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a log stretch to the tensor.</span>
 
-<span class="sd">    Args: </span>
+<span class="sd">    Args:</span>
 <span class="sd">        tensor (PyTorch tensor): input tensor :math:`x`</span>
 
 <span class="sd">    Returns: :math:`\ln(1 + |x|)`</span>
@@ -256,7 +256,7 @@
 
 <div class="viewcode-block" id="loglinspace"><a class="viewcode-back" href="../../api.html#mpol.utils.loglinspace">[docs]</a><span class="k">def</span> <span class="nf">loglinspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">N_log</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``. </span>
+<span class="sd">    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        start (float): starting cell left edge</span>
@@ -284,14 +284,14 @@
 
 <div class="viewcode-block" id="fftspace"><a class="viewcode-back" href="../../api.html#mpol.utils.fftspace">[docs]</a><span class="k">def</span> <span class="nf">fftspace</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        width (float): the width of the array</span>
 <span class="sd">        N (int): the number of elements in the array</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        numpy.float64 1D array: the fftspace array</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">N</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;N must be even.&quot;</span>
 
@@ -326,7 +326,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.</span>
 
-<span class="sd">    Args: </span>
+<span class="sd">    Args:</span>
 <span class="sd">        uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].</span>
 
 <span class="sd">    Returns: cell_size (in arcsec)</span>
@@ -338,8 +338,8 @@
 <div class="viewcode-block" id="sky_gaussian_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_radians">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_radians</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is rotated ``Omega`` degrees East of North.</span>
-<span class="sd">    </span>
-<span class="sd">    To evaluate the Gaussian, internally first we translate to center </span>
+
+<span class="sd">    To evaluate the Gaussian, internally first we translate to center</span>
 
 <span class="sd">    .. math::</span>
 
@@ -353,7 +353,7 @@
 <span class="sd">        l&#39;&#39; = l&#39; \cos \phi - m&#39; \sin \phi \\</span>
 <span class="sd">        m&#39;&#39; = l&#39; \sin \phi + m&#39; \cos \phi</span>
 
-<span class="sd">    and then evaluate the Gaussian </span>
+<span class="sd">    and then evaluate the Gaussian</span>
 
 <span class="sd">    .. math::</span>
 
@@ -416,7 +416,7 @@
 
 <div class="viewcode-block" id="fourier_gaussian_lambda_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_lambda_radians">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_lambda_radians</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`. </span>
+<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        u: l in units of [lambda]</span>
@@ -432,7 +432,7 @@
 <span class="sd">        2D Gaussian evaluated at input args</span>
 
 <span class="sd">    The following is a description of how we derived the analytical relationships. In what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units of :math:`\lambda`.</span>
-<span class="sd">    </span>
+
 <span class="sd">    We start from Fourier dual relationships in Bracewell&#39;s `The Fourier Transform and Its Applications &lt;https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract&gt;`_</span>
 
 <span class="sd">    .. math::</span>
@@ -445,14 +445,14 @@
 
 <span class="sd">        f_0(l,m) = a \exp \left ( -\pi [l^2 + m^2] \right)</span>
 
-<span class="sd">    and </span>
+<span class="sd">    and</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        F_0(u,v) = a \exp \left ( -\pi [u^2 + v^2] \right),</span>
 
 <span class="sd">    respectively. The sky-plane Gaussian has a maximum value of :math:`a`.</span>
-<span class="sd">    </span>
+
 <span class="sd">    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into :math:`F_\mathrm{g}(u,v)`.</span>
 
 <span class="sd">    The similarity theorem states that (in 1D)</span>
@@ -473,7 +473,7 @@
 
 <span class="sd">        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, \frac{m}{\sigma_m \sqrt{2 \pi}}\right).</span>
 
-<span class="sd">    Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is </span>
+<span class="sd">    Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is</span>
 
 <span class="sd">    .. math::</span>
 
@@ -492,21 +492,21 @@
 <span class="sd">        u&#39; = u \cos \Omega - v \sin \Omega \\</span>
 <span class="sd">        v&#39; = u \sin \Omega + v \cos \Omega</span>
 
-<span class="sd">    such that </span>
+<span class="sd">    such that</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        f_2(l, m) = f_1(l&#39;, m&#39;) \\</span>
 <span class="sd">        F_2(u, v) = F_1(u&#39;, m&#39;)</span>
 
-<span class="sd">    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is </span>
+<span class="sd">    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        f_3(l,m) = f_2(l - \delta_l, m - \delta_m)</span>
 
-<span class="sd">    According to the shift theorem, the equivalent :math:`F_3(u,v)` is </span>
-<span class="sd">    </span>
+<span class="sd">    According to the shift theorem, the equivalent :math:`F_3(u,v)` is</span>
+
 <span class="sd">    .. math::</span>
 
 <span class="sd">        F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)</span>
@@ -517,7 +517,7 @@
 
 <span class="sd">        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u&#39;^2 + \sigma_m^2 v&#39;^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).</span>
 
-<span class="sd">    N.B. that we have mixed primed (:math:`u&#39;`) and unprimed (:math:`u`) coordinates in the same equation for brevity. </span>
+<span class="sd">    N.B. that we have mixed primed (:math:`u&#39;`) and unprimed (:math:`u`) coordinates in the same equation for brevity.</span>
 
 <span class="sd">    Finally, the same Fourier dual relationship holds</span>
 
@@ -525,7 +525,7 @@
 
 <span class="sd">        f_\mathrm{g}(l,m) \leftrightharpoons F_\mathrm{g}(u,v)</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># calculate primed rotated coordinates</span>
@@ -575,7 +575,6 @@
         <span class="n">sigma_y</span> <span class="o">*</span> <span class="n">arcsec</span><span class="p">,</span>
         <span class="n">Omega</span><span class="p">,</span>
     <span class="p">)</span></div>
-
 </pre></div>
 
            </div>
