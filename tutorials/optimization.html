@@ -452,7 +452,7 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span><span class="p">,</span> <span class="n">display</span>
 </pre></div>
@@ -491,7 +491,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># define the image dimensions, as in the previous tutorial</span>
-<span class="n">coords</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 <span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
 <span class="p">)</span>
@@ -669,7 +669,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fc3fc967c70&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f8d0644aee0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -713,10 +713,10 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
          [ 7.1800e-03+2.8196e-05j,  4.4902e-06+3.5266e-08j,
           -4.4899e-06-5.2898e-08j,  ...,
            4.4899e-06-3.5264e-08j, -4.4902e-06+1.7633e-08j,
-           4.4903e-06-3.8083e-22j],
+           4.4903e-06+4.9217e-19j],
          [-7.1797e-03-5.6390e-05j, -4.4899e-06-5.2898e-08j,
            4.4895e-06+7.0527e-08j,  ...,
-          -4.4899e-06+1.7632e-08j,  4.4901e-06+1.1980e-21j,
+          -4.4899e-06+1.7632e-08j,  4.4901e-06-6.4302e-19j,
           -4.4902e-06-1.7633e-08j],
          ...,
          [ 7.1791e-03-8.4581e-05j,  4.4899e-06-3.5264e-08j,
@@ -724,10 +724,10 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
            4.4885e-06-1.0578e-07j, -4.4891e-06+8.8154e-08j,
            4.4895e-06-7.0526e-08j],
          [-7.1797e-03+5.6390e-05j, -4.4902e-06+1.7633e-08j,
-           4.4901e-06-1.6480e-21j,  ...,
+           4.4901e-06+6.4011e-19j,  ...,
           -4.4891e-06+8.8154e-08j,  4.4895e-06-7.0527e-08j,
           -4.4899e-06+5.2898e-08j],
-         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-1.4745e-21j,
+         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-4.9292e-19j,
           -4.4902e-06-1.7633e-08j,  ...,
            4.4895e-06-7.0526e-08j, -4.4899e-06+5.2898e-08j,
            4.4902e-06-3.5266e-08j]]], dtype=torch.complex128,
@@ -752,7 +752,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-22.095552746835345
+22.09555274683534
 </pre></div></div>
 </div>
 <p>and then we can calculate the gradient of the loss function with respect to the parameters</p>
@@ -770,7 +770,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/torch/autograd/__init__.py:145: UserWarning: Casting complex values to real discards the imaginary part (Triggered internally at  /pytorch/aten/src/ATen/native/Copy.cpp:219.)
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/torch/autograd/__init__.py:145: UserWarning: Casting complex values to real discards the imaginary part (Triggered internally at  /pytorch/aten/src/ATen/native/Copy.cpp:219.)
   Variable._execution_engine.run_backward(
 </pre></div></div>
 </div>
@@ -799,7 +799,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fc3fbfee0d0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f8d05b46400&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -874,7 +874,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fc3fbf28100&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f8d05a800d0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -922,8 +922,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 1min 8s, sys: 7.83 s, total: 1min 16s
-Wall time: 43.8 s
+CPU times: user 58.2 s, sys: 7.99 s, total: 1min 6s
+Wall time: 37.7 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -982,7 +982,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fc3fc84b970&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f8d0642f7c0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

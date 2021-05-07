@@ -174,8 +174,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mpol.connectors</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
 
@@ -232,10 +231,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span>
 
 <div class="viewcode-block" id="GriddedResidualConnector.forward"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the residuals as </span>
-<span class="sd">        </span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the residuals as</span>
+
 <span class="sd">        .. math::</span>
-<span class="sd">        </span>
+
 <span class="sd">            \mathrm{residuals} = \mathrm{data} - \mathrm{model}</span>
 
 <span class="sd">        And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.</span>
@@ -274,7 +273,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.double : 3D image cube of shape ``(nchan, npix, npix)`` in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
-<span class="sd">            </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
 
@@ -318,7 +317,6 @@
 <span class="sd">            torch.complex : 3D phase cube of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">)</span></div>
-
 </pre></div>
 
            </div>

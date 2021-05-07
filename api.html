@@ -753,6 +753,20 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="mpol.datasets.GriddedDataset.to">
+<code class="sig-name descname"><span class="pre">to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset.to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset.to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the tensors of the dataset to specified device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>device</strong> (<em>torch.device</em>) – the desired device</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>copy of the GriddedDataset instance on the new device</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -868,12 +882,26 @@ m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mpol.images.FourierCube.ground_psd">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_psd</span></code><a class="headerlink" href="#mpol.images.FourierCube.ground_psd" title="Permalink to this definition">¶</a></dt>
-<dd><p>The power spectral density of the cube, in ground format.</p>
+<dt id="mpol.images.FourierCube.ground_amp">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_amp</span></code><a class="headerlink" href="#mpol.images.FourierCube.ground_amp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>power spectral density cube</p>
+<dd class="field-odd"><p>3D amplitude cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mpol.images.FourierCube.ground_phase">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ground_phase</span></code><a class="headerlink" href="#mpol.images.FourierCube.ground_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>3D phase cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>torch.double</p>

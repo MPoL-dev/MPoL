@@ -175,14 +175,13 @@
             
   <h1>Source code for mpol.datasets</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.lib.twodim_base</span> <span class="kn">import</span> <span class="n">histogram2d</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spheroidal_gridding</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span><span class="p">,</span> <span class="n">_setup_coords</span>
+<span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">_setup_coords</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">loglinspace</span>
 
 
@@ -268,13 +267,34 @@
 <span class="sd">            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GriddedDataset.to"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Moves the tensors of the dataset to specified device.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            device (torch.device): the desired device</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            copy of the GriddedDataset instance on the new device</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># pre-index the values</span>
+        <span class="c1"># note that these are *collapsed* across all channels</span>
+        <span class="c1"># 1D array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
 <span class="c1"># custom dataset loader</span>
 <div class="viewcode-block" id="UVDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.UVDataset">[docs]</a><span class="k">class</span> <span class="nc">UVDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Container for loose interferometric visibilities.</span>
 
 <span class="sd">    Args:</span>
@@ -286,7 +306,7 @@
 <span class="sd">        cell_size (float): the image pixel size in arcsec. Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.</span>
 <span class="sd">        npix (int): the number of pixels per image side (square images only). Defaults to None, but if both `cell_size` and `npix` are set, the visibilities will be pre-gridded to the RFFT output dimensions.</span>
 <span class="sd">        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
-<span class="sd">    </span>
+
 <span class="sd">    If both `cell_size` and `npix` are set, the dataset will be automatically pre-gridded to the RFFT output grid. This will greatly speed up performance.</span>
 
 <span class="sd">    If you have just a single channel, you can pass 1D numpy arrays for `uu`, `vv`, `weights`, `data_re`, and `data_im` and they will automatically be promoted to 2D with a leading dimension of 1 (i.e., ``nchan=1``).</span>
@@ -387,7 +407,7 @@
 <span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
-<span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`. </span>
+<span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -431,7 +451,7 @@
 <span class="sd">        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
 
 <span class="sd">        Data coordinates should include the points for the Hermitian visibilities.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`</span>
 <span class="sd">            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</span>
@@ -471,7 +491,7 @@
 
 <div class="viewcode-block" id="Dartboard.build_grid_mask_from_cells"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.build_grid_mask_from_cells">[docs]</a>    <span class="k">def</span> <span class="nf">build_grid_mask_from_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_index_list</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` . </span>
+<span class="sd">        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.</span>
@@ -517,7 +537,7 @@
 <span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
 <span class="sd">        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
 
-<span class="sd">    Once initialized, iterate through the datasets like </span>
+<span class="sd">    Once initialized, iterate through the datasets like</span>
 
 <span class="sd">    &gt;&gt;&gt; cv = datasets.KFoldCrossValidatorGridded(dataset, k)</span>
 <span class="sd">    &gt;&gt;&gt; for (train, test) in cv: # iterate among k datasets</span>
@@ -600,7 +620,6 @@
             <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span></div>
-
 </pre></div>
 
            </div>
