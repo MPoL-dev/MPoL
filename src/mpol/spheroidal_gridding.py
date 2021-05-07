@@ -5,8 +5,9 @@ You probably wont need to use these routines in the normal workflow of MPoL, but
 
 import numpy as np
 from scipy.sparse import lil_matrix
-from .constants import arcsec
+
 from . import utils
+from .constants import arcsec
 
 
 def horner(x, a):
@@ -48,22 +49,28 @@ def spheroid(eta):
     if eta <= 0.75:
         nn = eta ** 2 - 0.75 ** 2
 
-        return horner(
-            nn,
-            np.array(
-                [8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1]
-            ),
-        ) / horner(nn, np.array([1.0, 8.212018e-1, 2.078043e-1]))
+        return (
+            horner(
+                nn,
+                np.array(
+                    [8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1]
+                ),
+            )
+            / horner(nn, np.array([1.0, 8.212018e-1, 2.078043e-1]))
+        )
 
     elif eta <= 1.0:
         nn = eta ** 2 - 1.0
 
-        return horner(
-            nn,
-            np.array(
-                [4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2]
-            ),
-        ) / horner(nn, np.array([1.0, 9.599102e-1, 2.918724e-1]))
+        return (
+            horner(
+                nn,
+                np.array(
+                    [4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2]
+                ),
+            )
+            / horner(nn, np.array([1.0, 9.599102e-1, 2.918724e-1]))
+        )
 
     elif eta <= 1.0 + 1e-7:
         # case to allow some floating point error
@@ -160,10 +167,10 @@ def calc_matrices(u_data, v_data, u_model, v_model):
 
         V_\Im = C_\Im W_\Im
 
-    such that :math:`V_\Re` and :math:`V_\Im` are the real and imaginary visibilities interpolated to `u_data` and `v_data`. 
+    such that :math:`V_\Re` and :math:`V_\Im` are the real and imaginary visibilities interpolated to `u_data` and `v_data`.
 
     Args:
-    
+
         u_data (1D numpy array): the :math:`u` coordinates of the dataset (in [:math:`k\lambda`])
         v_data (1D numpy array): the :math:`v` coordinates of the dataset (in [:math:`k\lambda`])
         u_model: the :math:`u` axis delivered by the rfft (unflattened, in [:math:`k\lambda`]). Assuming this is trailing dimension, which is the one over which the RFFT was carried out.
@@ -336,13 +343,13 @@ def grid_datachannel(uu, vv, weights, re, im, cell_size, npix, debug=False, **kw
 
     An image `cell_size` and `npix` correspond to particular `u_grid` and `v_grid` values from the RFFT.
 
-    This pre-gridding procedure is similar to "uniform" weighting of visibilities for imaging, but not exactly the same in practice. This is because we are still evaluating a visibility likelihood function which incorporates the uncertainties of the measured spatial frequencies, whereas imaging routines use the weights to adjust the contributions of the measured visibility to the synthesize image. Evaluating a model against these gridded visibilities should be equivalent to the full interpolated calculation so long as it is true that 
-    
-        1) the visibility function is approximately constant over a :math:`(u,v)` cell 
+    This pre-gridding procedure is similar to "uniform" weighting of visibilities for imaging, but not exactly the same in practice. This is because we are still evaluating a visibility likelihood function which incorporates the uncertainties of the measured spatial frequencies, whereas imaging routines use the weights to adjust the contributions of the measured visibility to the synthesize image. Evaluating a model against these gridded visibilities should be equivalent to the full interpolated calculation so long as it is true that
+
+        1) the visibility function is approximately constant over a :math:`(u,v)` cell
         2) the measurement uncertainties on the real and imaginary components of individual visibilities are correct and described by Gaussian noise
 
-    If (1) is violated, you can always increase the width and npix of the image (keeping `cell_size` constant) to shrink the size of the :math:`(u,v)` cells (i.e., see https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html). If you need to do this, this probably indicates that you weren't using an image size appropriate for your dataset. 
-    
+    If (1) is violated, you can always increase the width and npix of the image (keeping `cell_size` constant) to shrink the size of the :math:`(u,v)` cells (i.e., see https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html). If you need to do this, this probably indicates that you weren't using an image size appropriate for your dataset.
+
     If (2) is violated, then it's not a good idea to procede with this faster routine. Instead, revisit the calibration of your dataset, or build in self-calibration adjustments based upon antenna and time metadata of the visibilities. One downside of the pre-gridding operation is that it eliminates the possibility of using self-calibration type loss functions.
     """
     assert npix % 2 == 0, "Image must have an even number of pixels"

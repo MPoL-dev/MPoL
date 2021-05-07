@@ -1,6 +1,6 @@
 import torch
-from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
+from torch import nn
 
 from . import utils
 

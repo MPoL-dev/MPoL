@@ -1,10 +1,11 @@
-import torch
-import numpy as np
+import copy
 
-from mpol import datasets, images, connectors, utils
 import matplotlib
 import matplotlib.pyplot as plt
-import copy
+import numpy as np
+import torch
+
+from mpol import connectors, datasets, images, utils
 
 
 def test_dataset_device(dataset):

@@ -59,7 +59,12 @@ data_im = -d["data_im"][
 # define the image dimensions, as in the previous tutorial
 coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 gridder = gridding.Gridder(
-    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=data_re,
+    data_im=data_im,
 )
 
 # Note that we needed to do the gridding with "uniform" in order to

@@ -12,24 +12,24 @@ BUILDDIR      = _build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile html clean 
+.PHONY: help Makefile html clean
 
 NOTEBOOKS := tutorials/gridder.ipynb tutorials/optimization.ipynb tutorials/crossvalidation.ipynb
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 
 clean:
-	rm -rf _build 
+	rm -rf _build
 	rm -rf ${NOTEBOOKS}
 	rm -rf tutorials/.ipynb_checkpoints
-	rm -rf tutorials/runs 
+	rm -rf tutorials/runs
 	rm -rf ${CHARTS}
 	rm -rf _static/baselines/build/baselines.csv
 
 tutorials/%.ipynb: tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
 
-# baseline table 
-_static/baselines/build/baselines.csv: 
+# baseline table
+_static/baselines/build/baselines.csv:
 	mkdir -p _static/baselines/build
 	python _static/baselines/src/print_conversions.py $@
 

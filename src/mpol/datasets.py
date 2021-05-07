@@ -1,9 +1,10 @@
+import copy
+
 import numpy as np
 import torch
-import copy
 from torch.utils.data import Dataset
-from . import spheroidal_gridding
-from . import utils
+
+from . import spheroidal_gridding, utils
 from .constants import *
 from .coordinates import _setup_coords
 from .utils import loglinspace

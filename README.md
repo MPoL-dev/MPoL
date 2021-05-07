@@ -10,7 +10,7 @@ MPoL is a flexible Python package designed for Regularized Maximum Likelihood im
 
 Documentation and installation instructions: [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
 
-## Citation 
+## Citation
 
 If you use this package or derivatives of it, please cite
 

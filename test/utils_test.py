@@ -1,9 +1,8 @@
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pytest
 
-from mpol import coordinates
-from mpol import utils
+from mpol import coordinates, utils
 from mpol.constants import *
 
 
