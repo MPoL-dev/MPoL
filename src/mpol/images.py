@@ -333,16 +333,6 @@ class FourierCube(nn.Module):
         return self.vis
 
     @property
-    def ground_psd(self):
-        r"""
-        The power spectral density of the cube, in ground format.
-
-        Returns:
-            torch.double: power spectral density cube
-        """
-        return torch.abs(self.ground_vis) ** 2
-
-    @property
     def ground_vis(self):
         r"""
         The visibility cube in ground format cube fftshifted for plotting with ``imshow``.
@@ -351,11 +341,33 @@ class FourierCube(nn.Module):
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
         """
 
-        return torch.fft.fftshift(self.vis, dim=(1, 2))
+        return utils.packed_cube_to_ground_cube(self.vis)
+
+    @property
+    def ground_amp(self):
+        r"""
+        The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
+
+        Returns:
+            torch.double : 3D amplitude cube of shape ``(nchan, npix, npix)``
+        """
+        return torch.abs(self.ground_vis)
+
+    @property
+    def ground_phase(self):
+        r"""
+        The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
+
+        Returns:
+            torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
+        """
+        return torch.angle(self.ground_vis)
 
 
 # class ImageCubeOld(nn.Module):
 #     r"""
+
+
 #     A PyTorch layer that provides a parameter set and transformations to model interferometric visibilities.
 
 #     The parameter set is the pixel values of the image cube itself. The transformations are the real fast Fourier transform (RFFT) and band-limited interpolation routines. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
