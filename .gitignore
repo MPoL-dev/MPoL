@@ -107,21 +107,21 @@ venv.bak/
 # vscode configs
 .vscode
 
-# mac files 
+# mac files
 .DS_Store
-docs/.DS_Store 
+docs/.DS_Store
 
-# images from tests 
+# images from tests
 test/*.png
 
 # virtual environment
 venv/
 
-# notebooks produced from jupytext 
+# notebooks produced from jupytext
 docs/tutorials/*.ipynb
 
 # testing cache
-tmp_cache 
+tmp_cache
 
 # setup file
 project_setup.sh

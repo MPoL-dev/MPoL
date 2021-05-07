@@ -86,7 +86,12 @@ coords.img_ext  # [arcsec]
 # The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by
 
 gridder = gridding.Gridder(
-    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=data_re,
+    data_im=data_im,
 )
 
 # Note that the `uu`, `vv`, `weight`, `data_re`, and `data_im` arrays are all two-dimensional numpy arrays of shape `(nchan, nvis)`. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape `(1, nvis)`.
@@ -142,4 +147,3 @@ fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
 # -
 
 # If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the regular TMS convention.
-

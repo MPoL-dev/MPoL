@@ -1,7 +1,7 @@
-import torch
 import numpy as np
+import torch
 
-from .constants import arcsec, cc, kB, deg
+from .constants import arcsec, cc, deg, kB
 
 
 def ground_cube_to_packed_cube(ground_cube):
@@ -69,7 +69,7 @@ def log_stretch(x):
     r"""
     Apply a log stretch to the tensor.
 
-    Args: 
+    Args:
         tensor (PyTorch tensor): input tensor :math:`x`
 
     Returns: :math:`\ln(1 + |x|)`
@@ -80,7 +80,7 @@ def log_stretch(x):
 
 def loglinspace(start, end, N_log, M_linear=3):
     r"""
-    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``. 
+    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``.
 
     Args:
         start (float): starting cell left edge
@@ -108,14 +108,14 @@ def loglinspace(start, end, N_log, M_linear=3):
 
 def fftspace(width, N):
     """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
-    
+
     Args:
         width (float): the width of the array
         N (int): the number of elements in the array
-        
+
     Returns:
         numpy.float64 1D array: the fftspace array
-    
+
     """
     assert N % 2 == 0, "N must be even."
 
@@ -150,7 +150,7 @@ def get_maximum_cell_size(uu_vv_point):
     r"""
     Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.
 
-    Args: 
+    Args:
         uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].
 
     Returns: cell_size (in arcsec)
@@ -162,8 +162,8 @@ def get_maximum_cell_size(uu_vv_point):
 def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
     r"""
     Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is rotated ``Omega`` degrees East of North.
-    
-    To evaluate the Gaussian, internally first we translate to center 
+
+    To evaluate the Gaussian, internally first we translate to center
 
     .. math::
 
@@ -177,7 +177,7 @@ def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
         l'' = l' \cos \phi - m' \sin \phi \\
         m'' = l' \sin \phi + m' \cos \phi
 
-    and then evaluate the Gaussian 
+    and then evaluate the Gaussian
 
     .. math::
 
@@ -240,7 +240,7 @@ def sky_gaussian_arcsec(x, y, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
 
 def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
     r"""
-    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`. 
+    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.
 
     Args:
         u: l in units of [lambda]
@@ -256,7 +256,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
         2D Gaussian evaluated at input args
 
     The following is a description of how we derived the analytical relationships. In what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units of :math:`\lambda`.
-    
+
     We start from Fourier dual relationships in Bracewell's `The Fourier Transform and Its Applications <https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract>`_
 
     .. math::
@@ -269,14 +269,14 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
         f_0(l,m) = a \exp \left ( -\pi [l^2 + m^2] \right)
 
-    and 
+    and
 
     .. math::
 
         F_0(u,v) = a \exp \left ( -\pi [u^2 + v^2] \right),
 
     respectively. The sky-plane Gaussian has a maximum value of :math:`a`.
-    
+
     We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into :math:`F_\mathrm{g}(u,v)`.
 
     The similarity theorem states that (in 1D)
@@ -297,7 +297,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
         f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, \frac{m}{\sigma_m \sqrt{2 \pi}}\right).
 
-    Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is 
+    Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is
 
     .. math::
 
@@ -316,21 +316,21 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
         u' = u \cos \Omega - v \sin \Omega \\
         v' = u \sin \Omega + v \cos \Omega
 
-    such that 
+    such that
 
     .. math::
 
         f_2(l, m) = f_1(l', m') \\
         F_2(u, v) = F_1(u', m')
 
-    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is 
+    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is
 
     .. math::
 
         f_3(l,m) = f_2(l - \delta_l, m - \delta_m)
 
-    According to the shift theorem, the equivalent :math:`F_3(u,v)` is 
-    
+    According to the shift theorem, the equivalent :math:`F_3(u,v)` is
+
     .. math::
 
         F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)
@@ -341,7 +341,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
         F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).
 
-    N.B. that we have mixed primed (:math:`u'`) and unprimed (:math:`u`) coordinates in the same equation for brevity. 
+    N.B. that we have mixed primed (:math:`u'`) and unprimed (:math:`u`) coordinates in the same equation for brevity.
 
     Finally, the same Fourier dual relationship holds
 
@@ -349,7 +349,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
         f_\mathrm{g}(l,m) \leftrightharpoons F_\mathrm{g}(u,v)
 
-    
+
     """
 
     # calculate primed rotated coordinates
@@ -399,4 +399,3 @@ def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y,
         sigma_y * arcsec,
         Omega,
     )
-

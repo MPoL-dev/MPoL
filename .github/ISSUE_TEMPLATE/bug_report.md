@@ -20,8 +20,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. Linux + distro, MacOS, Windows] 
- - Python Version 
+ - OS: [e.g. Linux + distro, MacOS, Windows]
+ - Python Version
  - MPoL Version (`$python -c "import mpol; print(mpol.__version__)"`
 
 **Additional context**

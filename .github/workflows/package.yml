@@ -1,6 +1,6 @@
 name: build and upload pip
 
-on: 
+on:
   release:
     types:
       - published
@@ -21,7 +21,7 @@ jobs:
         pip install --upgrade pip
         pip install setuptools wheel twine
         pip install pep517 --user
-    - name: Install vanilla package 
+    - name: Install vanilla package
       run: |
         pip install .
     - name: Build a binary wheel and a source tarball

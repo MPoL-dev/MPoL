@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
-from mpol import coordinates, connectors, images
+
+from mpol import connectors, coordinates, images
 from mpol.constants import *
 
 

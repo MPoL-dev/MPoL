@@ -1,8 +1,9 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.optim
 from torch.utils.tensorboard import SummaryWriter
-import matplotlib.pyplot as plt
+
 from mpol import losses, precomposed
 from mpol.constants import *
 

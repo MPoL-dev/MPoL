@@ -67,7 +67,12 @@ data_im = -d["data_im"][
 # of the expected emission
 coords = coordinates.GridCoords(cell_size=0.03, npix=180)
 gridder = gridding.Gridder(
-    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im,
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=data_re,
+    data_im=data_im,
 )
 
 # export to PyTorch dataset
@@ -198,11 +203,16 @@ for i, (train, test) in enumerate(k_fold_datasets):
     )
 
     ax[i, 1].imshow(
-        train_chan.detach().numpy(), origin="lower", extent=img_ext,
+        train_chan.detach().numpy(),
+        origin="lower",
+        extent=img_ext,
     )
 
     ax[i, 2].imshow(
-        test_mask.detach().numpy(), origin="lower", extent=vis_ext, cmap="GnBu",
+        test_mask.detach().numpy(),
+        origin="lower",
+        extent=vis_ext,
+        cmap="GnBu",
     )
 
     ax[i, 0].set_ylabel("k-fold {:}".format(i))
@@ -311,7 +321,9 @@ def train_and_image(pars):
     img_ext = rml.coords.img_ext
     fig, ax = plt.subplots()
     ax.imshow(
-        np.squeeze(rml.icube.sky_cube.detach().numpy()), origin="lower", extent=img_ext,
+        np.squeeze(rml.icube.sky_cube.detach().numpy()),
+        origin="lower",
+        extent=img_ext,
     )
     return fig, ax
 
@@ -335,4 +347,3 @@ print("Cross validation score:", cross_validate(pars))
 train_and_image(pars)
 
 # More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``nll_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
-

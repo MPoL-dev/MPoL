@@ -1,13 +1,14 @@
 import numpy as np
-from numpy.fft import ifft2, fftfreq, fftshift, ifftshift, rfftfreq
+from numpy.fft import fftfreq, fftshift, ifft2, ifftshift, rfftfreq
+
 from .constants import arcsec
 from .utils import get_max_spatial_freq, get_maximum_cell_size
 
 
 class GridCoords:
     r"""
-    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid. 
-    
+    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid.
+
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
@@ -17,19 +18,19 @@ class GridCoords:
     Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
 
     After the object is initialized, instance variables can be accessed, for example
-    
+
     >>> myCoords = GridCoords(cell_size=0.005, 512)
     >>> myCoords.img_ext
-    
+
     :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]
     :ivar dm: image-plane cell spacing in DEC direction [radians]
     :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [arcsec]
     :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]
     :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]
-    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`]. 
-    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`]. 
-    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`]. 
-    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`]. 
+    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].
+    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`].
+    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`].
+    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`].
     :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]
     :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]
     :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]
@@ -188,7 +189,7 @@ def _setup_coords(self, cell_size=None, npix=None, coords=None, nchan=None):
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
 
-    Returns: None. 
+    Returns: None.
     """
     if coords:
         assert (

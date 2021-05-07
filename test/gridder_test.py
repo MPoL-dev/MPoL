@@ -1,10 +1,11 @@
-import pytest
-import numpy as np
+import copy
+
 import matplotlib
 import matplotlib.pyplot as plt
-from mpol import gridding
-from mpol import coordinates
-import copy
+import numpy as np
+import pytest
+
+from mpol import coordinates, gridding
 from mpol.constants import *
 
 

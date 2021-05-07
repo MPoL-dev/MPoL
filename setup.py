@@ -1,5 +1,6 @@
-import setuptools
 import os.path
+
+import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -42,7 +43,7 @@ EXTRA_REQUIRES = {
 }
 
 EXTRA_REQUIRES["dev"] = (
-    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black"]
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
 )
 
 

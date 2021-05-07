@@ -1,9 +1,8 @@
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pytest
 
-from mpol import utils
-from mpol import spheroidal_gridding
+from mpol import spheroidal_gridding, utils
 from mpol.constants import *
 
 

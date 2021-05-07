@@ -7,7 +7,9 @@ parser.add_argument("outfile", help="Destination to save CSV table.")
 args = parser.parse_args()
 
 import csv
+
 import numpy as np
+
 from mpol.constants import c_ms
 
 header = ["baseline", "100 GHz (Band 3)", "230 GHz (Band 6)", "340 GHz (Band 7)"]

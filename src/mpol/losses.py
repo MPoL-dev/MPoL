@@ -6,15 +6,15 @@ If you don't see a loss function you need, it's easy to write your own directly 
 import numpy as np
 import torch
 
-from .constants import *
 from . import connectors
+from .constants import *
 
 
 def nll(model_vis, data_vis, weight):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all 
-    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply 
-    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real 
+    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all
+    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
+    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real
     and imaginaries in the :math:`\chi^2` sum.
 
     Args:
@@ -48,9 +48,9 @@ def nll(model_vis, data_vis, weight):
 
 def nll_gridded(vis, datasetGridded):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all 
-    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply 
-    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real 
+    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all
+    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
+    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real
     and imaginaries in the :math:`\chi^2` sum.
 
     Args:
@@ -75,7 +75,7 @@ def nll_gridded(vis, datasetGridded):
 
 def entropy(cube, prior_intensity):
     r"""
-    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_. 
+    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
     Args:
         cube (any tensor): pixel values must be positive :math:`I_i > 0` for all :math:`i`
@@ -84,7 +84,7 @@ def entropy(cube, prior_intensity):
     Returns:
         torch.double: entropy loss
 
-    The entropy loss is calculated as 
+    The entropy loss is calculated as
 
     .. math::
 
@@ -182,7 +182,7 @@ def sparsity(cube, mask=None):
     Returns:
         torch.double: sparsity loss calculated where ``mask == True``
 
-    The sparsity loss calculated as 
+    The sparsity loss calculated as
 
     .. math::
 
@@ -199,12 +199,12 @@ def sparsity(cube, mask=None):
 
 def UV_sparsity(vis, qs, q_max):
     r"""
-    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`. 
+    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`.
 
     Args:
         vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)
-        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2) 
-        q_max (float): maximum radial baseline 
+        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2)
+        q_max (float): maximum radial baseline
 
     Returns:
         torch.double: UV sparsity loss above :math:`q_\mathrm{max}`
@@ -230,13 +230,13 @@ def PSD(qs, psd, l):
     r"""
     Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
 
-    Assumes an image plane kernel of 
+    Assumes an image plane kernel of
 
     .. math::
 
         k(r) = exp(-\frac{r^2}{2 \ell^2})
 
-    The corresponding power spectral density is 
+    The corresponding power spectral density is
 
     .. math::
 

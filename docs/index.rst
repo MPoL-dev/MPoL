@@ -29,7 +29,7 @@ For more information about the constellation of packages supporting RML imaging 
    api.rst
    units-and-conventions.rst
    developer-documentation.rst
-   
+
 .. toctree::
    :maxdepth: 2
    :caption: Tutorials

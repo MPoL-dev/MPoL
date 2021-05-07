@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
-from mpol import gridding, coordinates
+import pytest
 from astropy.utils.data import download_file
+
+from mpol import coordinates, gridding
 
 # We need a fixture which provides mock visibilities of the sort we'd
 # expect from visread, but *without* the CASA dependency.

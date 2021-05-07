@@ -19,7 +19,7 @@ Several of the tests require mock data that is not practical to package within t
 
 ## Viewing plots
 
-Some tests produce temporary files, like plots, that could be useful to view for development or debugging. Normally these are produced to a temporary directory created by the system which will be cleaned up after the tests finish. To preserve them, first create a plot directory and then run the tests with this `basetemp` specified 
-    
+Some tests produce temporary files, like plots, that could be useful to view for development or debugging. Normally these are produced to a temporary directory created by the system which will be cleaned up after the tests finish. To preserve them, first create a plot directory and then run the tests with this `basetemp` specified
+
     $ mkdir plotsdir
     $ python -m pytest --basetemp=plotsdir

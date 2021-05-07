@@ -2,13 +2,12 @@ r"""The ``images`` module provides the core functionality of MPoL via :class:`mp
 
 import numpy as np
 import torch
-from torch import nn
 import torch.fft  # to avoid conflicts with old torch.fft *function*
+from torch import nn
 
 from . import utils
-from .gridding import _setup_coords
 from .coordinates import GridCoords
-from . import utils
+from .gridding import _setup_coords
 
 
 class BaseCube(nn.Module):
@@ -251,8 +250,8 @@ class ImageCube(nn.Module):
         """
 
         try:
-            from astropy.io import fits
             from astropy import wcs
+            from astropy.io import fits
         except ImportError:
             print(
                 "Please install the astropy package to use FITS export functionality."

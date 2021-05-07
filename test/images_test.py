@@ -1,10 +1,8 @@
+import matplotlib.pyplot as plt
 import pytest
 import torch
-import matplotlib.pyplot as plt
 
-from mpol import images
-from mpol import gridding
-from mpol import utils
+from mpol import gridding, images, utils
 from mpol.constants import *
 
 
@@ -253,4 +251,3 @@ def test_multi_chan_conv(coords, tmp_path):
     conv_layer = images.HannConvCube(nchan=nchan)
 
     conv_layer(test_cube)
-
