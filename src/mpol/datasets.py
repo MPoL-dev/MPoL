@@ -99,6 +99,9 @@ class GriddedDataset:
 
         Args:
             device (torch.device): the desired device
+
+        Returns:
+            copy of the GriddedDataset instance on the new device
         """
         self.vis_gridded = self.vis_gridded.to(device)
         self.weight_gridded = self.weight_gridded.to(device)
