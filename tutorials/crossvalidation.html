@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Cross validation &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -23,14 +24,15 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "math|output_area"}}</script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -40,6 +42,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
@@ -99,20 +103,20 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Cross validation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Setup">Setup</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#K-fold-cross-validation">K-fold cross validation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Choosing-the-K-folds">Choosing the <span class="math notranslate nohighlight">\(K\)</span>-folds</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#K-fold-cross-validation">K-fold cross validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Choosing-the-K-folds">Choosing the <span class="math notranslate nohighlight">\(K\)</span>-folds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-cross-validation-loop">The cross validation loop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Results">Results</a></li>
 </ul>
 </li>
 </ul>
@@ -434,10 +438,10 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Cross-validation">
+<section id="Cross-validation">
 <h1>Cross validation<a class="headerlink" href="#Cross-validation" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial, we’ll design and optimize a more sophisticated imaging workflow. Cross validation will help us build confidence that we are setting the regularization hyperparameters appropriately.</p>
-<div class="section" id="Setup">
+<section id="Setup">
 <h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this headline">¶</a></h2>
 <p>We’ll continue with the same central channel of the ALMA logo measurement set as before. If these commands don’t make sense, please consult the previous tutorials.</p>
 <div class="nbinput nblast docutils container">
@@ -530,8 +534,9 @@ Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 <img alt="../_images/tutorials_crossvalidation_3_1.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_3_1.png" style="width: 462px; height: 481px;" />
 </div>
 </div>
-<div class="section" id="K-fold-cross-validation">
-<h3>K-fold cross validation<a class="headerlink" href="#K-fold-cross-validation" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="K-fold-cross-validation">
+<h2>K-fold cross validation<a class="headerlink" href="#K-fold-cross-validation" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Cross-validation_(statistics)">K-fold cross validation</a> is a technique used to assess model validity. In the context of RML imaging, we use “model” to describe a whole host of assumptions inherent to the imaging workflow. Model settings include the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>, the number of pixels, the mapping of the BaseCube to the ImageCube, as well as hyperparameter choices like the strength of the regularizer terms for each type of loss function. Usually we’re most
 interested in assessing whether we have adequately set hyperparameters (like in this tutorial), but sometimes we’d like to assess model settings too.</p>
 <p>If you’re coming from astronomy or astrophysics, you might be most familiar with doing <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019arXiv190912313S/abstract">Bayesian parameter inference</a> with all of the data at once. In a typical workflow, you might implicitly assume that your model is valid and explore the shape of the unnormalized posterior distribution using a standard MCMC technique like Metropolis-Hastings. If you did want to compare the validity of models, then you would need to use a
@@ -546,9 +551,9 @@ sampler which computes the Bayesian evidence, or posterior normalization.</p>
 </ul>
 <p>When all loops are done, you can average the <span class="math notranslate nohighlight">\(K\)</span> cross-validation scores together into a final score for that model configuration. Lower cross validation scores are better in the sense that the trained model did a better job predicting the test data.</p>
 <p><strong>Why does this work?</strong> Cross validation is such a useful tool because it tells us how well a model generalizes to new data, with the idea being that a better model will predict new data more accurately. Some more considered thoughts on cross validation and model fitting are in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2021arXiv210107256H/abstract">Hogg and Villar</a>.</p>
-</div>
-<div class="section" id="Choosing-the-K-folds">
-<h3>Choosing the <span class="math notranslate nohighlight">\(K\)</span>-folds<a class="headerlink" href="#Choosing-the-K-folds" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="Choosing-the-K-folds">
+<h2>Choosing the <span class="math notranslate nohighlight">\(K\)</span>-folds<a class="headerlink" href="#Choosing-the-K-folds" title="Permalink to this headline">¶</a></h2>
 <p>There are many ways to split a dataset into <span class="math notranslate nohighlight">\(K\)</span> chunks, and, depending on your application, some schemes are better than others. For most interferometric datasets, visibility samples are clustered in Fourier space due to the limitations on the number and location of the antennas. One objective of cross validation might be figuring out how sparse <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage adversely affects our imaging process—ideally we’d like to tune the algorithm such that we would still recover a
 similar image even if our <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> sampling were different. To explore slicing choices, here is the full <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage of our ALMA logo mock dataset (C43-7, 1 hour observation)</p>
 <div class="nbinput docutils container">
@@ -736,6 +741,9 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 <img alt="../_images/tutorials_crossvalidation_15_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_15_0.png" style="width: 602px; height: 956px;" />
 </div>
 </div>
+</section>
+<section id="The-cross-validation-loop">
+<h2>The cross validation loop<a class="headerlink" href="#The-cross-validation-loop" title="Permalink to this headline">¶</a></h2>
 <p>Building on the previous optimization tutorial, we’ll wrap the iterative optimization commands into a training function. This will come in handy, because we’ll want to train the model on each of the varied <span class="math notranslate nohighlight">\(K\)</span>-fold training datasets. In this tutorial, we’ll use a loss function of the form</p>
 <div class="math notranslate nohighlight">
 \[f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity} + \lambda_{TSV} f_\mathrm{TSV}\]</div>
@@ -850,6 +858,9 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </pre></div>
 </div>
 </div>
+</section>
+<section id="Results">
+<h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
 <p>As a starting point, we’ll try cross-validating without any regularization.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -968,9 +979,8 @@ Cross validation score: 5.415293814001459
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

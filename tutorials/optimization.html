@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Optimization Loop &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -23,14 +24,15 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "math|output_area"}}</script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -40,6 +42,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
@@ -99,9 +103,9 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
@@ -438,10 +442,10 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Optimization-Loop">
+<section id="Optimization-Loop">
 <h1>Optimization Loop<a class="headerlink" href="#Optimization-Loop" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial, we’ll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We’ll continue with the dataset described in the <a class="reference external" href="gridder.html">Gridding and Diagnostic Images</a> tutorial.</p>
-<div class="section" id="Gridding-recap">
+<section id="Gridding-recap">
 <h2>Gridding recap<a class="headerlink" href="#Gridding-recap" title="Permalink to this headline">¶</a></h2>
 <p>Let’s set up the gridder and coordinates as before</p>
 <div class="nbinput nblast docutils container">
@@ -507,8 +511,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="The-PyTorch-dataset">
+</section>
+<section id="The-PyTorch-dataset">
 <h2>The PyTorch dataset<a class="headerlink" href="#The-PyTorch-dataset" title="Permalink to this headline">¶</a></h2>
 <p>Now we will export the gridded visibilities to a PyTorch dataset to use in the imaging loop. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.</p>
 <div class="nbinput docutils container">
@@ -529,8 +533,8 @@ div.rendered_html tbody tr:hover {
 this dataset has 1 channel
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Building-an-image-model">
+</section>
+<section id="Building-an-image-model">
 <h2>Building an image model<a class="headerlink" href="#Building-an-image-model" title="Permalink to this headline">¶</a></h2>
 <p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We’ve bundled the most common modules for imaging together in a <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a> meta-module, which we’ll use here.</p>
 <p>This diagram shows how the primitive modules, like <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>, <a class="reference external" href="../api.html#mpol.images.ImageCube">ImageCube</a>, etc… are connected together to form <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>. In this workflow, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> are the core model parameters representing the image. More information about all of these components is available in the <a class="reference external" href="../api.html">API documentation</a>.</p>
@@ -560,8 +564,8 @@ this dataset has 1 channel
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Breaking-down-the-training-loop">
+</section>
+<section id="Breaking-down-the-training-loop">
 <h2>Breaking down the training loop<a class="headerlink" href="#Breaking-down-the-training-loop" title="Permalink to this headline">¶</a></h2>
 <p>Our goal for the rest of the tutorial is to set up a loop that will</p>
 <ol class="arabic simple">
@@ -581,13 +585,13 @@ this dataset has 1 channel
 </div>
 <p>The role of the optimizer is to advance the parameters (in this case, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>) using the gradient of the loss function with respect to those parameters. PyTorch has many different <a class="reference external" href="https://pytorch.org/docs/stable/optim.html#module-torch.optim">optimizers</a> available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The <code class="docutils literal notranslate"><span class="pre">lr</span></code> parameter is the
 ‘learning rate,’ or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.</p>
-</div>
-<div class="section" id="Loss-functions">
+</section>
+<section id="Loss-functions">
 <h2>Loss functions<a class="headerlink" href="#Loss-functions" title="Permalink to this headline">¶</a></h2>
 <p>In the parlance of the machine learning community, one defines “loss” functions comparing models to data. For regularized maximum likelihood imaging, the most fundamental loss function we’ll use is the <a class="reference external" href="../api.html#mpol.losses.loss_fn">data likelihood</a> or the <span class="math notranslate nohighlight">\(\chi^2\)</span> value comparing the model visibilities to the data visibilities. For this introductory tutorial, we’ll use only the data likelihood loss function to start, but you should know that because imaging is an ill-defined inverse
 problem, this is not a sufficient constraint by itself. In later tutorials, we will apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The <a class="reference external" href="../api.html#module-mpol.losses">mpol.losses</a> module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.</p>
-</div>
-<div class="section" id="Gradient-descent">
+</section>
+<section id="Gradient-descent">
 <h2>Gradient descent<a class="headerlink" href="#Gradient-descent" title="Permalink to this headline">¶</a></h2>
 <p>Let’s walk through how we calculate a loss value and optimize the parameters. To start, let’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/saving_loading_models.html">examine the parameters of the model</a></p>
 <div class="nbinput docutils container">
@@ -674,7 +678,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fa7e43bf040&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f6dbbc01dc0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -804,7 +808,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fa7e3a3e430&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f6dbb28b670&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -879,7 +883,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fa7e39eafa0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f6dbb235160&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -889,8 +893,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <img alt="../_images/tutorials_optimization_42_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_42_1.png" style="width: 456px; height: 393px;" />
 </div>
 </div>
-</div>
-<div class="section" id="Iterating-the-training-Loop">
+</section>
+<section id="Iterating-the-training-Loop">
 <h2>Iterating the training Loop<a class="headerlink" href="#Iterating-the-training-Loop" title="Permalink to this headline">¶</a></h2>
 <p>Now that we’ve covered how to use gradient descent to optimize a set of image parameters, let’s wrap these steps into a training loop and iterate a few hundred times to converge to a final product.</p>
 <p>In addition to the steps just outlined, we’ll also track the loss values as we optimize.</p>
@@ -927,8 +931,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 1min 2s, sys: 7.59 s, total: 1min 10s
-Wall time: 40 s
+CPU times: user 56.9 s, sys: 7.95 s, total: 1min 4s
+Wall time: 36.8 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -960,8 +964,8 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
-</div>
-<div class="section" id="Visualizing-output">
+</section>
+<section id="Visualizing-output">
 <h2>Visualizing output<a class="headerlink" href="#Visualizing-output" title="Permalink to this headline">¶</a></h2>
 <p>Let’s visualize the final product. The bounds for <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> are available in the <code class="docutils literal notranslate"><span class="pre">img_ext</span></code> parameter.</p>
 <div class="nbinput docutils container">
@@ -987,7 +991,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fa7e43bf5e0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f6dbb1b4280&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -997,15 +1001,15 @@ Text(0, 0.5, &#39;loss&#39;)
 <img alt="../_images/tutorials_optimization_48_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_48_1.png" style="width: 424px; height: 393px;" />
 </div>
 </div>
-</div>
-<div class="section" id="Wrapup">
+</section>
+<section id="Wrapup">
 <h2>Wrapup<a class="headerlink" href="#Wrapup" title="Permalink to this headline">¶</a></h2>
 <p>And there you have it, an image optimized to fit the data. Don’t be fooled into thinking that minimal regularization (like we’ve done here with only the data likelihood) yields the most conservative image estimates, however! With this setup, we’ve done <em>some</em> regularization because the functional basis set we chose automatically enforced image positivity (see the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> documentation), but in truth we aren’t too far off from the dirty image itself.</p>
 <p>Though the dirty image is easy to produce and is in fact a maximal likelihood image (with no regularization), we would argue that it’s far from a conservative image since it is generated by making some rather strong assumptions about the data—that unsampled spatial frequencies carry zero power. In future tutorials we’ll examine how to set up additional regularizer terms that can yield more desireable image characteristics.</p>
 <p>Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">GitHub discussion</a>. If you spot a bug or have an idea to improve these tutorials, please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">GitHub issue</a> or better yet <a class="reference external" href="file:///Users/ian/Documents/Research/Disks/RML/MPoL/docs/_build/html/developer-documentation.html">submit a pull
 request</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Gridding and diagnostic images &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -23,14 +24,15 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "math|output_area"}}</script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -40,13 +42,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Optimization Loop" href="optimization.html" />
-    <link rel="prev" title="Developer Documentation" href="../developer-documentation.html" /> 
+    <link rel="prev" title="API" href="../api.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,9 +103,9 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
@@ -434,10 +438,10 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Gridding-and-diagnostic-images">
+<section id="Gridding-and-diagnostic-images">
 <h1>Gridding and diagnostic images<a class="headerlink" href="#Gridding-and-diagnostic-images" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial covers how to read visibility data, average it to a “grid”, and make diagnostic images.</p>
-<div class="section" id="Importing-data">
+<section id="Importing-data">
 <h2>Importing data<a class="headerlink" href="#Importing-data" title="Permalink to this headline">¶</a></h2>
 <p>We’ll start by using the mock CASA measurement set that we produced in the <a class="reference external" href="https://visread.readthedocs.io/en/latest/">visread</a> <a class="reference external" href="https://visread.readthedocs.io/en/latest/tutorials/plot_baselines.html">quickstart</a>. You can use your own measurement set (either with real data or create one via CASA simulation) or download the already-made one directly from <a class="reference external" href="https://zenodo.org/record/4460128#.YB4ehGRKidZ">Zenodo</a>.</p>
 <p>If you’re fine working in Python 3.6 and you have <a class="reference external" href="https://visread.readthedocs.io/">visread</a> installed, you can read the visibility data from the measurement set by</p>
@@ -499,8 +503,8 @@ vis.data_im  # imaginary components of visibilities in Jy
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="The-GridCoords-object">
+</section>
+<section id="The-GridCoords-object">
 <h2>The GridCoords object<a class="headerlink" href="#The-GridCoords-object" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -541,8 +545,8 @@ vis.data_im  # imaginary components of visibilities in Jy
 </pre></div></div>
 </div>
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
-</div>
-<div class="section" id="The-Gridder-object">
+</section>
+<section id="The-Gridder-object">
 <h2>The Gridder object<a class="headerlink" href="#The-Gridder-object" title="Permalink to this headline">¶</a></h2>
 <p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by</p>
 <div class="nbinput nblast docutils container">
@@ -581,8 +585,8 @@ GridCoords and Gridder object in one shot by</p>
 </div>
 </div>
 <p>if you don’t want to specify your GridCoords object separately.</p>
-</div>
-<div class="section" id="Gridding-the-visibilities">
+</section>
+<section id="Gridding-the-visibilities">
 <h2>Gridding the visibilities<a class="headerlink" href="#Gridding-the-visibilities" title="Permalink to this headline">¶</a></h2>
 <p>The next step is to average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords using the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.grid_visibilities"><span class="std std-ref">Gridder.grid_visibilities</span></a> routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information
 on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>.</p>
@@ -595,8 +599,8 @@ on the difference between these schemes, see the <a class="reference external" h
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Visualizing-the-images">
+</section>
+<section id="Visualizing-the-images">
 <h2>Visualizing the images<a class="headerlink" href="#Visualizing-the-images" title="Permalink to this headline">¶</a></h2>
 <p>The gridder object now has a dense representation of the visibility data attached to it as <code class="docutils literal notranslate"><span class="pre">gridder.gridded_vis</span></code>, or separately <code class="docutils literal notranslate"><span class="pre">gridder.gridded_re</span></code> and <code class="docutils literal notranslate"><span class="pre">gridder.gridded_im</span></code>. We won’t normally need to access these products directly. However, we are interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the “dirty beam” and “dirty image” by radio astronomers. Those are accessible via the following routines</p>
 <div class="nbinput nblast docutils container">
@@ -663,8 +667,8 @@ on the difference between these schemes, see the <a class="reference external" h
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the
 regular TMS convention.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -677,7 +681,7 @@ regular TMS convention.</p>
         <a href="optimization.html" class="btn btn-neutral float-right" title="Optimization Loop" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../developer-documentation.html" class="btn btn-neutral float-left" title="Developer Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

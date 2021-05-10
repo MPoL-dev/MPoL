@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Developer Documentation &mdash; MPoL 0.1.1.dev0 documentation</title>
@@ -23,6 +24,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -38,12 +40,14 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Gridding and diagnostic images" href="tutorials/gridder.html" />
+    <link rel="next" title="API" href="api.html" />
     <link rel="prev" title="Units and Conventions" href="units-and-conventions.html" /> 
 </head>
 
@@ -97,22 +101,39 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#code-bugs-and-enhancements">Code Bugs and Enhancements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-model">Release model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-development-environment">Setting up your development environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#forking-mpol-and-cloning-from-github">Forking MPoL and cloning from Github</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-virtual-environment">Python virtual environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-mpol-and-development-dependencies">Installing MPoL and development dependencies</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-dependencies">Installing dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#test-cache">Test cache</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#viewing-test-and-debug-plots">Viewing test and debug plots</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-the-documentation">Building the Documentation</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#developing-tutorials">Developing tutorials</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#tutorial-best-practices">Tutorial best practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributing-code-and-tests">Contributing code and tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributing-documentation">Contributing documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributing-tutorials">Contributing tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#best-practices">Best practices</a></li>
 </ul>
 </li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
@@ -190,83 +211,206 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="developer-documentation">
+  <section id="developer-documentation">
 <span id="developer-documentation-label"></span><h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
-<p>If you are new to contributing code to a project, we recommend a quick read through the excellent contributing guides of the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> and <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy</a> packages. What follows in this guide draws upon many of the suggestions from those two resources.</p>
-<div class="section" id="code-bugs-and-enhancements">
-<h2>Code Bugs and Enhancements<a class="headerlink" href="#code-bugs-and-enhancements" title="Permalink to this headline">¶</a></h2>
-<p>If you find an issue with the code, documentation, or would like to make a suggestion for an improvement, please raise an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
-<blockquote>
-<div></div></blockquote>
+<p>If you find an issue with the code, documentation, or would like to make a specific suggestion for an improvement, please raise an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>. If you have a more general query or would just like to discuss a topic, please make a post on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
+<p>If you are new to contributing to an open source project, we recommend a quick read through the excellent contributing guides of the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> and <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy</a> packages. What follows in this guide draws upon many of the suggestions from those two resources. There are many ways to contribute to an open source project like MPoL, and all of them are valuable to us. No contribution is too small—even a typo fix is appreciated!</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#release-model" id="id5">Release model</a></p></li>
+<li><p><a class="reference internal" href="#setting-up-your-development-environment" id="id6">Setting up your development environment</a></p>
+<ul>
+<li><p><a class="reference internal" href="#forking-mpol-and-cloning-from-github" id="id7">Forking MPoL and cloning from Github</a></p></li>
+<li><p><a class="reference internal" href="#python-virtual-environment" id="id8">Python virtual environment</a></p></li>
+<li><p><a class="reference internal" href="#installing-mpol-and-development-dependencies" id="id9">Installing MPoL and development dependencies</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#testing" id="id10">Testing</a></p>
+<ul>
+<li><p><a class="reference internal" href="#installing-dependencies" id="id11">Installing dependencies</a></p></li>
+<li><p><a class="reference internal" href="#running-the-tests" id="id12">Running the tests</a></p></li>
+<li><p><a class="reference internal" href="#test-cache" id="id13">Test cache</a></p></li>
+<li><p><a class="reference internal" href="#viewing-test-and-debug-plots" id="id14">Viewing test and debug plots</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#documentation" id="id15">Documentation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dependencies" id="id16">Dependencies</a></p></li>
+<li><p><a class="reference internal" href="#building-the-documentation" id="id17">Building the Documentation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#contributing" id="id18">Contributing</a></p>
+<ul>
+<li><p><a class="reference internal" href="#contributing-code-and-tests" id="id19">Contributing code and tests</a></p></li>
+<li><p><a class="reference internal" href="#contributing-documentation" id="id20">Contributing documentation</a></p></li>
+<li><p><a class="reference internal" href="#contributing-tutorials" id="id21">Contributing tutorials</a></p>
+<ul>
+<li><p><a class="reference internal" href="#best-practices" id="id22">Best practices</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 </div>
-<div class="section" id="testing">
-<span id="testing-reference-label"></span><h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>MPoL includes a test suite written using <a class="reference external" href="https://docs.pytest.org/">pytest</a>. You can install the package dependencies for testing via</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install .[test]
+<section id="release-model">
+<h2><a class="toc-backref" href="#id5">Release model</a><a class="headerlink" href="#release-model" title="Permalink to this headline">¶</a></h2>
+<p>The MPoL project values stable software, and so we place a special emphasis on writing and running tests to ensure the code works reliably for as many users as possible. It is our intent that the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch of the github repository always reflects a stable version of the code that passes all tests. After significant new functionality has been introduced, a tagged releases (e.g., <code class="docutils literal notranslate"><span class="pre">v0.1.1</span></code>) is generated from the main branch and pushed to PyPI.</p>
+</section>
+<section id="setting-up-your-development-environment">
+<h2><a class="toc-backref" href="#id6">Setting up your development environment</a><a class="headerlink" href="#setting-up-your-development-environment" title="Permalink to this headline">¶</a></h2>
+<section id="forking-mpol-and-cloning-from-github">
+<h3><a class="toc-backref" href="#id7">Forking MPoL and cloning from Github</a><a class="headerlink" href="#forking-mpol-and-cloning-from-github" title="Permalink to this headline">¶</a></h3>
+<p>MPoL is developed using the git version control system. The source repository is hosted on <a class="reference external" href="https://github.com/MPoL-dev/MPoL">Github</a> as part of the <a class="reference external" href="https://github.com/MPoL-dev/">MPoL-dev</a> organization. If you are new to using git and Github, we recommend reviewing the git resources on the <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy contributing guide</a>.</p>
+<p>We use a “fork and pull request” model for collaborative development. If you are unfamiliar with this workflow, check out this short Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. For even more reference material, see the official Github documentation on <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests">collaborating with issues and pull requests</a>.</p>
+<p>After forking the MPoL repository to your own github account, clone the repository to your local machine.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YOURUSERNAME/MPoL.git
 </pre></div>
 </div>
-<p>after you’ve cloned the repository and changed to the root of the repository.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[test]'</span></code> instead.</p>
+</section>
+<section id="python-virtual-environment">
+<h3><a class="toc-backref" href="#id8">Python virtual environment</a><a class="headerlink" href="#python-virtual-environment" title="Permalink to this headline">¶</a></h3>
+<p>To keep things organized, we recommend creating a Python <a class="reference external" href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a> specifically for MPoL development (though this step isn’t strictly necessary). To do this,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd MPoL
+$ python3 -m venv venv
+</pre></div>
 </div>
-<p>To run all of the tests, from  the root of the repository, invoke</p>
+<p>More information on virtual environments is available through the official <a class="reference external" href="https://docs.python.org/3/tutorial/venv.html">Python documentation</a>. Then, activate the virtual environment</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source venv/bin/activate
+</pre></div>
+</div>
+<p>This gives you a clean Python environment in which to work without fear of conflicting package dependencies (e.g., perhaps you want to have two versions of MPoL installed on your system, one for production work and the other for development work. This is possible as long as you use two different virtual environments). You will need to remember to activate the corresponding virtual environment with each new shell session, however.</p>
+</section>
+<section id="installing-mpol-and-development-dependencies">
+<h3><a class="toc-backref" href="#id9">Installing MPoL and development dependencies</a><a class="headerlink" href="#installing-mpol-and-development-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Then, use pip to install the MPoL package. We recommend installing the package using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(venv) $ pip install -e &#39;.[dev]&#39;
+</pre></div>
+</div>
+<p>This directs pip to install whatever package is in the current working directory (<code class="docutils literal notranslate"><span class="pre">.</span></code>) as an editable package (<code class="docutils literal notranslate"><span class="pre">-e</span></code>). More information on the pip command line arguments is available via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--help</span></code>. We’ve additionally told pip to install the packages listed in the (<code class="docutils literal notranslate"><span class="pre">[dev]</span></code>) <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES</span></code> variable in <a class="reference external" href="https://github.com/MPoL-dev/MPoL/blob/main/setup.py">setup.py</a>. This variable contains a list of all of the Python packages that you might need throughout the course of developing and testing the package (e.g., pytest). These packages are only needed when developing, building, and testing the package. They are not needed to run the package in its normal configuration, hence, they are not installed with the vanilla <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">MPoL</span></code>.</p>
+<p>We also recommend using a set of git <a class="reference external" href="https://pre-commit.com/">pre-commit hooks</a> that we have configured via the <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> file in the MPoL repository. They are very useful tools for keeping git diffs orderly and small. To install these tools to your local copy of the MPoL repository, run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pre-commit install
+</pre></div>
+</div>
+<p>Then, each time you run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code> these scripts will run on the repository code and check for things like whether your code complies with formatting guidelines. If any issues are found, the pre-commit script will stop the commit and correct the offending files for you. Then, you can redo the <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code> with the modified files.</p>
+<blockquote>
+<div></div></blockquote>
+</section>
+</section>
+<section id="testing">
+<span id="testing-reference-label"></span><h2><a class="toc-backref" href="#id10">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>MPoL includes a test suite written using <a class="reference external" href="https://docs.pytest.org/">pytest</a>. We aim for this test suite to be as comprehensive as possible, since this helps us achieve our goal of shipping stable software.</p>
+<section id="installing-dependencies">
+<h3><a class="toc-backref" href="#id11">Installing dependencies</a><a class="headerlink" href="#installing-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>If you are only interested in running the tests, you can install the more limited set of testing package dependencies via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install `.[test]`
+</pre></div>
+</div>
+<p>after you’ve cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> list is a superset of the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> list.</p>
+</section>
+<section id="running-the-tests">
+<h3><a class="toc-backref" href="#id12">Running the tests</a><a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h3>
+<p>To run all of the tests, change to the root of the repository and invoke</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m pytest
 </pre></div>
 </div>
-<p>If a test errors on a stable branch, please report what went wrong as an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
-<div class="section" id="test-cache">
-<h3>Test cache<a class="headerlink" href="#test-cache" title="Permalink to this headline">¶</a></h3>
-<p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo and downloaded using astropy caching functions. If you run into trouble with the test cache becoming stale, you can delete it by deleting the <code class="docutils literal notranslate"><span class="pre">.mpol/cache</span></code> folder in home directory.</p>
-</div>
-<div class="section" id="viewing-test-and-debug-plots">
-<h3>Viewing test and debug plots<a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this headline">¶</a></h3>
+<p>If a test errors (especially on the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch), please report what went wrong as a bug report issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
+</section>
+<section id="test-cache">
+<h3><a class="toc-backref" href="#id13">Test cache</a><a class="headerlink" href="#test-cache" title="Permalink to this headline">¶</a></h3>
+<p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo and downloaded using astropy caching functions. If you run into trouble with the test cache becoming stale, you can delete it by deleting the <code class="docutils literal notranslate"><span class="pre">.mpol/cache</span></code> folder in your home directory.</p>
+</section>
+<section id="viewing-test-and-debug-plots">
+<h3><a class="toc-backref" href="#id14">Viewing test and debug plots</a><a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this headline">¶</a></h3>
 <p>Some tests produce temporary files, like plots, that could be useful to view for development or debugging. Normally these are saved to a temporary directory created by the system which will be cleaned up after the tests finish. To preserve them, first create a plot directory (e.g., <code class="docutils literal notranslate"><span class="pre">plotsdir</span></code>) and then run the tests with this <code class="docutils literal notranslate"><span class="pre">--basetemp</span></code> specified</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir plotsdir
 $ python -m pytest --basetemp=plotsdir
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="contributing">
-<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
-<p>We use a “fork and pull request” model for collaborative development on Github, using git. If you are unfamiliar with this workflow, check out this short Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. For even more reference material, see the official Github documentation on <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests">collaborating with issues and pull requests</a>.</p>
-<p>After forking the MPoL repository to your own github account, clone the repository and install it with the development tools in editable mode:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/MPoL-dev/MPoL.git
-$ cd MPoL
-$ pip install -e .[dev]
+</section>
+</section>
+<section id="documentation">
+<h2><a class="toc-backref" href="#id15">Documentation</a><a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>MPoL documentation is written as docstrings attached to MPoL classes and functions and as individual <code class="docutils literal notranslate"><span class="pre">.rst</span></code> files located in the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder. The documentation is built using the <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> Python documentation generator.</p>
+<section id="dependencies">
+<h3><a class="toc-backref" href="#id16">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<p>If you are only interested in building the documentation, you can install the more limited set of documentation package dependencies via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &#39;.[docs]&#39;
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you use the zsh shell, you might need to try <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code> instead.</p>
+<p>after you’ve cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> list is a superset of the <code class="docutils literal notranslate"><span class="pre">[docs]</span></code> list.</p>
+<p>In addition to these Python packages, you will also need to install the <a class="reference external" href="https://github.com/mermaid-js/mermaid-cli">mmdc</a> command line tool to render several <a class="reference external" href="https://mermaid-js.github.io/mermaid/#/">mermaid.js</a> charts used to explain MPoL functionality. After installation, make sure that you can successfully run the <code class="docutils literal notranslate"><span class="pre">mmdc</span></code> command line utility from the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder.</p>
+</section>
+<section id="building-the-documentation">
+<h3><a class="toc-backref" href="#id17">Building the Documentation</a><a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">¶</a></h3>
+<p>To build the documentation, change to the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder and run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make html
+</pre></div>
 </div>
-<p>Before starting to make any changes, you should first run the tests as described <a class="reference internal" href="#testing-reference-label"><span class="std std-ref">Testing</span></a> to make sure everything passes.</p>
-<p>Once you’re done making your changes, run the test suite again. If any tests fail, please address these issues before submitting a pull request. If you’ve changed a substantial amount of code or added new features, you should write new tests covering these changes. Instructions on how to write new tests can be found in the <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html#toc">pytest documentation</a> and the <code class="docutils literal notranslate"><span class="pre">MPoL/tests/</span></code> directory contains many examples.</p>
-<p>Once you are satisfied with your changes and all tests pass, initiate a pull request back to the main <a class="reference external" href="https://github.com/MPoL-dev/MPoL/">MPoL-dev/MPoL repository</a> as described in the Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. Thank you for your contribution!</p>
-<div class="section" id="developing-tutorials">
-<h3>Developing tutorials<a class="headerlink" href="#developing-tutorials" title="Permalink to this headline">¶</a></h3>
+<p>If successful, the HTML documentation will be available in the <code class="docutils literal notranslate"><span class="pre">_build/html</span></code> folder. You can preview the documentation locally using your favorite web browser by opening up <code class="docutils literal notranslate"><span class="pre">_build/html/index.html</span></code></p>
+<p>You can clean up (delete) all of the built products by running</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make clean
+</pre></div>
+</div>
+<p>For more information on the build process, take a look at the documentation makefile in <code class="docutils literal notranslate"><span class="pre">docs/Makefile</span></code>.</p>
+</section>
+</section>
+<section id="contributing">
+<h2><a class="toc-backref" href="#id18">Contributing</a><a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>The following subsections describe recommended workflows for contributing code, documentation, and tutorials to the MPoL package. They are written assuming that you are familiar with the preceding development guidelines in this document.</p>
+<p>In keeping with the <a class="reference external" href="https://guides.github.com/activities/forking/">fork and pull request model</a>, you carry out development on a forked version of the repository (i.e., <code class="docutils literal notranslate"><span class="pre">https://github.com/YOURUSERNAME/MPoL.git</span></code>) and, once you’re satisfied with your changes (and all code passes the tests), you initiate a pull request back to the central repository (<code class="docutils literal notranslate"><span class="pre">https://github.com/MPoL-dev/MPoL.git</span></code>).</p>
+<p>In general, we envision the contribution lifecycle following a pattern:</p>
+<ol class="arabic simple">
+<li><p>If you notice that the MPoL-dev repository has newer changes since you made your fork, fetch upstream changes to your repository and merge them into the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. You can do this via the Github interface by clicking “fetch upstream” and then pulling the changes to your local machine with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>. Alternatively, you can do this from the command line by configuring the <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/configuring-a-remote-for-a-fork">remote upstream repository</a> to <code class="docutils literal notranslate"><span class="pre">https://github.com/MPoL-dev/MPoL.git</span></code> and <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork">syncing the changes</a> from the upstream repository to your forked repo.</p></li>
+<li><p>Checkout the updated <code class="docutils literal notranslate"><span class="pre">main</span></code> branch of your MPoL repository and verify that it contains any new changes by comparing commits with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code>.</p></li>
+<li><p>Run the test suite (with <code class="docutils literal notranslate"><span class="pre">pytest</span></code>) and verify that all tests pass. If not, raise a Github issue with the error.</p></li>
+<li><p>Create a new feature branch with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">my_feature_branch</span></code>.</p></li>
+<li><p>Develop your code/documentation/tutorial (see below) and commit your changes to the repository as you go. Be sure to commit the right things to the repository (such as source files) and avoid committing build products (like .png files produced as part of the documentation build, for example).</p></li>
+<li><p>When you are satisfied with your changes, run the tests and build the documentation. If anything fails due to changes you made, please fix the code so that the tests pass and the documentation builds, then recommit your changes. If you cannot figure out why the tests or documentation are breaking, please raise a Github issue with the error.</p></li>
+<li><p>Push the changes on your feature branch to Github with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">my_feature_branch</span></code>. Make sure that the automated tests and documentation build as part of Github actions complete successfully. If not, assess the error(s), make additional changes to your feature branch, and re-push the changes until all tests pass.</p></li>
+<li><p>After the tests have completed successfully, use the Github interface to initiate a pull request back to the central repository. If you know that your feature branch isn’t ready to be merged, but would still like feedback on your work, please submit a <a class="reference external" href="https://github.blog/2019-02-14-introducing-draft-pull-requests/">draft or “work in progress”</a> pull request.</p></li>
+<li><p>Someone will review your pull request and may suggest additional changes for improvements. If approved, your pull request will be merged into the MPoL-dev/MPoL repo. Thank you for your contribution!</p></li>
+</ol>
+<section id="contributing-code-and-tests">
+<h3><a class="toc-backref" href="#id19">Contributing code and tests</a><a class="headerlink" href="#contributing-code-and-tests" title="Permalink to this headline">¶</a></h3>
+<p>We strive to release a useable, stable software package. One way to help accomplish this is through writing rigorous and complete tests, especially after adding new functionality to the package. MPoL tests are located within the <code class="docutils literal notranslate"><span class="pre">test/</span></code> directory and follow <a class="reference external" href="https://docs.pytest.org/en/6.2.x/contents.html#toc">pytest</a> conventions. Please add your new tests to this directory—we love new and useful tests.</p>
+<p>If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for ‘tests’ to be one of the first suggestions on your pull request.</p>
+</section>
+<section id="contributing-documentation">
+<h3><a class="toc-backref" href="#id20">Contributing documentation</a><a class="headerlink" href="#contributing-documentation" title="Permalink to this headline">¶</a></h3>
+<p>A general workflow for writing documentation might look like</p>
+<ol class="arabic simple">
+<li><p>run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> in the <cite>docs/</cite> folder</p></li>
+<li><p>look at the built documentation with your web browser</p></li>
+<li><p>write/edit documentation source as docstrings or <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> files</p></li>
+<li><p>run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> to rebuild those files you’ve changed</p></li>
+<li><p>go to #2 and repeat as necessary</p></li>
+</ol>
+<p>The idea behind <a class="reference external" href="https://www.gnu.org/software/make/manual/make.html">GNU make</a> is that every invocation of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> will only rebuild the files whose dependencies have changed, saving lots of time.</p>
+</section>
+<section id="contributing-tutorials">
+<h3><a class="toc-backref" href="#id21">Contributing tutorials</a><a class="headerlink" href="#contributing-tutorials" title="Permalink to this headline">¶</a></h3>
 <p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, MPoL tutorials are written as <code class="docutils literal notranslate"><span class="pre">.py</span></code> python files and converted to Jupyter notebooks using <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a>. You can learn more about this neat plugin on the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a> page. You don’t need to worry about pairing notebooks—we’re only interested in keeping the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file up to date and committed to source control. For small tutorials, the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file you create is the only thing you need to commit to the github repo (don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.</p>
 <p>To write a tutorial:</p>
 <ol class="arabic simple">
 <li><p>copy and rename one of the existing <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in <code class="docutils literal notranslate"><span class="pre">docs/tutorials/</span></code> to <code class="docutils literal notranslate"><span class="pre">docs/tutorials/your-new-tutorial</span></code>, being sure to keep the header metadata</p></li>
 <li><p>start a Jupyter notebook kernel</p></li>
-<li><p>open the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file as a notebook and edit it like you would any other Jupyter notebook. If you’ve already installed the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a> tool (as part of <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code>), your changes in the Jupyter notebook window should be automatically saved back to the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file. As you progress, make sure you commit your changes in the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file back to the repository (but don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file).</p></li>
+<li><p>open the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file as a notebook and edit it like you would any other Jupyter notebook. If you’ve already installed the <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">jupytext</a> tool (as part of <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code>), your changes in the Jupyter notebook window should be automatically saved back to the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file. As you progress, make sure you commit your changes in the <code class="docutils literal notranslate"><span class="pre">.py</span></code> file back to the repository (but don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file).</p></li>
 </ol>
-<p>When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">tutorials/gridder.py</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">tutorials/gridder</span></code> line to the tabel of contents.</p>
-<p>To build the docs locally, <code class="docutils literal notranslate"><span class="pre">cd</span></code> to the docs folder and run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>. This script includes the line</p>
+<p>When done, add a reference to your tutorial in the table of contents in <code class="docutils literal notranslate"><span class="pre">docs/index.rst</span></code>. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">tutorials/gridder.py</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">tutorials/gridder</span></code> line. You should also add the name of your tutorial with the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> extension (e.g., <code class="docutils literal notranslate"><span class="pre">tutorials/gridder.ipynb</span></code>) to the <code class="docutils literal notranslate"><span class="pre">NOTEBOOKS</span></code> variable in <code class="docutils literal notranslate"><span class="pre">docs/Makefile</span></code>.</p>
+<p>Then, you should be able to build the documentation as normal (i.e., <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>) and your tutorial will be included in the documentation. Behind the scenes, the Makefile includes the line</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupytext</span> <span class="o">--</span><span class="n">to</span> <span class="n">ipynb</span> <span class="o">--</span><span class="n">execute</span> <span class="n">tutorials</span><span class="o">/*.</span><span class="n">py</span>
 </pre></div>
 </div>
-<p>which converts your <code class="docutils literal notranslate"><span class="pre">.py</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file and executes its contents, storing the cell output to the notebook. Then, when Sphinx builds the documention, the <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin sees a Jupyter notebook and incorporates it into the build. If you’ve added any extra documentation build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES['docs']</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
-</div>
-<div class="section" id="tutorial-best-practices">
-<h3>Tutorial best practices<a class="headerlink" href="#tutorial-best-practices" title="Permalink to this headline">¶</a></h3>
-<p>Tutorials should still be self-contained. If the tutorial requires a dataset, the dataset should be publically available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.</p>
+<p>which converts your <code class="docutils literal notranslate"><span class="pre">.py</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file and executes its contents, storing the cell output to the notebook. Then, when Sphinx builds the documentation, the <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin sees a Jupyter notebook and incorporates it into the build.</p>
+<p>If your tutorial requires any extra build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES['docs']</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
+<section id="best-practices">
+<h4><a class="toc-backref" href="#id22">Best practices</a><a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h4>
+<p>Tutorials should be self-contained. If the tutorial requires a dataset, the dataset should be publicly available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo and/or as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets repository</a>). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.</p>
 <p>If you’re thinking about contributing a tutorial and would like guidance on form or scope, please raise an <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">issue</a> or <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">discussion</a> on the github repository.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
+</section>
 
 
            </div>
@@ -276,7 +420,7 @@ $ pip install -e .[dev]
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorials/gridder.html" class="btn btn-neutral float-right" title="Gridding and diagnostic images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="units-and-conventions.html" class="btn btn-neutral float-left" title="Units and Conventions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
