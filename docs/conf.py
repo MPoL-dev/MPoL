@@ -35,6 +35,10 @@ extensions = [
     "sphinxcontrib.mermaid",
 ]
 
+mathjax_path = (
+    "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+)
+
 autodoc_mock_imports = ["torch", "torchvision"]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -71,8 +75,11 @@ master_doc = "index"
 html_static_path = ["_static"]
 
 # Mermaid configuration
-# only works locally
 mermaid_output_format = "svg"
+
+# zero out any JS, since it doesn't work
+mermaid_init_js = ""
+mermaid_version = ""
 
 if os.getenv("CI"):
     # if True, we're running on github actions and need
