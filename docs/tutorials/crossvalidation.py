@@ -89,7 +89,7 @@ ax.set_title("image")
 ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 
-# ### K-fold cross validation
+# # K-fold cross validation
 #
 # [K-fold cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)) is a technique used to assess model validity. In the context of RML imaging, we use "model" to describe a whole host of assumptions inherent to the imaging workflow. Model settings include the ``cell_size``, the number of pixels, the mapping of the BaseCube to the ImageCube, as well as hyperparameter choices like the strength of the regularizer terms for each type of loss function. Usually we're most interested in assessing whether we have adequately set hyperparameters (like in this tutorial), but sometimes we'd like to assess model settings too.
 #
@@ -108,7 +108,7 @@ ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 #
 # **Why does this work?** Cross validation is such a useful tool because it tells us how well a model generalizes to new data, with the idea being that a better model will predict new data more accurately. Some more considered thoughts on cross validation and model fitting are in [Hogg and Villar](https://ui.adsabs.harvard.edu/abs/2021arXiv210107256H/abstract).
 
-# ### Choosing the $K$-folds
+# # Choosing the $K$-folds
 #
 # There are many ways to split a dataset into $K$ chunks, and, depending on your application, some schemes are better than others. For most interferometric datasets, visibility samples are clustered in Fourier space due to the limitations on the number and location of the antennas. One objective of cross validation might be figuring out how sparse $u$,$v$ coverage adversely affects our imaging process---ideally we'd like to tune the algorithm such that we would still recover a similar image even if our $u$,$v$ sampling were different. To explore slicing choices, here is the full $u$,$v$ coverage of our ALMA logo mock dataset (C43-7, 1 hour observation)
 
@@ -228,6 +228,8 @@ for a in ax.flatten():
 fig.subplots_adjust(left=0.15, hspace=0.0, wspace=0.2)
 # -
 
+# # The cross validation loop
+#
 # Building on the previous optimization tutorial, we'll wrap the iterative optimization commands into a training function. This will come in handy, because we'll want to train the model on each of the varied $K$-fold training datasets. In this tutorial, we'll use a loss function of the form
 #
 # $$
@@ -328,6 +330,8 @@ def train_and_image(pars):
     return fig, ax
 
 
+# # Results
+#
 # As a starting point, we'll try cross-validating without any regularization.
 
 pars = {"lr": 0.5, "lambda_sparsity": 0, "lambda_TV": 0, "epochs": 600}

@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   tests:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -12,30 +11,30 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Install vanilla package
-      run: |
-        pip install .
-    - name: Install test deps
-      run: |
-        pip install .[test]
-    - name: Test with pytest
-      run: |
-        pytest
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Install vanilla package
+        run: |
+          pip install .
+      - name: Install test deps
+        run: |
+          pip install .[test]
+      - name: Test with pytest
+        run: |
+          pytest
 
   # if all tests succeed, then
   # make sure the docs build OK
@@ -44,23 +43,23 @@ jobs:
     needs: tests # don't bother running if a test failed
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install doc deps
-      run: |
-        pip install .[docs]
-    - name: Install Pandoc dependency
-      run: |
-        sudo apt-get install pandoc
-    - name: Set up node
-      uses: actions/setup-node@v2
-    - name: Install mermaid.js dependency
-      run: |
-        npm install @mermaid-js/mermaid-cli
-    - name: Build the docs
-      run: |
-        make -C docs clean
-        make -C docs html MERMAID_PATH="../node_modules/.bin/"
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install doc deps
+        run: |
+          pip install .[docs]
+      - name: Install Pandoc dependency
+        run: |
+          sudo apt-get install pandoc
+      - name: Set up node
+        uses: actions/setup-node@v2
+      - name: Install mermaid.js dependency
+        run: |
+          npm install @mermaid-js/mermaid-cli
+      - name: Build the docs
+        run: |
+          make -C docs clean
+          make -C docs html MERMAID_PATH="../node_modules/.bin/"

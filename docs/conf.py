@@ -8,6 +8,13 @@ try:
 except DistributionNotFound:
     __version__ = "unknown version"
 
+# https://github.com/mgaitan/sphinxcontrib-mermaid/issues/72
+import errno
+
+import sphinx.util.osutil
+
+sphinx.util.osutil.ENOENT = errno.ENOENT
+
 project = "MPoL"
 copyright = "2019-21, Ian Czekala"
 author = "Ian Czekala"
