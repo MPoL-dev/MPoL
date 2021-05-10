@@ -8,10 +8,6 @@ If you find an issue with the code, documentation, or would like to make a speci
 
 If you are new to contributing to an open source project, we recommend a quick read through the excellent contributing guides of the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ and `astropy <https://docs.astropy.org/en/stable/development/workflow/development_workflow.html>`_ packages. What follows in this guide draws upon many of the suggestions from those two resources. There are many ways to contribute to an open source project like MPoL, and all of them are valuable to us. No contribution is too small---even a typo fix is appreciated!
 
-.. contents:: :local:
-    :depth: 3
-
-
 
 Release model
 =============
