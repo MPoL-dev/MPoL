@@ -32,9 +32,24 @@ jobs:
       - name: Install test deps
         run: |
           pip install .[test]
-      - name: Test with pytest
+      - name: Run tests with coverage
         run: |
-          pytest
+          pytest --cov=mpol
+      - name: Run Coveralls
+        uses: AndreMiras/coveralls-python-action@v20201129
+        with:
+          parallel: true
+          flag-name: Unit Tests
+
+  coverage:
+    name: "Merge and upload coverage"
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: AndreMiras/coveralls-python-action@v20201129
+        with:
+          parallel-finished: true
 
   # if all tests succeed, then
   # make sure the docs build OK

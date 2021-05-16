@@ -98,12 +98,12 @@ ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 # But if you're coming from the machine learning community, you're most likely already familiar from the concept of optimizing your model using a "training" dataset and the assessing how well it does using a "test" or "validation" dataset. Astrophysical datasets are typically hard-won, however, so it's not often that we have a sizeable chunk of data lying around to use as a test set *in addition to* what we want to incorporate into our training dataset.
 #
 # $K$-fold cross validation helps alleviate this concern somewhat by rotating testing/training chunks through the dataset. To implement $K$-fold cross validation, first split your dataset into $K$ (approximately equal) chunks. Then, do the following $K$ times:
-
+#
 # * store one chunk ($1/K$th of the total data) separately as a test dataset
 # * combine the remaining chunks ($(K-1)/K$ of the total data set) into one dataset and use this to train the model
 # * use this model to predict the values of the data in the test dataset
 # * assess the difference between predicted test data and actual test data using a $\chi^2$ metric, called the cross-validation score
-
+#
 # When all loops are done, you can average the $K$ cross-validation scores together into a final score for that model configuration. Lower cross validation scores are better in the sense that the trained model did a better job predicting the test data.
 #
 # **Why does this work?** Cross validation is such a useful tool because it tells us how well a model generalizes to new data, with the idea being that a better model will predict new data more accurately. Some more considered thoughts on cross validation and model fitting are in [Hogg and Villar](https://ui.adsabs.harvard.edu/abs/2021arXiv210107256H/abstract).
