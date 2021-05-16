@@ -32,9 +32,9 @@ jobs:
       - name: Install test deps
         run: |
           pip install .[test]
-      - name: Test with pytest
+      - name: Run tests with coverage
         run: |
-          pytest
+          pytest --cov=mpol
 
   # if all tests succeed, then
   # make sure the docs build OK

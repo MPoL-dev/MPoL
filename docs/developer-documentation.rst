@@ -96,6 +96,19 @@ Some tests produce temporary files, like plots, that could be useful to view for
     $ mkdir plotsdir
     $ python -m pytest --basetemp=plotsdir
 
+
+Test coverage
+-------------
+
+To investigate how well the test suite covers the full range of program functionality, you can run `coverage.py <https://coverage.readthedocs.io/en/coverage-5.5/>`__ through pytest using `pytest-cov <https://pypi.org/project/pytest-cov/>`__, which should already be installed as part of the ``[test]`` dependencies ::
+
+    $ pytest --cov=mpol
+    $ coverage html
+
+And then use your favorite web browser to open ``htmlcov/index.html`` and view the coverage report.
+
+For more information on code coverage, see the `coverage.py documentation <https://coverage.readthedocs.io/en/coverage-5.5/>`__. A worthy goal is to reach 100% code coverage with the testing suite. However, 100% coverage *doesn't mean the code is free of bugs*. More important than complete coverage is writing tests that properly probe program functionality.
+
 Documentation
 =============
 
@@ -153,7 +166,7 @@ Contributing code and tests
 
 We strive to release a useable, stable software package. One way to help accomplish this is through writing rigorous and complete tests, especially after adding new functionality to the package. MPoL tests are located within the ``test/`` directory and follow `pytest <https://docs.pytest.org/en/6.2.x/contents.html#toc>`__ conventions. Please add your new tests to this directory---we love new and useful tests.
 
-If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for 'tests' to be one of the first suggestions on your pull request.
+If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for 'tests' to be one of the first suggestions on your pull request. Some helpful advice on *which* tests to write is `here <https://docs.python-guide.org/writing/tests/>`__, `here <https://realpython.com/pytest-python-testing/>`__, and `here <https://www.nerdwallet.com/blog/engineering/5-pytest-best-practices/>`__.
 
 Contributing documentation
 --------------------------

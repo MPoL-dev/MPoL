@@ -1,3 +1,11 @@
 [run]
 omit =
     venv/*
+    src/mpol/spheroidal_gridding.py
+relative_files = True
+
+
+[report]
+exclude_lines =
+    raise NotImplementedError
+    except ImportError
