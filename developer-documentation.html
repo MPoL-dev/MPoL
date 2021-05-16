@@ -114,6 +114,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#test-cache">Test cache</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#viewing-test-and-debug-plots">Viewing test and debug plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-coverage">Test coverage</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
@@ -289,6 +290,16 @@ $ python -m pytest --basetemp=plotsdir
 </pre></div>
 </div>
 </section>
+<section id="test-coverage">
+<h3>Test coverage<a class="headerlink" href="#test-coverage" title="Permalink to this headline">¶</a></h3>
+<p>To investigate how well the test suite covers the full range of program functionality, you can run <a class="reference external" href="https://coverage.readthedocs.io/en/coverage-5.5/">coverage.py</a> through pytest using <a class="reference external" href="https://pypi.org/project/pytest-cov/">pytest-cov</a>, which should already be installed as part of the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> dependencies</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --cov=mpol
+$ coverage html
+</pre></div>
+</div>
+<p>And then use your favorite web browser to open <code class="docutils literal notranslate"><span class="pre">htmlcov/index.html</span></code> and view the coverage report.</p>
+<p>For more information on code coverage, see the <a class="reference external" href="https://coverage.readthedocs.io/en/coverage-5.5/">coverage.py documentation</a>. A worthy goal is to reach 100% code coverage with the testing suite. However, 100% coverage <em>doesn’t mean the code is free of bugs</em>. More important than complete coverage is writing tests that properly probe program functionality.</p>
+</section>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
@@ -335,7 +346,7 @@ $ python -m pytest --basetemp=plotsdir
 <section id="contributing-code-and-tests">
 <h3>Contributing code and tests<a class="headerlink" href="#contributing-code-and-tests" title="Permalink to this headline">¶</a></h3>
 <p>We strive to release a useable, stable software package. One way to help accomplish this is through writing rigorous and complete tests, especially after adding new functionality to the package. MPoL tests are located within the <code class="docutils literal notranslate"><span class="pre">test/</span></code> directory and follow <a class="reference external" href="https://docs.pytest.org/en/6.2.x/contents.html#toc">pytest</a> conventions. Please add your new tests to this directory—we love new and useful tests.</p>
-<p>If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for ‘tests’ to be one of the first suggestions on your pull request.</p>
+<p>If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for ‘tests’ to be one of the first suggestions on your pull request. Some helpful advice on <em>which</em> tests to write is <a class="reference external" href="https://docs.python-guide.org/writing/tests/">here</a>, <a class="reference external" href="https://realpython.com/pytest-python-testing/">here</a>, and <a class="reference external" href="https://www.nerdwallet.com/blog/engineering/5-pytest-best-practices/">here</a>.</p>
 </section>
 <section id="contributing-documentation">
 <h3>Contributing documentation<a class="headerlink" href="#contributing-documentation" title="Permalink to this headline">¶</a></h3>

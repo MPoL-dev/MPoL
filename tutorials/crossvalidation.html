@@ -576,7 +576,7 @@ similar image even if our <span class="math notranslate nohighlight">\(u\)</span
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_8_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_8_0.png" style="width: 502px; height: 480px;" />
+<img alt="../_images/tutorials_crossvalidation_6_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_6_0.png" style="width: 502px; height: 480px;" />
 </div>
 </div>
 <p>As you can see, the <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> space is sampled in a very structured way:</p>
@@ -623,7 +623,7 @@ similar image even if our <span class="math notranslate nohighlight">\(u\)</span
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_10_1.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_10_1.png" style="width: 502px; height: 480px;" />
+<img alt="../_images/tutorials_crossvalidation_8_1.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_8_1.png" style="width: 502px; height: 480px;" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -737,7 +737,7 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_15_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_15_0.png" style="width: 602px; height: 956px;" />
+<img alt="../_images/tutorials_crossvalidation_13_0.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_13_0.png" style="width: 602px; height: 956px;" />
 </div>
 </div>
 </section>
@@ -902,7 +902,7 @@ Cross validation score: 49.06716516993585
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_25_3.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_25_3.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_23_3.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_23_3.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -922,7 +922,7 @@ Cross validation score: 49.06716516993585
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Cross validation score: 8.202177678461089
+Cross validation score: 8.202181115487862
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -938,7 +938,7 @@ Cross validation score: 8.202177678461089
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_27_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_27_2.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_25_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_25_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -958,7 +958,7 @@ Cross validation score: 8.202177678461089
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Cross validation score: 5.415293814001459
+Cross validation score: 5.415210661003532
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -974,7 +974,7 @@ Cross validation score: 5.415293814001459
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_29_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_29_2.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_27_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_27_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
