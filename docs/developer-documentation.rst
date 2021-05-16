@@ -104,7 +104,8 @@ To investigate how well the test suite covers the full range of program function
 
     $ pytest --cov=mpol
     $ coverage html
-    $ open htmlcov/index.html
+
+And then use your favorite web browser to open ``htmlcov/index.html`` and view the coverage report.
 
 For more information on code coverage, see the `coverage.py documentation <https://coverage.readthedocs.io/en/coverage-5.5/>`__. A worthy goal is to reach 100% code coverage with the testing suite. However, 100% coverage *doesn't mean the code is free of bugs*. More important than complete coverage is writing tests that properly probe program functionality.
 

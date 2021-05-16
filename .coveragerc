@@ -2,7 +2,7 @@
 omit =
     venv/*
     src/mpol/spheroidal_gridding.py
-relative_files = true
+relative_files = True
 
 
 [report]
