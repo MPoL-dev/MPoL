@@ -259,12 +259,10 @@ def test_grid_uniform(gridder, tmp_path):
 
     chan = 4
 
-    gridder._grid_visibilities(weighting="uniform")
-    img_uniform, beam_uniform = gridder.get_dirty_image()
+    img_uniform, beam_uniform = gridder.get_dirty_image(weighting="uniform")
 
     r = -2
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    img_robust, beam_robust = gridder.get_dirty_image()
+    img_robust, beam_robust = gridder.get_dirty_image(weighting="briggs", robust=r)
 
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
 
@@ -299,13 +297,14 @@ def test_grid_uniform_arcsec2(gridder, tmp_path):
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
     chan = 4
-
-    gridder._grid_visibilities(weighting="uniform")
-    img_uniform, beam_uniform = gridder.get_dirty_image(unit="Jy/arcsec^2")
+    img_uniform, beam_uniform = gridder.get_dirty_image(
+        weighting="uniform", unit="Jy/arcsec^2"
+    )
 
     r = -2
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    img_robust, beam_robust = gridder.get_dirty_image(unit="Jy/arcsec^2")
+    img_robust, beam_robust = gridder.get_dirty_image(
+        weighting="briggs", robust=r, unit="Jy/arcsec^2"
+    )
 
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
 
@@ -342,12 +341,10 @@ def test_grid_natural(gridder, tmp_path):
 
     chan = 4
 
-    gridder._grid_visibilities(weighting="natural")
-    img_natural, beam_natual = gridder.get_dirty_image()
+    img_natural, beam_natual = gridder.get_dirty_image(weighting="natural")
 
     r = 2
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    img_robust, beam_robust = gridder.get_dirty_image()
+    img_robust, beam_robust = gridder.get_dirty_image(weighting="briggs", robust=r)
 
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
 
@@ -382,12 +379,14 @@ def test_grid_natural_arcsec2(gridder, tmp_path):
 
     chan = 4
 
-    gridder._grid_visibilities(weighting="natural")
-    img_natural, beam_natural = gridder.get_dirty_image(unit="Jy/arcsec^2")
+    img_natural, beam_natural = gridder.get_dirty_image(
+        weighting="natural", unit="Jy/arcsec^2"
+    )
 
     r = 2
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    img_robust, beam_robust = gridder.get_dirty_image(unit="Jy/arcsec^2")
+    img_robust, beam_robust = gridder.get_dirty_image(
+        weighting="briggs", robust=r, unit="Jy/arcsec^2"
+    )
 
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(8, 4.5))
 
@@ -438,6 +437,7 @@ def test_weight_gridding(mock_visibility_data, tmp_path):
     )
 
     gridder._grid_visibilities(weighting="uniform")
+    gridder._grid_weights()
 
     # make sure all average values are set to 1
     diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
