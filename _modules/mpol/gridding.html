@@ -327,7 +327,7 @@
 
         <span class="k">return</span> <span class="n">cube</span>
 
-<div class="viewcode-block" id="Gridder.grid_visibilities"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.grid_visibilities">[docs]</a>    <span class="k">def</span> <span class="nf">grid_visibilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_grid_visibilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Grid the loose data visibilities to the Fourier grid in preparation for imaging.</span>
 
@@ -430,11 +430,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span> <span class="o">*</span> <span class="mf">1.0</span><span class="n">j</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">re_gridded_beam</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
+    <span class="k">def</span> <span class="nf">_grid_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Grid the weights to the Fourier grid, to be used when preparing a PyTorch dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># create the cells as edges around the existing points</span>
+        <span class="c1"># note that at this stage, the UV grid is strictly increasing</span>
+        <span class="c1"># when in fact, later on, we&#39;ll need to fftshift for the FFT</span>
+        <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
         <span class="c1"># instantiate uncertainties for each averaged visibility.</span>
-        <span class="k">if</span> <span class="n">weighting</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span> <span class="ow">and</span> <span class="n">robust</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">taper_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_fliplr_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cube</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -549,18 +556,32 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nulled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># arcsec^2</span></div>
 
-<div class="viewcode-block" id="Gridder.get_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Gridder.get_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the dirty image.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            weighting (string): The type of cell averaging to perform. Choices of ``&quot;natural&quot;``, ``&quot;uniform&quot;``, or ``&quot;briggs&quot;``, following CASA tclean. If ``&quot;briggs&quot;``, also specify a robust value.</span>
+<span class="sd">            robust (float): If ``weighting=&#39;briggs&#39;``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.</span>
+<span class="sd">            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.</span>
 <span class="sd">            unit (string): what unit should the image be in. Default is ``&quot;Jy/beam&quot;``. If ``&quot;Jy/arcsec^2&quot;``, then the effective area of the dirty beam will be used to convert from ``&quot;Jy/beam&quot;`` to ``&quot;Jy/arcsec^2&quot;``.</span>
 
-<span class="sd">        Returns: (nchan, npix, npix) numpy array of the dirty image cube.</span>
+<span class="sd">        Returns: image,beam where</span>
+<span class="sd">                 image: (nchan, npix, npix) numpy array of the dirty image cube.</span>
+<span class="sd">                 beam: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># check unit input</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">,</span> <span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown unit&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+
+        <span class="c1"># call _grid_visibilities</span>
+        <span class="c1"># inputs for weighting will be checked inside _grid_visibilities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid_visibilities</span><span class="p">(</span>
+            <span class="n">weighting</span><span class="o">=</span><span class="n">weighting</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="n">taper_function</span>
+        <span class="p">)</span>
 
         <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fliplr_cube</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
@@ -588,7 +609,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">real</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span></div>
 
 <div class="viewcode-block" id="Gridder.to_pytorch_dataset"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.to_pytorch_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_pytorch_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -598,6 +621,11 @@
 <span class="sd">            :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># grid visibilites (uniform weighting necessary here) and weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid_visibilities</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid_weights</span><span class="p">()</span>
+
+        <span class="c1"># This should be an obsolete check now but I&#39;ll leave it here for now</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">),</span> <span class="s2">&quot;To export with uncertainties, first grid visibilities with weighting=&#39;uniform&#39;, no tapering function, and robust=None. Otherwise, data weights are not defined.&quot;</span>

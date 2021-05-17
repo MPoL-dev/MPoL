@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "bad6dbe4",
+   "id": "4778beef",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:09.885218Z",
-     "iopub.status.busy": "2021-05-16T17:02:09.884382Z",
-     "iopub.status.idle": "2021-05-16T17:02:10.217039Z",
-     "shell.execute_reply": "2021-05-16T17:02:10.216222Z"
+     "iopub.execute_input": "2021-05-17T18:23:38.687360Z",
+     "iopub.status.busy": "2021-05-17T18:23:38.686684Z",
+     "iopub.status.idle": "2021-05-17T18:23:38.984898Z",
+     "shell.execute_reply": "2021-05-17T18:23:38.984202Z"
     },
     "nbsphinx": "hidden"
    },
@@ -21,13 +21,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "8978b511",
+   "id": "6ed2b1a9",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:10.221198Z",
-     "iopub.status.busy": "2021-05-16T17:02:10.220628Z",
-     "iopub.status.idle": "2021-05-16T17:02:10.237825Z",
-     "shell.execute_reply": "2021-05-16T17:02:10.238592Z"
+     "iopub.execute_input": "2021-05-17T18:23:38.994378Z",
+     "iopub.status.busy": "2021-05-17T18:23:38.988456Z",
+     "iopub.status.idle": "2021-05-17T18:23:39.000295Z",
+     "shell.execute_reply": "2021-05-17T18:23:39.000824Z"
     },
     "nbsphinx": "hidden"
    },
@@ -38,7 +38,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "29eff5a5",
+   "id": "b6def99c",
    "metadata": {},
    "source": [
     "## Optimization Loop\n",
@@ -52,13 +52,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "650ffa79",
+   "id": "e24e91e0",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:10.243635Z",
-     "iopub.status.busy": "2021-05-16T17:02:10.243075Z",
-     "iopub.status.idle": "2021-05-16T17:02:10.802562Z",
-     "shell.execute_reply": "2021-05-16T17:02:10.801484Z"
+     "iopub.execute_input": "2021-05-17T18:23:39.005637Z",
+     "iopub.status.busy": "2021-05-17T18:23:39.005041Z",
+     "iopub.status.idle": "2021-05-17T18:23:39.510937Z",
+     "shell.execute_reply": "2021-05-17T18:23:39.510319Z"
     }
    },
    "outputs": [],
@@ -74,13 +74,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "cf607127",
+   "id": "b21143b7",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:10.809081Z",
-     "iopub.status.busy": "2021-05-16T17:02:10.808028Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.027161Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.026651Z"
+     "iopub.execute_input": "2021-05-17T18:23:39.516412Z",
+     "iopub.status.busy": "2021-05-17T18:23:39.515751Z",
+     "iopub.status.idle": "2021-05-17T18:23:39.719286Z",
+     "shell.execute_reply": "2021-05-17T18:23:39.718681Z"
     }
    },
    "outputs": [],
@@ -109,13 +109,13 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "e27a8ffe",
+   "id": "0f3102dd",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.032282Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.031742Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.345956Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.345275Z"
+     "iopub.execute_input": "2021-05-17T18:23:39.726672Z",
+     "iopub.status.busy": "2021-05-17T18:23:39.726137Z",
+     "iopub.status.idle": "2021-05-17T18:23:39.825941Z",
+     "shell.execute_reply": "2021-05-17T18:23:39.825416Z"
     }
    },
    "outputs": [],
@@ -129,33 +129,30 @@
     "    weight=weight,\n",
     "    data_re=data_re,\n",
     "    data_im=data_im,\n",
-    ")\n",
-    "\n",
-    "# Note that we needed to do the gridding with \"uniform\" in order to\n",
-    "# propagate the uncertainties needed for RML correctly.\n",
-    "gridder.grid_visibilities(weighting=\"uniform\")"
+    ")\n"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "d47b7a03",
+   "id": "7d842ec8",
    "metadata": {},
    "source": [
     "### The PyTorch dataset\n",
     "\n",
-    "Now we will export the gridded visibilities to a PyTorch dataset to use in the imaging loop. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset."
+    "Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The [Gridder.to_pytorch_dataset](../api.rst#mpol.gridding.Gridder.to_pytorch_dataset) routine grids the visibilites with \"uniform\" weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities with PyTorch tensors.\n",
+    "This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 6,
-   "id": "e7368c41",
+   "id": "33abeced",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.350509Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.349815Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.363369Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.362297Z"
+     "iopub.execute_input": "2021-05-17T18:23:39.830110Z",
+     "iopub.status.busy": "2021-05-17T18:23:39.829533Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.057479Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.057937Z"
     }
    },
    "outputs": [
@@ -174,7 +171,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "12faee45",
+   "id": "84999834",
    "metadata": {},
    "source": [
     "### Building an image model"
@@ -182,7 +179,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ae9d3940",
+   "id": "1355a26e",
    "metadata": {},
    "source": [
     "MPoL provides \"modules\" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We've bundled the most common modules for imaging together in a [SimpleNet](../api.html#mpol.precomposed.SimpleNet) meta-module, which we'll use here.\n",
@@ -193,20 +190,20 @@
   {
    "cell_type": "code",
    "execution_count": 7,
-   "id": "6bf4e191",
+   "id": "0e07e753",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.368069Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.366681Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.394677Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.395176Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.062132Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.061486Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.079276Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.079696Z"
     }
    },
    "outputs": [
     {
      "data": {
       "image/svg+xml": [
-       "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"mermaid-1621184505133\" width=\"100%\" height=\"456\" style=\"max-width: 346px;\" viewBox=\"0 0 346 456\"><style>#mermaid-1621184505133{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1621184505133 .error-icon{fill:#552222;}#mermaid-1621184505133 .error-text{fill:#552222;stroke:#552222;}#mermaid-1621184505133 .edge-thickness-normal{stroke-width:2px;}#mermaid-1621184505133 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1621184505133 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1621184505133 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1621184505133 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1621184505133 .marker{fill:#333333;stroke:#333333;}#mermaid-1621184505133 .marker.cross{stroke:#333333;}#mermaid-1621184505133 svg{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:16px;}#mermaid-1621184505133 .label{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;color:#333;}#mermaid-1621184505133 .cluster-label text{fill:#333;}#mermaid-1621184505133 .cluster-label span{color:#333;}#mermaid-1621184505133 .label text,#mermaid-1621184505133 span{fill:#333;color:#333;}#mermaid-1621184505133 .node rect,#mermaid-1621184505133 .node circle,#mermaid-1621184505133 .node ellipse,#mermaid-1621184505133 .node polygon,#mermaid-1621184505133 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1621184505133 .node .label{text-align:center;}#mermaid-1621184505133 .node.clickable{cursor:pointer;}#mermaid-1621184505133 .arrowheadPath{fill:#333333;}#mermaid-1621184505133 .edgePath .path{stroke:#333333;stroke-width:1.5px;}#mermaid-1621184505133 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1621184505133 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-1621184505133 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-1621184505133 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1621184505133 .cluster text{fill:#333;}#mermaid-1621184505133 .cluster span{color:#333;}#mermaid-1621184505133 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:12px;background:hsl(80,100%,96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1621184505133:root{--mermaid-font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;}#mermaid-1621184505133 flowchart{fill:apa;}</style><g><g class=\"output\"><g class=\"clusters\"><g class=\"cluster\" id=\"flowchart-SimpleNet-20\" transform=\"translate(109.9296875,184)\" style=\"opacity: 1;\"><rect width=\"203.859375\" height=\"352\" x=\"-101.9296875\" y=\"-176\"/><g class=\"label\" transform=\"translate(0, -162)\" id=\"mermaid-1621184505133Text\"><g transform=\"translate(-36.90625,-9)\"><foreignObject width=\"73.8125\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">SimpleNet</div></foreignObject></g></g></g></g><g class=\"edgePaths\"><g class=\"edgePath LS-bc LE-HannConvCube\" id=\"L-bc-HannConvCube\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,71L109.9296875,75.16666666666667C109.9296875,79.33333333333333,109.9296875,87.66666666666667,109.9296875,96C109.9296875,104.33333333333333,109.9296875,112.66666666666667,109.9296875,116.83333333333333L109.9296875,121\" marker-end=\"url(#arrowhead49)\" style=\"fill:none\"/><defs><marker id=\"arrowhead49\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-HannConvCube LE-ImageCube\" id=\"L-HannConvCube-ImageCube\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,159L109.9296875,163.16666666666666C109.9296875,167.33333333333334,109.9296875,175.66666666666666,109.9296875,184C109.9296875,192.33333333333334,109.9296875,200.66666666666666,109.9296875,204.83333333333334L109.9296875,209\" marker-end=\"url(#arrowhead50)\" style=\"fill:none\"/><defs><marker id=\"arrowhead50\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-ImageCube LE-FourierLayer\" id=\"L-ImageCube-FourierLayer\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,247L109.9296875,251.16666666666666C109.9296875,255.33333333333334,109.9296875,263.6666666666667,109.9296875,272C109.9296875,280.3333333333333,109.9296875,288.6666666666667,109.9296875,292.8333333333333L109.9296875,297\" marker-end=\"url(#arrowhead51)\" style=\"fill:none\"/><defs><marker id=\"arrowhead51\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-FourierLayer LE-il\" id=\"L-FourierLayer-il\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,335L109.9296875,339.1666666666667C109.9296875,343.3333333333333,109.9296875,351.6666666666667,109.9296875,360C109.9296875,368.3333333333333,109.9296875,376.6666666666667,119.86328125,385.62323059360733C129.796875,394.5797945205479,149.6640625,404.15958904109584,159.59765625,408.94948630136986L169.53125,413.7393835616438\" marker-end=\"url(#arrowhead52)\" style=\"fill:none\"/><defs><marker id=\"arrowhead52\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-ad LE-il\" id=\"L-ad-il\" style=\"opacity: 1;\"><path class=\"path\" d=\"M292.9296875,335.5L292.8463541666667,339.5833333333333C292.7630208333333,343.6666666666667,292.5963541666667,351.8333333333333,292.5130208333333,360.0833333333333C292.4296875,368.3333333333333,292.4296875,376.6666666666667,282.49609375,385.62323059360733C272.5625,394.5797945205479,252.6953125,404.15958904109584,242.76171875,408.94948630136986L232.828125,413.7393835616438\" marker-end=\"url(#arrowhead53)\" style=\"fill:none\"/><defs><marker id=\"arrowhead53\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g></g><g class=\"edgeLabels\"><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-bc-HannConvCube\" class=\"edgeLabel L-LS-bc' L-LE-HannConvCube\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-HannConvCube-ImageCube\" class=\"edgeLabel L-LS-HannConvCube' L-LE-ImageCube\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-ImageCube-FourierLayer\" class=\"edgeLabel L-LS-ImageCube' L-LE-FourierLayer\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-FourierLayer-il\" class=\"edgeLabel L-LS-FourierLayer' L-LE-il\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-ad-il\" class=\"edgeLabel L-LS-ad' L-LE-il\"/></div></foreignObject></g></g></g><g class=\"nodes\"><g class=\"node default\" id=\"flowchart-HannConvCube-11\" transform=\"translate(109.9296875,140)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-66.9296875\" y=\"-19\" width=\"133.859375\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-56.9296875,-9)\"><foreignObject width=\"113.859375\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">HannConvCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-bc-10\" transform=\"translate(109.9296875,52)\" style=\"opacity: 1;\"><rect rx=\"5\" ry=\"5\" x=\"-47.359375\" y=\"-19\" width=\"94.71875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-37.359375,-9)\"><foreignObject width=\"74.71875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">BaseCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-ImageCube-13\" transform=\"translate(109.9296875,228)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-51.359375\" y=\"-19\" width=\"102.71875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-41.359375,-9)\"><foreignObject width=\"82.71875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">ImageCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-FourierLayer-15\" transform=\"translate(109.9296875,316)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-55.3515625\" y=\"-19\" width=\"110.703125\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-45.3515625,-9)\"><foreignObject width=\"90.703125\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">FourierLayer</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-il-17\" transform=\"translate(201.1796875,429)\" style=\"opacity: 1;\"><rect rx=\"19\" ry=\"19\" x=\"-31.6484375\" y=\"-19\" width=\"63.296875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-16.8984375,-9)\"><foreignObject width=\"33.796875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">Loss</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-ad-18\" transform=\"translate(292.4296875,316)\" style=\"opacity: 1;\"><polygon points=\"0,0 75.140625,0 75.140625,-38 0,-38 0,0 -8,0 83.140625,0 83.140625,-38 -8,-38 -8,0\" transform=\"translate(-37.5703125,19)\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-27.5703125,-9)\"><foreignObject width=\"55.140625\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">Dataset</div></foreignObject></g></g></g></g></g></g></svg>"
+       "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"mermaid-1621275795304\" width=\"100%\" height=\"456\" style=\"max-width: 346px;\" viewBox=\"0 0 346 456\"><style>#mermaid-1621275795304{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1621275795304 .error-icon{fill:#552222;}#mermaid-1621275795304 .error-text{fill:#552222;stroke:#552222;}#mermaid-1621275795304 .edge-thickness-normal{stroke-width:2px;}#mermaid-1621275795304 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1621275795304 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1621275795304 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1621275795304 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1621275795304 .marker{fill:#333333;stroke:#333333;}#mermaid-1621275795304 .marker.cross{stroke:#333333;}#mermaid-1621275795304 svg{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:16px;}#mermaid-1621275795304 .label{font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;color:#333;}#mermaid-1621275795304 .cluster-label text{fill:#333;}#mermaid-1621275795304 .cluster-label span{color:#333;}#mermaid-1621275795304 .label text,#mermaid-1621275795304 span{fill:#333;color:#333;}#mermaid-1621275795304 .node rect,#mermaid-1621275795304 .node circle,#mermaid-1621275795304 .node ellipse,#mermaid-1621275795304 .node polygon,#mermaid-1621275795304 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1621275795304 .node .label{text-align:center;}#mermaid-1621275795304 .node.clickable{cursor:pointer;}#mermaid-1621275795304 .arrowheadPath{fill:#333333;}#mermaid-1621275795304 .edgePath .path{stroke:#333333;stroke-width:1.5px;}#mermaid-1621275795304 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1621275795304 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-1621275795304 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-1621275795304 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1621275795304 .cluster text{fill:#333;}#mermaid-1621275795304 .cluster span{color:#333;}#mermaid-1621275795304 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;font-size:12px;background:hsl(80,100%,96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1621275795304:root{--mermaid-font-family:&quot;trebuchet ms&quot;,verdana,arial,sans-serif;}#mermaid-1621275795304 flowchart{fill:apa;}</style><g><g class=\"output\"><g class=\"clusters\"><g class=\"cluster\" id=\"flowchart-SimpleNet-20\" transform=\"translate(109.9296875,184)\" style=\"opacity: 1;\"><rect width=\"203.859375\" height=\"352\" x=\"-101.9296875\" y=\"-176\"/><g class=\"label\" transform=\"translate(0, -162)\" id=\"mermaid-1621275795304Text\"><g transform=\"translate(-36.90625,-9)\"><foreignObject width=\"73.8125\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">SimpleNet</div></foreignObject></g></g></g></g><g class=\"edgePaths\"><g class=\"edgePath LS-bc LE-HannConvCube\" id=\"L-bc-HannConvCube\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,71L109.9296875,75.16666666666667C109.9296875,79.33333333333333,109.9296875,87.66666666666667,109.9296875,96C109.9296875,104.33333333333333,109.9296875,112.66666666666667,109.9296875,116.83333333333333L109.9296875,121\" marker-end=\"url(#arrowhead49)\" style=\"fill:none\"/><defs><marker id=\"arrowhead49\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-HannConvCube LE-ImageCube\" id=\"L-HannConvCube-ImageCube\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,159L109.9296875,163.16666666666666C109.9296875,167.33333333333334,109.9296875,175.66666666666666,109.9296875,184C109.9296875,192.33333333333334,109.9296875,200.66666666666666,109.9296875,204.83333333333334L109.9296875,209\" marker-end=\"url(#arrowhead50)\" style=\"fill:none\"/><defs><marker id=\"arrowhead50\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-ImageCube LE-FourierLayer\" id=\"L-ImageCube-FourierLayer\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,247L109.9296875,251.16666666666666C109.9296875,255.33333333333334,109.9296875,263.6666666666667,109.9296875,272C109.9296875,280.3333333333333,109.9296875,288.6666666666667,109.9296875,292.8333333333333L109.9296875,297\" marker-end=\"url(#arrowhead51)\" style=\"fill:none\"/><defs><marker id=\"arrowhead51\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-FourierLayer LE-il\" id=\"L-FourierLayer-il\" style=\"opacity: 1;\"><path class=\"path\" d=\"M109.9296875,335L109.9296875,339.1666666666667C109.9296875,343.3333333333333,109.9296875,351.6666666666667,109.9296875,360C109.9296875,368.3333333333333,109.9296875,376.6666666666667,119.86328125,385.62323059360733C129.796875,394.5797945205479,149.6640625,404.15958904109584,159.59765625,408.94948630136986L169.53125,413.7393835616438\" marker-end=\"url(#arrowhead52)\" style=\"fill:none\"/><defs><marker id=\"arrowhead52\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g><g class=\"edgePath LS-ad LE-il\" id=\"L-ad-il\" style=\"opacity: 1;\"><path class=\"path\" d=\"M292.9296875,335.5L292.8463541666667,339.5833333333333C292.7630208333333,343.6666666666667,292.5963541666667,351.8333333333333,292.5130208333333,360.0833333333333C292.4296875,368.3333333333333,292.4296875,376.6666666666667,282.49609375,385.62323059360733C272.5625,394.5797945205479,252.6953125,404.15958904109584,242.76171875,408.94948630136986L232.828125,413.7393835616438\" marker-end=\"url(#arrowhead53)\" style=\"fill:none\"/><defs><marker id=\"arrowhead53\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\" orient=\"auto\"><path d=\"M 0 0 L 10 5 L 0 10 z\" class=\"arrowheadPath\" style=\"stroke-width: 1; stroke-dasharray: 1, 0;\"/></marker></defs></g></g><g class=\"edgeLabels\"><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-bc-HannConvCube\" class=\"edgeLabel L-LS-bc' L-LE-HannConvCube\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-HannConvCube-ImageCube\" class=\"edgeLabel L-LS-HannConvCube' L-LE-ImageCube\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-ImageCube-FourierLayer\" class=\"edgeLabel L-LS-ImageCube' L-LE-FourierLayer\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-FourierLayer-il\" class=\"edgeLabel L-LS-FourierLayer' L-LE-il\"/></div></foreignObject></g></g><g class=\"edgeLabel\" transform=\"\" style=\"opacity: 1;\"><g transform=\"translate(0,0)\" class=\"label\"><rect rx=\"0\" ry=\"0\" width=\"0\" height=\"0\"/><foreignObject width=\"0\" height=\"0\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\"><span id=\"L-L-ad-il\" class=\"edgeLabel L-LS-ad' L-LE-il\"/></div></foreignObject></g></g></g><g class=\"nodes\"><g class=\"node default\" id=\"flowchart-HannConvCube-11\" transform=\"translate(109.9296875,140)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-66.9296875\" y=\"-19\" width=\"133.859375\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-56.9296875,-9)\"><foreignObject width=\"113.859375\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">HannConvCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-bc-10\" transform=\"translate(109.9296875,52)\" style=\"opacity: 1;\"><rect rx=\"5\" ry=\"5\" x=\"-47.359375\" y=\"-19\" width=\"94.71875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-37.359375,-9)\"><foreignObject width=\"74.71875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">BaseCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-ImageCube-13\" transform=\"translate(109.9296875,228)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-51.359375\" y=\"-19\" width=\"102.71875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-41.359375,-9)\"><foreignObject width=\"82.71875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">ImageCube</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-FourierLayer-15\" transform=\"translate(109.9296875,316)\" style=\"opacity: 1;\"><rect rx=\"0\" ry=\"0\" x=\"-55.3515625\" y=\"-19\" width=\"110.703125\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-45.3515625,-9)\"><foreignObject width=\"90.703125\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">FourierLayer</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-il-17\" transform=\"translate(201.1796875,429)\" style=\"opacity: 1;\"><rect rx=\"19\" ry=\"19\" x=\"-31.6484375\" y=\"-19\" width=\"63.296875\" height=\"38\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-16.8984375,-9)\"><foreignObject width=\"33.796875\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">Loss</div></foreignObject></g></g></g><g class=\"node default\" id=\"flowchart-ad-18\" transform=\"translate(292.4296875,316)\" style=\"opacity: 1;\"><polygon points=\"0,0 75.140625,0 75.140625,-38 0,-38 0,0 -8,0 83.140625,0 83.140625,-38 -8,-38 -8,0\" transform=\"translate(-37.5703125,19)\" class=\"label-container\"/><g class=\"label\" transform=\"translate(0,0)\"><g transform=\"translate(-27.5703125,-9)\"><foreignObject width=\"55.140625\" height=\"18\"><div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"display: inline-block; white-space: nowrap;\">Dataset</div></foreignObject></g></g></g></g></g></g></svg>"
       ],
       "text/plain": [
        "<IPython.core.display.SVG object>"
@@ -222,7 +219,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a57131e6",
+   "id": "946b6e89",
    "metadata": {},
    "source": [
     "It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves [(following the SimpleNet source code as an example)](../_modules/mpol/precomposed.html#SimpleNet) and swap in/out modules as we saw fit."
@@ -230,7 +227,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a847a8a6",
+   "id": "83632573",
    "metadata": {},
    "source": [
     "We then initialize SimpleNet with the relevant information"
@@ -239,13 +236,13 @@
   {
    "cell_type": "code",
    "execution_count": 8,
-   "id": "057fd697",
+   "id": "d888d507",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.400672Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.399230Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.412888Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.412345Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.083467Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.082905Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.089171Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.088561Z"
     }
    },
    "outputs": [],
@@ -255,7 +252,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dc2dbedb",
+   "id": "43c08761",
    "metadata": {},
    "source": [
     "### Breaking down the training loop\n",
@@ -272,13 +269,13 @@
   {
    "cell_type": "code",
    "execution_count": 9,
-   "id": "df60f1dd",
+   "id": "c14fce9b",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.418262Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.416807Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.419314Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.419931Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.093773Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.092663Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.094757Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.095228Z"
     }
    },
    "outputs": [],
@@ -288,7 +285,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "58bcc70b",
+   "id": "0b3d2e44",
    "metadata": {},
    "source": [
     "The role of the optimizer is to advance the parameters (in this case, the pixel values of the [BaseCube](../api.html#mpol.images.BaseCube)) using the gradient of the loss function with respect to those parameters. PyTorch has many different [optimizers](https://pytorch.org/docs/stable/optim.html#module-torch.optim) available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The `lr` parameter is the 'learning rate,' or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time."
@@ -296,7 +293,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "76d50688",
+   "id": "c55dce92",
    "metadata": {},
    "source": [
     "### Loss functions\n",
@@ -305,7 +302,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "81ba684b",
+   "id": "ef643557",
    "metadata": {},
    "source": [
     "### Gradient descent\n",
@@ -316,13 +313,13 @@
   {
    "cell_type": "code",
    "execution_count": 10,
-   "id": "283bf05f",
+   "id": "e6103d09",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.424738Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.424134Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.430435Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.430938Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.099549Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.098954Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.103931Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.104341Z"
     }
    },
    "outputs": [
@@ -356,7 +353,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ddc5fc7c",
+   "id": "4ebd4ee4",
    "metadata": {},
    "source": [
     "These are the default values that were used to initialize the [BaseCube](../api.html#mpol.images.BaseCube) component of the [SimpleNet](../api.html#mpol.precomposed.SimpleNet).\n",
@@ -367,13 +364,13 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "6116b3f4",
+   "id": "30cc8699",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.442717Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.442042Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.453434Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.453909Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.114676Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.114072Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.124399Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.124909Z"
     }
    },
    "outputs": [],
@@ -383,7 +380,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d15e73e3",
+   "id": "708a68bd",
    "metadata": {},
    "source": [
     "``bcube`` is still a PyTorch tensor, but matplotlib requires numpy arrays. To convert back, we need to first [\"detach\" the computational graph](https://stackoverflow.com/questions/63582590/why-do-we-call-detach-before-calling-numpy-on-a-pytorch-tensor) from the PyTorch tensor (used to propagate gradients) and then call the numpy conversion routine."
@@ -392,13 +389,13 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "8e6e5efe",
+   "id": "c400dd7f",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.458539Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.457975Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.461982Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.462489Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.129983Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.129326Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.133678Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.132927Z"
     }
    },
    "outputs": [
@@ -417,7 +414,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f29d18dc",
+   "id": "e91b4188",
    "metadata": {},
    "source": [
     "lastly, we remove the channel dimension to plot the 2D image using ``np.squeeze``"
@@ -426,20 +423,20 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "4997c12f",
+   "id": "9ca74117",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.488608Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.484994Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.832339Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.831413Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.153331Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.152707Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.465200Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.465681Z"
     }
    },
    "outputs": [
     {
      "data": {
       "text/plain": [
-       "<matplotlib.colorbar.Colorbar at 0x7fcf010b8160>"
+       "<matplotlib.colorbar.Colorbar at 0x7ff2b940b310>"
       ]
      },
      "execution_count": 1,
@@ -475,7 +472,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "573ce3a3",
+   "id": "67876dec",
    "metadata": {},
    "source": [
     "A blank image is not that exciting, but hopefully this demonstrates the state of the parameters at the start of optimization."
@@ -483,7 +480,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8798ebf7",
+   "id": "52615d34",
    "metadata": {},
    "source": [
     "Because we'll want to compute a clean set of gradient values in a later step, we \"zero out\" any gradients attached to the tensor components so that they aren't counted twice."
@@ -492,13 +489,13 @@
   {
    "cell_type": "code",
    "execution_count": 14,
-   "id": "1ab13642",
+   "id": "35cc6076",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.836910Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.836310Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.839674Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.840121Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.470108Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.469329Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.473416Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.472968Z"
     }
    },
    "outputs": [],
@@ -508,7 +505,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "30346515",
+   "id": "26e566a0",
    "metadata": {},
    "source": [
     "Most modules in MPoL are designed to work in a \"feed forward\" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the [BaseCube](../api.html#mpol.images.BaseCube)"
@@ -517,13 +514,13 @@
   {
    "cell_type": "code",
    "execution_count": 15,
-   "id": "8399019a",
+   "id": "e55ebc6f",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.843705Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.843165Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.929534Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.930037Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.476617Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.476081Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.558757Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.558297Z"
     }
    },
    "outputs": [
@@ -567,7 +564,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7f808bc1",
+   "id": "048e83bf",
    "metadata": {},
    "source": [
     "Of course, these aren't that exciting since they just reflect the constant value image.\n",
@@ -578,13 +575,13 @@
   {
    "cell_type": "code",
    "execution_count": 16,
-   "id": "91b7e5d8",
+   "id": "2e758108",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.934076Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.933520Z",
-     "iopub.status.idle": "2021-05-16T17:02:11.943215Z",
-     "shell.execute_reply": "2021-05-16T17:02:11.943967Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.562702Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.562095Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.572699Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.573144Z"
     }
    },
    "outputs": [
@@ -604,7 +601,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6c2b468d",
+   "id": "a2004423",
    "metadata": {},
    "source": [
     "and then we can calculate the gradient of the loss function with respect to the parameters"
@@ -613,13 +610,13 @@
   {
    "cell_type": "code",
    "execution_count": 17,
-   "id": "3a6260a0",
+   "id": "724e9034",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:11.949003Z",
-     "iopub.status.busy": "2021-05-16T17:02:11.947930Z",
-     "iopub.status.idle": "2021-05-16T17:02:12.034058Z",
-     "shell.execute_reply": "2021-05-16T17:02:12.032879Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.576948Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.576419Z",
+     "iopub.status.idle": "2021-05-17T18:23:40.649077Z",
+     "shell.execute_reply": "2021-05-17T18:23:40.649850Z"
     }
    },
    "outputs": [
@@ -638,7 +635,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "69ae0fac",
+   "id": "6050f298",
    "metadata": {},
    "source": [
     "We can even visualize what the gradient of the [BaseCube](../api.html#mpol.images.BaseCube) looks like (using a similar ``.detach()`` call as before)"
@@ -647,20 +644,20 @@
   {
    "cell_type": "code",
    "execution_count": 18,
-   "id": "b2bd97d8",
+   "id": "b4ed4339",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:12.064985Z",
-     "iopub.status.busy": "2021-05-16T17:02:12.064308Z",
-     "iopub.status.idle": "2021-05-16T17:02:12.509295Z",
-     "shell.execute_reply": "2021-05-16T17:02:12.509737Z"
+     "iopub.execute_input": "2021-05-17T18:23:40.675855Z",
+     "iopub.status.busy": "2021-05-17T18:23:40.672981Z",
+     "iopub.status.idle": "2021-05-17T18:23:41.104027Z",
+     "shell.execute_reply": "2021-05-17T18:23:41.104571Z"
     }
    },
    "outputs": [
     {
      "data": {
       "text/plain": [
-       "<matplotlib.colorbar.Colorbar at 0x7fcf00fa9490>"
+       "<matplotlib.colorbar.Colorbar at 0x7ff2b9284f70>"
       ]
      },
      "execution_count": 1,
@@ -698,7 +695,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b223b3f0",
+   "id": "2fc45630",
    "metadata": {},
    "source": [
     "The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient"
@@ -707,13 +704,13 @@
   {
    "cell_type": "code",
    "execution_count": 19,
-   "id": "dde96876",
+   "id": "5f6c9971",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:12.513886Z",
-     "iopub.status.busy": "2021-05-16T17:02:12.513335Z",
-     "iopub.status.idle": "2021-05-16T17:02:12.519155Z",
-     "shell.execute_reply": "2021-05-16T17:02:12.519736Z"
+     "iopub.execute_input": "2021-05-17T18:23:41.109609Z",
+     "iopub.status.busy": "2021-05-17T18:23:41.108912Z",
+     "iopub.status.idle": "2021-05-17T18:23:41.112566Z",
+     "shell.execute_reply": "2021-05-17T18:23:41.113021Z"
     }
    },
    "outputs": [],
@@ -723,7 +720,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "056e34b6",
+   "id": "efbe1d73",
    "metadata": {},
    "source": [
     "We can see that the parameter values have changed"
@@ -732,13 +729,13 @@
   {
    "cell_type": "code",
    "execution_count": 20,
-   "id": "8aa4343c",
+   "id": "882efed4",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:12.523683Z",
-     "iopub.status.busy": "2021-05-16T17:02:12.523153Z",
-     "iopub.status.idle": "2021-05-16T17:02:12.528245Z",
-     "shell.execute_reply": "2021-05-16T17:02:12.527818Z"
+     "iopub.execute_input": "2021-05-17T18:23:41.119532Z",
+     "iopub.status.busy": "2021-05-17T18:23:41.118827Z",
+     "iopub.status.idle": "2021-05-17T18:23:41.121773Z",
+     "shell.execute_reply": "2021-05-17T18:23:41.122199Z"
     }
    },
    "outputs": [
@@ -772,7 +769,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7771e455",
+   "id": "e819fc80",
    "metadata": {},
    "source": [
     "as has the base image"
@@ -781,20 +778,20 @@
   {
    "cell_type": "code",
    "execution_count": 21,
-   "id": "dc4f390e",
+   "id": "595a7e5e",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:12.562679Z",
-     "iopub.status.busy": "2021-05-16T17:02:12.561963Z",
-     "iopub.status.idle": "2021-05-16T17:02:12.990431Z",
-     "shell.execute_reply": "2021-05-16T17:02:12.989883Z"
+     "iopub.execute_input": "2021-05-17T18:23:41.142478Z",
+     "iopub.status.busy": "2021-05-17T18:23:41.131139Z",
+     "iopub.status.idle": "2021-05-17T18:23:41.554960Z",
+     "shell.execute_reply": "2021-05-17T18:23:41.554416Z"
     }
    },
    "outputs": [
     {
      "data": {
       "text/plain": [
-       "<matplotlib.colorbar.Colorbar at 0x7fcf00ee30a0>"
+       "<matplotlib.colorbar.Colorbar at 0x7ff2b91be8e0>"
       ]
      },
      "execution_count": 1,
@@ -830,7 +827,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "34beefac",
+   "id": "33d18c8d",
    "metadata": {},
    "source": [
     "### Iterating the training Loop\n",
@@ -843,13 +840,13 @@
   {
    "cell_type": "code",
    "execution_count": 22,
-   "id": "0b0f35d0",
+   "id": "d59c5c67",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:13.003177Z",
-     "iopub.status.busy": "2021-05-16T17:02:13.002460Z",
-     "iopub.status.idle": "2021-05-16T17:02:56.652591Z",
-     "shell.execute_reply": "2021-05-16T17:02:56.653583Z"
+     "iopub.execute_input": "2021-05-17T18:23:41.566656Z",
+     "iopub.status.busy": "2021-05-17T18:23:41.565979Z",
+     "iopub.status.idle": "2021-05-17T18:24:21.626894Z",
+     "shell.execute_reply": "2021-05-17T18:24:21.626400Z"
     }
    },
    "outputs": [
@@ -857,8 +854,8 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "CPU times: user 1min 5s, sys: 9.27 s, total: 1min 14s\n",
-      "Wall time: 43.6 s\n"
+      "CPU times: user 1min 1s, sys: 8.26 s, total: 1min 9s\n",
+      "Wall time: 40.1 s\n"
      ]
     }
    ],
@@ -888,13 +885,13 @@
   {
    "cell_type": "code",
    "execution_count": 23,
-   "id": "3d2b6929",
+   "id": "cab230fa",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:56.683002Z",
-     "iopub.status.busy": "2021-05-16T17:02:56.682265Z",
-     "iopub.status.idle": "2021-05-16T17:02:56.902657Z",
-     "shell.execute_reply": "2021-05-16T17:02:56.902042Z"
+     "iopub.execute_input": "2021-05-17T18:24:21.653487Z",
+     "iopub.status.busy": "2021-05-17T18:24:21.631602Z",
+     "iopub.status.idle": "2021-05-17T18:24:21.864831Z",
+     "shell.execute_reply": "2021-05-17T18:24:21.865364Z"
     }
    },
    "outputs": [
@@ -933,7 +930,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8d610283",
+   "id": "173eb28f",
    "metadata": {},
    "source": [
     "and we see that we've reasonably converged to a set of parameters without much further improvement in the loss value."
@@ -941,7 +938,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "31e13b78",
+   "id": "9d232788",
    "metadata": {},
    "source": [
     "### Visualizing output\n",
@@ -952,20 +949,20 @@
   {
    "cell_type": "code",
    "execution_count": 24,
-   "id": "022c98c9",
+   "id": "b7fd3b88",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-05-16T17:02:56.982023Z",
-     "iopub.status.busy": "2021-05-16T17:02:56.976211Z",
-     "iopub.status.idle": "2021-05-16T17:02:57.400040Z",
-     "shell.execute_reply": "2021-05-16T17:02:57.400480Z"
+     "iopub.execute_input": "2021-05-17T18:24:21.946787Z",
+     "iopub.status.busy": "2021-05-17T18:24:21.946212Z",
+     "iopub.status.idle": "2021-05-17T18:24:22.343676Z",
+     "shell.execute_reply": "2021-05-17T18:24:22.344166Z"
     }
    },
    "outputs": [
     {
      "data": {
       "text/plain": [
-       "<matplotlib.colorbar.Colorbar at 0x7fcf0108f3a0>"
+       "<matplotlib.colorbar.Colorbar at 0x7ff2b940b070>"
       ]
      },
      "execution_count": 1,
@@ -1002,7 +999,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a79d570c",
+   "id": "4c77e004",
    "metadata": {},
    "source": [
     "### Wrapup\n",

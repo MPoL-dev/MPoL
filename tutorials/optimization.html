@@ -504,16 +504,14 @@ div.rendered_html tbody tr:hover {
     <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Note that we needed to do the gridding with &quot;uniform&quot; in order to</span>
-<span class="c1"># propagate the uncertainties needed for RML correctly.</span>
-<span class="n">gridder</span><span class="o">.</span><span class="n">grid_visibilities</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="The-PyTorch-dataset">
 <h2>The PyTorch dataset<a class="headerlink" href="#The-PyTorch-dataset" title="Permalink to this headline">¶</a></h2>
-<p>Now we will export the gridded visibilities to a PyTorch dataset to use in the imaging loop. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.</p>
+<p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <a class="reference internal" href="../api.html#mpol.gridding.Gridder.to_pytorch_dataset"><span class="std std-ref">Gridder.to_pytorch_dataset</span></a> routine grids the visibilites with “uniform” weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities with PyTorch tensors. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this
+tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -677,7 +675,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcf010b8160&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff2b940b310&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -807,7 +805,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcf00fa9490&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff2b9284f70&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -882,7 +880,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcf00ee30a0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff2b91be8e0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -930,8 +928,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 1min 5s, sys: 9.27 s, total: 1min 14s
-Wall time: 43.6 s
+CPU times: user 1min 1s, sys: 8.26 s, total: 1min 9s
+Wall time: 40.1 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -990,7 +988,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcf0108f3a0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff2b940b070&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

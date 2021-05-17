@@ -112,7 +112,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#Importing-data">Importing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#The-GridCoords-object">The GridCoords object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#The-Gridder-object">The Gridder object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Gridding-the-visibilities">Gridding the visibilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Visualizing-the-images">Visualizing the images</a></li>
 </ul>
 </li>
@@ -585,36 +584,23 @@ GridCoords and Gridder object in one shot by</p>
 </div>
 <p>if you don’t want to specify your GridCoords object separately.</p>
 </section>
-<section id="Gridding-the-visibilities">
-<h2>Gridding the visibilities<a class="headerlink" href="#Gridding-the-visibilities" title="Permalink to this headline">¶</a></h2>
-<p>The next step is to average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords using the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.grid_visibilities"><span class="std std-ref">Gridder.grid_visibilities</span></a> routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information
-on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>.</p>
+<section id="Visualizing-the-images">
+<h2>Visualizing the images<a class="headerlink" href="#Visualizing-the-images" title="Permalink to this headline">¶</a></h2>
+<p>To visualize the images, you can call <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image"><span class="std std-ref">Gridder.get_dirty_image</span></a>. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords and then get the diagnostic beam and image cubes that correspond to these gridded visibilities. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and
+thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>. We are usually interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently
+called the “dirty beam” and “dirty image” by radio astronomers. Those are accessible via the following routine</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">gridder</span><span class="o">.</span><span class="n">grid_visibilities</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</section>
-<section id="Visualizing-the-images">
-<h2>Visualizing the images<a class="headerlink" href="#Visualizing-the-images" title="Permalink to this headline">¶</a></h2>
-<p>The gridder object now has a dense representation of the visibility data attached to it as <code class="docutils literal notranslate"><span class="pre">gridder.gridded_vis</span></code>, or separately <code class="docutils literal notranslate"><span class="pre">gridder.gridded_re</span></code> and <code class="docutils literal notranslate"><span class="pre">gridder.gridded_im</span></code>. We won’t normally need to access these products directly. However, we are interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the “dirty beam” and “dirty image” by radio astronomers. Those are accessible via the following routines</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_beam</span><span class="p">()</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">()</span>
+<span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <p>Note that these are three dimensional image cubes with the same <code class="docutils literal notranslate"><span class="pre">nchan</span></code> as the input visibility data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -632,9 +618,9 @@ on the difference between these schemes, see the <a class="reference external" h
 (9, 800, 800)
 </pre></div></div>
 </div>
-<p>And the image has units of “Jy/beam”. Now let’s visualize the central channel of these cubes</p>
+<p>And the image has units of “Jy/beam”. The gridder object also now has a dense representation of the visibility data attached to it as <code class="docutils literal notranslate"><span class="pre">gridder.gridded_vis</span></code>, or separately <code class="docutils literal notranslate"><span class="pre">gridder.gridded_re</span></code> and <code class="docutils literal notranslate"><span class="pre">gridder.gridded_im</span></code>, however, we won’t normally need to access these products directly. Now let’s visualize the central channel of these cubes</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -661,7 +647,7 @@ on the difference between these schemes, see the <a class="reference external" h
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_gridder_27_0.png" class="no-scaled-link" src="../_images/tutorials_gridder_27_0.png" style="width: 654px; height: 344px;" />
+<img alt="../_images/tutorials_gridder_25_0.png" class="no-scaled-link" src="../_images/tutorials_gridder_25_0.png" style="width: 654px; height: 344px;" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the
