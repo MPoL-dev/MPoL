@@ -56,7 +56,6 @@ def dataset(mock_visibility_data, coords):
         data_re=data_re,
         data_im=data_im,
     )
-    gridder.grid_visibilities(weighting="uniform")
 
     return gridder.to_pytorch_dataset()
 
@@ -80,7 +79,6 @@ def dataset_cont(mock_visibility_data, coords):
         data_re=data_re,
         data_im=data_im,
     )
-    gridder.grid_visibilities(weighting="uniform")
 
     return gridder.to_pytorch_dataset()
 
@@ -106,7 +104,7 @@ def crossvalidation_products(mock_visibility_data):
         data_re=data_re,
         data_im=data_im,
     )
-    gridder.grid_visibilities(weighting="uniform")
+
     dataset = gridder.to_pytorch_dataset()
 
     return coords, dataset

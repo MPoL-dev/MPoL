@@ -76,12 +76,11 @@ gridder = gridding.Gridder(
 )
 
 # export to PyTorch dataset
-gridder.grid_visibilities(weighting="uniform")
 dset = gridder.to_pytorch_dataset()
 # -
 
 # Show the dirty image
-img = gridder.get_dirty_image()
+img, beam = gridder.get_dirty_image()
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
 ax.imshow(np.squeeze(img), **kw)
