@@ -341,7 +341,7 @@ def test_grid_natural(gridder, tmp_path):
 
     chan = 4
 
-    img_natural, beam_natual = gridder.get_dirty_image(weighting="natural")
+    img_natural, beam_natural = gridder.get_dirty_image(weighting="natural")
 
     r = 2
     img_robust, beam_robust = gridder.get_dirty_image(weighting="briggs", robust=r)
