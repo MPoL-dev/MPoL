@@ -67,14 +67,12 @@ gridder = gridding.Gridder(
     data_im=data_im,
 )
 
-# Note that we needed to do the gridding with "uniform" in order to
-# propagate the uncertainties needed for RML correctly.
-gridder.grid_visibilities(weighting="uniform")
 # -
 
 # ### The PyTorch dataset
 #
-# Now we will export the gridded visibilities to a PyTorch dataset to use in the imaging loop. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.
+# Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The [Gridder.to_pytorch_dataset](../api.rst#mpol.gridding.Gridder.to_pytorch_dataset) routine grids the visibilites with "uniform" weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities with PyTorch tensors.
+# This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.
 
 dset = gridder.to_pytorch_dataset()
 print("this dataset has {:} channel".format(dset.nchan))
