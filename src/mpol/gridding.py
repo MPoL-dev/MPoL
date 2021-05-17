@@ -444,7 +444,7 @@ class Gridder:
         """
 
         # grid visibilites (uniform weighting necessary here) and weights
-        self._grid_visibilities(weighting="unform")
+        self._grid_visibilities(weighting="uniform")
         self._grid_weights()
 
         # This should be an obsolete check now but I'll leave it here for now
