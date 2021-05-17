@@ -149,7 +149,7 @@ class Gridder:
 
         return cube
 
-    def grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
+    def _grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
         r"""
         Grid the loose data visibilities to the Fourier grid in preparation for imaging.
 
@@ -252,11 +252,18 @@ class Gridder:
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
         self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
 
+    def _grid_weights(self):
+        r"""
+        Grid the weights to the Fourier grid, to be used when preparing a PyTorch dataset.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._histogram_cube(self.weight)
+
         # instantiate uncertainties for each averaged visibility.
-        if weighting == "uniform" and robust == None and taper_function is None:
-            self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
-        else:
-            self.weight_gridded = None
+        self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
 
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
@@ -371,18 +378,32 @@ class Gridder:
         )
         return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
 
-    def get_dirty_image(self, unit="Jy/beam"):
+    def get_dirty_image(
+        self, weighting="uniform", robust=None, taper_function=None, unit="Jy/beam"
+    ):
         """
         Calculate the dirty image.
 
         Args:
+            weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
+            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
             unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
 
-        Returns: (nchan, npix, npix) numpy array of the dirty image cube.
+        Returns: image,beam where
+                 image: (nchan, npix, npix) numpy array of the dirty image cube.
+                 beam: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.
         """
 
+        # check unit input
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
+
+        # call _grid_visibilities
+        # inputs for weighting will be checked inside _grid_visibilities
+        self._grid_visibilities(
+            weighting=weighting, robust=robust, taper_function=taper_function
+        )
 
         img = self._fliplr_cube(
             np.fft.fftshift(
@@ -410,7 +431,9 @@ class Gridder:
 
         self.img = img.real
 
-        return self.img
+        self.get_dirty_beam()
+
+        return self.img, self.beam
 
     def to_pytorch_dataset(self):
         """
@@ -420,6 +443,11 @@ class Gridder:
             :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
         """
 
+        # grid visibilites (uniform weighting necessary here) and weights
+        self._grid_visibilities(weighting="unform")
+        self._grid_weights()
+
+        # This should be an obsolete check now but I'll leave it here for now
         assert (
             self.weight_gridded is not None
         ), "To export with uncertainties, first grid visibilities with weighting='uniform', no tapering function, and robust=None. Otherwise, data weights are not defined."
