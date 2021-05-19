@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pytest
 import torch
 
+from astropy.io import fits
 from mpol import gridding, images, utils
 from mpol.constants import *
 
@@ -47,6 +48,25 @@ def test_imagecube_grad(coords):
     # segfaults on 3.9
     # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
+
+# test for proper fits scale
+def test_imagecube_tofits(coords, tmp_path):
+    # creating base cube
+    bcube = images.BaseCube(coords=coords)
+
+    # try passing through ImageLayer
+    imagecube = images.ImageCube(coords=coords, passthrough=True)
+
+    # sending the basecube through the imagecube
+    imagecube.forward(bcube.forward())
+
+    # creating output fits file with name 'test_cube_fits_file39.fits'
+    # file will be deleted after testing
+    imagecube.to_FITS(fname=tmp_path / 'test_cube_fits_file39.fits', overwrite=True)
+
+    # inputting the header from the previously created fits file
+    fits_header = fits.open(tmp_path / 'test_cube_fits_file39.fits')[0].header
+    assert (fits_header['CDELT1'] and fits_header['CDELT2']) == pytest.approx(coords.cell_size / 3600)
 
 
 # test image packing
