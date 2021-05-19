@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import pytest
 import torch
-import os
 
 from astropy.io import fits
 from mpol import gridding, images, utils
@@ -51,7 +50,7 @@ def test_imagecube_grad(coords):
     loss.backward()
 
 # test for proper fits scale
-def test_imagecube_tofits(coords):
+def test_imagecube_tofits(coords, tmp_path):
     # creating base cube
     bcube = images.BaseCube(coords=coords)
 
@@ -63,11 +62,10 @@ def test_imagecube_tofits(coords):
 
     # creating output fits file with name 'test_cube_fits_file39.fits'
     # file will be deleted after testing
-    imagecube.to_FITS(fname='test_cube_fits_file39.fits', overwrite=True)
+    imagecube.to_FITS(fname=tmp_path / 'test_cube_fits_file39.fits', overwrite=True)
 
     # inputting the header from the previously created fits file
-    fits_header = fits.open('test_cube_fits_file39.fits')[0].header
-    os.remove('test_cube_fits_file39.fits')
+    fits_header = fits.open(tmp_path / 'test_cube_fits_file39.fits')[0].header
     assert (fits_header['CDELT1'] and fits_header['CDELT2']) == pytest.approx(coords.cell_size / 3600)
 
 
