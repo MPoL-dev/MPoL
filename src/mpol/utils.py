@@ -6,7 +6,13 @@ from .constants import arcsec, cc, deg, kB
 
 def ground_cube_to_packed_cube(ground_cube):
     r"""
-    For visibility-plane work.
+    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.
+    
+    Args:
+        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
+
+    Returns:
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Packed Visibility Cube. 
     """
     shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
     return shifted
@@ -14,7 +20,13 @@ def ground_cube_to_packed_cube(ground_cube):
 
 def packed_cube_to_ground_cube(packed_cube):
     r"""
-    For visibility-plane work.
+    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.
+    
+    Args:
+        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
+
+    Returns:
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Ground Cube.
     """
     # fftshift the image cube to the correct quadrants
     shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
@@ -23,7 +35,13 @@ def packed_cube_to_ground_cube(packed_cube):
 
 def sky_cube_to_packed_cube(sky_cube):
     r"""
-    For image-plane work.
+    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.
+    
+    Args:
+        sky_cube: a previously initialized Sky Cube object with RA increasing to the *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
+
+    Returns:
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Packed Image Cube.
     """
     flipped = torch.flip(sky_cube, (2,))
     shifted = torch.fft.fftshift(flipped, dim=(1, 2))
@@ -32,7 +50,13 @@ def sky_cube_to_packed_cube(sky_cube):
 
 def packed_cube_to_sky_cube(packed_cube):
     r"""
-    For image-plane work.
+    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.
+    
+    Args:
+        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
+
+    Returns:
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Sky Cube.
     """
     # fftshift the image cube to the correct quadrants
     shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
