@@ -29,13 +29,13 @@ tutorials/%.ipynb: tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
 
 # baseline table
-_static/baselines/build/baselines.csv:
+_static/baselines/build/baselines.csv: _static/baselines/src/print_conversions.py
 	mkdir -p _static/baselines/build
 	python _static/baselines/src/print_conversions.py $@
 
 # fftshift figure
-_static/fftshift/image/plot.png:
-	mkdir -p _static/fftshift/image
+_static/fftshift/build/plot.png: _static/fftshift/src/plot.py
+	mkdir -p _static/fftshift/build
 	python _static/fftshift/src/plot.py $@
 
 # mermaid.js files
@@ -43,5 +43,5 @@ _static/mmd/build/%.svg: _static/mmd/src/%.mmd
 	mkdir -p _static/mmd/build
 	${MERMAID_PATH}mmdc -i $^ -o $@
 
-html: ${NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv
+html: ${NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
