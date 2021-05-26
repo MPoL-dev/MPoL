@@ -33,6 +33,11 @@ _static/baselines/build/baselines.csv:
 	mkdir -p _static/baselines/build
 	python _static/baselines/src/print_conversions.py $@
 
+# fftshift figure
+_static/fftshift/image/plot.png:
+	mkdir -p _static/fftshift/image
+	python _static/fftshift/src/plot.py $@
+
 # mermaid.js files
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
 	mkdir -p _static/mmd/build

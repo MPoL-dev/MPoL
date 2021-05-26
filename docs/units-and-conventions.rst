@@ -120,10 +120,11 @@ If we had a fully sampled grid of :math:`{\cal V}_{u,v}` values, then the operat
 For more information on this procedure as implmented in MPoL, see the :class:`~mpol.gridding.Gridder` class and the source code of its :func:`~mpol.gridding.Gridder.get_dirty_image` method. When the grid of :math:`{\cal V}_{u,v}` values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal `Ph.D. thesis <http://www.aoc.nrao.edu/dissertations/dbriggs/>`_ of Daniel Briggs.
 
 
-"Packed" Image Cubes
---------------------
+**"Packed" Image Cubes**
 
-Internally, data is represented by Cubes, or arrays of three dimensions. In the case of MPoL, the dimensions of an MPoL cube represent Declination (DEC, axis one), Right Ascension (RA, axis two), and Velocity/Frequency (axis three). Initially, the Normal Cube, or Sky Cube, is the orientation of an image on the sky. Due to this, the RA increases to the *left*. It is desirable to flip the RA axis to obtain a traditional scaling with RA increasing to the *right*.
+For our data to properly conform to FFT routine conventions, properly organized data cubes, or arrays of three dimensions, are needed. FFT will operate on a multidimensional array, and for each dimension we want a direct relationship between the increase of the input array index and an increase in coordinate value (i.e. as index increases: i=1,2,3... corresponds to an increase in :math:`l`). In this way, the output array from FFT will have a similar relationship between the array index (i) and coordinate value (:math:`u`). Along the same lines, FFT assumes the first element of an array in a data cube layer is the zeroth :math:`l,m` or :math:`u,v` coordinate. This leads to a direct relationship between the Packed Image Cube and Packed Visibility Cube through a FFT. Without the use of ``torch.fft.fftshift()``, the zeroth element would not be in the first position of the arrays and therefore lead to incorrect representations of data. All of the aforementioned creates the need for the Packed Cube format.
+
+Internally, the dimensions of an MPoL cube represent Declination (DEC, axis one), Right Ascension (RA, axis two), and Velocity/Frequency (axis three). Initially, the Normal Cube, or Sky Cube, is the orientation of an image on the sky. In general, astronomical images are plotted with North facing the top of the page, and East facing the left. This plotting format shows us how the object appears in the sky, but, since RA increases to the left, it is not represented in the way we typically read graphs (where the x-axis increases to the *right). It is desirable to flip the RA axis (the :math:`l` axis) to obtain a traditional-looking graph with RA increasing towards the right of the page.
 
 We now have a flipped version of the Sky Cube (referred to as the Flip Cube). The next step is to "pack" the cube. In this application, this is carried out by applying ``torch.fft.fftshift()`` to the Flip Cube. This method acts only along the DEC and RA axes (axis one and axis two) leaving axis three untouched and creating a Packed Cube, or Image Cube. This method is represented internally as ``mpol.utils.sky_cube_to_packed_cube()``. 
 
@@ -131,10 +132,7 @@ At this point, a two-dimensional Fast Fourier Transformation (described above) i
 
 To convert from a Ground Cube to a Sky Cube, simply reverse this process. Apply the ``mpol.utils.ground_cube_to_packed_cube()`` function to shift the data to a Packed Visibility Cube, apply the FFT to the Packed Cube to create an Image Cube, then use the function ``mpol.utils.packed_cube_to_sky_cube()`` to obtain a Sky Cube from the Image Cube. 
 
-More details on the MPoL methods mentioned here can be found in the API.
+More details on the MPoL methods mentioned here can be found in the API. See the below figure for a visual representation of the data at each of these stages. 
 
----------------
-FFT Conventions
----------------
-
-Due to the nature of the FFT, the ``torch.fft.fftshift()`` is required before applying the FFT. This function shifts the zero-point to the center of the array. Without doing this, images will not appear in the intended way after the FFT is applied. 
+.. image:: _static/fftshift/image/plot.png
+    :width: 300
