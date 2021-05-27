@@ -24,7 +24,7 @@ coords = coordinates.GridCoords(cell_size=0.007, npix=512)
 kw = {"origin": "lower", "interpolation": "none", "extent": coords.img_ext}
 kwvis = {"origin": "lower", "interpolation": "none", "extent": coords.vis_ext}
 
-fig = plt.figure(constrained_layout=False)
+fig = plt.figure(constrained_layout=False, figsize=(8, 6))
 gs = GridSpec(2, 3, fig)
 ax = fig.add_subplot(gs[0, 0])
 ax1 = fig.add_subplot(gs[0, 1])
@@ -38,14 +38,14 @@ sky_cube = d[0].data
 d.close()
 ax.imshow(sky_cube, **kw)
 ax.set_title("Sky Cube")
-ax.set_xlabel(r"$\alpha$ [deg]")
-ax.set_ylabel(r"$\delta$ [deg]")
+ax.set_xlabel(r"$\Delta \alpha \cos \delta \; [{}^{\prime\prime}]$")
+ax.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
 
 flip_cube = np.flip(sky_cube, (1,))
 ax1.imshow(sky_cube, **kw)
 ax1.set_title("Flip Cube")
-ax1.set_xlabel(r"$\alpha$ [deg]")
-ax1.set_ylabel(r"$\delta$ [deg]")
+ax1.set_xlabel(r"$\Delta \alpha \cos \delta\; [{}^{\prime\prime}]$")
+ax1.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
 ax1.invert_xaxis()
 
 image_cube = np.fft.fftshift(flip_cube, axes=(0, 1))
@@ -66,92 +66,54 @@ ax4.set_title("Ground Cube")
 ax4.set_xlabel(r"$u$ [k$\lambda$]")
 ax4.set_ylabel(r"$v$ [k$\lambda$]")
 
+arrow_kws = {"mutation_scale": 20, "transform": fig.transFigure, "fc": "black"}
 
-arrow = patches.FancyArrowPatch(
-    (0.7, 0.3),
-    (0.32, 0.3),
-    transform=fig.transFigure,
-    arrowstyle="simple",
-    mutation_scale=30,
-    fc='black'
-)
-arrow1 = patches.FancyArrowPatch(
-    (0.65, 0.75),
-    (0.78, 0.75),
-    transform=fig.transFigure,
-    arrowstyle="simple",
-    mutation_scale=30,
-    fc='black'
-)
-arrow2 = patches.FancyArrowPatch(
-    (0.29, 0.75),
-    (0.41, 0.75),
-    transform=fig.transFigure,
-    arrowstyle="simple",
-    mutation_scale=30,
-    fc='black'
-)
-arrow3 = patches.FancyArrowPatch(
-    (0.75, 0.57),
-    (0.32, 0.36),
-    transform=fig.transFigure,
-    arrowstyle="simple",
-    mutation_scale=30,
-    fc='black'
-)
-arrow4 = patches.FancyArrowPatch(
-    (0.32, 0.33),
-    (0.75, 0.54),
-    transform=fig.transFigure,
-    arrowstyle="simple",
-    mutation_scale=30,
-    fc='black'
-)
+annotate_kws = {
+    "xycoords": fig.transFigure,
+    "va": "center",
+    "ha": "center",
+    "weight": "bold",
+    "fontsize": "large",
+}
 
-fig.patches.append(arrow)
-fig.patches.append(arrow1)
-fig.patches.append(arrow2)
-fig.patches.append(arrow3)
-fig.patches.append(arrow4)
+text_kws = {"va": "center", "ha": "center", "weight": "bold", "fontsize": "large"}
 
-# used annotate here to assist in the orginazation and placement of figures
-plt.annotate(
-    r"np.fft.fftshift($Ground$ $Cube$)",
-    (0.43, 0.32),
-    xycoords=fig.transFigure,
-    va="center",
-    weight="bold",
+x0, x1 = 0.62, 0.31
+y = 0.2
+arrow_ground_cube_to_packed_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="<->"
 )
+fig.patches.append(arrow_ground_cube_to_packed_cube)
+plt.annotate(r"$\texttt{fftshift}$", ((x0 + x1) / 2, y + 0.02), **annotate_kws)
 
-plt.tight_layout(h_pad=-1.8, w_pad=-2.5)
+y = 0.82
+x0, x1 = 0.28, 0.37
+arrow_sky_cube_to_flip_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="<->"
+)
+fig.patches.append(arrow_sky_cube_to_flip_cube)
+fig.text((x0 + x1) / 2, y + 0.05, r"$\texttt{flip}$\\ across R.A.", **text_kws)
 
-fig.text(
-    0.65, 
-    0.77, 
-    r"np.fft.fftshift($Flip$ $Cube$)", 
-    weight="bold",
+x0, x1 = 0.62, 0.73
+arrow_flip_cube_to_packed_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="<->"
 )
-fig.text(
-    0.31, 
-    0.77, 
-    r"np.flip($\alpha$)", 
-    weight="bold",
-)
+fig.patches.append(arrow_flip_cube_to_packed_cube)
+fig.text((x0 + x1) / 2, y + 0.03, r"$\texttt{fftshift}$", **text_kws)
 
-fig.text(
-    0.48, 
-    0.46,
-    r"np.fft.fft2($Packed$ $Cube$)",
-    weight="bold",
-    rotation=17,
+x_center = 0.5
+arrow_packed_image_to_packed_visibility = patches.FancyArrowPatch(
+    (0.73, 0.59), (0.32, 0.38), **arrow_kws, arrowstyle="->"
 )
-fig.text(
-    0.48, 
-    0.38,
-    r"np.fft.ifft2($Packed$ $Cube$)",
-    weight="bold",
-    rotation=17,
-)
+fig.patches.append(arrow_packed_image_to_packed_visibility)
+fig.text(x_center, 0.50, r"$\texttt{fft2}$", rotation=17, **text_kws)
 
-fig.set_size_inches(13, 8)
+arrow_packed_visibility_to_packed_image = patches.FancyArrowPatch(
+    (0.34, 0.33), (0.75, 0.54), **arrow_kws, arrowstyle="->"
+)
+fig.patches.append(arrow_packed_visibility_to_packed_image)
+fig.text(x_center, 0.37, r"$\texttt{ifft2}$", rotation=17, **text_kws)
+
+
+fig.subplots_adjust(wspace=0.65, left=0.06, right=0.94, top=0.97, bottom=0.05)
 plt.savefig(args.outfile, dpi=300)
