@@ -37,9 +37,9 @@ Discretized representation
 
 There are several annoying pitfalls that can arise when dealing with discretized images and Fourier transforms, and most relate back to confusing or ill-specified conventions. The purpose of this page is to explicitly define the conventions used throughout MPoL and make clear how each transformation relates back to the continuous equations.
 
-------------
-Pixel fluxes
-------------
+--------------------------------
+Pixel fluxes and Cube dimensions
+--------------------------------
 
 * Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of :math:`\mathrm{Jy\,arcsec}^{-2}`.
 * The image cubes are packed as 3D arrays ``(nchan, npix, npix)``.
@@ -118,3 +118,21 @@ If we had a fully sampled grid of :math:`{\cal V}_{u,v}` values, then the operat
     I_{l,m} = U V (\Delta u)(\Delta v) \mathtt{iFFT}({\cal V}_{u,v})
 
 For more information on this procedure as implmented in MPoL, see the :class:`~mpol.gridding.Gridder` class and the source code of its :func:`~mpol.gridding.Gridder.get_dirty_image` method. When the grid of :math:`{\cal V}_{u,v}` values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal `Ph.D. thesis <http://www.aoc.nrao.edu/dissertations/dbriggs/>`_ of Daniel Briggs.
+
+---------------------------
+Image Cube Packing for FFTs
+---------------------------
+
+Numerical FFT routines expect that the first element of an input array (i.e., ``array[i,0,0]``) corresponds to the zeroth spatial (:math:`l,m`) or frequency (:math:`u,v`) coordinate. This convention is quite different than the way we normally look at images. As described above, MPoL deals with three dimensional image cubes of shape ``(nchan, npix, npix)``, where the "rows" of the image cube (axis=1) correspond to the :math:`m` or Dec axis, and the "columns" of the image cube (axis=2) correspond to the :math:`l` or R.A. axis. Normally, the zeroth spatial component :math:`(l,m) = (0,0)` is in the *center* of the array (at position ``array[i,M/2,L/2]``), so that when an array is visualized (say with ``matplotlib.pyplot.imshow``, ``origin="lower"``), the center of the array appears in the center of the image.
+
+.. image:: _static/fftshift/build/plot.png
+
+Complicating this already non-standard situation is the fact that astronomers usually plot images as seen on the sky: with north (:math:`m`) up and east (:math:`l`) to the left. Throughout the MPoL base, we call these cubes 'sky cubes,' see the above figure for a representation. In order to display sky cubes properly with routines like ``matplotilb.pyplot.imshow``, when indexed as ``array[i,j,k]``, an increasing ``k`` index must correspond to *decreasing* values of :math:`l`. (It's OK that an increasing ``j`` index corresponds to increasing values of :math:`m`, however we must be certain to include the ``origin="lower`` argument when using ``matplotlib.pyplot.imshow``).
+
+Correctly taking the Fourier transform of a sky cube requires several steps.  First, we must flip the cube across the R.A. axis (axis=2) to create an ``array[i,j,k]`` which has both increasing values of ``j`` and ``k`` correspond to increasing values of :math:`m` and :math:`l`, respectively. We call this intermediate product a 'flip cube.'
+
+Then, the cube must be packed such that the first element(s) of an input array (i.e., ``array[i,0,0]``) correspond to the zeroth spatial coordinates :math:`(l,m) = (0,0)`. Thankfully, we can carry out this operation easily using ``fftshift`` functions commonly provided by FFT packages like ``numpy.fft`` or ``torch.fft``. We shift across the Dec and R.A. axes (axis=1 and axis=2) leaving the channel axis (axis=0) untouched to create a 'packed image cube.' MPoL has convenience functions to carry out both the flip and packing operations called :func:`mpol.utils.sky_cube_to_packed_cube` and the inverse process :func:`mpol.utils.packed_cube_to_sky_cube`.
+
+After the FFT is correctly applied to the R.A. and Dec dimensions using ``fft2``, the output is a packed visibility cube, where the first elements (i.e., ``array[i,0,0]``) correspond to the zeroth spatial frequency coordinates :math:`(u,v) = (0,0)`. To translate this cube back into something that's more recognizable when plotted, we can apply the ``ifftshift`` operation along the :math:`v` and :math:`u` axes (axis=1 and axis=2) leaving the channel axis (axis=0) untouched to create a 'ground visibility cube'. We choose to orient the visibility plane from the perspective of an areial observer looking down at an interferometric array on the ground, such that north is up and east is to the right, therefore no additional flip is required for the visibility cube. MPoL has convenience functions to carry out the unpacking operation :func:`mpol.utils.packed_cube_to_ground_cube` and the inverse process :func:`mpol.utils.ground_cube_to_packed_cube`.
+
+In practice, ``fftshift`` and ``ifftshift`` routines operate identically for arrays with an even number of elements (currently required by MPoL).

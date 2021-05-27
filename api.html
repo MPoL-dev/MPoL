@@ -366,7 +366,18 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.ground_cube_to_packed_cube">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">ground_cube_to_packed_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#ground_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.ground_cube_to_packed_cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>For visibility-plane work.</p>
+<dd><p>Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ground_cube</strong> – a previously initialized Ground Cube object (cube (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>))</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the input arg; i.e Returns a Packed Visibility Cube.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -400,19 +411,52 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.packed_cube_to_ground_cube">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">packed_cube_to_ground_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#packed_cube_to_ground_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_ground_cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>For visibility-plane work.</p>
+<dd><p>Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>packed_cube</strong> – a previously initialized Packed Cube object (cube (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>))</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the input arg; i.e Returns a Ground Cube.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.packed_cube_to_sky_cube">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">packed_cube_to_sky_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#packed_cube_to_sky_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_sky_cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>For image-plane work.</p>
+<dd><p>Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>packed_cube</strong> – a previously initialized Packed Image Cube object (cube (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>))</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the <code class="docutils literal notranslate"><span class="pre">torch.flip()</span></code> of the RA axis; i.e Returns a Sky Cube.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.sky_cube_to_packed_cube">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">sky_cube_to_packed_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#sky_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_cube_to_packed_cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>For image-plane work.</p>
+<dd><p>Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sky_cube</strong> – a previously initialized Sky Cube object with RA increasing to the <em>left</em> (cube (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>))</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the <code class="docutils literal notranslate"><span class="pre">torch.flip()</span></code> of the RA axis; i.e Returns a Packed Image Cube.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

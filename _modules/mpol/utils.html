@@ -184,7 +184,13 @@
 
 <div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For visibility-plane work.</span>
+<span class="sd">    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Packed Visibility Cube. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">shifted</span></div>
@@ -192,7 +198,13 @@
 
 <div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For visibility-plane work.</span>
+<span class="sd">    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Ground Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -201,7 +213,13 @@
 
 <div class="viewcode-block" id="sky_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For image-plane work.</span>
+<span class="sd">    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        sky_cube: a previously initialized Sky Cube object with RA increasing to the *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Packed Image Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -210,7 +228,13 @@
 
 <div class="viewcode-block" id="packed_cube_to_sky_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_sky_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For image-plane work.</span>
+<span class="sd">    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Sky Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
