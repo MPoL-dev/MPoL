@@ -78,14 +78,6 @@ annotate_kws = {
 
 text_kws = {"va": "center", "ha": "center", "weight": "bold", "fontsize": "large"}
 
-x0, x1 = 0.62, 0.31
-y = 0.2
-arrow_ground_cube_to_packed_cube = patches.FancyArrowPatch(
-    (x0, y), (x1, y), **arrow_kws, arrowstyle="<->"
-)
-fig.patches.append(arrow_ground_cube_to_packed_cube)
-plt.annotate(r"$\texttt{fftshift}$", ((x0 + x1) / 2, y + 0.02), **annotate_kws)
-
 y = 0.82
 x0, x1 = 0.28, 0.37
 arrow_sky_cube_to_flip_cube = patches.FancyArrowPatch(
@@ -94,12 +86,22 @@ arrow_sky_cube_to_flip_cube = patches.FancyArrowPatch(
 fig.patches.append(arrow_sky_cube_to_flip_cube)
 fig.text((x0 + x1) / 2, y + 0.05, r"$\texttt{flip}$\\ across R.A.", **text_kws)
 
-x0, x1 = 0.62, 0.73
+x0, x1 = 0.62, 0.72
+y = 0.84
 arrow_flip_cube_to_packed_cube = patches.FancyArrowPatch(
-    (x0, y), (x1, y), **arrow_kws, arrowstyle="<->"
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="->"
 )
 fig.patches.append(arrow_flip_cube_to_packed_cube)
 fig.text((x0 + x1) / 2, y + 0.03, r"$\texttt{fftshift}$", **text_kws)
+
+x0, x1 = 0.72, 0.62
+y = 0.77
+arrow_packed_cube_to_flip_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="->"
+)
+fig.patches.append(arrow_packed_cube_to_flip_cube)
+fig.text((x0 + x1) / 2, y + 0.03, r"$\texttt{ifftshift}$", **text_kws)
+
 
 x_center = 0.5
 arrow_packed_image_to_packed_visibility = patches.FancyArrowPatch(
@@ -113,6 +115,23 @@ arrow_packed_visibility_to_packed_image = patches.FancyArrowPatch(
 )
 fig.patches.append(arrow_packed_visibility_to_packed_image)
 fig.text(x_center, 0.37, r"$\texttt{ifft2}$", rotation=17, **text_kws)
+
+
+x0, x1 = 0.62, 0.31
+y = 0.23
+arrow_ground_cube_to_packed_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="->"
+)
+fig.patches.append(arrow_ground_cube_to_packed_cube)
+plt.annotate(r"$\texttt{fftshift}$", ((x0 + x1) / 2, y + 0.02), **annotate_kws)
+
+x0, x1 = 0.31, 0.62
+y = 0.16
+arrow_packed_cube_to_ground_cube = patches.FancyArrowPatch(
+    (x0, y), (x1, y), **arrow_kws, arrowstyle="->"
+)
+fig.patches.append(arrow_packed_cube_to_ground_cube)
+plt.annotate(r"$\texttt{ifftshift}$", ((x0 + x1) / 2, y + 0.02), **annotate_kws)
 
 
 fig.subplots_adjust(wspace=0.65, left=0.06, right=0.94, top=0.97, bottom=0.05)

@@ -37,9 +37,9 @@ Discretized representation
 
 There are several annoying pitfalls that can arise when dealing with discretized images and Fourier transforms, and most relate back to confusing or ill-specified conventions. The purpose of this page is to explicitly define the conventions used throughout MPoL and make clear how each transformation relates back to the continuous equations.
 
-------------
-Pixel fluxes
-------------
+--------------------------------
+Pixel fluxes and Cube dimensions
+--------------------------------
 
 * Throughout the codebase, any sky plane cube representing the sky plane is assumed to have units of :math:`\mathrm{Jy\,arcsec}^{-2}`.
 * The image cubes are packed as 3D arrays ``(nchan, npix, npix)``.
@@ -123,9 +123,13 @@ For more information on this procedure as implmented in MPoL, see the :class:`~m
 Image Cube Packing for FFTs
 ---------------------------
 
-For our data to properly conform to FFT routine conventions, properly organized data cubes, or arrays of three dimensions, are needed. FFT will operate on a multidimensional array, and for each dimension we want a direct relationship between the increase of the input array index and an increase in coordinate value (i.e. as index increases: i=1,2,3... corresponds to an increase in :math:`l`). In this way, the output array from FFT will have a similar relationship between the array index (i) and coordinate value (:math:`u`). Along the same lines, FFT assumes the first element of an array in a data cube layer is the zeroth :math:`l,m` or :math:`u,v` coordinate. This leads to a direct relationship between the Packed Image Cube and Packed Visibility Cube through a FFT. Without the use of ``torch.fft.fftshift()``, the zeroth element would not be in the first position of the arrays and therefore lead to incorrect representations of data. All of the aforementioned creates the need for the Packed Cube format.
+Numerical FFT routines expect that the first element of an input array corresponds to the zeroth spatial (:math:`l,m`) or frequency (:math:`u,v`) coordinate. This convention is quite different than the way we normally represent images. As described above, we represent image cubes as 3D arrays of shape ``(nchan, npix, npix)``, where the "rows" of the image cube (axis=1) correspond to the :math:`m` or Dec axis, and the "columns" of the image cube (axis=2) correspond to the :math:`l` or R.A. axis. Normally, the zeroth spatial component is in the *center* of the array, so that when an array is visualized (say with ``matplotlib.imshow``), the center of the array appears in the center of the image. An additional complication is the fact that astronomers usually plot images as seen on the sky: north is up and east is left. For example, see the "Sky Cube" panel in the plot below.
 
-Internally, the dimensions of an MPoL cube represent Declination (DEC, axis one), Right Ascension (RA, axis two), and Velocity/Frequency (axis three). Initially, the Normal Cube, or Sky Cube, is the orientation of an image on the sky. In general, astronomical images are plotted with North facing the top of the page, and East facing the left. This plotting format shows us how the object appears in the sky, but, since RA increases to the left, it is not represented in the way we typically read graphs (where the x-axis increases to the *right*). It is desirable to flip the RA axis (the :math:`l` axis) to obtain a traditional-looking graph with RA increasing towards the right of the page.
+.. image:: _static/fftshift/build/plot.png
+
+For our data to properly conform to FFT routine conventions, we need properly organized data cubes. The FFT operates on a multidimensional array, and for each dimension we want a direct relationship between the increase of the input array index and an increase in coordinate value (i.e. as index increases: i=1,2,3... corresponds to an increase in :math:`l`). In this way, the output array from FFT will have a similar relationship between the array index (i) and coordinate value (:math:`u`). To achieve this format, we need to flip the "Sky Cube" array along the R.A. axis such that increasing array index corresponds to an increase in :math:`l`.
+
+This plotting format shows us how the object appears in the sky, but, since RA increases to the left, it is not represented in the way we typically read graphs (where the x-axis increases to the *right*). It is desirable to flip the RA axis (the :math:`l` axis) to obtain a traditional-looking graph with RA increasing towards the right of the page.
 
 We now have a flipped version of the Sky Cube (referred to as the Flip Cube). The next step is to "pack" the cube. In this application, this is carried out by applying ``torch.fft.fftshift()`` to the Flip Cube. This method acts only along the DEC and RA axes (axis one and axis two) leaving axis three untouched and creating a Packed Cube, or Image Cube. This method is represented internally as ``mpol.utils.sky_cube_to_packed_cube()``.
 
@@ -134,5 +138,3 @@ At this point, a two-dimensional Fast Fourier Transformation (described above) i
 To convert from a Ground Cube to a Sky Cube, simply reverse this process. Apply the ``mpol.utils.ground_cube_to_packed_cube()`` function to shift the data to a Packed Visibility Cube, apply the FFT to the Packed Cube to create an Image Cube, then use the function ``mpol.utils.packed_cube_to_sky_cube()`` to obtain a Sky Cube from the Image Cube.
 
 More details on the MPoL methods mentioned here can be found in the API. See the below figure for a visual representation of the data at each of these stages.
-
-.. image:: _static/fftshift/build/plot.png
