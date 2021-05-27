@@ -68,46 +68,45 @@ ax4.set_ylabel(r"$v$ [k$\lambda$]")
 
 
 arrow = patches.FancyArrowPatch(
-    (0.65, 0.4),
-    (0.35, 0.4),
+    (0.7, 0.3),
+    (0.32, 0.3),
     transform=fig.transFigure,
-    arrowstyle="->",
+    arrowstyle="simple",
     mutation_scale=30,
-    color="r",
+    fc='black'
 )
 arrow1 = patches.FancyArrowPatch(
     (0.65, 0.75),
-    (0.75, 0.75),
+    (0.78, 0.75),
     transform=fig.transFigure,
-    arrowstyle="->",
+    arrowstyle="simple",
     mutation_scale=30,
-    color="r",
+    fc='black'
 )
 arrow2 = patches.FancyArrowPatch(
-    (0.31, 0.75),
-    (0.39, 0.75),
+    (0.29, 0.75),
+    (0.41, 0.75),
     transform=fig.transFigure,
-    arrowstyle="->",
+    arrowstyle="simple",
     mutation_scale=30,
-    color="orange",
+    fc='black'
 )
 arrow3 = patches.FancyArrowPatch(
     (0.75, 0.57),
-    (0.32, 0.46),
+    (0.32, 0.36),
     transform=fig.transFigure,
-    arrowstyle="->",
+    arrowstyle="simple",
     mutation_scale=30,
-    color="green",
+    fc='black'
 )
 arrow4 = patches.FancyArrowPatch(
-    (0.32, 0.43),
+    (0.32, 0.33),
     (0.75, 0.54),
     transform=fig.transFigure,
-    arrowstyle="->",
+    arrowstyle="simple",
     mutation_scale=30,
-    color="blue",
+    fc='black'
 )
-
 
 fig.patches.append(arrow)
 fig.patches.append(arrow1)
@@ -115,34 +114,43 @@ fig.patches.append(arrow2)
 fig.patches.append(arrow3)
 fig.patches.append(arrow4)
 
-
+# used annotate here to assist in the orginazation and placement of figures
 plt.annotate(
-    r"torch.fft.fftshift($Packed$ $Cube$)",
-    (0.43, 0.37),
+    r"np.fft.fftshift($Ground$ $Cube$)",
+    (0.43, 0.32),
     xycoords=fig.transFigure,
     va="center",
     weight="bold",
-    c="white",
 )
-# fig.subplots_adjust(left=.1, right=.9, bottom=0, top=.9)
-plt.tight_layout(h_pad=-1.8, w_pad=-5)
+
+plt.tight_layout(h_pad=-1.8, w_pad=-2.5)
+
 fig.text(
-    0.4, 0.3, r"Red arrows = np.fft.fftshift($Packed$ $Cube$)", color="r", weight="bold"
-)
-fig.text(0.4, 0.27, r"Orange arrow = np.flip($\alpha$)", color="orange", weight="bold")
-fig.text(
-    0.4,
-    0.24,
-    r"Green arrow = np.fft.fft2($Packed$ $Cube$)",
-    color="green",
+    0.65, 
+    0.77, 
+    r"np.fft.fftshift($Flip$ $Cube$)", 
     weight="bold",
 )
 fig.text(
-    0.4,
-    0.21,
-    r"Blue arrow = np.fft.ifft2($Packed$ $Cube$)",
-    color="blue",
+    0.31, 
+    0.77, 
+    r"np.flip($\alpha$)", 
     weight="bold",
+)
+
+fig.text(
+    0.48, 
+    0.46,
+    r"np.fft.fft2($Packed$ $Cube$)",
+    weight="bold",
+    rotation=17,
+)
+fig.text(
+    0.48, 
+    0.38,
+    r"np.fft.ifft2($Packed$ $Cube$)",
+    weight="bold",
+    rotation=17,
 )
 
 fig.set_size_inches(13, 8)
