@@ -37,6 +37,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    tutorials/gridder
    tutorials/optimization
    tutorials/crossvalidation
+   tutorials/initializedirtyimage
 
 .. toctree::
    :hidden:
