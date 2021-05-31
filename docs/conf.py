@@ -50,9 +50,7 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # nbsphinx configuration
-suppress_warnings = [
-    "nbsphinx",
-]
+suppress_warnings = ["nbsphinx"]
 
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_format='retina'",

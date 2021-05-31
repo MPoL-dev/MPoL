@@ -120,6 +120,9 @@ venv/
 # notebooks produced from jupytext
 docs/tutorials/*.ipynb
 
+# tensorboard outputs
+docs/tutorials/runs
+
 # testing cache
 tmp_cache
 
