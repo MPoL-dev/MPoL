@@ -158,7 +158,7 @@ display.Image(b64decode(multivarL2Node_img_data))
 # We can calculate $\frac{\partial f}{\partial a}$, $\frac{\partial f}{\partial b}$, and $\frac{\partial f}{\partial c}$ by using f.backward(). Recall that <code>torch.autograd.backward()</code> will only compute the sum of gradients with respect to **leaf nodes**. This is accomplished using the chain rule.
 
 # In the case of df/da, we see that this can be obtained by:
-# $ \frac{\partial f}{\partial a} = \frac{\partial f}{\partial d} \frac{\partial d}{\partial a} $
+# $ \frac{\partial f}{\partial a}$ = $\frac{\partial f}{\partial d} \frac{\partial d}{\partial a} $
 # Where <code>torch.autograd.backward()</code>  obtains values for each of the partial derivatives along each of the edges in the computational graphs.
 
 f.backward()
