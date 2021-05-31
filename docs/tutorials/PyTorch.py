@@ -71,3 +71,43 @@ print(f"Torch tensor multiplication result: {prod_tensor}")
 
 x = torch.tensor(3.0, requires_grad=True)  # create a tensor with a single 3
 x
+
+# ## Calculation of Gradients
+
+# ## Calculation of Gradients
+
+# PyTorch also allows us to to calculate the gradients on tensors.
+#
+# Let's define some variable y in terms of x:
+
+y = x ** 2
+
+#  When we plug in <code> x </code> from the previous section we find that the output is what we would expect had we plugged <3.> into the function:
+
+print(f"y: {y}")
+print(f"x: {x}")
+
+# Going back to our function, if we calculated the gradient by hand using calculus we would expect dy/dx = 2*x and the gradient evaluated for our original value <code> x </code> would be <6.>.
+#
+# We can see if PyTorch gets the same answer as us if we do:
+
+y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
+x.grad  # returns the grad attribute (the gradient) of y with respect to x
+
+# It works! But what does it mean? Instead of computing the derivative as we would by hand, the program is using a computational graph.
+
+# First we create a tensor object x. This creates a [leaf](https://pytorch.org/docs/master/generated/torch.Tensor.is_leaf.html) on our computational graph. Right now, <code> x.grad = None </code> because we haven't inserted any code to tell the program to compute the gradient.
+
+# ![Xleaf.png](attachment:Xleaf.png)
+
+# Then we perform an operation on x to get y. We are traversing forward on the computational graph. Recall, when we first created the x tensor we set <code> requires_grad = True </code> This indicates that we want the computer to keep track of what operations we perform on x.
+
+# ![Ynode.png](attachment:Ynode.png)
+
+# When we want the gradient to be computed we use <code> y.backward() </code>. **Leaf variables** with <code> requires_grad = True </code> that are connected to y will have the <code> grad </code> property populated with the derivative of y with respect to that leaf variable. In this case, dy/dx. We are traversing backward through the computational graph.
+#
+# In the scope of this tutorial we are looking at the gradients of scalar tensors (only containing one element). In the case of non-tensor scalars the parameter [grad_tensors](https://pytorch.org/docs/stable/autograd.html) would need to be specified in the backward function in order to not receive an error.
+
+# ![ybackward.png](attachment:ybackward.png)
+
+# To see what x.grad is we must run <code> x.grad </code>
