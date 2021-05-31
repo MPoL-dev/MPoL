@@ -111,3 +111,59 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 # ![ybackward.png](attachment:ybackward.png)
 
 # To see what x.grad is we must run <code> x.grad </code>
+
+# ##### Multivariable functions
+#
+# This process can also be done on multivariable functions. We can start with three tensors:
+
+a = torch.tensor(4.0, requires_grad=True)
+b = torch.tensor(5.0, requires_grad=True)
+c = torch.tensor(6.0, requires_grad=True)
+
+# This gives us 3 leaves on our computational graph:
+
+# ![MultivarLeaves.png](attachment:MultivarLeaves.png)
+
+# We can create new variables by performing operations on a, b, and c:
+
+d = a + b
+e = 3 * c
+
+#  Since we have <code> requires_grad = True </code>, these changes are tracked through the computational graph. This creates the two nodes on our computational graph:
+
+# ![MultivarL1Nodes.png](attachment:MultivarL1Nodes.png)
+
+# We can create one more variable by performing operations on d and e:
+
+f = e - d
+print(f"f: {f}")
+
+# This creates what will be our final layer, with our last node, on our computational graph:
+
+# ![MultivarL2Node.png](attachment:MultivarL2Node.png)
+
+# We can calculate $\frac{\partial f}{\partial a}$, $\frac{\partial f}{\partial b}$, and $\frac{\partial f}{\partial c}$ by using f.backward(). Recall that <code>torch.autograd.backward()</code> will only compute the sum of gradients with respect to **leaf nodes**. This is accomplished using the chain rule.
+
+# In the case of df/da, we see that this can be obtained by:
+#
+#
+# $ \frac{\partial f}{\partial a} = \frac{\partial f}{\partial d} \frac{\partial d}{\partial a} $
+#
+#
+# Where <code>torch.autograd.backward()</code>  obtains values for each of the partial derivatives along each of the edges in the computational graphs.
+
+f.backward()
+
+# ![MultivarGradPop.png](attachment:MultivarGradPop.png)
+
+print(f"a.grad = {a.grad}")
+print(f"b.grad = {b.grad}")
+print(f"c.grad = {c.grad}")
+
+# When we try <code> d.grad </code> we get a warning:
+
+d.grad
+
+# This is because <code> y.backward() </code> only populates grad attributes of **leaves** not nodes.
+#
+# Another thing to note, if there were multiple paths connecting a leaf to a tensor, the grad attribute would be calculated by (1) Multiplying the partial derivatives along each edge of a single path together (2) Adding up the products of each path together.  To see an example of this go [here](https://blog.paperspace.com/pytorch-101-understanding-graphs-and-automatic-differentiation/)
