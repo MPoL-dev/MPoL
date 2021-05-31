@@ -14,7 +14,7 @@ help:
 
 .PHONY: help Makefile html clean
 
-NOTEBOOKS := tutorials/gridder.ipynb tutorials/optimization.ipynb tutorials/crossvalidation.ipynb
+NOTEBOOKS := tutorials/PyTorch.ipynb tutorials/gridder.ipynb tutorials/optimization.ipynb tutorials/crossvalidation.ipynb
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 
 clean:
