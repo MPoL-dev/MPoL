@@ -22,13 +22,13 @@
 
 # # Introduction to PyTorch Tensors and Gradient Descent
 
-# This tutorial covers how to initialize tensors, calculate gradients, and optimize a function using gradient descent.
+# This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.
 #
 # ## Introduction to Tensors
 #
-# Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). These are useful in RML imaging for the usual purposes of matrices (i.e. multiple variables pointing to one data point), for their automatic differentiation capabilities when cleaning up an image and their fast processing time.
+# Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on PyTorch, and uses a form of gradient descent optimization to find the "best" image given a dataset and choice of regularizers.
 #
-# We'll start by importing the torch and numpy packages. Make sure you have [PyTorch installed](https://pytorch.org/get-started/locally/) on your device or virtual environment before proceeding.
+# We'll start this tutorial by importing the torch and numpy packages. Make sure you have [PyTorch installed](https://pytorch.org/get-started/locally/) before proceeding.
 
 import torch
 import numpy as np
@@ -43,7 +43,7 @@ a_tensor = torch.tensor(an_array)  # creates tensor of same size as an_array
 print(a_tensor)
 # -
 
-# Tensors have many parallels to numpy arrays. There are several [operations](https://pytorch.org/docs/stable/torch.html) that we can perform on tensors that we'd usually perform on numpy arrays. For example, we can multiply two numpy arrays and compare this with the multiplication of the corresponding PyTorch tensors:
+# Tensors are similar to numpy arrays---many of the same [operations](https://pytorch.org/docs/stable/torch.html) that we would perform on numpy arrays can easily be performed on PyTorch tensors. For example, we can compare how to calculate a matrix product using numpy and PyTorch
 
 # +
 another_array = np.array([[5, 6, 7], [8, 9, 0]])  # create 2x3 array
@@ -63,7 +63,7 @@ print(f"Torch tensor multiplication result: {prod_tensor}")
 
 # ## Calculating Gradients
 
-# PyTorch provides a key functionality---the ability to calculate the gradients on tensors. Let's start by creating a tensor with a single value. Here we are setting <code> requires_grad = True </code>, we'll see why this is important in a moment.
+# PyTorch provides a key functionality---the ability to calculate the gradients on tensors. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``, we'll see why this is important in a moment.
 
 x = torch.tensor(3.0, requires_grad=True)
 x
@@ -74,17 +74,17 @@ y = x ** 2
 
 #  We see that the value of $y$ is as we expect---nothing too strange here.
 
-print(f"y: {y}")
 print(f"x: {x}")
+print(f"y: {y}")
 
 # But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx} = 2*x$. The derivative evaluated at $x = 3$ is $6$.
 #
-# We can see if PyTorch gets the same answer as us if we do:
+# The magic is that can use PyTorch to get the same answer---no analytic derivative needed!
 
 y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
 x.grad  # returns the grad attribute (the gradient) of y with respect to x
 
-# PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph. This is a mechanistic application of the chain rule. For example, a tree with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of y with respect to x.
+# PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a tree with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
 
 # ## Optimizing a Function with Gradient Descent
 #
@@ -93,7 +93,7 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 # We wouldn't be able to see all the way to the bottom of the valley, but we could feel which way is down based on where we are standing. We would take steps in the downward direction and we'd know when to stop when the ground felt flat.
 #
 # One other thing we'd have to consider is our step size. If we take very small steps in the direction of the descent, it will take us a longer time than if we take larger steps. However, if we take super long steps, we might completely miss the flat part of the valley, and start ascending the other side of the valley.
-
+#
 # We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
 
 # +
@@ -103,10 +103,10 @@ def y(x_input):
 
 
 x = np.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
+plt.plot(x, y(x))
 # -
 
-# We will choose to start on the left hill at the point (-4, 16). This is an arbitrary choice, any point could've been chosen as the start:
+# We will choose some arbitrary place to start on the left side of the hill.
 
 # +
 x = np.linspace(-5, 5, 100)
@@ -228,7 +228,7 @@ plt.ylim(ymin=0, ymax=25)
 plt.show()
 # -
 
-# This works, but it takes a long time since we have several small steps. We could speed up the process by taking large steps.  We're only focused on the affects of changing the step size, so we will keep (-4, 16) as the starting point and increase the step size to $1.5$. Our first step now looks like:
+# This works, but it takes a long time since we have several small steps. We could speed up the process by taking large steps.  We're only focused on the effects of changing the step size, so we will keep (-4, 16) as the starting point and increase the step size to $1.5$. Our first step now looks like:
 
 # +
 x_large_step = np.linspace(-20, 20, 1000)
