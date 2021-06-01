@@ -68,16 +68,16 @@ print(f"Torch tensor multiplication result: {prod_tensor}")
 x = torch.tensor(3.0, requires_grad=True)
 x
 
-# Let's define some variable y in terms of x:
+# Let's define some variable $y$ in terms of $x$:
 
 y = x ** 2
 
-#  We see that the value of ``y`` is as we expect---nothing too strange here.
+#  We see that the value of $y$ is as we expect---nothing too strange here.
 
 print(f"y: {y}")
 print(f"x: {x}")
 
-# But what if we wanted to calculate the gradient of ``y`` with respect to ``x``? Using calculus, we find that the answer is dy/dx = 2*x. The derivative evaluated at ``x=3`` is ``6``.
+# But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx}$ = $2*x$. The derivative evaluated at $x$=$3$ is $6$.
 #
 # We can see if PyTorch gets the same answer as us if we do:
 
@@ -94,7 +94,7 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 #
 # One other thing we'd have to consider is our step size. If we take very small steps in the direction of the descent, it will take us a longer time than if we take larger steps. However, if we take super long steps, we might completely miss the flat part of the valley, and start ascending the other side of the valley.
 
-# We can look at the gradient descent from a more mathematical lense by looking at the graph z = t ** 2:
+# We can look at the gradient descent from a more mathematical lense by looking at the graph $z$ = $t^2$:
 
 t = np.linspace(-5, 5, 100)
 plt.plot(t, t ** 2)
@@ -179,7 +179,7 @@ plt.ylim(ymin=0, ymax=25)
 plt.show()
 # -
 
-# We would continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is <0.1:
+# We would continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
 
 # +
 t = np.linspace(-5, 5, 100)
@@ -243,7 +243,7 @@ plt.ylim(ymin=0, ymax=25)
 plt.show()
 # -
 
-# This works, but it takes a long time since we have several small steps. We could speed up the process by taking large steps. Starting at (-4,16) and increasing the step of size to 1.5 we find:
+# This works, but it takes a long time since we have several small steps. We could speed up the process by taking large steps. Starting at (-4,16) and increasing the step of size to $1.5$ we find:
 
 # +
 q = np.linspace(-20, 20, 1000)
@@ -313,7 +313,7 @@ plt.show()
 # This is why it is important to pick the proper step size- also known as the learning rate. Too small steps take a long time while steps that are too large may cause us to miss the minimum. We should pick a step size that is in between the two. For example, in this case a reasonable choice would have been `step size = 0.6`, as it would have approximately reached the minimum after 3 steps.
 #
 #
-# This process of: (1)Calculating the gradient at a point, (2) Determining if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or <0.01), and (3) Taking a step if the criterion is not met, is known as Gradient Descent.
+# This process of: (1)Calculating the gradient at a point, (2) Determining if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or $<0.01$), and (3) Taking a step if the criterion is not met, is known as Gradient Descent.
 #
 # ## Additional Resources
 #
