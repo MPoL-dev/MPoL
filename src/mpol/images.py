@@ -261,7 +261,7 @@ class ImageCube(nn.Module):
 
         w.wcs.crpix = np.array([1, 1])
         w.wcs.cdelt = (
-            np.array([self.coords.cell_size, self.coords.cell_size]) * 180.0 / np.pi
+            np.array([self.coords.cell_size, self.coords.cell_size]) / 3600
         )  # decimal degrees
         w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
 

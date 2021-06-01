@@ -109,23 +109,20 @@ gridder = gridding.Gridder(
 
 # if you don't want to specify your GridCoords object separately.
 
-# ## Gridding the visibilities
-# The next step is to average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords using the [Gridder.grid_visibilities](../api.rst#mpol.gridding.Gridder.grid_visibilities) routine. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
-
-gridder.grid_visibilities(weighting="uniform")
-
 # ## Visualizing the images
-# The gridder object now has a dense representation of the visibility data attached to it as `gridder.gridded_vis`, or separately `gridder.gridded_re` and `gridder.gridded_im`. We won't normally need to access these products directly. However, we are interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the "dirty beam" and "dirty image" by radio astronomers. Those are accessible via the following routines
+# To visualize the images, you can call [Gridder.get_dirty_image](../api.rst#mpol.gridding.Gridder.get_dirty_image). This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords and then get the diagnostic beam and image cubes that correspond to these gridded visibilities.
+# There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
+# We are usually interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the "dirty beam" and "dirty image" by radio astronomers. Those are accessible via the following routine
 
-beam = gridder.get_dirty_beam()
-img = gridder.get_dirty_image()
+img, beam = gridder.get_dirty_image(weighting="uniform")
 
 # Note that these are three dimensional image cubes with the same `nchan` as the input visibility data.
 
 print(beam.shape)
 print(img.shape)
 
-# And the image has units of "Jy/beam". Now let's visualize the central channel of these cubes
+# And the image has units of "Jy/beam". The gridder object also now has a dense representation of the visibility data attached to it as `gridder.gridded_vis`, or separately `gridder.gridded_re` and `gridder.gridded_im`, however, we won't normally need to access these products directly.
+# Now let's visualize the central channel of these cubes
 
 # +
 
