@@ -22,7 +22,7 @@
 
 # # Introduction to PyTorch Tensors and Gradient Descent
 
-# This tutorial covers how to initialize tensors, calculation of gradients, and the idea of a gradient descent.
+# This tutorial covers how to initialize tensors, calculate gradients, and optimize a function using gradient descent.
 #
 # ## Introduction to Tensors
 #
