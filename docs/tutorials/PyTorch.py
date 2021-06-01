@@ -333,11 +333,9 @@ plt.show()
 #
 # This process of:
 #
-# --- Calculating the gradient at a point
-#
-# --- Determining if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or $<0.1$)
-#
-# --- Taking a step if the criterion is not met
+# * Calculating the gradient at a point
+# * Determining if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or $<0.1$)
+# * Taking a step if the criterion is not met
 #
 #  is known as Gradient Descent.
 #
