@@ -97,37 +97,22 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 # We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
 
 # +
-# Define y(x) = x ** 2
 def y(x_input):
     y = torch.square(x_input)
     return y
 
 
-x = torch.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
 # -
 
-# We will choose some arbitrary place to start on the left side of the hill. Matplotlib.pyplot doesn't accept tensors in the parameters of functions, so we will use .item( ) to only obtain the value contained inside the tensor:
+# We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent. Tensors cannot be passed into Matplotlib.pyplot functions so we use ``.item()`` to only obtain the value within the tensor:
 
 # +
 x = torch.linspace(-5, 5, 100)
 plt.plot(x, y(x))  # plot y = x ** 2
-
 x_start = torch.tensor(
     -4.0, requires_grad=True
 )  # tensor with x coordinate of starting point
 y_start = y(x_start)  # tensor with y coordinate of starting point
-
-plt.scatter(x_start.item(), y_start.item())  # plot starting point
-plt.show()
-# -
-
-# If we plot a tangent line at this point, we see which directions we can go. As before, tensors cannot be passed into Matplotlib.pyplot functions so we use .item() to only obtain the value within the tensor:
-
-# +
-x = torch.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
-
 
 plt.scatter(x_start.item(), y_start.item())  # plot starting point
 
@@ -136,13 +121,14 @@ slope_start = (
     x_start.grad
 )  # tensor containing derivative of y = x ** 2 evaluated at x_start
 plt.plot(x, slope_start.item() * (x - x_start.item()) + y_start.item())  # tangent line
-
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
 plt.xlim(xmin=-5, xmax=5)
 plt.ylim(ymin=0, ymax=25)
 plt.show()
 # -
 
-# We see we need to go down to go toward the minimum. We take a very small step in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:
+# We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:
 #
 # $x_{new} = x_{current} - \nabla y(x_{current}) * (step \: size)$
 #
@@ -154,22 +140,17 @@ plt.show()
 #
 # - $(step \: size)$ is a value we choose that scales our steps
 #
-# This makes sense because we start at some x value and we want to get to a new x value that is closer to the minimum. In the above plot, the gradient is negative. If we were to add the gradient to our current x value that would bring us further away from the minimum to a more negative x value. This is because the gradient points in the direction of the steepest ascent while we are looking to go in the direction of the steepest descent. This is why there is a negative in the equation.
-#
-#
 # We will choose ``step_size = 0.1``:
 
 # +
 x = torch.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
+plt.plot(x, y(x), zorder=0)  # plot y = x ** 2
 
-# We chose step size of 0.1
 step_size = 0.1
 
 # Tensors containing current coordinates at the starting point we chose:
 x_current = x_start
 y_current = y(x_current)
-
 
 # To keep track of our coordinates at each step, we will create 2 lists, initialized with the values at our chosen starting point
 # These lists will be used to plot points with Matplotlib.pyplot so we use .item() to only retain the value in the tensor
@@ -199,18 +180,22 @@ y_coords.append(y_new.item())
 
 
 plt.scatter(x_coords, y_coords)  # plot points showing steps
-plt.text(-4.5, 12, "step 1")
+# replot the last point in a new color
+plt.scatter(x_coords[-1], y_coords[-1], c="C1", zorder=1)
+plt.text(-2, 5, "step 1", va="center")
 
 plt.xlim(xmin=-5, xmax=5)
-plt.ylim(ymin=0, ymax=25)
+plt.ylim(ymin=-1, ymax=25)
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
 plt.show()
 # -
 
-# The gradient at our new point is still not close to zero, meaning we haven't reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
+# The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
 
 # +
 x = torch.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
+plt.plot(x, y(x), zorder=0)  # plot y = x ** 2
 
 # We are now at our second point so we need to update our tensors containing our current coordinates
 x_current = x_new
@@ -239,17 +224,22 @@ while abs(x_current.grad) >= 0.1:  # Check to see if we're at minimum
 
 
 plt.scatter(x_coords, y_coords)  # plot points showing steps
+plt.scatter(x_coords[-1], y_coords[-1], c="C1")  # highlight last point
 
 plt.xlim(xmin=-5, xmax=5)
-plt.ylim(ymin=0, ymax=25)
+plt.ylim(ymin=-1, ymax=25)
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
 plt.show()
 # -
 
-# This works, but it takes a long time since we have several small steps. We could speed up the process by taking large steps.  We're only focused on the effects of changing the step size, so we will keep (-4, 16) as the starting point and increase the step size to $1.5$. Our first step now looks like:
+# This works, but it takes a long time since we have several small steps.
+#
+# Can we speed up the process by taking large steps? Most likely, yes. But there is a danger in taking step sizes that are too large. For example, let's repeat this exercise with a step size of $1.5$. Our first step now looks like:
 
 # +
 x_large_step = torch.linspace(-20, 20, 1000)
-plt.plot(x_large_step, y(x_large_step))  # plot y = x ** 2
+plt.plot(x_large_step, y(x_large_step), zorder=0)  # plot y = x ** 2
 
 # Current values at starting point we chose:
 x_large_step_current = torch.tensor(-4.0, requires_grad=True)
@@ -281,107 +271,30 @@ x_large_coords.append(x_large_step_new.item())
 y_large_coords.append(y_large_step_new.item())
 
 
-plt.plot(x_large_coords, y_large_coords)  # plot points showing steps
+plt.scatter(x_large_coords, y_large_coords)  # plot points showing steps
+plt.scatter(x_large_coords[-1], y_large_coords[-1], c="C1")
 
 
 plt.xlim(xmin=-20, xmax=20)
-plt.ylim(ymin=0, ymax=260)
+plt.ylim(ymin=-1, ymax=260)
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
 plt.show()
 # -
 
-# *Note the change in scale.* With only one step, we already see that we stepped over the minimum! If we look at the tangent line at this point we see that the direction of the steepest descent is now to the left instead of the right:
-
-# +
-x_large_step = torch.linspace(-20, 20, 1000)
-plt.plot(x_large_step, y(x_large_step))  # plot y = x ** 2
-
-
-plt.plot(x_large_coords, y_large_coords)  # plot points showing steps
-
-# Get new slope at current point
-y_large_step_new.backward()  # populate x_large_setp_new.grad
-slope_large_step_new = (
-    x_large_step_new.grad
-)  # tensor containing derivative of y = x ** 2 evaluated at current point
-
-
-plt.plot(
-    x_large_step,
-    slope_large_step_new.item() * (x_large_step - x_large_step_new.item())
-    + y_large_step_new.item(),
-)  # tangent line
-
-plt.xlim(xmin=-20, xmax=20)
-plt.ylim(ymin=0, ymax=260)
-plt.show()
-# -
-
-# In our attempt to continue to find the minimum, we would take a step of the same size, but now to the left. This puts us back on the left side of the valley, but now above where we started. We would be stuck going back and forth between the two sides of the valley continuing to go upward.
-
-# +
-x_large_step = torch.linspace(-20, 20, 1000)
-plt.plot(x_large_step, y(x_large_step))  # plot y = x ** 2
-
-# We are now at our second point so we need to update our current values
-x_large_step_current = x_large_step_new
-y_large_step_current = y_large_step_new
-slope_large_step_current = slope_large_step_new
-
-# We automate this process with the following while loop
-
-num_iter = 0  # To keep track of number of steps
-while abs(slope_large_step_new) >= 0.1:  # Check to see if we're at minimum
-    # Get new coordinates
-    x_large_step_new = torch.tensor(
-        x_large_step_current.item() - slope_large_step_current.item() * large_step_size,
-        requires_grad=True,
-    )
-    y_large_step_new = y(x_large_step_new)
-
-    # Add new coordinates to lists
-    x_large_coords.append(x_large_step_new.item())
-    y_large_coords.append(y_large_step_new.item())
-
-    # Update current position
-    x_large_step_current = x_large_step_new
-    y_large_step_current = y_large_step_new
-
-    # Update current slope
-    y_large_step_current.backward()  # populate slope_large_step_current.grad
-    slope_large_step_current = (
-        x_large_step_current.grad
-    )  # tensor containing derivative of y = x ** 2 evaluated at current point
-
-    # Update number of iterations
-    num_iter = num_iter + 1
-
-    # Break loop if minimum not found within 20 steps
-    if num_iter > 20:
-        break
-
-
-plt.plot(x_large_coords, y_large_coords)  # plot points showing steps
-
-
-plt.xlim(xmin=-20, xmax=20)
-plt.ylim(ymin=0, ymax=260)
-plt.show()
-# -
-
+# *Note the change in scale.* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.
 #
-# This is why it is important to pick the proper step size- also known as the learning rate. Steps that are too small take a long time while steps that are too large may cause us to miss the minimum. We should pick a step size that is in between the two. In this case, a reasonable choice would have been <code> step size = 0.6 </code>, as it would have approximately reached the minimum after 3 steps.
+# To sum up, optimizing a function with gradient descent consists of
 #
+# 1. Calculate the gradient at your current point
+# 2. Determine if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or $<0.1$), if so stop
+# 3. Otherwise, take a step in the direction of the gradient and go to #1
 #
-# This process of:
-#
-# * Calculating the gradient at a point
-# * Determining if the gradient is within the stopping criterion (in this case, the gradient is about equal to zero or $<0.1$)
-# * Taking a step if the criterion is not met
-#
-#  is known as Gradient Descent.
+# Autodifferentiation frameworks like PyTorch allow us to easily calculate the gradient of complex functions, including a large set of prior/regularizer functions that we would want to use for Regularized Maximum Likelihood (RML) imaging. This makes it relatively easy to quickly and efficiently solve for the "optimal" image given a set of data and regularizer terms.
 #
 # ## Additional Resources
 #
 # * [PyTorch documentation on autograd](https://pytorch.org/docs/stable/autograd.html)
 # * [Angus Williams' blog post on autodifferentiaton, JAX, and Laplace's method](https://anguswilliams91.github.io/statistics/computing/jax/)
 # * [Paperspace blog post on understanding graphs and automatic differentiation](https://blog.paperspace.com/pytorch-101-understanding-graphs-and-automatic-differentiation/)
+# * [3Blue1Brown video on gradient descent](https://youtu.be/IHZwWFHWa-w)
