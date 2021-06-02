@@ -62,6 +62,9 @@ nbsphinx_execute_arguments = [
 html_theme = "faculty-sphinx-theme"
 html_theme_options = {"analytics_id": "UA-5472810-8"}
 
+# https://github.com/readthedocs/sphinx_rtd_theme/issues/1145
+html_css_files = ["bullets.css"]
+
 html_logo = "logo.png"
 html_favicon = "favicon.ico"
 
