@@ -84,7 +84,7 @@ print(f"x: {x}")
 y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
 x.grad  # returns the grad attribute (the gradient) of y with respect to x
 
-# PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph. This is a mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of y with respect to x.
+# PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a tree with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
 
 # ## Optimizing a Function with Gradient Descent
 #
@@ -92,7 +92,7 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 #
 # We wouldn't be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we'd know when to stop when the ground felt flat.
 #
-# One other thing we'd have to consider is our step size. If we take very small steps in the direction of the descent, it will take us a longer time than if we were to take larger steps. However, if we take enormous steps, we might completely miss the flat part of the valley, and start ascending the other side.
+# PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a tree with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
 
 # We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
 
@@ -107,7 +107,7 @@ x = torch.linspace(-5, 5, 100)
 plt.plot(x, y(x))  # plot y = x ** 2
 # -
 
-# We will choose to start on the left hill at the point (-4, 16). This is an arbitrary choice, any point could've been chosen as the start. Matplotlib.pyplt doesn't accept tensors in the parameters of functions, so we will use .item( ) to only obtain the value contained inside the tensor:
+# We will choose some arbitrary place to start on the left side of the hill. Matplotlib.pyplot doesn't accept tensors in the parameters of functions, so we will use .item( ) to only obtain the value contained inside the tensor:
 
 # +
 x = torch.linspace(-5, 5, 100)
