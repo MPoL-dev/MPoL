@@ -20,8 +20,6 @@
 # %run notebook_setup
 # -
 
-# # Not completely done, still have to do some links do some fleshing out, just want to get it here to make sure there isn't anything critically wrong.
-#
 # ## Initializing Model with the Dirty Image
 #
 # In this tutorial we will be going over how to optimize the model based off of the dirty image. It has a low loss value (maximal likelihood) and so this allows the optimization to be much quicker. The problem with the dirty image is that certain model paramterizations enforce image positivity while the dirty image usually contains regions of negative flux. So in this tutorial we will be optimizing the model to be similar to the dirty image (phrasing could be better here). We will also be going over saving and loading the model. After saving and loading it, it can be then optimized against the visibility data to complete it (though this will not be done in this tutorial). We will be using the dataset of the ALMA logo first used in the Gridding and Diagnostic Images tutorial.
