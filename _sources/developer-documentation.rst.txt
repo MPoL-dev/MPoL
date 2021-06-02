@@ -47,7 +47,7 @@ Installing MPoL and development dependencies
 
 Then, use pip to install the MPoL package. We recommend installing the package using ::
 
-    (venv) $ pip install -e '.[dev]'
+    (venv) $ pip install -e ".[dev]"
 
 This directs pip to install whatever package is in the current working directory (``.``) as an editable package (``-e``). More information on the pip command line arguments is available via ``pip install --help``. We've additionally told pip to install the packages listed in the (``[dev]``) ``EXTRA_REQUIRES`` variable in `setup.py <https://github.com/MPoL-dev/MPoL/blob/main/setup.py>`__. This variable contains a list of all of the Python packages that you might need throughout the course of developing and testing the package (e.g., pytest). These packages are only needed when developing, building, and testing the package. They are not needed to run the package in its normal configuration, hence, they are not installed with the vanilla ``pip install MPoL``.
 
@@ -69,7 +69,7 @@ Installing dependencies
 
 If you are only interested in running the tests, you can install the more limited set of testing package dependencies via ::
 
-    $ pip install `.[test]`
+    $ pip install ".[test]"
 
 after you've cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the ``[dev]`` list is a superset of the ``[test]`` list.
 
@@ -119,11 +119,15 @@ Dependencies
 
 If you are only interested in building the documentation, you can install the more limited set of documentation package dependencies via ::
 
-    $ pip install '.[docs]'
+    $ pip install ".[docs]"
 
 after you've cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the ``[dev]`` list is a superset of the ``[docs]`` list.
 
-In addition to these Python packages, you will also need to install the `mmdc <https://github.com/mermaid-js/mermaid-cli>`__ command line tool to render several `mermaid.js <https://mermaid-js.github.io/mermaid/#/>`__ charts used to explain MPoL functionality. After installation, make sure that you can successfully run the ``mmdc`` command line utility from the ``docs/`` folder.
+In addition to these Python packages, you will also need to install the `mmdc` tool and `pandoc`.
+
+The `mmdc <https://github.com/mermaid-js/mermaid-cli>`__ command line tool is used to render several `mermaid.js <https://mermaid-js.github.io/mermaid/#/>`__ charts used to explain MPoL functionality. After installation, make sure that you can successfully run the ``mmdc`` command line utility from the ``docs/`` folder.
+
+Installation instructions for ``pandoc`` can be found `here <https://pandoc.org/installing.html>`__, if it isn't already installed on your system.
 
 Building the Documentation
 --------------------------
@@ -190,7 +194,7 @@ To write a tutorial:
 
 1. copy and rename one of the existing ``.py`` files in ``docs/tutorials/`` to ``docs/tutorials/your-new-tutorial``, being sure to keep the header metadata
 2. start a Jupyter notebook kernel
-3. open the ``.py`` file as a notebook and edit it like you would any other Jupyter notebook. If you've already installed the `jupytext <https://jupytext.readthedocs.io/en/latest/>`_ tool (as part of ``pip install -e '.[dev]'``), your changes in the Jupyter notebook window should be automatically saved back to the ``.py`` file. As you progress, make sure you commit your changes in the ``.py`` file back to the repository (but don't commit the ``.ipynb`` file).
+3. open the ``.py`` file as a notebook and edit it like you would any other Jupyter notebook. If you've already installed the `jupytext <https://jupytext.readthedocs.io/en/latest/>`_ tool (as part of ``pip install -e ".[dev]"``), your changes in the Jupyter notebook window should be automatically saved back to the ``.py`` file. As you progress, make sure you commit your changes in the ``.py`` file back to the repository (but don't commit the ``.ipynb`` file).
 
 When done, add a reference to your tutorial in the table of contents in ``docs/index.rst``. E.g., if your contribution is the ``tutorials/gridder.py`` file, add a ``tutorials/gridder`` line. You should also add the name of your tutorial with the ``.ipynb`` extension (e.g., ``tutorials/gridder.ipynb``) to the ``NOTEBOOKS`` variable in ``docs/Makefile``.
 
