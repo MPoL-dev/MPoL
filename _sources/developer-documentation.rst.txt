@@ -125,7 +125,7 @@ after you've cloned the repository and changed to the root of the repository. Ot
 
 In addition to these Python packages, you will also need to install the `mmdc` tool and `pandoc`.
 
-The `mmdc <https://github.com/mermaid-js/mermaid-cli>`__ command line tool is used to render several `mermaid.js <https://mermaid-js.github.io/mermaid/#/>`__ charts used to explain MPoL functionality. After installation, make sure that you can successfully run the ``mmdc`` command line utility from the ``docs/`` folder.
+The `mmdc <https://github.com/mermaid-js/mermaid-cli>`__ command line tool is used to render several `mermaid.js <https://mermaid-js.github.io/mermaid/#/>`__ charts used to explain MPoL functionality. After installation, make sure that you can successfully run the ``mmdc`` command line utility from the ``docs/`` folder. Note that you will specifically want to install the ``mermaid-cli`` package (linked `here <https://github.com/mermaid-js/mermaid-cli>`__). There are outdated versions of the package available under the name ``mermaid.cli`` which will not build the MPoL charts correctly.
 
 Installation instructions for ``pandoc`` can be found `here <https://pandoc.org/installing.html>`__, if it isn't already installed on your system.
 
