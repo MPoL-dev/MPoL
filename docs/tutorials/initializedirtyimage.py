@@ -104,11 +104,7 @@ rml.state_dict()  # parameters of the model
 
 # The loss function that will be used to optimize the initial part of the image is the pixel-to-pixel L2 norm (also known as the Euclidian Norm). It calculates the loss based off of the image-plane distance between the dirty image and the state of the ImageCube in order to make the state of the ImageCube closer to the dirty image.
 #
-# The L2 Norm (Euclidian Norm) is based off of the euclidian distance function and it takes the form of: $ L_{oss} = \sqrt{\sum_{i=1}^{N} (y_i - x_i)^2}  $
-
-
-def l2norm(sky, dirt):
-    return ((torch.sum((sky - dirt) ** 2))) ** 0.5
+# The L2 Norm (Euclidian Norm) is based off of the euclidian distance function and it takes the form of: $ L_{oss} = \sqrt{\sum_{i=1}^{N} (y_i - x_i)^2}  $. Pytorch provides a loss function for mean squared error which is the squared L2 norm so we will be using the squareroot of that.
 
 
 # ### Training Loop
@@ -128,20 +124,22 @@ for iteration in range(50):
 
     sky_cube = rml.icube.sky_cube
 
-    # lossfunc = torch.nn.MSELoss(reduction='sum')  #the MSELoss calculates mean squared error (squared L2 norm), so we take sqrt of it
-    # loss = (lossfunc(sky_cube,dirty_image))**.5 #https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html
-
-    loss = l2norm(sky_cube, dirty_image)
+    lossfunc = torch.nn.MSELoss(
+        reduction="sum"
+    )  # the MSELoss calculates mean squared error (squared L2 norm), so we take the sqrt of it
+    loss = (
+        lossfunc(sky_cube, dirty_image)
+    ) ** 0.5  # https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html
 
     loss_tracker.append(loss.item())
     loss.backward()
     optimizer.step()
-# torch.save(rml, "dirty_image_model.pt")
+
 torch.save(rml.state_dict(), "dirty_image_model.pt")
 # -
 
-# We also can save the state of the model or the entire model itself. The torch.save(model.state_dict(), PATH) will just save the state.dict() which are the model's learned parameters. The alternative will save the entire model.
-# https://pytorch.org/tutorials/beginner/saving_loading_models.html
+# We also can save the state of the model. The [torch.save(model.state_dict(), PATH)](https://pytorch.org/tutorials/beginner/saving_loading_models.html) will save the state.dict() which are the model's learned parameters.
+#
 
 # ### Results
 
