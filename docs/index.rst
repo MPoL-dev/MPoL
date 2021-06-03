@@ -34,6 +34,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    :maxdepth: 2
    :caption: Tutorials
 
+   tutorials/PyTorch
    tutorials/gridder
    tutorials/optimization
    tutorials/crossvalidation
