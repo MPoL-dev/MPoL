@@ -46,4 +46,4 @@ Using CUDA acceleration
 -----------------------
 MPoL uses PyTorch for its Neural Networks as seen in the `Optimization Loop` tutorial. If you are interested in using PyTorch's full potential by utilizing a Nvidia graphics card, then the CUDA tool kit will need to be installed (TensorVision is also required). More information on this is available in the `GPU Tutorial` page. It is worth noting that PyTorch may need to be (re)installed separately using a specific `pip` for your system.
 
-More information on this can be found on the PyTorch homepage: `pytorch.org <pytorch.org>`_.
+More information on this can be found on the PyTorch homepage: `pytorch.org <pytorch.org>`__.
