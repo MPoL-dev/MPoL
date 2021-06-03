@@ -74,12 +74,6 @@ faster*
     C = A + B
     print(time.time() - start)
 
-
-.. parsed-literal::
-
-    0.07879066467285156
-    
-
 .. code:: ipython3
 
     torch.cuda.empty_cache() # emptying the cache on the gpu just incase there was any memory left over from an old operation
@@ -91,12 +85,6 @@ faster*
     start = time.time()
     C = A + B
     print(time.time() - start)
-
-
-.. parsed-literal::
-
-    0.039895057678222656
-    
 
 Part 2
 ======
