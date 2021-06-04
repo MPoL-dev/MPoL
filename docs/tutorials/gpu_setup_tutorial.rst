@@ -116,7 +116,7 @@ will assume that ``device=cuda:0``. *Note: ‘cuda:0’ is technically only
 required if you have more than one GPU, if ``device='cuda'`` then
 PyTorch will use the default cuda device.*
 
-Now that we have our device set, let's create some data-filled tensor
+Now that we have our device set, let us create some data-filled tensor
 objects from the mock ALMA dataset. This is a multi-channel dataset
 which is represented as a data cube. Here we will use the central
 channel of the cube for demonstration purposes, this corresponds to
@@ -144,7 +144,7 @@ channel of the cube for demonstration purposes, this corresponds to
     )
     dataset = gridder.to_pytorch_dataset()
 
-Now let's create a SimpleNet Neural Network that we will train with our
+Now let us create a SimpleNet Neural Network that we will train with our
 data. A SimpleNet, as defined by MPoL, is a combination of the most
 common modules for imaging. For a visual and for more detailed
 information, see the `Optimization
@@ -224,5 +224,5 @@ is the same SimpleNet as used in MPoL tutorial `Cross
 Validation <https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html>`__.
 As seen, the process for running on the GPU is rather simple. Once your
 CUDA device has been set-up, it only requires moving the data and the
-net to the GPU.
+net to the GPU. 
 
