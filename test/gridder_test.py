@@ -127,7 +127,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     assert pytest.approx(np.max(gridder.data_im_gridded), 1)
 
     im = plt.imshow(
-        gridder.sky_vis_gridded[4].real, origin="lower", extent=gridder.coords.vis_ext
+        gridder.ground_cube[4].real, origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)

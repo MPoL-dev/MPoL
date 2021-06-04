@@ -269,7 +269,9 @@ class Gridder:
 
     def _grid_weights(self):
         r"""
-        Grid the weights to the Fourier grid, to be used when preparing a PyTorch dataset.
+        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
+        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
+        within that cell.
         """
 
         # create the cells as edges around the existing points
@@ -287,7 +289,11 @@ class Gridder:
         """
         Compute the dirty beam corresponding to the gridded visibilities.
 
-        Returns: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.
+        Args:
+            None
+
+        Returns:
+            numpy image cube with a dirty beam (PSF) for each channel. By definition, the peak is normalized to 1.0.
         """
         # if we're sticking to the dirty beam and image equations in Briggs' Ph.D. thesis,
         # no correction for du or dv prefactors needed here
@@ -394,7 +400,12 @@ class Gridder:
         return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
 
     def get_dirty_image(
-        self, weighting="uniform", robust=None, taper_function=None, unit="Jy/beam"
+        self,
+        weighting="uniform",
+        robust=None,
+        taper_function=None,
+        unit="Jy/beam",
+        **beam_kwargs
     ):
         """
         Calculate the dirty image.
@@ -404,6 +415,7 @@ class Gridder:
             robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
             unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
+            **beam_kwargs: all additional keyword arguments passed to :func:`~mpol.gridding.get_dirty_beam_area` if ``unit="Jy/arcsec^2"``.
 
         Returns: image,beam where
                  image: (nchan, npix, npix) numpy array of the dirty image cube.
@@ -432,7 +444,7 @@ class Gridder:
         # uniform weighting. The relationships get more complex for robust or natural weighting, however,
         # so it's safer to calculate the number of arcseconds^2 per beam
         if unit == "Jy/arcsec^2":
-            beam_area_per_chan = self.get_dirty_beam_area()  # [arcsec^2]
+            beam_area_per_chan = self.get_dirty_beam_area(**beam_kwargs)  # [arcsec^2]
 
             # convert image
             # (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)
@@ -444,11 +456,7 @@ class Gridder:
             np.max(img.imag) < 1e-10
         ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
 
-        self.img = img.real
-
-        self.get_dirty_beam()
-
-        return self.img, self.beam
+        return img.real, self.get_dirty_beam()
 
     def to_pytorch_dataset(self):
         """
@@ -476,7 +484,7 @@ class Gridder:
         )
 
     @property
-    def sky_vis_gridded(self):
+    def ground_cube(self):
         r"""
         The visibility FFT cube fftshifted for plotting with ``imshow``.
 
