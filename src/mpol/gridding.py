@@ -108,34 +108,49 @@ class Gridder:
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
 
-    def _histogram_channel(self, uu, vv, channel_weight):
+    def _sum_cell_values_channel(self, uu, vv, values=None):
         r"""
-        Perform a 2D histogram over the Fourier grid defined by ``coords``.
+        Given a list of loose visibility points :math:`(u,v)` and their corresponding values :math:`x`,
+        partition the points up into 2D :math:`u-v` cells defined by the ``coords`` object attached to
+        the gridder, such that ``cell[i,j]`` has bounds between ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``.
+        Then, sum the corresponding values for each :math:`(u,v)` point that falls within each cell. The resulting
+        cell value is
+
+        .. math::
+
+            \mathrm{result}_{i,j} = \sum_k \mathrm{values}_k
+
+        where :math:`k` indexes all :math:`(u,v)` points that fall within ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``. In the case that all values are :math:`1`, the result is the number of visibilities within each cell (i.e., a histogram).
 
         Args:
             uu (np.array): 1D array of East-West spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
             vv: 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
-            channel_weight (np.array): 1D array of weights to use in the histogramming.
+            values (np.array): 1D array of values (the same length as uu and vv) to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.
 
+        Returns:
+            A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.
         """
-        # order is swapped because of the way the image looks
 
         result = np.histogram2d(
             vv,
             uu,
             bins=[self.coords.v_edges, self.coords.u_edges],
-            weights=channel_weight,
+            weights=values,
         )
 
         # only return the "H" value
         return result[0]
 
-    def _histogram_cube(self, weight):
+    def _sum_cell_values_cube(self, values=None):
         r"""
-        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..
+        Perform the :func:`~mpol.gridding.Gridder.sum_cell_values_channel` routine over all channels of the
+        input visibilities.
 
         Args:
-            weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.
+            values (iterable): ``(nchan, nvis)`` array of values to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.
+
+        Returns:
+            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the summed cell quantities.
 
         """
         # calculate the histogrammed result for all channels
@@ -145,7 +160,7 @@ class Gridder:
         )
 
         for i in range(self.nchan):
-            cube[i] = self._histogram_channel(self.uu[i], self.vv[i], weight[i])
+            cube[i] = self._sum_cell_values_channel(self.uu[i], self.vv[i], values[i])
 
         return cube
 
@@ -167,7 +182,7 @@ class Gridder:
         # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
         # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._histogram_cube(self.weight)
+        cell_weight = self._sum_cell_values_cube(self.weight)
 
         # boolean index for cells that *contain* visibilities
         mask = cell_weight > 0.0
@@ -230,18 +245,18 @@ class Gridder:
         self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
-        # outputs from _histogram_cube are *not* pre-packed
-        data_re_gridded = self._histogram_cube(
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
             self.data_re * tapering_weight * density_weight * self.weight
         )
 
-        data_im_gridded = self._histogram_cube(
+        data_im_gridded = self._sum_cell_values_cube(
             self.data_im * tapering_weight * density_weight * self.weight
         )
 
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
-        re_gridded_beam = self._histogram_cube(
+        re_gridded_beam = self._sum_cell_values_cube(
             tapering_weight * density_weight * self.weight
         )
 
@@ -260,7 +275,7 @@ class Gridder:
         # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
         # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._histogram_cube(self.weight)
+        cell_weight = self._sum_cell_values_cube(self.weight)
 
         # instantiate uncertainties for each averaged visibility.
         self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
