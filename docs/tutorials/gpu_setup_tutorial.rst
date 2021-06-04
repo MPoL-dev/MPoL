@@ -58,7 +58,7 @@ computing speeds for large volumes of data. Since MPoL works with
 images, the switch to the GPU for training Neural Networks causes a
 significant boost to training speed. For a quick example on this,
 consult the code below. For a specific run, the time decreased from
-0.133 seconds the CPU to 0.0349 seconds on a GPU for this simple
+0.133 seconds on the CPU to 0.0349 seconds on a GPU for this simple
 operation. *Note: timing will change run to run, but in general running
 operations on the GPU, especially for a large amount of operations, is
 faster*
@@ -116,7 +116,7 @@ will assume that ``device=cuda:0``. *Note: ‘cuda:0’ is technically only
 required if you have more than one GPU, if ``device='cuda'`` then
 PyTorch will use the default cuda device.*
 
-Now that we have our device set, lets create some data-filled tensor
+Now that we have our device set, let's create some data-filled tensor
 objects from the mock ALMA dataset. This is a multi-channel dataset
 which is represented as a data cube. Here we will use the central
 channel of the cube for demonstration purposes, this corresponds to
@@ -144,7 +144,7 @@ channel of the cube for demonstration purposes, this corresponds to
     )
     dataset = gridder.to_pytorch_dataset()
 
-Now lets create a SimpleNet Neural Network that we will train with our
+Now let's create a SimpleNet Neural Network that we will train with our
 data. A SimpleNet, as defined by MPoL, is a combination of the most
 common modules for imaging. For a visual and for more detailed
 information, see the `Optimization
@@ -176,7 +176,7 @@ due to the strong cross validation score they result in. For more
 details on these variables, see the `Cross Validation
 Tutorial <https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html>`__.
 
-*Note: GriddedDataset objects also enherits a
+*Note: GriddedDataset objects also inherits a
 ``GriddedDataset.to(device)`` function that works similarly to
 PyTorch’s*
 
