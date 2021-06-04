@@ -157,6 +157,10 @@ class Gridder:
             dtype="float",
         )
 
+        if values is None:
+            # pass None to every channel
+            values = [None] * self.nchan
+
         for i in range(self.nchan):
             cube[i] = self._sum_cell_values_channel(self.uu[i], self.vv[i], values[i])
 

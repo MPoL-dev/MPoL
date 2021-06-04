@@ -136,9 +136,84 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
 
 # test the standard deviation estimation routines
-def test_estimate_standard_deviation(mock_visibility_data):
+def test_estimate_standard_deviation(mock_visibility_data, tmp_path):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    pass
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = 0.1 * np.ones_like(uu)
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    s_re, s_im = gridder.estimate_cell_standard_deviation()
+
+    chan = 4
+
+    fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
+
+    im = ax[0].imshow(s_re[chan], origin="lower", extent=gridder.coords.vis_ext)
+    ax[0].set_title(r"$s_{i,j}$ real")
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(s_im[chan], origin="lower", extent=gridder.coords.vis_ext)
+    ax[1].set_title(r"$s_{i,j}$ imag")
+    plt.colorbar(im, ax=ax[1])
+
+    plt.savefig(tmp_path / "standard_deviation_correct.png", dpi=300)
+
+    plt.close("all")
+
+
+def test_estimate_standard_deviation_large(mock_visibility_data, tmp_path):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
+
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = 0.1 * np.ones_like(uu)
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(
+        loc=0, scale=2 * sigma, size=uu.shape
+    )
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    s_re, s_im = gridder.estimate_cell_standard_deviation()
+
+    chan = 4
+
+    fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
+
+    im = ax[0].imshow(s_re[chan], origin="lower", extent=gridder.coords.vis_ext)
+    ax[0].set_title(r"$s_{i,j}$ real")
+    plt.colorbar(im, ax=ax[0])
+
+    im = ax[1].imshow(s_im[chan], origin="lower", extent=gridder.coords.vis_ext)
+    ax[1].set_title(r"$s_{i,j}$ imag")
+    plt.colorbar(im, ax=ax[1])
+
+    plt.savefig(tmp_path / "standard_deviation_large.png", dpi=300)
+
+    plt.close("all")
 
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
