@@ -45,11 +45,9 @@ class Gridder:
 
     The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
-    Once the loose visibilities are attached, the user can decide how to 'grid', or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.
+    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
 
-    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine. Note that you must average the visiblities with ``weighting='uniform'``, otherwise the probabilistic interpretation is invalid.
-
-    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded with :func:`~mpol.gridding.Gridder.grid_visibilities`, these are available via the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
+    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
@@ -164,6 +162,24 @@ class Gridder:
 
         return cube
 
+    def _extract_gridded_values_to_loose(self, gridded_quantity):
+        r"""
+        Extract the gridded cell quantity corresponding to each of the loose visibilities.
+
+        Args:
+            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the gridded cell quantities.
+
+        Returns:
+            A ``(nchan, nvis)`` array of values corresponding to the loose visibilities, using the quantity in that cell.
+        """
+
+        return np.array(
+            [
+                gridded_quantity[i][self.index_v[i], self.index_u[i]]
+                for i in range(self.nchan)
+            ]
+        )
+
     def _grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
         r"""
         Grid the loose data visibilities to the Fourier grid in preparation for imaging.
@@ -195,12 +211,7 @@ class Gridder:
             # cell_weight is (nchan, ncell_v, ncell_u)
             # self.index_v, self.index_u are (nchan, nvis)
             # we want density_weights to be (nchan, nvis)
-            density_weight = 1 / np.array(
-                [
-                    cell_weight[i][self.index_v[i], self.index_u[i]]
-                    for i in range(self.nchan)
-                ]
-            )
+            density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
 
         elif weighting == "briggs":
             if robust is None:
@@ -227,12 +238,8 @@ class Gridder:
             cell_robust_weight[~mask] = 0
 
             # now assign the cell robust weight to each visibility within that cell
-            density_weight = np.array(
-                [
-                    cell_robust_weight[i][self.index_v[i], self.index_u[i]]
-                    for i in range(self.nchan)
-                ]
-            )
+            density_weight = self._extract_gridded_values_to_loose(cell_robust_weight)
+
         else:
             raise ValueError(
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
@@ -281,6 +288,79 @@ class Gridder:
 
         # instantiate uncertainties for each averaged visibility.
         self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
+
+    def estimate_cell_standard_deviation(self):
+        r"""
+        Estimate the `standard deviation <https://en.wikipedia.org/wiki/Standard_deviation>`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.
+
+        1. Calculate the mean real :math:`\mu_\Re` and imaginary :math:`\mu_\Im` values within each cell using a weighted mean, assuming that the visibility function is constant across the cell.
+        2. For each visibility :math:`k` that falls within the cell, calculate the real and imaginary residuals (:math:`r_\Re` and :math:`r_\Im`) in units of :math:`\sigma_k`, where :math:`\sigma_k = \sqrt{1/w_k}` and :math:`w_k` is the weight of that visibility.
+        3. Calculate the standard deviation :math:`s_{i,j}` of the residual distributions within each cell
+
+        .. math::
+
+            s_{i,j} = \sqrt{\frac{1}{N} \sum_k \left (\sigma_k - \bar{\sigma}_{i,j} \right )^2}
+
+        where :math:`\bar{\sigma}_{i,j}` is first estimated as
+
+        .. math::
+
+            \bar{\sigma}_{i,j} = \frac{1}{N} \sum_k \sigma_k
+
+
+        Returns:
+            std_real, std_imag: two 3D arrays of size ``(nchan, npix, npix)`` in ground format containing the standard deviation of the real and imaginary values within each cell, in units of :math:`\sigma`. If everything is correctly calibrated, we expect :math:`s_{i,j} \approx 1 \forall i,j`.
+
+        """
+
+        # 1. use the gridding routine to calculate the mean real and imaginary values on the grid
+        self._grid_visibilities(weighting="uniform")
+
+        # convert grid back to ground format
+        mu_re_gridded = np.fft.fftshift(self.data_re_gridded, axes=(1, 2))
+        mu_im_gridded = np.fft.fftshift(self.data_im_gridded, axes=(1, 2))
+
+        # extract the real and imaginary values corresponding to the "loose" visibilities
+        # mu_re_gridded and mu_im_gridded are arrays with shape (nchan, ncell_v, ncell_u)
+        # self.index_v, self.index_u are (nchan, nvis)
+        # we want mu_re and mu_im to be (nchan, nvis)
+        mu_re = self._extract_gridded_values_to_loose(mu_re_gridded)
+        mu_im = self._extract_gridded_values_to_loose(mu_im_gridded)
+
+        # 2. calculate the real and imaginary residuals for the loose visibilities
+        # 1/sigma = np.sqrt(weight)
+        residual_re = (self.data_re - mu_re) * np.sqrt(self.weight)
+        residual_im = (self.data_im - mu_im) * np.sqrt(self.weight)
+
+        # 3. calculate the standard deviation of the residual visibilities
+
+        # 3.1 first calculate the mean residuals
+        # calculate the number of visibilities with each cell
+        nvis_cell_grid = self._sum_cell_values_cube()
+        # extract this out as a quantity for each visibility
+        nvis_cell_loose = self._extract_gridded_values_to_loose(nvis_cell_grid)
+
+        # calculate the mean residuals
+        # sum residual values
+        bar_sigma_re = self._sum_cell_values_cube(residual_re / nvis_cell_loose)
+        bar_sigma_im = self._sum_cell_values_cube(residual_im / nvis_cell_loose)
+        # extract back to loose
+        bar_sigma_re_loose = self._extract_gridded_values_to_loose(bar_sigma_re)
+        bar_sigma_im_loose = self._extract_gridded_values_to_loose(bar_sigma_im)
+
+        # 3.2 calculate the standard deviation of the residuals
+        s_re = np.sqrt(
+            self._sum_cell_values_cube(
+                (residual_re - bar_sigma_re_loose) ** 2 / nvis_cell_loose
+            )
+        )
+        s_im = np.sqrt(
+            self._sum_cell_values_cube(
+                (residual_im - bar_sigma_im_loose) ** 2 / nvis_cell_loose
+            )
+        )
+
+        return s_re, s_im
 
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]

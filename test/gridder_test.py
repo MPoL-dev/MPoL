@@ -135,6 +135,12 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.close("all")
 
 
+# test the standard deviation estimation routines
+def test_estimate_standard_deviation(mock_visibility_data):
+
+    pass
+
+
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
 @pytest.fixture
 def gridder(mock_visibility_data):
