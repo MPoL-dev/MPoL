@@ -44,11 +44,10 @@ to the `PyTorch Official Site <https://pytorch.org/>`__ and scroll down
 on the page until you see the **Install PyTorch** section. Input your
 specifications for your needs into this area and use the text that is
 generated for your install. In the making of this tutorial, one Windows
-10 system using a Nvidia GTX 1080 required
-specific pip installation while another Windows 10 system using a 
-Nvidia GTX 1660Ti worked with ``pip install torch torchvision``. 
-It is unclear why one system may require one installation command over
-another.
+10 system using a Nvidia GTX 1080 required specific pip installation
+while another Windows 10 system using a Nvidia GTX 1660Ti worked with 
+``pip install torch torchvision``. It is unclear why one system may
+require one installation command over another.
 
 Why is This Important?
 ~~~~~~~~~~~~~~~~~~~~~~
