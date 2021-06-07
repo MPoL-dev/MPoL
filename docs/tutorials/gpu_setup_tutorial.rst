@@ -45,10 +45,10 @@ on the page until you see the **Install PyTorch** section. Input your
 specifications for your needs into this area and use the text that is
 generated for your install. In the making of this tutorial, one Windows
 10 system using a Nvidia GTX 1080 required
-``pip3 install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio===0.8.1 -f https://download.pytorch.org/whl/torch_stable.html``
-while another Windows 10 system using a Nvidia GTX 1660Ti worked with
-``pip install torch torchvision``. It is unclear why one system may
-require one installation command over another.
+specific pip installation while another Windows 10 system using a 
+Nvidia GTX 1660Ti worked with ``pip install torch torchvision``. 
+It is unclear why one system may require one installation command over
+another.
 
 Why is This Important?
 ~~~~~~~~~~~~~~~~~~~~~~
