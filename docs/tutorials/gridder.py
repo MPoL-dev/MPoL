@@ -149,8 +149,8 @@ fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
 # When working with real data, it is possible that the uncertainties, or weights, were not correctly calibrated. This could result in misleading images, so it is important to check your data weights. The `get_dirty_image` routine includes this functionality:
 
 img, beam = gridder.get_dirty_image(
-    weighting="uniform", check_visibility_scatter=True, max_scatter=1.0
+    weighting="uniform", check_visibility_scatter=True, max_scatter=1.2
 )
 
 # When `check_visibility_scatter=True` the `get_dirty_image` routine will compute the standard deviation of both real and imaginary visibility values in each cell (which we defined with GridCoords earlier). If the standard deviation of any cell is higher than the `max_scatter` threshold, the routine will raise an error urging the user to carefully check the data weights.
-# We actually already checked this earlier in the tutorial, as `check_visibility_scatter=True` by default. The default value for `max_scatter` is $\sqrt{2}$. Because no error was raised, we assume that this data set has a reasonable amout of visibility scatter within each cell.
+# We actually already checked this earlier in the tutorial, as `check_visibility_scatter=True` by default. The default value for `max_scatter` is 1.2. Because no error was raised, we assume that this data set has a reasonable amout of visibility scatter within each cell.

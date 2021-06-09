@@ -500,7 +500,7 @@ class Gridder:
         taper_function=None,
         unit="Jy/beam",
         check_visibility_scatter=True,
-        max_scatter=np.sqrt(2),
+        max_scatter=1.2,
         **beam_kwargs
     ):
         """
@@ -512,7 +512,7 @@ class Gridder:
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
             unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
             check_visibility_scatter (bool): whether the routine should check the standard deviation of visiblities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an exception if any cell has a scatter larger than ``max_scatter``.
-            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to ``np.sqrt(2)``.
+            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to 1.2.
             **beam_kwargs: all additional keyword arguments passed to :func:`~mpol.gridding.get_dirty_beam_area` if ``unit="Jy/arcsec^2"``.
 
         Returns: image,beam where
@@ -559,13 +559,13 @@ class Gridder:
 
         return img.real, self.get_dirty_beam()
 
-    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=np.sqrt(2)):
+    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
         """
         Export gridded visibilities to a PyTorch dataset object.
 
         Args:
         check_visibility_scatter (bool): whether the routine should check the standard deviation of visiblities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an error if any cell has a scatter larger than ``max_scatter``.
-        max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to ``np.sqrt(2)``.
+        max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to 1.2.
 
         Returns:
             :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
