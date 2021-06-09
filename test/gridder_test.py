@@ -216,6 +216,54 @@ def test_estimate_standard_deviation_large(mock_visibility_data, tmp_path):
     plt.close("all")
 
 
+def test_cell_variance_error_image(mock_visibility_data):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
+
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"] * 5
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    with pytest.raises(Exception):
+        img, beam = gridder.get_dirty_image(weighting="uniform")
+
+
+def test_cell_variance_error_pytorch(mock_visibility_data):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
+
+    d = mock_visibility_data
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"] * 5
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    with pytest.raises(Exception):
+        dset = gridder.to_pytorch_dataset()
+
+
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
 @pytest.fixture
 def gridder(mock_visibility_data):
