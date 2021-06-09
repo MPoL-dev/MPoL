@@ -371,7 +371,7 @@ class Gridder:
         Checks/compares visibility scatter to a given threshold value ``max_scatter`` and warns the user if the scatter is too high. Called in ``get_dirty_image`` and ``to_pytorch_dataset`` if check_visibility_scatter=True
         """
         s_re, s_im = self.estimate_cell_standard_deviation()
-        if np.max(std_re) > max_scatter or np.max(std_im) > max_scatter:
+        if np.max(s_re) > max_scatter or np.max(s_im) > max_scatter:
             raise Exception(
                 "High scatter of visibilities indicates a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities to MPoL"
             )
