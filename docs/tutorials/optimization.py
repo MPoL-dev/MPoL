@@ -77,6 +77,8 @@ gridder = gridding.Gridder(
 dset = gridder.to_pytorch_dataset()
 print("this dataset has {:} channel".format(dset.nchan))
 
+# Note that the `to_pytorch_dataset` routine automatically checks the visibility scatter and raises an error if there are potential errors. This is also discussed in the [Gridding and Diagnostic Images Tutorial](gridder.html).
+
 # ### Building an image model
 
 # MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We've bundled the most common modules for imaging together in a [SimpleNet](../api.html#mpol.precomposed.SimpleNet) meta-module, which we'll use here.
