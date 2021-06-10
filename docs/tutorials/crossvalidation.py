@@ -329,6 +329,9 @@ def train_and_image(pars):
     return fig, ax
 
 
+# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](https://mpol-dev.github.io/MPoL/tutorials/gpu_setup_tutorial.html).
+
+
 # # Results
 #
 # As a starting point, we'll try cross-validating without any regularization.
