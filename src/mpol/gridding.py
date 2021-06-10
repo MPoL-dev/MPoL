@@ -368,13 +368,16 @@ class Gridder:
 
     def _check_scatter(self, max_scatter):
         """
-        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and warns the user if the scatter is too high. Called in ``get_dirty_image`` and ``to_pytorch_dataset`` if check_visibility_scatter=True
+        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the scatter in any cell exceeds ``max_scatter``.
+
+        Args:
+            max_scatter (float): the maximum permissible scatter in units of standard deviation.
+
         """
         s_re, s_im = self.estimate_cell_standard_deviation()
-        if np.max(s_re) > max_scatter or np.max(s_im) > max_scatter:
-            raise Exception(
-                "High scatter of visibilities indicates a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities to MPoL"
-            )
+        assert (np.max(s_re) < max_scatter) and (
+            np.max(s_im) < max_scatter
+        ), "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
 
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
@@ -511,7 +514,7 @@ class Gridder:
             robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
             unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
-            check_visibility_scatter (bool): whether the routine should check the standard deviation of visiblities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an exception if any cell has a scatter larger than ``max_scatter``.
+            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an exception if any cell has a scatter larger than ``max_scatter``.
             max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to 1.2.
             **beam_kwargs: all additional keyword arguments passed to :func:`~mpol.gridding.get_dirty_beam_area` if ``unit="Jy/arcsec^2"``.
 
@@ -524,7 +527,7 @@ class Gridder:
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
 
-        if check_visibility_scatter == True:
+        if check_visibility_scatter:
             self._check_scatter(max_scatter)
 
         # call _grid_visibilities
@@ -564,14 +567,14 @@ class Gridder:
         Export gridded visibilities to a PyTorch dataset object.
 
         Args:
-        check_visibility_scatter (bool): whether the routine should check the standard deviation of visiblities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an error if any cell has a scatter larger than ``max_scatter``.
+        check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an error if any cell has a scatter larger than ``max_scatter``.
         max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to 1.2.
 
         Returns:
             :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
         """
 
-        if check_visibility_scatter == True:
+        if check_visibility_scatter:
             self._check_scatter(max_scatter)
 
         # grid visibilites (uniform weighting necessary here) and weights

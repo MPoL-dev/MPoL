@@ -222,10 +222,12 @@ def test_cell_variance_error_image(mock_visibility_data):
     d = mock_visibility_data
     uu = d["uu"]
     vv = d["vv"]
-    weight = d["weight"] * 5
+    weight = d["weight"]
     sigma = np.sqrt(1 / weight)
-    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
-    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(
+        loc=0, scale=2 * sigma, size=uu.shape
+    )
 
     gridder = gridding.Gridder(
         coords=coords,
@@ -236,7 +238,7 @@ def test_cell_variance_error_image(mock_visibility_data):
         data_im=data_im,
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(AssertionError):
         img, beam = gridder.get_dirty_image(weighting="uniform")
 
 
@@ -246,10 +248,12 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
     d = mock_visibility_data
     uu = d["uu"]
     vv = d["vv"]
-    weight = d["weight"] * 5
+    weight = d["weight"]
     sigma = np.sqrt(1 / weight)
-    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
-    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(
+        loc=0, scale=2 * sigma, size=uu.shape
+    )
 
     gridder = gridding.Gridder(
         coords=coords,
@@ -260,8 +264,8 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
         data_im=data_im,
     )
 
-    with pytest.raises(Exception):
-        dset = gridder.to_pytorch_dataset()
+    with pytest.raises(AssertionError):
+        gridder.to_pytorch_dataset()
 
 
 # now that we've tested the creation ops, cache an instantiated gridder for future ops
