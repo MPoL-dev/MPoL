@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "e816ba12",
+   "id": "580ba229",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:30.807546Z",
-     "iopub.status.busy": "2021-06-09T19:51:30.806914Z",
-     "iopub.status.idle": "2021-06-09T19:51:31.107333Z",
-     "shell.execute_reply": "2021-06-09T19:51:31.107792Z"
+     "iopub.execute_input": "2021-06-10T01:01:27.173027Z",
+     "iopub.status.busy": "2021-06-10T01:01:27.172370Z",
+     "iopub.status.idle": "2021-06-10T01:01:27.492330Z",
+     "shell.execute_reply": "2021-06-10T01:01:27.491641Z"
     },
     "nbsphinx": "hidden"
    },
@@ -21,13 +21,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "182f20a4",
+   "id": "1fd10a9b",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:31.112951Z",
-     "iopub.status.busy": "2021-06-09T19:51:31.112202Z",
-     "iopub.status.idle": "2021-06-09T19:51:31.125235Z",
-     "shell.execute_reply": "2021-06-09T19:51:31.124331Z"
+     "iopub.execute_input": "2021-06-10T01:01:27.496691Z",
+     "iopub.status.busy": "2021-06-10T01:01:27.496143Z",
+     "iopub.status.idle": "2021-06-10T01:01:27.510379Z",
+     "shell.execute_reply": "2021-06-10T01:01:27.509367Z"
     },
     "nbsphinx": "hidden"
    },
@@ -38,7 +38,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "43b245d8",
+   "id": "f0bc61d6",
    "metadata": {},
    "source": [
     "# Gridding and diagnostic images\n",
@@ -52,7 +52,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ffbe5bfd",
+   "id": "31d070c3",
    "metadata": {},
    "source": [
     "If you're fine working in Python 3.6 and you have [visread](https://visread.readthedocs.io/) installed, you can read the visibility data from the measurement set by\n",
@@ -76,13 +76,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "dec5bcc9",
+   "id": "bc3f92c9",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:31.130375Z",
-     "iopub.status.busy": "2021-06-09T19:51:31.129120Z",
-     "iopub.status.idle": "2021-06-09T19:51:31.281869Z",
-     "shell.execute_reply": "2021-06-09T19:51:31.280908Z"
+     "iopub.execute_input": "2021-06-10T01:01:27.515616Z",
+     "iopub.status.busy": "2021-06-10T01:01:27.514482Z",
+     "iopub.status.idle": "2021-06-10T01:01:27.677045Z",
+     "shell.execute_reply": "2021-06-10T01:01:27.676560Z"
     }
    },
    "outputs": [],
@@ -94,7 +94,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cf7f96b6",
+   "id": "15f3e2c3",
    "metadata": {},
    "source": [
     "For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file."
@@ -103,13 +103,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "35415154",
+   "id": "d00db026",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:31.286597Z",
-     "iopub.status.busy": "2021-06-09T19:51:31.285584Z",
-     "iopub.status.idle": "2021-06-09T19:51:37.083193Z",
-     "shell.execute_reply": "2021-06-09T19:51:37.082656Z"
+     "iopub.execute_input": "2021-06-10T01:01:27.681740Z",
+     "iopub.status.busy": "2021-06-10T01:01:27.681202Z",
+     "iopub.status.idle": "2021-06-10T01:01:34.719914Z",
+     "shell.execute_reply": "2021-06-10T01:01:34.718499Z"
     }
    },
    "outputs": [],
@@ -126,13 +126,13 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "3edc93e0",
+   "id": "0288bcad",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:37.088983Z",
-     "iopub.status.busy": "2021-06-09T19:51:37.087239Z",
-     "iopub.status.idle": "2021-06-09T19:51:37.286003Z",
-     "shell.execute_reply": "2021-06-09T19:51:37.285021Z"
+     "iopub.execute_input": "2021-06-10T01:01:34.725237Z",
+     "iopub.status.busy": "2021-06-10T01:01:34.724681Z",
+     "iopub.status.idle": "2021-06-10T01:01:34.926007Z",
+     "shell.execute_reply": "2021-06-10T01:01:34.925495Z"
     }
    },
    "outputs": [],
@@ -149,7 +149,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1473320e",
+   "id": "7fe29fc6",
    "metadata": {},
    "source": [
     "## The GridCoords object"
@@ -158,13 +158,13 @@
   {
    "cell_type": "code",
    "execution_count": 6,
-   "id": "87a90a52",
+   "id": "cc3d90bd",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:37.512463Z",
-     "iopub.status.busy": "2021-06-09T19:51:37.509961Z",
-     "iopub.status.idle": "2021-06-09T19:51:37.660417Z",
-     "shell.execute_reply": "2021-06-09T19:51:37.659766Z"
+     "iopub.execute_input": "2021-06-10T01:01:34.930435Z",
+     "iopub.status.busy": "2021-06-10T01:01:34.929729Z",
+     "iopub.status.idle": "2021-06-10T01:01:35.306217Z",
+     "shell.execute_reply": "2021-06-10T01:01:35.305724Z"
     }
    },
    "outputs": [],
@@ -174,7 +174,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b42e1ebd",
+   "id": "30efc507",
    "metadata": {},
    "source": [
     " The first MPoL object we'll familiarize ourselves with is GridCoords. Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and Fourier space."
@@ -183,13 +183,13 @@
   {
    "cell_type": "code",
    "execution_count": 7,
-   "id": "3578b3e0",
+   "id": "cf45127f",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:37.664770Z",
-     "iopub.status.busy": "2021-06-09T19:51:37.663937Z",
-     "iopub.status.idle": "2021-06-09T19:51:37.723362Z",
-     "shell.execute_reply": "2021-06-09T19:51:37.722388Z"
+     "iopub.execute_input": "2021-06-10T01:01:35.310455Z",
+     "iopub.status.busy": "2021-06-10T01:01:35.309558Z",
+     "iopub.status.idle": "2021-06-10T01:01:35.400894Z",
+     "shell.execute_reply": "2021-06-10T01:01:35.400396Z"
     }
    },
    "outputs": [],
@@ -199,7 +199,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dd5ddfc9",
+   "id": "cb80b319",
    "metadata": {},
    "source": [
     "The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the [GridCoords](../api.rst#mpol.coordinates.GridCoords) API documentation. The information you'll most likely want to access are the image dimensions"
@@ -208,13 +208,13 @@
   {
    "cell_type": "code",
    "execution_count": 8,
-   "id": "8ca06f62",
+   "id": "bdcd99f6",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:37.729506Z",
-     "iopub.status.busy": "2021-06-09T19:51:37.728979Z",
-     "iopub.status.idle": "2021-06-09T19:51:37.734516Z",
-     "shell.execute_reply": "2021-06-09T19:51:37.734940Z"
+     "iopub.execute_input": "2021-06-10T01:01:35.407125Z",
+     "iopub.status.busy": "2021-06-10T01:01:35.406591Z",
+     "iopub.status.idle": "2021-06-10T01:01:35.413368Z",
+     "shell.execute_reply": "2021-06-10T01:01:35.412909Z"
     }
    },
    "outputs": [
@@ -235,7 +235,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a67a082d",
+   "id": "1dbfa942",
    "metadata": {},
    "source": [
     "which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow`."
@@ -243,7 +243,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b7d4aaee",
+   "id": "9d17e275",
    "metadata": {},
    "source": [
     "## The Gridder object\n",
@@ -254,13 +254,13 @@
   {
    "cell_type": "code",
    "execution_count": 9,
-   "id": "c2010aea",
+   "id": "5fb7ec02",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:37.739340Z",
-     "iopub.status.busy": "2021-06-09T19:51:37.738693Z",
-     "iopub.status.idle": "2021-06-09T19:51:38.356103Z",
-     "shell.execute_reply": "2021-06-09T19:51:38.355582Z"
+     "iopub.execute_input": "2021-06-10T01:01:35.417608Z",
+     "iopub.status.busy": "2021-06-10T01:01:35.417080Z",
+     "iopub.status.idle": "2021-06-10T01:01:36.064675Z",
+     "shell.execute_reply": "2021-06-10T01:01:36.064147Z"
     }
    },
    "outputs": [],
@@ -277,7 +277,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9d74bec0",
+   "id": "0733decc",
    "metadata": {},
    "source": [
     "Note that the `uu`, `vv`, `weight`, `data_re`, and `data_im` arrays are all two-dimensional numpy arrays of shape `(nchan, nvis)`. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape `(1, nvis)`.\n",
@@ -287,13 +287,13 @@
   {
    "cell_type": "code",
    "execution_count": 10,
-   "id": "c3b0404c",
+   "id": "d15e5aed",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:38.360297Z",
-     "iopub.status.busy": "2021-06-09T19:51:38.359707Z",
-     "iopub.status.idle": "2021-06-09T19:51:39.076633Z",
-     "shell.execute_reply": "2021-06-09T19:51:39.075647Z"
+     "iopub.execute_input": "2021-06-10T01:01:36.068804Z",
+     "iopub.status.busy": "2021-06-10T01:01:36.068259Z",
+     "iopub.status.idle": "2021-06-10T01:01:36.780941Z",
+     "shell.execute_reply": "2021-06-10T01:01:36.779987Z"
     }
    },
    "outputs": [],
@@ -311,7 +311,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "377e7fd4",
+   "id": "8ff2cf16",
    "metadata": {},
    "source": [
     "if you don't want to specify your GridCoords object separately."
@@ -319,7 +319,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d19368e1",
+   "id": "0e0bff78",
    "metadata": {},
    "source": [
     "## Visualizing the images\n",
@@ -331,13 +331,13 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "356662b8",
+   "id": "671b7ff6",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:39.081955Z",
-     "iopub.status.busy": "2021-06-09T19:51:39.081344Z",
-     "iopub.status.idle": "2021-06-09T19:51:41.777641Z",
-     "shell.execute_reply": "2021-06-09T19:51:41.776710Z"
+     "iopub.execute_input": "2021-06-10T01:01:36.785019Z",
+     "iopub.status.busy": "2021-06-10T01:01:36.784480Z",
+     "iopub.status.idle": "2021-06-10T01:01:39.490682Z",
+     "shell.execute_reply": "2021-06-10T01:01:39.490152Z"
     }
    },
    "outputs": [],
@@ -347,7 +347,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "957c5cfc",
+   "id": "eca79edd",
    "metadata": {},
    "source": [
     "Note that these are three dimensional image cubes with the same `nchan` as the input visibility data."
@@ -356,13 +356,13 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "bbb8f583",
+   "id": "7f69d78b",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:41.782202Z",
-     "iopub.status.busy": "2021-06-09T19:51:41.781666Z",
-     "iopub.status.idle": "2021-06-09T19:51:41.785514Z",
-     "shell.execute_reply": "2021-06-09T19:51:41.785071Z"
+     "iopub.execute_input": "2021-06-10T01:01:39.501125Z",
+     "iopub.status.busy": "2021-06-10T01:01:39.500412Z",
+     "iopub.status.idle": "2021-06-10T01:01:39.502963Z",
+     "shell.execute_reply": "2021-06-10T01:01:39.501620Z"
     }
    },
    "outputs": [
@@ -382,7 +382,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "188c530d",
+   "id": "f538e475",
    "metadata": {},
    "source": [
     "And the image has units of \"Jy/beam\". The gridder object also now has a dense representation of the visibility data attached to it as `gridder.gridded_vis`, or separately `gridder.gridded_re` and `gridder.gridded_im`, however, we won't normally need to access these products directly.\n",
@@ -392,13 +392,13 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "fe4adf3c",
+   "id": "db83771c",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-09T19:51:41.808765Z",
-     "iopub.status.busy": "2021-06-09T19:51:41.804828Z",
-     "iopub.status.idle": "2021-06-09T19:51:42.513647Z",
-     "shell.execute_reply": "2021-06-09T19:51:42.514094Z"
+     "iopub.execute_input": "2021-06-10T01:01:39.523530Z",
+     "iopub.status.busy": "2021-06-10T01:01:39.522884Z",
+     "iopub.status.idle": "2021-06-10T01:01:40.255364Z",
+     "shell.execute_reply": "2021-06-10T01:01:40.254821Z"
     }
    },
    "outputs": [
@@ -439,7 +439,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "343e2044",
+   "id": "268d8954",
    "metadata": {},
    "source": [
     "If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the regular TMS convention."

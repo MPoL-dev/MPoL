@@ -49,7 +49,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Initializing Model with the Dirty Image" href="initializedirtyimage.html" />
+    <link rel="next" title="GPU Acceleration" href="gpu_setup.html" />
     <link rel="prev" title="Optimization Loop" href="optimization.html" /> 
 </head>
 
@@ -120,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#Results">Results</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
 </ul>
 <ul>
@@ -859,6 +860,7 @@ tensor([[[0.+0.j, 0.+0.j, 0.+0.j,  ..., 0.+0.j, 0.+0.j, 0.+0.j],
 </pre></div>
 </div>
 </div>
+<p>All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the <a class="reference external" href="https://mpol-dev.github.io/MPoL/tutorials/gpu_setup_tutorial.html">GPU Setup Tutorial</a>.</p>
 </section>
 <section id="Results">
 <h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
@@ -904,7 +906,7 @@ Cross validation score: 49.06716516993585
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_23_3.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_23_3.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_24_3.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_24_3.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -940,7 +942,7 @@ Cross validation score: 8.202177678461089
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_25_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_25_2.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_26_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_26_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -976,7 +978,7 @@ Cross validation score: 5.415293814001459
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_crossvalidation_27_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_27_2.png" style="width: 434px; height: 425px;" />
+<img alt="../_images/tutorials_crossvalidation_28_2.png" class="no-scaled-link" src="../_images/tutorials_crossvalidation_28_2.png" style="width: 434px; height: 425px;" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
@@ -991,7 +993,7 @@ Cross validation score: 5.415293814001459
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="initializedirtyimage.html" class="btn btn-neutral float-right" title="Initializing Model with the Dirty Image" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="gpu_setup.html" class="btn btn-neutral float-right" title="GPU Acceleration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="optimization.html" class="btn btn-neutral float-left" title="Optimization Loop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

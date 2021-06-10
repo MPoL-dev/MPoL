@@ -50,7 +50,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changelog" href="../changelog.html" />
-    <link rel="prev" title="Cross validation" href="crossvalidation.html" /> 
+    <link rel="prev" title="GPU Acceleration" href="gpu_setup.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Initializing Model with the Dirty Image</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Image-Setup">Image Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Model-and-Optimization-Setup">Model and Optimization Setup</a></li>
@@ -540,7 +541,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcb15b56c70&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fb4788f9c70&gt;
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -640,8 +641,8 @@ is the squared L2 norm so we will be using the squareroot of that.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 764 ms, sys: 75 µs, total: 764 ms
-Wall time: 386 ms
+CPU times: user 761 ms, sys: 523 µs, total: 762 ms
+Wall time: 387 ms
 </pre></div></div>
 </div>
 <p>We see that the optimization has completed successfully</p>
@@ -739,7 +740,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcb1495dfa0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fb4776fef10&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -775,7 +776,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7fcb14883e80&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fb4776a3ee0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -875,7 +876,7 @@ process</a> like <a class="reference external" href="https://casa.nrao.edu/docs/
         <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="crossvalidation.html" class="btn btn-neutral float-left" title="Cross validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="gpu_setup.html" class="btn btn-neutral float-left" title="GPU Acceleration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#using-pip">Using pip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#upgrading">Upgrading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-cuda-acceleration">Using CUDA acceleration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
@@ -116,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/crossvalidation.html">Cross validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
 </ul>
 <ul>
@@ -227,6 +229,11 @@ $ pip install .
 &gt;&gt;&gt; print(mpol.__version__)
 </pre></div>
 </div>
+</section>
+<section id="using-cuda-acceleration">
+<h2>Using CUDA acceleration<a class="headerlink" href="#using-cuda-acceleration" title="Permalink to this headline">¶</a></h2>
+<p>MPoL uses PyTorch for its Neural Networks as seen in the <cite>Optimization Loop</cite> tutorial. If you are interested in using PyTorch’s full potential by utilizing a Nvidia graphics card, then the CUDA tool kit will need to be installed (TensorVision is also required). More information on this is available in the <cite>GPU Tutorial</cite> page. It is worth noting that PyTorch may need to be (re)installed separately using a specific <cite>pip</cite> for your system.</p>
+<p>More information on this can be found on the PyTorch homepage: <a class="reference external" href="pytorch.org">pytorch.org</a>.</p>
 </section>
 </section>
 
