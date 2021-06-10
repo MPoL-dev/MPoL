@@ -38,7 +38,7 @@ Why use the GPU?
 ================
 
 Using a GPU can accelerate computing speeds up to 100x over CPUs, especially for operations on large images, like is common for MPoL. The following is a quick example showing the addition of two large vectors. Your exact timing may vary, but for our hardware this calculation took
-133 milliseconds seconds on the CPU, while it only took 35 milliseconds on the GPU.
+320 milliseconds seconds on the CPU, while it only took 3.1 milliseconds on the GPU.
 
 .. code:: ipython3
 
@@ -59,9 +59,13 @@ Using a GPU can accelerate computing speeds up to 100x over CPUs, especially for
 
 .. code:: ipython3
 
-    start = time.time()
+    start = torch.cuda.Event(enable_timing=True)
+    end = torch.cuda.Event(enable_timing=True)
+    start.record()
     C = A + B
-    print(time.time() - start)
+    end.record()
+    torch.cuda.synchronize()
+    print(start.elapsed_time(end))
 
 Using the GPU as part of PyTorch and MPoL
 =========================================
