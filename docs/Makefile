@@ -16,7 +16,7 @@ help:
 
 NOTEBOOKS := tutorials/PyTorch.ipynb tutorials/gridder.ipynb tutorials/optimization.ipynb tutorials/crossvalidation.ipynb tutorials/initializedirtyimage.ipynb tutorials/HD143006_Tut_P1.ipynb
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
-
+PLOTS := tutorials/robust_0.png tutorials/robust_1.0.png tutorials/robust_-1.0.png tutorials/uniform.png
 clean:
 	rm -rf _build
 	rm -rf ${NOTEBOOKS}
@@ -24,6 +24,7 @@ clean:
 	rm -rf tutorials/runs
 	rm -rf ${CHARTS}
 	rm -rf _static/baselines/build/baselines.csv
+	rm -rf ${PLOTS}
 
 tutorials/%.ipynb: tutorials/%.py ${CHARTS}
 	jupytext --to ipynb --execute $<
