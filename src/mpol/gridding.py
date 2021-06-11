@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from .coordinates import _setup_coords
@@ -189,8 +191,6 @@ class Gridder:
         weighting="uniform",
         robust=None,
         taper_function=None,
-        check_visibility_scatter=True,
-        max_scatter=1.2,
     ):
         r"""
         Grid the loose data visibilities to the Fourier grid in preparation for imaging.
@@ -199,8 +199,6 @@ class Gridder:
             weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
             robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
-            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True'``. The routine will raise an exception if any cell has a scatter larger than ``max_scatter``.
-            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to 1.2.
         """
 
         if taper_function is None:
@@ -287,10 +285,6 @@ class Gridder:
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
         self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
 
-        # check the visibility scatter and flag user if there are issues
-        if check_visibility_scatter:
-            self._check_scatter(max_scatter)
-
     def _grid_weights(self):
         r"""
         Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
@@ -306,7 +300,7 @@ class Gridder:
         # instantiate uncertainties for each averaged visibility.
         self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
 
-    def estimate_cell_standard_deviation(self):
+    def _estimate_cell_standard_deviation(self):
         r"""
         Estimate the `standard deviation <https://en.wikipedia.org/wiki/Standard_deviation>`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.
 
@@ -331,7 +325,7 @@ class Gridder:
         """
 
         # 1. use the gridding routine to calculate the mean real and imaginary values on the grid
-        self._grid_visibilities(weighting="uniform", check_visibility_scatter=False)
+        self._grid_visibilities(weighting="uniform")
 
         # convert grid back to ground format
         mu_re_gridded = np.fft.fftshift(self.data_re_gridded, axes=(1, 2))
@@ -379,18 +373,20 @@ class Gridder:
 
         return s_re, s_im
 
-    def _check_scatter(self, max_scatter):
+    def _check_scatter_error(self, max_scatter):
         """
         Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the scatter in any cell exceeds ``max_scatter``.
 
         Args:
             max_scatter (float): the maximum permissible scatter in units of standard deviation.
 
+        Returns:
+            status (boolean): ``False`` if scatter is within acceptable limits of max_scatter (good). ``True`` if scatter exceeds acceptable limits.
+
         """
-        s_re, s_im = self.estimate_cell_standard_deviation()
-        assert (np.max(s_re) < max_scatter) and (
-            np.max(s_im) < max_scatter
-        ), "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
+        s_re, s_im = self._estimate_cell_standard_deviation()
+
+        return (np.max(s_re) < max_scatter) and (np.max(s_im) < max_scatter)
 
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
@@ -540,6 +536,14 @@ class Gridder:
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
 
+        # check the visibility scatter and flag user if there are issues
+        if check_visibility_scatter:
+            if self._check_scatter(max_scatter):
+                warnings.warn(
+                    "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL.",
+                    RuntimeWarning,
+                )
+
         # call _grid_visibilities
         # inputs for weighting will be checked inside _grid_visibilities
         self._grid_visibilities(
@@ -588,11 +592,16 @@ class Gridder:
             :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
         """
 
+        # check the visibility scatter and flag user if there are issues
+        if check_visibility_scatter:
+            if self._check_scatter(max_scatter):
+                raise RuntimeError(
+                    "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
+                )
+
         # grid visibilites (uniform weighting necessary here) and weights
         self._grid_visibilities(
             weighting="uniform",
-            check_visibility_scatter=check_visibility_scatter,
-            max_scatter=max_scatter,
         )
         self._grid_weights()
 
