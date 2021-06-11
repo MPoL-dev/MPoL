@@ -8,6 +8,25 @@ from mpol import coordinates, gridding
 from mpol.constants import *
 
 
+def test_grid_cont(mock_visibility_data_cont):
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    gridder = gridding.Gridder(
+        cell_size=0.005,
+        npix=800,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    print(gridder.uu.shape)
+    print(gridder.nchan)
+
+    gridder._grid_visibilities(weighting="uniform")
+
+
 # test that we're getting the right numbers back for some well defined operations
 def test_uniform_ones(mock_visibility_data, tmp_path):
     coords = coordinates.GridCoords(cell_size=0.005, npix=800)

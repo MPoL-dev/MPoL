@@ -538,10 +538,11 @@ class Gridder:
 
         # check the visibility scatter and flag user if there are issues
         if check_visibility_scatter:
-            if self._check_scatter(max_scatter):
+            if self._check_scatter_error(max_scatter):
                 warnings.warn(
-                    "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL.",
-                    RuntimeWarning,
+                    RuntimeWarning(
+                        "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
+                    )
                 )
 
         # call _grid_visibilities
@@ -550,8 +551,6 @@ class Gridder:
             weighting=weighting,
             robust=robust,
             taper_function=taper_function,
-            check_visibility_scatter=check_visibility_scatter,
-            max_scatter=max_scatter,
         )
 
         img = self._fliplr_cube(
@@ -594,7 +593,7 @@ class Gridder:
 
         # check the visibility scatter and flag user if there are issues
         if check_visibility_scatter:
-            if self._check_scatter(max_scatter):
+            if self._check_scatter_error(max_scatter):
                 raise RuntimeError(
                     "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
                 )
