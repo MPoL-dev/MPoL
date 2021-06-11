@@ -32,6 +32,18 @@ jobs:
       - name: Install test deps
         run: |
           pip install .[test]
+      - name: Cache/Restore the .mpol folder cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-mpol-dls
+        with:
+          # files are stored in .mpol
+          path: .mpol
+          # we want to hash off of the download script
+          key: ${{ hashFiles('docs/download_external_files.py') }}
+      - name: Download large files
+        run: |
+          python3 docs/download_external_files.py
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
@@ -59,6 +71,18 @@ jobs:
       - name: Install mermaid.js dependency
         run: |
           npm install @mermaid-js/mermaid-cli
+      - name: Cache/Restore the .mpol folder cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-mpol-dls
+        with:
+          # files are stored in .mpol
+          path: .mpol
+          # we want to hash off of the download script
+          key: ${{ hashFiles('docs/download_external_files.py') }}
+      - name: Download large files
+        run: |
+          python3 docs/download_external_files.py
       - name: Build the docs
         run: |
           make -C docs clean
