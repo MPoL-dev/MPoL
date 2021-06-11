@@ -105,7 +105,7 @@ def test_weight_gridding(mock_visibility_data, tmp_path):
 
 
 # test the standard deviation estimation routines
-def test_estimate_standard_deviation(mock_visibility_data, tmp_path):
+def test_estimate_stddev(mock_visibility_data, tmp_path):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
@@ -123,7 +123,7 @@ def test_estimate_standard_deviation(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    s_re, s_im = gridder.estimate_cell_standard_deviation()
+    s_re, s_im = gridder._estimate_cell_standard_deviation()
 
     chan = 4
 
@@ -137,12 +137,12 @@ def test_estimate_standard_deviation(mock_visibility_data, tmp_path):
     ax[1].set_title(r"$s_{i,j}$ imag")
     plt.colorbar(im, ax=ax[1])
 
-    plt.savefig(tmp_path / "standard_deviation_correct.png", dpi=300)
+    plt.savefig(tmp_path / "stddev_correct.png", dpi=300)
 
     plt.close("all")
 
 
-def test_estimate_standard_deviation_large(mock_visibility_data, tmp_path):
+def test_estimate_stddev_large(mock_visibility_data, tmp_path):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
@@ -162,7 +162,7 @@ def test_estimate_standard_deviation_large(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    s_re, s_im = gridder.estimate_cell_standard_deviation()
+    s_re, s_im = gridder._estimate_cell_standard_deviation()
 
     chan = 4
 
@@ -176,6 +176,12 @@ def test_estimate_standard_deviation_large(mock_visibility_data, tmp_path):
     ax[1].set_title(r"$s_{i,j}$ imag")
     plt.colorbar(im, ax=ax[1])
 
-    plt.savefig(tmp_path / "standard_deviation_large.png", dpi=300)
+    plt.savefig(tmp_path / "stddev_large.png", dpi=300)
 
     plt.close("all")
+
+
+def test_max_scatter(mock_visibility_data, tmp_path):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
+
+    uu, vv, weight, data_re, data_im = mock_visibility_data
