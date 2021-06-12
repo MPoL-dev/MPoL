@@ -180,7 +180,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mpol.losses</h1><div class="highlight"><pre>
-<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, including the regularization strength, :math:`\zeta`, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.</span>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, including the regularization strength, which aspires to be similar across all terms, providing at least a starting point for tuning multiple loss functions.</span>
 
 <span class="sd">If you don&#39;t see a loss function you need, it&#39;s easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -231,7 +231,7 @@
 <div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all</span>
-<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
+<span class="sd">    quantities have the *same* shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
 <span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real</span>
 <span class="sd">    and imaginaries in the :math:`\chi^2` sum.</span>
 

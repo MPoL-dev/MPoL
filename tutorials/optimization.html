@@ -472,7 +472,7 @@ div.rendered_html tbody tr:hover {
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4498439/files/logo_cube.npz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -485,10 +485,9 @@ div.rendered_html tbody tr:hover {
 <span class="n">uu</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
 <span class="n">vv</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
 <span class="n">weight</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
-<span class="n">data_re</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data_re&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
-<span class="n">data_im</span> <span class="o">=</span> <span class="o">-</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;data_im&quot;</span><span class="p">][</span>
-    <span class="n">chan</span>
-<span class="p">]</span>  <span class="c1"># we&#39;re converting from CASA convention to regular TMS convention by complex conjugating the visibilities</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
+<span class="n">data_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">data_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -514,8 +513,8 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="The-PyTorch-dataset">
 <h2>The PyTorch dataset<a class="headerlink" href="#The-PyTorch-dataset" title="Permalink to this headline">¶</a></h2>
-<p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <a class="reference internal" href="../api.html#mpol.gridding.Gridder.to_pytorch_dataset"><span class="std std-ref">Gridder.to_pytorch_dataset</span></a> routine grids the visibilites with “uniform” weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities with PyTorch tensors. This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this
-tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.</p>
+<p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <code class="docutils literal notranslate"><span class="pre">to_pytorch_dataset</span></code> routine grids the visibilities with “uniform” weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the <code class="docutils literal notranslate"><span class="pre">to_pytorch_dataset</span></code> routine automatically checks the
+visibility scatter and raises a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the <a class="reference external" href="gridder.html">Gridding and Diagnostic Images Tutorial</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -537,7 +536,7 @@ this dataset has 1 channel
 </section>
 <section id="Building-an-image-model">
 <h2>Building an image model<a class="headerlink" href="#Building-an-image-model" title="Permalink to this headline">¶</a></h2>
-<p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We’ve bundled the most common modules for imaging together in a <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a> meta-module, which we’ll use here.</p>
+<p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We’ve bundled the most common modules for imaging together in a <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a> meta-module, which we’ll use here.</p>
 <p>This diagram shows how the primitive modules, like <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>, <a class="reference external" href="../api.html#mpol.images.ImageCube">ImageCube</a>, etc… are connected together to form <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>. In this workflow, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> are the core model parameters representing the image. More information about all of these components is available in the <a class="reference external" href="../api.html">API documentation</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -580,7 +579,7 @@ this dataset has 1 channel
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">500.0</span><span class="p">)</span>
+<span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">8000.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -679,7 +678,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f69d95db640&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f2dd0a95340&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -762,7 +761,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-22.09555274683534
+3.124348303800103
 </pre></div></div>
 </div>
 <p>and then we can calculate the gradient of the loss function with respect to the parameters</p>
@@ -809,14 +808,14 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f69d945c9a0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f2dce914a90&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_36_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_36_1.png" style="width: 498px; height: 393px;" />
+<img alt="../_images/tutorials_optimization_36_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_36_1.png" style="width: 441px; height: 414px;" />
 </div>
 </div>
 <p>The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient</p>
@@ -846,13 +845,13 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 OrderedDict([(&#39;bcube.base_cube&#39;,
-              tensor([[[0.0925, 0.0923, 0.0917,  ..., 0.0915, 0.0921, 0.0925],
-                       [0.0883, 0.0880, 0.0874,  ..., 0.0875, 0.0881, 0.0883],
-                       [0.0842, 0.0839, 0.0832,  ..., 0.0837, 0.0841, 0.0842],
+              tensor([[[0.1532, 0.1587, 0.1637,  ..., 0.1354, 0.1414, 0.1474],
+                       [0.1436, 0.1491, 0.1541,  ..., 0.1257, 0.1318, 0.1378],
+                       [0.1340, 0.1395, 0.1445,  ..., 0.1161, 0.1222, 0.1282],
                        ...,
-                       [0.1055, 0.1054, 0.1048,  ..., 0.1037, 0.1046, 0.1052],
-                       [0.1011, 0.1010, 0.1004,  ..., 0.0996, 0.1004, 0.1009],
-                       [0.0968, 0.0966, 0.0960,  ..., 0.0955, 0.0962, 0.0967]]],
+                       [0.1818, 0.1872, 0.1922,  ..., 0.1643, 0.1703, 0.1761],
+                       [0.1723, 0.1778, 0.1828,  ..., 0.1548, 0.1607, 0.1666],
+                       [0.1628, 0.1683, 0.1733,  ..., 0.1451, 0.1511, 0.1570]]],
                      dtype=torch.float64)),
              (&#39;conv_layer.m.weight&#39;,
               tensor([[[[0.0625, 0.1250, 0.0625],
@@ -884,14 +883,14 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f69d9408640&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f2dcc8541f0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_42_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_42_1.png" style="width: 456px; height: 393px;" />
+<img alt="../_images/tutorials_optimization_42_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_42_1.png" style="width: 460px; height: 393px;" />
 </div>
 </div>
 </section>
@@ -932,8 +931,8 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 1min 1s, sys: 8.08 s, total: 1min 9s
-Wall time: 39.5 s
+CPU times: user 50.3 s, sys: 8.33 s, total: 58.6 s
+Wall time: 33.5 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -961,7 +960,7 @@ Text(0, 0.5, &#39;loss&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_45_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_45_1.png" style="width: 482px; height: 451px;" />
+<img alt="../_images/tutorials_optimization_45_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_45_1.png" style="width: 469px; height: 451px;" />
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
@@ -993,7 +992,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f69d95db0d0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7f2dd0acc2b0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1006,10 +1005,10 @@ Text(0, 0.5, &#39;loss&#39;)
 </section>
 <section id="Wrapup">
 <h2>Wrapup<a class="headerlink" href="#Wrapup" title="Permalink to this headline">¶</a></h2>
-<p>And there you have it, an image optimized to fit the data. Don’t be fooled into thinking that minimal regularization (like we’ve done here with only the data likelihood) yields the most conservative image estimates, however! With this setup, we’ve done <em>some</em> regularization because the functional basis set we chose automatically enforced image positivity (see the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> documentation), but in truth we aren’t too far off from the dirty image itself.</p>
-<p>Though the dirty image is easy to produce and is in fact a maximal likelihood image (with no regularization), we would argue that it’s far from a conservative image since it is generated by making some rather strong assumptions about the data—that unsampled spatial frequencies carry zero power. In future tutorials we’ll examine how to set up additional regularizer terms that can yield more desireable image characteristics.</p>
-<p>Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">GitHub discussion</a>. If you spot a bug or have an idea to improve these tutorials, please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">GitHub issue</a> or better yet <a class="reference external" href="file:///Users/ian/Documents/Research/Disks/RML/MPoL/docs/_build/html/developer-documentation.html">submit a pull
-request</a>.</p>
+<p>And there you have it, an image optimized to fit the data. To be honest, the results aren’t great—that’s because we’ve used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it’s easy for the lower signal-to-noise visibilities at longer baselines to dominate the image
+appearance (not unlike “uniform”ly weighted images).</p>
+<p>In the following tutorials we’ll examine how to set up additional regularizer terms that can yield more desireable image characteristics.</p>
+<p>Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">GitHub discussion</a>. If you spot a bug or have an idea to improve these tutorials, please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">GitHub issue</a> or better yet submit a pull request.</p>
 </section>
 </section>
 

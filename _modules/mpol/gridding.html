@@ -180,7 +180,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mpol.gridding</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">_setup_coords</span>
 <span class="kn">from</span> <span class="nn">.datasets</span> <span class="kn">import</span> <span class="n">GriddedDataset</span>
@@ -227,11 +229,9 @@
 
 <span class="sd">    The :class:`.Gridder` object accepts &quot;loose&quot; *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel &#39;continuum&#39; visibilities, they will just have nchan = 1 in the first dimension of most products.</span>
 
-<span class="sd">    Once the loose visibilities are attached, the user can decide how to &#39;grid&#39;, or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.</span>
+<span class="sd">    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.</span>
 
-<span class="sd">    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine. Note that you must average the visiblities with ``weighting=&#39;uniform&#39;``, otherwise the probabilistic interpretation is invalid.</span>
-
-<span class="sd">    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the &#39;dirty image&#39; and the point spread function or &#39;dirty beam&#39;. After the visibilities have been gridded with :func:`~mpol.gridding.Gridder.grid_visibilities`, these are available via the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.</span>
+<span class="sd">    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the &#39;dirty image&#39; and the point spread function or &#39;dirty beam&#39; using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): width of a single square pixel in [arcsec]</span>
@@ -290,34 +290,49 @@
             <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">v_chan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">v_edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">v_chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vv</span><span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_histogram_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">channel_weight</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_sum_cell_values_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform a 2D histogram over the Fourier grid defined by ``coords``.</span>
+<span class="sd">        Given a list of loose visibility points :math:`(u,v)` and their corresponding values :math:`x`,</span>
+<span class="sd">        partition the points up into 2D :math:`u-v` cells defined by the ``coords`` object attached to</span>
+<span class="sd">        the gridder, such that ``cell[i,j]`` has bounds between ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``.</span>
+<span class="sd">        Then, sum the corresponding values for each :math:`(u,v)` point that falls within each cell. The resulting</span>
+<span class="sd">        cell value is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \mathrm{result}_{i,j} = \sum_k \mathrm{values}_k</span>
+
+<span class="sd">        where :math:`k` indexes all :math:`(u,v)` points that fall within ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``. In the case that all values are :math:`1`, the result is the number of visibilities within each cell (i.e., a histogram).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            uu (np.array): 1D array of East-West spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">            vv: 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">            channel_weight (np.array): 1D array of weights to use in the histogramming.</span>
+<span class="sd">            vv (np.array): 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">            values (np.array): 1D array of values (the same length as uu and vv) to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">            A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># order is swapped because of the way the image looks</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
             <span class="n">vv</span><span class="p">,</span>
             <span class="n">uu</span><span class="p">,</span>
             <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">v_edges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">u_edges</span><span class="p">],</span>
-            <span class="n">weights</span><span class="o">=</span><span class="n">channel_weight</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># only return the &quot;H&quot; value</span>
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_sum_cell_values_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..</span>
+<span class="sd">        Perform the :func:`~mpol.gridding.Gridder.sum_cell_values_channel` routine over all channels of the</span>
+<span class="sd">        input visibilities.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.</span>
+<span class="sd">            values (iterable): ``(nchan, nvis)`` array of values to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the summed cell quantities.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># calculate the histogrammed result for all channels</span>
@@ -326,12 +341,39 @@
             <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># pass None to every channel</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
+
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">):</span>
-            <span class="n">cube</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uu</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">cube</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uu</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">cube</span>
 
-    <span class="k">def</span> <span class="nf">_grid_visibilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridded_quantity</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the gridded cell quantity corresponding to each of the loose visibilities.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the gridded cell quantities.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A ``(nchan, nvis)`` array of values corresponding to the loose visibilities, using the quantity in that cell.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">gridded_quantity</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">index_v</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_u</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_grid_visibilities</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span>
+        <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Grid the loose data visibilities to the Fourier grid in preparation for imaging.</span>
 
@@ -349,7 +391,7 @@
         <span class="c1"># create the cells as edges around the existing points</span>
         <span class="c1"># note that at this stage, the UV grid is strictly increasing</span>
         <span class="c1"># when in fact, later on, we&#39;ll need to fftshift for the FFT</span>
-        <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 
         <span class="c1"># boolean index for cells that *contain* visibilities</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">cell_weight</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
@@ -362,12 +404,7 @@
             <span class="c1"># cell_weight is (nchan, ncell_v, ncell_u)</span>
             <span class="c1"># self.index_v, self.index_u are (nchan, nvis)</span>
             <span class="c1"># we want density_weights to be (nchan, nvis)</span>
-            <span class="n">density_weight</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">cell_weight</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">index_v</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_u</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">density_weight</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">weighting</span> <span class="o">==</span> <span class="s2">&quot;briggs&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">robust</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -394,12 +431,8 @@
             <span class="n">cell_robust_weight</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="c1"># now assign the cell robust weight to each visibility within that cell</span>
-            <span class="n">density_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">cell_robust_weight</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">index_v</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_u</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">density_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">cell_robust_weight</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;weighting must be specified as one of &#39;natural&#39;, &#39;uniform&#39;, or &#39;briggs&#39;&quot;</span>
@@ -412,18 +445,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># grid the reals and imaginaries separately</span>
-        <span class="c1"># outputs from _histogram_cube are *not* pre-packed</span>
-        <span class="n">data_re_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="c1"># outputs from _sum_cell_values_cube are *not* pre-packed</span>
+        <span class="n">data_re_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_re</span> <span class="o">*</span> <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
-        <span class="n">data_im_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="n">data_im_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_im</span> <span class="o">*</span> <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
         <span class="c1"># the beam is the response to a point source, which is data_re = constant, data_im = 0</span>
         <span class="c1"># so we save time and only calculate the reals, because gridded_beam_im = 0</span>
-        <span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span>
+        <span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span>
             <span class="n">tapering_weight</span> <span class="o">*</span> <span class="n">density_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="p">)</span>
 
@@ -436,25 +469,129 @@
 
     <span class="k">def</span> <span class="nf">_grid_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Grid the weights to the Fourier grid, to be used when preparing a PyTorch dataset.</span>
+<span class="sd">        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that</span>
+<span class="sd">        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities</span>
+<span class="sd">        within that cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create the cells as edges around the existing points</span>
         <span class="c1"># note that at this stage, the UV grid is strictly increasing</span>
         <span class="c1"># when in fact, later on, we&#39;ll need to fftshift for the FFT</span>
-        <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_histogram_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">cell_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 
         <span class="c1"># instantiate uncertainties for each averaged visibility.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
+    <span class="k">def</span> <span class="nf">_estimate_cell_standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate the `standard deviation &lt;https://en.wikipedia.org/wiki/Standard_deviation&gt;`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.</span>
+
+<span class="sd">        1. Calculate the mean real :math:`\mu_\Re` and imaginary :math:`\mu_\Im` values within each cell using a weighted mean, assuming that the visibility function is constant across the cell.</span>
+<span class="sd">        2. For each visibility :math:`k` that falls within the cell, calculate the real and imaginary residuals (:math:`r_\Re` and :math:`r_\Im`) in units of :math:`\sigma_k`, where :math:`\sigma_k = \sqrt{1/w_k}` and :math:`w_k` is the weight of that visibility.</span>
+<span class="sd">        3. Calculate the standard deviation :math:`s_{i,j}` of the residual distributions within each cell</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            s_{i,j} = \sqrt{\frac{1}{N} \sum_k \left (\sigma_k - \bar{\sigma}_{i,j} \right )^2}</span>
+
+<span class="sd">        where :math:`\bar{\sigma}_{i,j}` is first estimated as</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \bar{\sigma}_{i,j} = \frac{1}{N} \sum_k \sigma_k</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            std_real, std_imag: two 3D arrays of size ``(nchan, npix, npix)`` in ground format containing the standard deviation of the real and imaginary values within each cell, in units of :math:`\sigma`. If everything is correctly calibrated, we expect :math:`s_{i,j} \approx 1 \forall i,j`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># 1. use the gridding routine to calculate the mean real and imaginary values on the grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid_visibilities</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+
+        <span class="c1"># convert grid back to ground format</span>
+        <span class="n">mu_re_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_re_gridded</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">mu_im_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_im_gridded</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># extract the real and imaginary values corresponding to the &quot;loose&quot; visibilities</span>
+        <span class="c1"># mu_re_gridded and mu_im_gridded are arrays with shape (nchan, ncell_v, ncell_u)</span>
+        <span class="c1"># self.index_v, self.index_u are (nchan, nvis)</span>
+        <span class="c1"># we want mu_re and mu_im to be (nchan, nvis)</span>
+        <span class="n">mu_re</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">mu_re_gridded</span><span class="p">)</span>
+        <span class="n">mu_im</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">mu_im_gridded</span><span class="p">)</span>
+
+        <span class="c1"># 2. calculate the real and imaginary residuals for the loose visibilities</span>
+        <span class="c1"># 1/sigma = np.sqrt(weight)</span>
+        <span class="n">residual_re</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_re</span> <span class="o">-</span> <span class="n">mu_re</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">residual_im</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_im</span> <span class="o">-</span> <span class="n">mu_im</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="c1"># 3. calculate the standard deviation of the residual visibilities</span>
+
+        <span class="c1"># 3.1 first calculate the mean residuals</span>
+        <span class="c1"># calculate the number of visibilities with each cell</span>
+        <span class="n">nvis_cell_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">()</span>
+        <span class="c1"># extract this out as a quantity for each visibility</span>
+        <span class="n">nvis_cell_loose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">nvis_cell_grid</span><span class="p">)</span>
+
+        <span class="c1"># calculate the mean residuals</span>
+        <span class="c1"># sum residual values</span>
+        <span class="n">bar_sigma_re</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span><span class="n">residual_re</span> <span class="o">/</span> <span class="n">nvis_cell_loose</span><span class="p">)</span>
+        <span class="n">bar_sigma_im</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span><span class="n">residual_im</span> <span class="o">/</span> <span class="n">nvis_cell_loose</span><span class="p">)</span>
+        <span class="c1"># extract back to loose</span>
+        <span class="n">bar_sigma_re_loose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">bar_sigma_re</span><span class="p">)</span>
+        <span class="n">bar_sigma_im_loose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="n">bar_sigma_im</span><span class="p">)</span>
+
+        <span class="c1"># 3.2 calculate the standard deviation of the residuals</span>
+        <span class="n">s_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">residual_re</span> <span class="o">-</span> <span class="n">bar_sigma_re_loose</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">nvis_cell_loose</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">s_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sum_cell_values_cube</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">residual_im</span> <span class="o">-</span> <span class="n">bar_sigma_im_loose</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">nvis_cell_loose</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">s_re</span><span class="p">,</span> <span class="n">s_im</span>
+
+    <span class="k">def</span> <span class="nf">_check_scatter_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the median scatter across all cells exceeds ``max_scatter``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_scatter (float): the maximum permissible scatter in units of standard deviation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a dictionary containing keys ``return_status``, ``median_re``, and ``median_im``. ``return_status`` is a boolean that is ``False`` if scatter is within acceptable limits of max_scatter (good), and is ``True`` if scatter exceeds acceptable limits. ``median_re`` and ``median_im`` are the median scatter values returned across all cells, in units of standard deviation (estimated from the provided weights).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s_re</span><span class="p">,</span> <span class="n">s_im</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_cell_standard_deviation</span><span class="p">()</span>
+
+        <span class="n">median_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">s_re</span><span class="p">[</span><span class="n">s_re</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">median_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">s_im</span><span class="p">[</span><span class="n">s_im</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">return_status</span> <span class="o">=</span> <span class="p">(</span><span class="n">median_re</span> <span class="o">&gt;</span> <span class="n">max_scatter</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">median_im</span> <span class="o">&gt;</span> <span class="n">max_scatter</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;return_status&quot;</span><span class="p">:</span> <span class="n">return_status</span><span class="p">,</span>
+            <span class="s2">&quot;median_re&quot;</span><span class="p">:</span> <span class="n">median_re</span><span class="p">,</span>
+            <span class="s2">&quot;median_im&quot;</span><span class="p">:</span> <span class="n">median_im</span><span class="p">,</span>
+        <span class="p">}</span>
+
     <span class="k">def</span> <span class="nf">_fliplr_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cube</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Gridder.get_dirty_beam"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_beam">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">re_gridded_beam</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the dirty beam corresponding to the gridded visibilities.</span>
 
-<span class="sd">        Returns: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            C (1D np.array): normalization constants for each channel</span>
+<span class="sd">            re_gridded_beam (3d np.array): the gridded visibilities corresponding to a unit point source in the center of the field.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy image cube with a dirty beam (PSF) for each channel. By definition, the peak is normalized to 1.0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if we&#39;re sticking to the dirty beam and image equations in Briggs&#39; Ph.D. thesis,</span>
         <span class="c1"># no correction for du or dv prefactors needed here</span>
@@ -465,7 +602,7 @@
             <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span> <span class="o">**</span> <span class="mi">2</span>
                 <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft2</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span><span class="p">,</span>
+                    <span class="n">C</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">re_gridded_beam</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="p">)</span>
@@ -477,7 +614,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">beam</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">real</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span>
 
     <span class="k">def</span> <span class="nf">_null_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.</span>
@@ -492,7 +629,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beam</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span><span class="p">)</span>
 
         <span class="c1"># consider the 2D beam for each channel described by polar coordinates r, theta.</span>
         <span class="c1">#</span>
@@ -547,13 +684,14 @@
 
 <div class="viewcode-block" id="Gridder.get_dirty_beam_area"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_beam_area">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_beam_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.</span>
+<span class="sd">        Compute the effective area of the dirty beam for each channel. Assumes that the beam has already been generated by running :func:`~mpol.gridding.Gridder.get_dirty_image`. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.</span>
 <span class="sd">            single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.</span>
 
-<span class="sd">        Returns: (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nulled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_dirty_beam</span><span class="p">(</span>
             <span class="n">ntheta</span><span class="o">=</span><span class="n">ntheta</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="n">single_channel_estimate</span>
@@ -561,7 +699,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nulled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># arcsec^2</span></div>
 
 <div class="viewcode-block" id="Gridder.get_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_image</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span>
+        <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">,</span>
+        <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">beam_kwargs</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the dirty image.</span>
@@ -571,20 +716,36 @@
 <span class="sd">            robust (float): If ``weighting=&#39;briggs&#39;``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.</span>
 <span class="sd">            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.</span>
 <span class="sd">            unit (string): what unit should the image be in. Default is ``&quot;Jy/beam&quot;``. If ``&quot;Jy/arcsec^2&quot;``, then the effective area of the dirty beam will be used to convert from ``&quot;Jy/beam&quot;`` to ``&quot;Jy/arcsec^2&quot;``.</span>
+<span class="sd">            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeWarning`` will be raised if any cell has a scatter larger than ``max_scatter``.</span>
+<span class="sd">            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.</span>
+<span class="sd">            **beam_kwargs: all additional keyword arguments passed to :func:`~mpol.gridding.get_dirty_beam_area` if ``unit=&quot;Jy/arcsec^2&quot;``.</span>
 
-<span class="sd">        Returns: image,beam where</span>
-<span class="sd">                 image: (nchan, npix, npix) numpy array of the dirty image cube.</span>
-<span class="sd">                 beam: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            2-tuple of (``image``, ``beam``) where ``image`` is an (nchan, npix, npix) numpy array of the dirty image cube in units ``unit``. ``beam`` is an numpy image cube with a dirty beam (PSF) for each channel. The units of the beam are always Jy/{dirty beam}, i.e., the peak of the beam is normalized to 1.0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># check unit input</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">,</span> <span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown unit&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
 
+        <span class="c1"># check the visibility scatter and flag user if there are issues</span>
+        <span class="k">if</span> <span class="n">check_visibility_scatter</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_scatter_error</span><span class="p">(</span><span class="n">max_scatter</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;return_status&quot;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">(</span>
+                        <span class="s2">&quot;Visibility scatter exceeds ``max_scatter``:</span><span class="si">{:}</span><span class="s2">, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: </span><span class="si">{:}</span><span class="s2"> x sigma. Median imag scatter: </span><span class="si">{:}</span><span class="s2"> x sigma.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">max_scatter</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;median_re&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;median_im&quot;</span><span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
         <span class="c1"># call _grid_visibilities</span>
         <span class="c1"># inputs for weighting will be checked inside _grid_visibilities</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid_visibilities</span><span class="p">(</span>
-            <span class="n">weighting</span><span class="o">=</span><span class="n">weighting</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span> <span class="n">taper_function</span><span class="o">=</span><span class="n">taper_function</span>
+            <span class="n">weighting</span><span class="o">=</span><span class="n">weighting</span><span class="p">,</span>
+            <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span>
+            <span class="n">taper_function</span><span class="o">=</span><span class="n">taper_function</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fliplr_cube</span><span class="p">(</span>
@@ -595,11 +756,15 @@
             <span class="p">)</span>
         <span class="p">)</span>  <span class="c1"># Jy/beam</span>
 
+        <span class="c1"># calculate the beam</span>
+        <span class="c1"># also pre-stores internal self.beam value for area routine, if necessary</span>
+        <span class="n">beam</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span><span class="p">)</span>
+
         <span class="c1"># for units of Jy/arcsec^2, we could just leave out the C constant *if* we were doing</span>
         <span class="c1"># uniform weighting. The relationships get more complex for robust or natural weighting, however,</span>
         <span class="c1"># so it&#39;s safer to calculate the number of arcseconds^2 per beam</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">:</span>
-            <span class="n">beam_area_per_chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam_area</span><span class="p">()</span>  <span class="c1"># [arcsec^2]</span>
+            <span class="n">beam_area_per_chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam_area</span><span class="p">(</span><span class="o">**</span><span class="n">beam_kwargs</span><span class="p">)</span>  <span class="c1"># [arcsec^2]</span>
 
             <span class="c1"># convert image</span>
             <span class="c1"># (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)</span>
@@ -611,19 +776,29 @@
             <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span>
         <span class="p">),</span> <span class="s2">&quot;Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue.&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">beam</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_dirty_beam</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span></div>
-
-<div class="viewcode-block" id="Gridder.to_pytorch_dataset"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.to_pytorch_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_pytorch_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Gridder.to_pytorch_dataset"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.to_pytorch_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_pytorch_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export gridded visibilities to a PyTorch dataset object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeError`` will be raised if any cell has a scatter larger than ``max_scatter``.</span>
+<span class="sd">            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># check the visibility scatter and flag user if there are issues</span>
+        <span class="k">if</span> <span class="n">check_visibility_scatter</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_scatter_error</span><span class="p">(</span><span class="n">max_scatter</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;return_status&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Visibility scatter exceeds ``max_scatter``:</span><span class="si">{:}</span><span class="s2">, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: </span><span class="si">{:}</span><span class="s2"> x sigma. Median imag scatter: </span><span class="si">{:}</span><span class="s2"> x sigma.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">max_scatter</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;median_re&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;median_im&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
 
         <span class="c1"># grid visibilites (uniform weighting necessary here) and weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid_visibilities</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
@@ -643,7 +818,7 @@
         <span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sky_vis_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The visibility FFT cube fftshifted for plotting with ``imshow``.</span>
 

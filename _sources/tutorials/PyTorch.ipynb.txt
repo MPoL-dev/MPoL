@@ -3,13 +3,13 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "3d6b48a7",
+   "id": "18cf68a7",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:21.034392Z",
-     "iopub.status.busy": "2021-06-10T01:01:21.033786Z",
-     "iopub.status.idle": "2021-06-10T01:01:23.547581Z",
-     "shell.execute_reply": "2021-06-10T01:01:23.546965Z"
+     "iopub.execute_input": "2021-06-12T18:56:51.043984Z",
+     "iopub.status.busy": "2021-06-12T18:56:51.043511Z",
+     "iopub.status.idle": "2021-06-12T18:56:51.650312Z",
+     "shell.execute_reply": "2021-06-12T18:56:51.650857Z"
     },
     "nbsphinx": "hidden"
    },
@@ -21,13 +21,13 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "6d397194",
+   "id": "e3f81d05",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:23.558128Z",
-     "iopub.status.busy": "2021-06-10T01:01:23.551571Z",
-     "iopub.status.idle": "2021-06-10T01:01:23.564520Z",
-     "shell.execute_reply": "2021-06-10T01:01:23.564952Z"
+     "iopub.execute_input": "2021-06-12T18:56:51.655317Z",
+     "iopub.status.busy": "2021-06-12T18:56:51.654679Z",
+     "iopub.status.idle": "2021-06-12T18:56:51.665428Z",
+     "shell.execute_reply": "2021-06-12T18:56:51.665007Z"
     },
     "nbsphinx": "hidden"
    },
@@ -38,7 +38,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "284745cb",
+   "id": "06412e64",
    "metadata": {},
    "source": [
     "# Introduction to PyTorch Tensors and Gradient Descent"
@@ -46,7 +46,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "35db12f9",
+   "id": "f29b1f24",
    "metadata": {},
    "source": [
     "This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.\n",
@@ -61,13 +61,13 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "fb4a25e2",
+   "id": "31087905",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:23.569274Z",
-     "iopub.status.busy": "2021-06-10T01:01:23.568717Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.011915Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.011019Z"
+     "iopub.execute_input": "2021-06-12T18:56:51.693610Z",
+     "iopub.status.busy": "2021-06-12T18:56:51.668384Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.212161Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.211578Z"
     }
    },
    "outputs": [],
@@ -79,7 +79,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b322676d",
+   "id": "a87932e6",
    "metadata": {},
    "source": [
     "There are several [ways to initialize a tensor](https://pytorch.org/docs/stable/tensors.html). A common method to create a tensor is from a numpy array:"
@@ -88,13 +88,13 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "77ec2d7b",
+   "id": "28a320fd",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.018311Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.017091Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.020571Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.020092Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.221068Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.220534Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.234976Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.234584Z"
     }
    },
    "outputs": [
@@ -116,7 +116,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "455277f2",
+   "id": "99ae093c",
    "metadata": {},
    "source": [
     "Tensors are similar to numpy arrays---many of the same [operations](https://pytorch.org/docs/stable/torch.html) that we would perform on numpy arrays can easily be performed on PyTorch tensors. For example, we can compare how to calculate a matrix product using numpy and PyTorch"
@@ -125,13 +125,13 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "3e034919",
+   "id": "3004241b",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.026436Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.025087Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.028553Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.028989Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.239006Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.238210Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.245634Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.245268Z"
     }
    },
    "outputs": [
@@ -164,7 +164,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0e39582b",
+   "id": "19a1a48b",
    "metadata": {},
    "source": [
     "## Calculating Gradients"
@@ -172,7 +172,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9675a70d",
+   "id": "57caee6f",
    "metadata": {},
    "source": [
     "PyTorch provides a key functionality---the ability to calculate the gradients on tensors. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``, we'll see why this is important in a moment."
@@ -181,13 +181,13 @@
   {
    "cell_type": "code",
    "execution_count": 6,
-   "id": "b8476d95",
+   "id": "721a2fb3",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.034485Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.033927Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.038622Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.039065Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.249654Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.249114Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.267899Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.267503Z"
     }
    },
    "outputs": [
@@ -209,7 +209,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ec548ecc",
+   "id": "1c71a312",
    "metadata": {},
    "source": [
     "Let's define some variable $y$ in terms of $x$:"
@@ -218,13 +218,13 @@
   {
    "cell_type": "code",
    "execution_count": 7,
-   "id": "77bd0ffc",
+   "id": "fc07e669",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.043457Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.042486Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.044323Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.044759Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.270616Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.270132Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.275203Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.274770Z"
     }
    },
    "outputs": [],
@@ -234,7 +234,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1dee8265",
+   "id": "6c361aeb",
    "metadata": {},
    "source": [
     " We see that the value of $y$ is as we expect---nothing too strange here."
@@ -243,13 +243,13 @@
   {
    "cell_type": "code",
    "execution_count": 8,
-   "id": "adca0385",
+   "id": "b5780e54",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.049946Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.048716Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.051780Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.051279Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.279078Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.278330Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.280737Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.280350Z"
     }
    },
    "outputs": [
@@ -269,10 +269,10 @@
   },
   {
    "cell_type": "markdown",
-   "id": "db427254",
+   "id": "f76bb3c5",
    "metadata": {},
    "source": [
-    "But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\\frac{dy}{dx} = 2*x$. The derivative evaluated at $x = 3$ is $6$.\n",
+    "But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\\frac{dy}{dx} = 2x$. The derivative evaluated at $x = 3$ is $6$.\n",
     "\n",
     "The magic is that can use PyTorch to get the same answer---no analytic derivative needed!"
    ]
@@ -280,13 +280,13 @@
   {
    "cell_type": "code",
    "execution_count": 9,
-   "id": "54d91928",
+   "id": "5b9dc248",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.055225Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.054685Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.061202Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.060729Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.283455Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.282966Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.288430Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.288051Z"
     },
     "lines_to_next_cell": 1
    },
@@ -309,7 +309,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e7465da3",
+   "id": "6ee04e82",
    "metadata": {},
    "source": [
     "PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$."
@@ -317,7 +317,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3cfd0479",
+   "id": "02ff9f59",
    "metadata": {},
    "source": [
     "## Optimizing a Function with Gradient Descent\n",
@@ -334,13 +334,13 @@
   {
    "cell_type": "code",
    "execution_count": 10,
-   "id": "d93dda2a",
+   "id": "9fe68ac7",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.066174Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.064998Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.066793Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.067229Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.291503Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.291073Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.293130Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.292729Z"
     }
    },
    "outputs": [],
@@ -352,7 +352,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "bba782d1",
+   "id": "eb37b425",
    "metadata": {},
    "source": [
     "We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent. Tensors cannot be passed into Matplotlib.pyplot functions so we use ``.item()`` to only obtain the value within the tensor:"
@@ -361,13 +361,13 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "7cad699e",
+   "id": "0dda4c9f",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.073432Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.072848Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.414259Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.413755Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.298466Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.297961Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.575869Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.575454Z"
     }
    },
    "outputs": [
@@ -411,7 +411,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dfca8ed8",
+   "id": "8eb0734a",
    "metadata": {},
    "source": [
     "We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:\n",
@@ -432,13 +432,13 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "7e2e3961",
+   "id": "83e08a1c",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.421973Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.421414Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.629677Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.630138Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.582552Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.582106Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.745852Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.745449Z"
     }
    },
    "outputs": [
@@ -509,7 +509,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cdf994aa",
+   "id": "34d75a8e",
    "metadata": {},
    "source": [
     "The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:"
@@ -518,13 +518,13 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "dcd88a5e",
+   "id": "831f20ca",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.659008Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.656379Z",
-     "iopub.status.idle": "2021-06-10T01:01:24.868358Z",
-     "shell.execute_reply": "2021-06-10T01:01:24.868817Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.765356Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.762942Z",
+     "iopub.status.idle": "2021-06-12T18:56:52.903681Z",
+     "shell.execute_reply": "2021-06-12T18:56:52.903123Z"
     }
    },
    "outputs": [
@@ -586,7 +586,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "aa945e7e",
+   "id": "d2177e5e",
    "metadata": {},
    "source": [
     "This works, but it takes a long time since we have several small steps.\n",
@@ -597,13 +597,13 @@
   {
    "cell_type": "code",
    "execution_count": 14,
-   "id": "0e954790",
+   "id": "88ecc4a1",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2021-06-10T01:01:24.890837Z",
-     "iopub.status.busy": "2021-06-10T01:01:24.888112Z",
-     "iopub.status.idle": "2021-06-10T01:01:25.131329Z",
-     "shell.execute_reply": "2021-06-10T01:01:25.130282Z"
+     "iopub.execute_input": "2021-06-12T18:56:52.910836Z",
+     "iopub.status.busy": "2021-06-12T18:56:52.909553Z",
+     "iopub.status.idle": "2021-06-12T18:56:53.103771Z",
+     "shell.execute_reply": "2021-06-12T18:56:53.104149Z"
     }
    },
    "outputs": [
@@ -670,7 +670,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0bc93823",
+   "id": "6213cf0c",
    "metadata": {},
    "source": [
     "*Note the change in scale.* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.\n",
