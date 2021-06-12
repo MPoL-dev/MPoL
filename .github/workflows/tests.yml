@@ -20,7 +20,7 @@ jobs:
           cache-name: cache-mpol-dls
         with:
           # files are stored in .mpol
-          path: .mpol
+          path: ~/.mpol
           # the "key" is the hash of the download script
           key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Download large files
@@ -63,7 +63,7 @@ jobs:
           cache-name: cache-mpol-dls
         with:
           # files are stored in .mpol
-          path: .mpol
+          path: ~/.mpol
           # the "key" is the hash of the download script
           key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Run tests with coverage
@@ -99,7 +99,7 @@ jobs:
           cache-name: cache-mpol-dls
         with:
           # files are stored in .mpol
-          path: .mpol
+          path: ~/.mpol
           # the "key" is the hash of the download script
           key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Build the docs
