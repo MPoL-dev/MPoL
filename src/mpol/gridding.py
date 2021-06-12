@@ -373,20 +373,29 @@ class Gridder:
 
         return s_re, s_im
 
-    def _check_scatter_error(self, max_scatter):
+    def _check_scatter_error(self, max_scatter=1.2):
         """
-        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the scatter in any cell exceeds ``max_scatter``.
+        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the median scatter across all cells exceeds ``max_scatter``.
 
         Args:
             max_scatter (float): the maximum permissible scatter in units of standard deviation.
 
         Returns:
-            status (boolean): ``False`` if scatter is within acceptable limits of max_scatter (good). ``True`` if scatter exceeds acceptable limits.
+            a dictionary containing keys ``return_status``, ``median_re``, and ``median_im``. ``return_status`` is a boolean that is ``False`` if scatter is within acceptable limits of max_scatter (good), and is ``True`` if scatter exceeds acceptable limits. ``median_re`` and ``median_im`` are the median scatter values returned across all cells, in units of standard deviation (estimated from the provided weights).
 
         """
         s_re, s_im = self._estimate_cell_standard_deviation()
 
-        return (np.max(s_re) < max_scatter) and (np.max(s_im) < max_scatter)
+        median_re = np.median(s_re[s_re > 0])
+        median_im = np.median(s_im[s_im > 0])
+
+        return_status = (median_re > max_scatter) or (median_im > max_scatter)
+
+        return {
+            "return_status": return_status,
+            "median_re": median_re,
+            "median_im": median_im,
+        }
 
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
@@ -538,10 +547,13 @@ class Gridder:
 
         # check the visibility scatter and flag user if there are issues
         if check_visibility_scatter:
-            if self._check_scatter_error(max_scatter):
+            d = self._check_scatter_error(max_scatter)
+            if d["return_status"]:
                 warnings.warn(
                     RuntimeWarning(
-                        "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
+                        "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
+                            max_scatter, d["median_re"], d["median_im"]
+                        )
                     )
                 )
 
@@ -593,9 +605,12 @@ class Gridder:
 
         # check the visibility scatter and flag user if there are issues
         if check_visibility_scatter:
-            if self._check_scatter_error(max_scatter):
+            d = self._check_scatter_error(max_scatter)
+            if d["return_status"]:
                 raise RuntimeError(
-                    "Visibility scatter exceeds ``max_scatter``, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL."
+                    "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
+                        max_scatter, d["median_re"], d["median_im"]
+                    )
                 )
 
         # grid visibilites (uniform weighting necessary here) and weights

@@ -181,7 +181,51 @@ def test_estimate_stddev_large(mock_visibility_data, tmp_path):
     plt.close("all")
 
 
-def test_max_scatter(mock_visibility_data, tmp_path):
+def test_max_scatter_pass(mock_visibility_data):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
+    weight = 0.1 * np.ones_like(uu)
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    # we want this to return an exit code of True, indicating an error
+    d = gridder._check_scatter_error()
+    print(d["median_re"], d["median_im"])
+    assert not d["return_status"]
+
+
+def test_max_scatter_fail(mock_visibility_data):
+    coords = coordinates.GridCoords(cell_size=0.01, npix=400)
+
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    weight = 0.1 * np.ones_like(uu)
+    sigma = np.sqrt(1 / weight)
+    data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
+    data_im = np.zeros_like(uu) + np.random.normal(
+        loc=0, scale=2 * sigma, size=uu.shape
+    )
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    # we want this to return an exit code of True, indicating an error
+    d = gridder._check_scatter_error()
+    print(d["median_re"], d["median_im"])
+    assert d["return_status"]
