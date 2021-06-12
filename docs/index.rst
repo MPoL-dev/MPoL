@@ -48,17 +48,21 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
 
 If you use MPoL in your research, please cite us! ::
 
-    @software{MPoL,
-    author       = {Ian Czekala, Brianna Zawadzki, and
-                    Ryan Loomis},
-    title        = {iancze/MPoL: A flexible Python Framework for Regularized Maximum Likelihood Imaging},
-    month        = feb,
-    year         = 2020,
-    publisher    = {Zenodo},
-    version      = {v0.0.4},
-    doi          = {10.5281/zenodo.3647603},
-    url          = {https://doi.org/10.5281/zenodo.3647603}
-    }
+   @software{ian_czekala_2021_4939048,
+   author       = {Ian Czekala and
+                  Brianna Zawadzki and
+                  Ryan Loomis and
+                  Hannah Grzybowski and
+                  Robert Frazier and
+                  Tyler Quinn},
+   title        = {MPoL-dev/MPoL: v0.1.1 Release},
+   month        = jun,
+   year         = 2021,
+   publisher    = {Zenodo},
+   version      = {v0.1.1},
+   doi          = {10.5281/zenodo.4939048},
+   url          = {https://doi.org/10.5281/zenodo.4939048}
+   }
 
 * :ref:`genindex`
 * :ref:`changelog-reference-label`
