@@ -45,23 +45,22 @@ from torch.utils.tensorboard import SummaryWriter
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
 )
 
-# this is a multi-channel dataset... but for demonstration purposes we'll use
+# this is a multi-channel dataset... for demonstration purposes we'll use
 # only the central, single channel
 chan = 4
 d = np.load(fname)
 uu = d["uu"][chan]
 vv = d["vv"][chan]
 weight = d["weight"][chan]
-data_re = d["data_re"][chan]
-data_im = -d["data_im"][
-    chan
-]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
+data = d["data"][chan]
+data_re = np.real(data)
+data_im = np.imag(data)
 
 # define the image dimensions, making sure they are big enough to fit all
 # of the expected emission

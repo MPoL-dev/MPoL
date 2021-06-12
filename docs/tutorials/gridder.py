@@ -52,7 +52,7 @@ from astropy.utils.data import download_file
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -62,10 +62,9 @@ d = np.load(fname)
 uu = d["uu"]
 vv = d["vv"]
 weight = d["weight"]
-data_re = d["data_re"]
-data_im = -d[
-    "data_im"
-]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
+data = d["data"]
+data_re = np.real(data)
+data_im = np.imag(data)
 
 # ## The GridCoords object
 
@@ -114,7 +113,7 @@ gridder = gridding.Gridder(
 # There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
 # We are usually interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the "dirty beam" and "dirty image" by radio astronomers. Those are accessible via the following routine
 
-img, beam = gridder.get_dirty_image(weighting="uniform")
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
 
 # Note that these are three dimensional image cubes with the same `nchan` as the input visibility data.
 

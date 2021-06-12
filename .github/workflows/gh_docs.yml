@@ -32,7 +32,7 @@ jobs:
         with:
           # files are stored in .mpol
           path: .mpol
-          # we want to hash off of the download script
+          # the "key" is the hash of the download script
           key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Download large files
         run: |
