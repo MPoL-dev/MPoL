@@ -37,7 +37,7 @@ from IPython.display import SVG, display
 # +
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -50,10 +50,9 @@ d = np.load(fname)
 uu = d["uu"][chan]
 vv = d["vv"][chan]
 weight = d["weight"][chan]
-data_re = d["data_re"][chan]
-data_im = -d["data_im"][
-    chan
-]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
+data = d["data"][chan]
+data_re = np.real(data)
+data_im = np.imag(data)
 
 # +
 # define the image dimensions, as in the previous tutorial
@@ -71,15 +70,15 @@ gridder = gridding.Gridder(
 
 # ### The PyTorch dataset
 #
-# Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The [Gridder.to_pytorch_dataset](../api.rst#mpol.gridding.Gridder.to_pytorch_dataset) routine grids the visibilites with "uniform" weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities with PyTorch tensors.
-# This is essentially the same representation stored in the gridder, but with PyTorch tensors instead of numpy arrays. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset.
+# Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The ``to_pytorch_dataset`` routine grids the visibilities with "uniform" weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the `to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.html).
 
 dset = gridder.to_pytorch_dataset()
 print("this dataset has {:} channel".format(dset.nchan))
 
+
 # ### Building an image model
 
-# MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed.We've bundled the most common modules for imaging together in a [SimpleNet](../api.html#mpol.precomposed.SimpleNet) meta-module, which we'll use here.
+# MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We've bundled the most common modules for imaging together in a [SimpleNet](../api.html#mpol.precomposed.SimpleNet) meta-module, which we'll use here.
 #
 # This diagram shows how the primitive modules, like [BaseCube](../api.html#mpol.images.BaseCube), [ImageCube](../api.html#mpol.images.ImageCube), etc... are connected together to form [SimpleNet](../api.html#mpol.precomposed.SimpleNet). In this workflow, the pixel values of the [BaseCube](../api.html#mpol.images.BaseCube) are the core model parameters representing the image. More information about all of these components is available in the [API documentation](../api.html).
 
@@ -101,7 +100,7 @@ rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
 #
 # We'll start by creating the optimizer
 
-optimizer = torch.optim.SGD(rml.parameters(), lr=500.0)
+optimizer = torch.optim.SGD(rml.parameters(), lr=8000.0)
 
 # The role of the optimizer is to advance the parameters (in this case, the pixel values of the [BaseCube](../api.html#mpol.images.BaseCube)) using the gradient of the loss function with respect to those parameters. PyTorch has many different [optimizers](https://pytorch.org/docs/stable/optim.html#module-torch.optim) available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The `lr` parameter is the 'learning rate,' or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.
 
@@ -246,8 +245,8 @@ plt.colorbar(im)
 
 # ### Wrapup
 #
-# And there you have it, an image optimized to fit the data. Don't be fooled into thinking that minimal regularization (like we've done here with only the data likelihood) yields the most conservative image estimates, however! With this setup, we've done *some* regularization because the functional basis set we chose automatically enforced image positivity (see the [BaseCube](../api.html#mpol.images.BaseCube) documentation), but in truth we aren't too far off from the dirty image itself.
+# And there you have it, an image optimized to fit the data. To be honest, the results aren't great---that's because we've used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the [BaseCube](../api.html#mpol.images.BaseCube) documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it's easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike "uniform"ly weighted images).
 #
-# Though the dirty image is easy to produce and is in fact a maximal likelihood image (with no regularization), we would argue that it's far from a conservative image since it is generated by making some rather strong assumptions about the data---that unsampled spatial frequencies carry zero power. In future tutorials we'll examine how to set up additional regularizer terms that can yield more desireable image characteristics.
+# In the following tutorials we'll examine how to set up additional regularizer terms that can yield more desireable image characteristics.
 #
-# Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a [GitHub discussion](https://github.com/MPoL-dev/MPoL/discussions). If you spot a bug or have an idea to improve these tutorials, please raise a [GitHub issue](https://github.com/MPoL-dev/MPoL/issues) or better yet [submit a pull request](file:///Users/ian/Documents/Research/Disks/RML/MPoL/docs/_build/html/developer-documentation.html).
+# Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a [GitHub discussion](https://github.com/MPoL-dev/MPoL/discussions). If you spot a bug or have an idea to improve these tutorials, please raise a [GitHub issue](https://github.com/MPoL-dev/MPoL/issues) or better yet submit a pull request.

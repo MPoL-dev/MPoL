@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from .coordinates import _setup_coords
@@ -45,11 +47,9 @@ class Gridder:
 
     The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
-    Once the loose visibilities are attached, the user can decide how to 'grid', or average, them to a more compact representation on the Fourier grid using the :func:`~mpol.gridding.Gridder.grid_visibilities` routine.
+    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
 
-    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine. Note that you must average the visiblities with ``weighting='uniform'``, otherwise the probabilistic interpretation is invalid.
-
-    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam'. After the visibilities have been gridded with :func:`~mpol.gridding.Gridder.grid_visibilities`, these are available via the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
+    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
@@ -108,34 +108,49 @@ class Gridder:
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
 
-    def _histogram_channel(self, uu, vv, channel_weight):
+    def _sum_cell_values_channel(self, uu, vv, values=None):
         r"""
-        Perform a 2D histogram over the Fourier grid defined by ``coords``.
+        Given a list of loose visibility points :math:`(u,v)` and their corresponding values :math:`x`,
+        partition the points up into 2D :math:`u-v` cells defined by the ``coords`` object attached to
+        the gridder, such that ``cell[i,j]`` has bounds between ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``.
+        Then, sum the corresponding values for each :math:`(u,v)` point that falls within each cell. The resulting
+        cell value is
+
+        .. math::
+
+            \mathrm{result}_{i,j} = \sum_k \mathrm{values}_k
+
+        where :math:`k` indexes all :math:`(u,v)` points that fall within ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``. In the case that all values are :math:`1`, the result is the number of visibilities within each cell (i.e., a histogram).
 
         Args:
             uu (np.array): 1D array of East-West spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
-            vv: 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
-            channel_weight (np.array): 1D array of weights to use in the histogramming.
+            vv (np.array): 1D array of North-South spatial frequency coordinates for a specific channel. Units of [:math:`\mathrm{k}\lambda`]
+            values (np.array): 1D array of values (the same length as uu and vv) to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.
 
+        Returns:
+            A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.
         """
-        # order is swapped because of the way the image looks
 
         result = np.histogram2d(
             vv,
             uu,
             bins=[self.coords.v_edges, self.coords.u_edges],
-            weights=channel_weight,
+            weights=values,
         )
 
         # only return the "H" value
         return result[0]
 
-    def _histogram_cube(self, weight):
+    def _sum_cell_values_cube(self, values=None):
         r"""
-        Perform a 2D histogram over the (non-packed) Fourier grid defined by ``coords``, for all channels..
+        Perform the :func:`~mpol.gridding.Gridder.sum_cell_values_channel` routine over all channels of the
+        input visibilities.
 
         Args:
-            weight (iterable): ``(nchan, nvis)`` list of 1D arrays of weights of shape to use in the histogramming.
+            values (iterable): ``(nchan, nvis)`` array of values to use in the sum over each cell. The default (``values=None``) corresponds to using ``values=np.ones_like(uu)`` such that the routine is equivalent to a histogram.
+
+        Returns:
+            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the summed cell quantities.
 
         """
         # calculate the histogrammed result for all channels
@@ -144,12 +159,39 @@ class Gridder:
             dtype="float",
         )
 
+        if values is None:
+            # pass None to every channel
+            values = [None] * self.nchan
+
         for i in range(self.nchan):
-            cube[i] = self._histogram_channel(self.uu[i], self.vv[i], weight[i])
+            cube[i] = self._sum_cell_values_channel(self.uu[i], self.vv[i], values[i])
 
         return cube
 
-    def _grid_visibilities(self, weighting="uniform", robust=None, taper_function=None):
+    def _extract_gridded_values_to_loose(self, gridded_quantity):
+        r"""
+        Extract the gridded cell quantity corresponding to each of the loose visibilities.
+
+        Args:
+            A 3D array of size ``(nchan, npix, npix)`` in ground format containing the gridded cell quantities.
+
+        Returns:
+            A ``(nchan, nvis)`` array of values corresponding to the loose visibilities, using the quantity in that cell.
+        """
+
+        return np.array(
+            [
+                gridded_quantity[i][self.index_v[i], self.index_u[i]]
+                for i in range(self.nchan)
+            ]
+        )
+
+    def _grid_visibilities(
+        self,
+        weighting="uniform",
+        robust=None,
+        taper_function=None,
+    ):
         r"""
         Grid the loose data visibilities to the Fourier grid in preparation for imaging.
 
@@ -167,7 +209,7 @@ class Gridder:
         # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
         # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._histogram_cube(self.weight)
+        cell_weight = self._sum_cell_values_cube(self.weight)
 
         # boolean index for cells that *contain* visibilities
         mask = cell_weight > 0.0
@@ -180,12 +222,7 @@ class Gridder:
             # cell_weight is (nchan, ncell_v, ncell_u)
             # self.index_v, self.index_u are (nchan, nvis)
             # we want density_weights to be (nchan, nvis)
-            density_weight = 1 / np.array(
-                [
-                    cell_weight[i][self.index_v[i], self.index_u[i]]
-                    for i in range(self.nchan)
-                ]
-            )
+            density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
 
         elif weighting == "briggs":
             if robust is None:
@@ -212,12 +249,8 @@ class Gridder:
             cell_robust_weight[~mask] = 0
 
             # now assign the cell robust weight to each visibility within that cell
-            density_weight = np.array(
-                [
-                    cell_robust_weight[i][self.index_v[i], self.index_u[i]]
-                    for i in range(self.nchan)
-                ]
-            )
+            density_weight = self._extract_gridded_values_to_loose(cell_robust_weight)
+
         else:
             raise ValueError(
                 "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
@@ -230,18 +263,18 @@ class Gridder:
         self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
 
         # grid the reals and imaginaries separately
-        # outputs from _histogram_cube are *not* pre-packed
-        data_re_gridded = self._histogram_cube(
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
             self.data_re * tapering_weight * density_weight * self.weight
         )
 
-        data_im_gridded = self._histogram_cube(
+        data_im_gridded = self._sum_cell_values_cube(
             self.data_im * tapering_weight * density_weight * self.weight
         )
 
         # the beam is the response to a point source, which is data_re = constant, data_im = 0
         # so we save time and only calculate the reals, because gridded_beam_im = 0
-        re_gridded_beam = self._histogram_cube(
+        re_gridded_beam = self._sum_cell_values_cube(
             tapering_weight * density_weight * self.weight
         )
 
@@ -254,25 +287,129 @@ class Gridder:
 
     def _grid_weights(self):
         r"""
-        Grid the weights to the Fourier grid, to be used when preparing a PyTorch dataset.
+        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
+        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
+        within that cell.
         """
 
         # create the cells as edges around the existing points
         # note that at this stage, the UV grid is strictly increasing
         # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._histogram_cube(self.weight)
+        cell_weight = self._sum_cell_values_cube(self.weight)
 
         # instantiate uncertainties for each averaged visibility.
         self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
 
+    def _estimate_cell_standard_deviation(self):
+        r"""
+        Estimate the `standard deviation <https://en.wikipedia.org/wiki/Standard_deviation>`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.
+
+        1. Calculate the mean real :math:`\mu_\Re` and imaginary :math:`\mu_\Im` values within each cell using a weighted mean, assuming that the visibility function is constant across the cell.
+        2. For each visibility :math:`k` that falls within the cell, calculate the real and imaginary residuals (:math:`r_\Re` and :math:`r_\Im`) in units of :math:`\sigma_k`, where :math:`\sigma_k = \sqrt{1/w_k}` and :math:`w_k` is the weight of that visibility.
+        3. Calculate the standard deviation :math:`s_{i,j}` of the residual distributions within each cell
+
+        .. math::
+
+            s_{i,j} = \sqrt{\frac{1}{N} \sum_k \left (\sigma_k - \bar{\sigma}_{i,j} \right )^2}
+
+        where :math:`\bar{\sigma}_{i,j}` is first estimated as
+
+        .. math::
+
+            \bar{\sigma}_{i,j} = \frac{1}{N} \sum_k \sigma_k
+
+
+        Returns:
+            std_real, std_imag: two 3D arrays of size ``(nchan, npix, npix)`` in ground format containing the standard deviation of the real and imaginary values within each cell, in units of :math:`\sigma`. If everything is correctly calibrated, we expect :math:`s_{i,j} \approx 1 \forall i,j`.
+
+        """
+
+        # 1. use the gridding routine to calculate the mean real and imaginary values on the grid
+        self._grid_visibilities(weighting="uniform")
+
+        # convert grid back to ground format
+        mu_re_gridded = np.fft.fftshift(self.data_re_gridded, axes=(1, 2))
+        mu_im_gridded = np.fft.fftshift(self.data_im_gridded, axes=(1, 2))
+
+        # extract the real and imaginary values corresponding to the "loose" visibilities
+        # mu_re_gridded and mu_im_gridded are arrays with shape (nchan, ncell_v, ncell_u)
+        # self.index_v, self.index_u are (nchan, nvis)
+        # we want mu_re and mu_im to be (nchan, nvis)
+        mu_re = self._extract_gridded_values_to_loose(mu_re_gridded)
+        mu_im = self._extract_gridded_values_to_loose(mu_im_gridded)
+
+        # 2. calculate the real and imaginary residuals for the loose visibilities
+        # 1/sigma = np.sqrt(weight)
+        residual_re = (self.data_re - mu_re) * np.sqrt(self.weight)
+        residual_im = (self.data_im - mu_im) * np.sqrt(self.weight)
+
+        # 3. calculate the standard deviation of the residual visibilities
+
+        # 3.1 first calculate the mean residuals
+        # calculate the number of visibilities with each cell
+        nvis_cell_grid = self._sum_cell_values_cube()
+        # extract this out as a quantity for each visibility
+        nvis_cell_loose = self._extract_gridded_values_to_loose(nvis_cell_grid)
+
+        # calculate the mean residuals
+        # sum residual values
+        bar_sigma_re = self._sum_cell_values_cube(residual_re / nvis_cell_loose)
+        bar_sigma_im = self._sum_cell_values_cube(residual_im / nvis_cell_loose)
+        # extract back to loose
+        bar_sigma_re_loose = self._extract_gridded_values_to_loose(bar_sigma_re)
+        bar_sigma_im_loose = self._extract_gridded_values_to_loose(bar_sigma_im)
+
+        # 3.2 calculate the standard deviation of the residuals
+        s_re = np.sqrt(
+            self._sum_cell_values_cube(
+                (residual_re - bar_sigma_re_loose) ** 2 / nvis_cell_loose
+            )
+        )
+        s_im = np.sqrt(
+            self._sum_cell_values_cube(
+                (residual_im - bar_sigma_im_loose) ** 2 / nvis_cell_loose
+            )
+        )
+
+        return s_re, s_im
+
+    def _check_scatter_error(self, max_scatter=1.2):
+        """
+        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the median scatter across all cells exceeds ``max_scatter``.
+
+        Args:
+            max_scatter (float): the maximum permissible scatter in units of standard deviation.
+
+        Returns:
+            a dictionary containing keys ``return_status``, ``median_re``, and ``median_im``. ``return_status`` is a boolean that is ``False`` if scatter is within acceptable limits of max_scatter (good), and is ``True`` if scatter exceeds acceptable limits. ``median_re`` and ``median_im`` are the median scatter values returned across all cells, in units of standard deviation (estimated from the provided weights).
+
+        """
+        s_re, s_im = self._estimate_cell_standard_deviation()
+
+        median_re = np.median(s_re[s_re > 0])
+        median_im = np.median(s_im[s_im > 0])
+
+        return_status = (median_re > max_scatter) or (median_im > max_scatter)
+
+        return {
+            "return_status": return_status,
+            "median_re": median_re,
+            "median_im": median_im,
+        }
+
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
 
-    def get_dirty_beam(self):
+    def _get_dirty_beam(self, C, re_gridded_beam):
         """
         Compute the dirty beam corresponding to the gridded visibilities.
 
-        Returns: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.
+        Args:
+            C (1D np.array): normalization constants for each channel
+            re_gridded_beam (3d np.array): the gridded visibilities corresponding to a unit point source in the center of the field.
+
+        Returns:
+            numpy image cube with a dirty beam (PSF) for each channel. By definition, the peak is normalized to 1.0.
         """
         # if we're sticking to the dirty beam and image equations in Briggs' Ph.D. thesis,
         # no correction for du or dv prefactors needed here
@@ -283,7 +420,7 @@ class Gridder:
             np.fft.fftshift(
                 self.coords.npix ** 2
                 * np.fft.ifft2(
-                    self.C[:, np.newaxis, np.newaxis] * self.re_gridded_beam,
+                    C[:, np.newaxis, np.newaxis] * re_gridded_beam,
                 ),
                 axes=(1, 2),
             )
@@ -310,7 +447,7 @@ class Gridder:
         try:
             self.beam
         except AttributeError:
-            self.get_dirty_beam()
+            self._get_dirty_beam(self.C, self.re_gridded_beam)
 
         # consider the 2D beam for each channel described by polar coordinates r, theta.
         #
@@ -365,13 +502,14 @@ class Gridder:
 
     def get_dirty_beam_area(self, ntheta=24, single_channel_estimate=True):
         r"""
-        Compute the effective area of the dirty beam for each channel. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
+        Compute the effective area of the dirty beam for each channel. Assumes that the beam has already been generated by running :func:`~mpol.gridding.Gridder.get_dirty_image`. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
 
         Args:
             ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
             single_channel_estimate (bool): If ``True`` (the default), use the area estimated from the first channel for all channels in the multi-channel image cube. If ``False``, calculate the beam area for all channels.
 
-        Returns: (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`
+        Returns:
+            (1D numpy array float) beam area for each channel in units of :math:`[\mathrm{arcsec}^{2}]`
         """
         nulled = self._null_dirty_beam(
             ntheta=ntheta, single_channel_estimate=single_channel_estimate
@@ -379,7 +517,14 @@ class Gridder:
         return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
 
     def get_dirty_image(
-        self, weighting="uniform", robust=None, taper_function=None, unit="Jy/beam"
+        self,
+        weighting="uniform",
+        robust=None,
+        taper_function=None,
+        unit="Jy/beam",
+        check_visibility_scatter=True,
+        max_scatter=1.2,
+        **beam_kwargs
     ):
         """
         Calculate the dirty image.
@@ -389,20 +534,36 @@ class Gridder:
             robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
             unit (string): what unit should the image be in. Default is ``"Jy/beam"``. If ``"Jy/arcsec^2"``, then the effective area of the dirty beam will be used to convert from ``"Jy/beam"`` to ``"Jy/arcsec^2"``.
+            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeWarning`` will be raised if any cell has a scatter larger than ``max_scatter``.
+            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.
+            **beam_kwargs: all additional keyword arguments passed to :func:`~mpol.gridding.get_dirty_beam_area` if ``unit="Jy/arcsec^2"``.
 
-        Returns: image,beam where
-                 image: (nchan, npix, npix) numpy array of the dirty image cube.
-                 beam: numpy image cube with a dirty beam (PSF) for each channel. The units are in Jy/{dirty beam}, i.e., the peak is normalized to 1.0.
+        Returns:
+            2-tuple of (``image``, ``beam``) where ``image`` is an (nchan, npix, npix) numpy array of the dirty image cube in units ``unit``. ``beam`` is an numpy image cube with a dirty beam (PSF) for each channel. The units of the beam are always Jy/{dirty beam}, i.e., the peak of the beam is normalized to 1.0.
         """
 
         # check unit input
         if unit not in ["Jy/beam", "Jy/arcsec^2"]:
             raise ValueError("Unknown unit", unit)
 
+        # check the visibility scatter and flag user if there are issues
+        if check_visibility_scatter:
+            d = self._check_scatter_error(max_scatter)
+            if d["return_status"]:
+                warnings.warn(
+                    RuntimeWarning(
+                        "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
+                            max_scatter, d["median_re"], d["median_im"]
+                        )
+                    )
+                )
+
         # call _grid_visibilities
         # inputs for weighting will be checked inside _grid_visibilities
         self._grid_visibilities(
-            weighting=weighting, robust=robust, taper_function=taper_function
+            weighting=weighting,
+            robust=robust,
+            taper_function=taper_function,
         )
 
         img = self._fliplr_cube(
@@ -413,11 +574,15 @@ class Gridder:
             )
         )  # Jy/beam
 
+        # calculate the beam
+        # also pre-stores internal self.beam value for area routine, if necessary
+        beam = self._get_dirty_beam(self.C, self.re_gridded_beam)
+
         # for units of Jy/arcsec^2, we could just leave out the C constant *if* we were doing
         # uniform weighting. The relationships get more complex for robust or natural weighting, however,
         # so it's safer to calculate the number of arcseconds^2 per beam
         if unit == "Jy/arcsec^2":
-            beam_area_per_chan = self.get_dirty_beam_area()  # [arcsec^2]
+            beam_area_per_chan = self.get_dirty_beam_area(**beam_kwargs)  # [arcsec^2]
 
             # convert image
             # (Jy/1 arcsec^2) = (Jy/ 1 beam) * (1 beam/ n arcsec^2)
@@ -429,19 +594,29 @@ class Gridder:
             np.max(img.imag) < 1e-10
         ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
 
-        self.img = img.real
+        return img.real, beam
 
-        self.get_dirty_beam()
-
-        return self.img, self.beam
-
-    def to_pytorch_dataset(self):
+    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
         """
         Export gridded visibilities to a PyTorch dataset object.
+
+        Args:
+            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeError`` will be raised if any cell has a scatter larger than ``max_scatter``.
+            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.
 
         Returns:
             :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
         """
+
+        # check the visibility scatter and flag user if there are issues
+        if check_visibility_scatter:
+            d = self._check_scatter_error(max_scatter)
+            if d["return_status"]:
+                raise RuntimeError(
+                    "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
+                        max_scatter, d["median_re"], d["median_im"]
+                    )
+                )
 
         # grid visibilites (uniform weighting necessary here) and weights
         self._grid_visibilities(weighting="uniform")
@@ -461,7 +636,7 @@ class Gridder:
         )
 
     @property
-    def sky_vis_gridded(self):
+    def ground_cube(self):
         r"""
         The visibility FFT cube fftshifted for plotting with ``imshow``.
 

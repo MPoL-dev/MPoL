@@ -77,7 +77,7 @@ y = x ** 2
 print(f"x: {x}")
 print(f"y: {y}")
 
-# But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx} = 2*x$. The derivative evaluated at $x = 3$ is $6$.
+# But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx} = 2x$. The derivative evaluated at $x = 3$ is $6$.
 #
 # The magic is that can use PyTorch to get the same answer---no analytic derivative needed!
 

@@ -146,7 +146,8 @@ class GridCoords:
             uu (np.array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
             vv (np.array): array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
 
-        Returns: ``True`` if all visibilities fit within the Fourier grid defined by ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an ``AssertionError`` is raised on the first violated boundary.
+        Returns:
+            ``True`` if all visibilities fit within the Fourier grid defined by ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an ``AssertionError`` is raised on the first violated boundary.
         """
 
         # max freq in dataset
