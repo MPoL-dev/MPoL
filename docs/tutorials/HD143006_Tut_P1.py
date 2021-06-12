@@ -40,7 +40,7 @@ from astropy.utils.data import download_file
 
 # downloading fits file
 fname_F = download_file(
-   'https://almascience.nrao.edu/almadata/lp/DSHARP/images/HD143006_continuum.fits',
+   'https://dl.dropboxusercontent.com/s/k6iv6d8nhvm9arb/HD143006_continuum.fits?dl=0',
    cache=True,
    pkgname='mpol',
 )
