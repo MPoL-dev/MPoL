@@ -1,4 +1,4 @@
-r"""The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the regularization strength, :math:`\zeta`, which aspires to be of order unity for most applications. This provides at least a useful starting point when starting to tune multiple loss functions.
+r"""The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the regularization strength, which aspires to be similar across all terms, providing at least a starting point for tuning multiple loss functions.
 
 If you don't see a loss function you need, it's easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!
 """
@@ -49,7 +49,7 @@ def nll(model_vis, data_vis, weight):
 def nll_gridded(vis, datasetGridded):
     r"""
     Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all
-    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
+    quantities have the *same* shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
     the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real
     and imaginaries in the :math:`\chi^2` sum.
 

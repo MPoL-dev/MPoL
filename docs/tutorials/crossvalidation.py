@@ -31,6 +31,9 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from astropy.io import fits
+import matplotlib
+
 from mpol import (
     gridding,
     coordinates,
@@ -79,7 +82,7 @@ dset = gridder.to_pytorch_dataset()
 # -
 
 # Show the dirty image
-img, beam = gridder.get_dirty_image()
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
 ax.imshow(np.squeeze(img), **kw)
@@ -231,7 +234,7 @@ fig.subplots_adjust(left=0.15, hspace=0.0, wspace=0.2)
 # Building on the previous optimization tutorial, we'll wrap the iterative optimization commands into a training function. This will come in handy, because we'll want to train the model on each of the varied $K$-fold training datasets. In this tutorial, we'll use a loss function of the form
 #
 # $$
-# f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity} + \lambda_{TSV} f_\mathrm{TSV}
+# f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity} + \lambda_{TV} f_\mathrm{TV}
 # $$
 # where the $\lambda$ prefactors are the strength of the regularization terms.
 
@@ -348,4 +351,45 @@ pars = {"lr": 0.5, "lambda_sparsity": 1e-4, "lambda_TV": 1e-4, "epochs": 600}
 print("Cross validation score:", cross_validate(pars))
 train_and_image(pars)
 
+
 # More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``nll_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
+
+# For the purposes of comparison, here is the image produced by the tclean algorithm using CASA. The full commands are in the [mpoldatasets](https://github.com/MPoL-dev/mpoldatasets/blob/main/products/ALMA-logo/tclean-iter.py) package.
+
+fname = download_file(
+    "https://zenodo.org/record/4930016/files/logo_cube.tclean.fits",
+    cache=True,
+    show_progress=True,
+    pkgname="mpol",
+)
+
+hdul = fits.open(fname)
+header = hdul[0].header
+data = 1e3 * hdul[0].data[4]  # mJy/pixel
+# get the coordinate labels
+nx = header["NAXIS1"]
+ny = header["NAXIS2"]
+# RA coordinates
+CDELT1 = 3600 * header["CDELT1"]  # arcsec (converted from decimal deg)
+# DEC coordinates
+CDELT2 = 3600 * header["CDELT2"]  # arcsec
+RA = (np.arange(nx) - nx / 2) * CDELT1  # [arcsec]
+DEC = (np.arange(ny) - ny / 2) * CDELT2  # [arcsec]
+# extent needs to include extra half-pixels.
+# RA, DEC are pixel centers
+ext = (
+    RA[0] - CDELT1 / 2,
+    RA[-1] + CDELT1 / 2,
+    DEC[0] - CDELT2 / 2,
+    DEC[-1] + CDELT2 / 2,
+)  # [arcsec]
+norm = matplotlib.colors.Normalize(vmin=0, vmax=np.max(data))
+
+fig, ax = plt.subplots(nrows=1, figsize=(4.5, 3.5))
+fig.subplots_adjust(left=0.2, bottom=0.2)
+im = ax.imshow(data, extent=ext, origin="lower", animated=True, norm=norm)
+r = 2.4
+ax.set_xlim(r, -r)
+ax.set_ylim(-r, r)
+ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
