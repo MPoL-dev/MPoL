@@ -33,7 +33,7 @@ def test_beam_normalized(gridder):
             gridder._grid_visibilities(weighting=weighting, robust=r)
         else:
             gridder._grid_visibilities(weighting=weighting)
-        beam = gridder.get_dirty_beam()
+        beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
 
         for i in range(gridder.nchan):
             assert pytest.approx(np.max(beam[i]), 1.0)
@@ -42,7 +42,7 @@ def test_beam_normalized(gridder):
 def test_beam_null(gridder, tmp_path):
     r = -0.5
     gridder._grid_visibilities(weighting="briggs", robust=r)
-    beam = gridder.get_dirty_beam()
+    beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
     nulled = gridder._null_dirty_beam()
 
     chan = 4
@@ -79,7 +79,7 @@ def test_beam_null(gridder, tmp_path):
 def test_beam_null_full(gridder, tmp_path):
     r = -0.5
     gridder._grid_visibilities(weighting="briggs", robust=r)
-    beam = gridder.get_dirty_beam()
+    beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
     nulled = gridder._null_dirty_beam(single_channel_estimate=False)
 
     chan = 4
