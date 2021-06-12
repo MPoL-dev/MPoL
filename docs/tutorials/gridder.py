@@ -25,30 +25,17 @@
 #
 # ## Importing data
 #
-# We'll start by using the mock CASA measurement set that we produced in the [visread](https://visread.readthedocs.io/en/latest/) [quickstart](https://visread.readthedocs.io/en/latest/tutorials/plot_baselines.html). You can use your own measurement set (either with real data or create one via CASA simulation) or download the already-made one directly from [Zenodo](https://zenodo.org/record/4460128#.YB4ehGRKidZ).
+# We'll use a mock CASA measurement set that we produced as part of the [mpoldatasets](https://github.com/MPoL-dev/mpoldatasets) package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a "monolithic" distribution with its own Python interpreter (which is difficult to install new packages into). Recently, ["modular" CASA](https://casa.nrao.edu/casadocs-devel/stable/usingcasa/obtaining-and-installing) has made it possible to install the CASA routines into your own Python environment---however the package is only supported on Python 3.6 and RHEL 7 linux. To avoid propagating these restrictive installation requirements to MPoL, we assume that the user provides the arrays of complex visibilities directly. The data requirements of RML imaging are really that simple.
+#
+# In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA ``table`` and ``ms`` tools as described [here](https://mpol-dev.github.io/visread/). The user can use either "monolithic" or "modular" CASA to read the visibilities and save them to a ``.npy`` array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.9, MacOS) you can read these visibilities and pass them to the MPoL routines.
+#
+# It's important to remember that MPoL follows the standard baseline convention as laid out in [Thompson, Moran, and Swenson](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) and other radio interferometry textbooks, while CASA follows a [historically complicated convention](https://casa.nrao.edu/casadocs/casa-5.5.0/knowledgebase-and-memos/casa-memos/casa_memo2_coordconvention_rau.pdf/view) derived from AIPS. The difference between the two can be expressed as the complex conjugate of the visibilities. So, if you find that your image appears upside down and mirrored, you'll want to take ``np.conj`` of your visibilities.
 
-# If you're fine working in Python 3.6 and you have [visread](https://visread.readthedocs.io/) installed, you can read the visibility data from the measurement set by
-#
-#     import visread
-#
-#     vis = visread.read(filename="myMeasurementSet.ms")
-#
-#     vis.swap_convention(CASA_convention=False)
-#     # access your data with
-#     vis.frequencies  # frequencies in GHz
-#     vis.uu  # East-West spatial frequencies in klambda
-#     vis.vv  # North-South spatial frequencies in klambda
-#     vis.weight # weight in 1/Jy^2
-#     vis.data_re  # real components of visibilities in Jy
-#     vis.data_im  # imaginary components of visibilities in Jy
-#
-# It's important to remember to swap from CASA convention to TSM convention using visread's `swap_convention` command, otherwise your image will appear upside down and mirrored.
 
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.utils.data import download_file
 
-# For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file.
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
