@@ -38,6 +38,7 @@ from mpol import (
     gridding,
     coordinates,
     precomposed,
+    fourier,
     losses,
     images,
     datasets,
@@ -171,7 +172,7 @@ cv = datasets.KFoldCrossValidatorGridded(dset, k, dartboard=dartboard, npseed=42
 k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
-flayer = images.FourierCube(coords=coords)
+flayer = fourier.FourierCube(coords=coords)
 flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
 
 # The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities, the dirty image corresponding to those training visibilities, and the "test" visibilities which will be used to evaluate the predictive ability of the model.

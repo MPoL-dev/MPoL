@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import connectors, coordinates, images
+from mpol import connectors, coordinates, fourier, images
 from mpol.constants import *
 
 
 # test instantiate connector
 def test_instantiate_connector(coords, dataset):
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
 
     # create a mock cube that includes negative values
     nchan = dataset.nchan
@@ -38,7 +38,7 @@ def test_instantiate_connector(coords, dataset):
 
 def test_connector_grad(coords, dataset):
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
@@ -59,7 +59,7 @@ def test_connector_grad(coords, dataset):
 
 def test_residual_connector(coords, dataset_cont, tmp_path):
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
 
     # create a mock cube that includes negative values
     nchan = dataset_cont.nchan

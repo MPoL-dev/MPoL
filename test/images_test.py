@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import pytest
 import torch
-
 from astropy.io import fits
-from mpol import gridding, images, utils
+
+from mpol import fourier, gridding, images, utils
 from mpol.constants import *
 
 
@@ -49,6 +49,7 @@ def test_imagecube_grad(coords):
     # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
+
 # test for proper fits scale
 def test_imagecube_tofits(coords, tmp_path):
     # creating base cube
@@ -62,11 +63,13 @@ def test_imagecube_tofits(coords, tmp_path):
 
     # creating output fits file with name 'test_cube_fits_file39.fits'
     # file will be deleted after testing
-    imagecube.to_FITS(fname=tmp_path / 'test_cube_fits_file39.fits', overwrite=True)
+    imagecube.to_FITS(fname=tmp_path / "test_cube_fits_file39.fits", overwrite=True)
 
     # inputting the header from the previously created fits file
-    fits_header = fits.open(tmp_path / 'test_cube_fits_file39.fits')[0].header
-    assert (fits_header['CDELT1'] and fits_header['CDELT2']) == pytest.approx(coords.cell_size / 3600)
+    fits_header = fits.open(tmp_path / "test_cube_fits_file39.fits")[0].header
+    assert (fits_header["CDELT1"] and fits_header["CDELT2"]) == pytest.approx(
+        coords.cell_size / 3600
+    )
 
 
 # test image packing
@@ -89,7 +92,7 @@ def test_fourier_layer(coords, tmp_path):
     )
 
     # calculated the packed FFT using the FourierLayer
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
     # convert img_packed to pytorch tensor
     img_packed_tensor = torch.from_numpy(img_packed[np.newaxis, :, :])
     fourier_packed_num = np.squeeze(flayer.forward(img_packed_tensor).numpy())
@@ -147,12 +150,12 @@ def test_fourier_grad(coords):
     )
 
     # calculated the packed FFT using the FourierLayer
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
     # convert img_packed to pytorch tensor
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
 
     # calculated the packed FFT using the FourierLayer
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
 
     output = flayer.forward(img_packed_tensor)
     loss = torch.sum(torch.abs(output))
