@@ -63,7 +63,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
-    install_requires=["numpy", "scipy", "torch>=1.8.0", "torchvision"],
+    install_requires=["numpy", "scipy", "torch>=1.8.0", "torchvision", "torchkbnufft"],
     extras_require=EXTRA_REQUIRES,
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
