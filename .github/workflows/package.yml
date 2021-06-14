@@ -3,7 +3,7 @@ name: build and upload pip
 on:
   release:
     types:
-      - published
+      - released
 
 jobs:
   deploy:
