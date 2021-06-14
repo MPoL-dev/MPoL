@@ -1,6 +1,9 @@
-name: package test and docs test
+name: test all operating systems pre-release
 
-on: [push, pull_request]
+on:
+  release:
+    types:
+      - prereleased
 
 jobs:
   dl_files:
@@ -29,11 +32,13 @@ jobs:
 
   tests:
     needs: dl_files # don't bother running if we didn't succeed getting the files
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -68,40 +73,3 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
-
-  # if all tests succeed, then
-  # make sure the docs build OK
-  # (but don't deploy to gh-pages)
-  docs:
-    needs: tests # don't bother running if a test failed
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install doc deps
-        run: |
-          pip install .[docs]
-      - name: Install Pandoc dependency
-        run: |
-          sudo apt-get install pandoc
-      - name: Set up node
-        uses: actions/setup-node@v2
-      - name: Install mermaid.js dependency
-        run: |
-          npm install @mermaid-js/mermaid-cli
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
-      - name: Build the docs
-        run: |
-          make -C docs clean
-          make -C docs html MERMAID_PATH="../node_modules/.bin/"
