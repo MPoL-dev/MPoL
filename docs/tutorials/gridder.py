@@ -25,34 +25,21 @@
 #
 # ## Importing data
 #
-# We'll start by using the mock CASA measurement set that we produced in the [visread](https://visread.readthedocs.io/en/latest/) [quickstart](https://visread.readthedocs.io/en/latest/tutorials/plot_baselines.html). You can use your own measurement set (either with real data or create one via CASA simulation) or download the already-made one directly from [Zenodo](https://zenodo.org/record/4460128#.YB4ehGRKidZ).
+# We'll use a mock CASA measurement set that we produced as part of the [mpoldatasets](https://github.com/MPoL-dev/mpoldatasets) package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a "monolithic" distribution with its own Python interpreter (which is difficult to install new packages into). Recently, ["modular" CASA](https://casa.nrao.edu/casadocs-devel/stable/usingcasa/obtaining-and-installing) has made it possible to install the CASA routines into your own Python environment---however the package is only supported on Python 3.6 and RHEL 7 linux. To avoid propagating these restrictive installation requirements to MPoL, we assume that the user provides the arrays of complex visibilities directly. The data requirements of RML imaging are really that simple.
+#
+# In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA ``table`` and ``ms`` tools as described [here](https://mpol-dev.github.io/visread/). The user can use either "monolithic" or "modular" CASA to read the visibilities and save them to a ``.npy`` array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.9, MacOS) you can read these visibilities and pass them to the MPoL routines.
+#
+# It's important to remember that MPoL follows the standard baseline convention as laid out in [Thompson, Moran, and Swenson](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) and other radio interferometry textbooks, while CASA follows a [historically complicated convention](https://casa.nrao.edu/casadocs/casa-5.5.0/knowledgebase-and-memos/casa-memos/casa_memo2_coordconvention_rau.pdf/view) derived from AIPS. The difference between the two can be expressed as the complex conjugate of the visibilities. So, if you find that your image appears upside down and mirrored, you'll want to take ``np.conj`` of your visibilities.
 
-# If you're fine working in Python 3.6 and you have [visread](https://visread.readthedocs.io/) installed, you can read the visibility data from the measurement set by
-#
-#     import visread
-#
-#     vis = visread.read(filename="myMeasurementSet.ms")
-#
-#     vis.swap_convention(CASA_convention=False)
-#     # access your data with
-#     vis.frequencies  # frequencies in GHz
-#     vis.uu  # East-West spatial frequencies in klambda
-#     vis.vv  # North-South spatial frequencies in klambda
-#     vis.weight # weight in 1/Jy^2
-#     vis.data_re  # real components of visibilities in Jy
-#     vis.data_im  # imaginary components of visibilities in Jy
-#
-# It's important to remember to swap from CASA convention to TSM convention using visread's `swap_convention` command, otherwise your image will appear upside down and mirrored.
 
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.utils.data import download_file
 
-# For the purposes of autoexecuting this tutorial without locking us into CASA's Python 3.6 dependency, however, we'll start directly from a saved NPZ file.
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -62,10 +49,9 @@ d = np.load(fname)
 uu = d["uu"]
 vv = d["vv"]
 weight = d["weight"]
-data_re = d["data_re"]
-data_im = -d[
-    "data_im"
-]  # we're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
+data = d["data"]
+data_re = np.real(data)
+data_im = np.imag(data)
 
 # ## The GridCoords object
 
@@ -110,37 +96,47 @@ gridder = gridding.Gridder(
 # if you don't want to specify your GridCoords object separately.
 
 # ## Visualizing the images
-# To visualize the images, you can call [Gridder.get_dirty_image](../api.rst#mpol.gridding.Gridder.get_dirty_image). This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords and then get the diagnostic beam and image cubes that correspond to these gridded visibilities.
+# To visualize the images, you can call [Gridder.get_dirty_image](../api.rst#mpol.gridding.Gridder.get_dirty_image). This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by GridCoords and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.
 # There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis.](http://www.aoc.nrao.edu/dissertations/dbriggs/).
 # We are usually interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the "dirty beam" and "dirty image" by radio astronomers. Those are accessible via the following routine
 
-img, beam = gridder.get_dirty_image(weighting="uniform")
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
 
 # Note that these are three dimensional image cubes with the same `nchan` as the input visibility data.
 
 print(beam.shape)
 print(img.shape)
 
-# And the image has units of "Jy/beam". The gridder object also now has a dense representation of the visibility data attached to it as `gridder.gridded_vis`, or separately `gridder.gridded_re` and `gridder.gridded_im`, however, we won't normally need to access these products directly.
-# Now let's visualize the central channel of these cubes
-
-# +
+# And the image has units of "Jy/beam".
 
 chan = 4
 kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
-
 fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
-
 ax[0].imshow(beam[chan], **kw)
 ax[0].set_title("beam")
 ax[1].imshow(img[chan], **kw)
 ax[1].set_title("image")
-
 for a in ax:
     a.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
     a.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-
 fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
-# -
 
-# If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA convention to the regular TMS convention.
+
+# If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by conjugating your visibilities.
+
+# ## Checking data weights
+# When working with real data, it is possible that the statistical uncertainties---conveyed by the weights---were [not correctly calibrated by certain CASA versions](https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html). For dirty and CLEAN imaging purposes, it's OK if the weights are not correctly scaled so long as their *relative* scalings are correct (to each other). For forward-modeling and RML imaging, it's important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a ``RuntimeWarning`` if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid---hence why these routines issue a warning.
+#
+# ```
+#   img, beam = gridder.get_dirty_image(
+#         weighting="uniform", check_visibility_scatter=True, max_scatter=1.2
+#   )
+# ```
+#
+# However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging, incorrectly scaled weights will raise a RuntimeError. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.
+#
+# The sensitivity of the export routines can be adjusted by changing the ``max_scatter`` keyword. Scatter checking can be disabled by setting ``check_visibility_scatter=False``, but is not recommended unless you are trying to debug things.
+#
+# ```
+#   dset = gridder.to_pytorch_dataset(check_visibility_scatter=True, max_scatter=1.2)
+# ```

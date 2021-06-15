@@ -14,16 +14,20 @@ Documentation and installation instructions: [https://mpol-dev.github.io/MPoL/](
 
 If you use this package or derivatives of it, please cite
 
-    @software{ian_czekala_2020_3647603,
-    author       = {Ian Czekala, Brianna Zawadzki, and
-                    Ryan Loomis},
-    title        = {iancze/MPoL: Pip installable package},
-    month        = feb,
-    year         = 2020,
+    @software{mpol,
+    author       = {Ian Czekala and
+                    Brianna Zawadzki and
+                    Ryan Loomis and
+                    Hannah Grzybowski and
+                    Robert Frazier and
+                    Tyler Quinn},
+    title        = {MPoL-dev/MPoL: v0.1.1 Release},
+    month        = jun,
+    year         = 2021,
     publisher    = {Zenodo},
-    version      = {v0.0.4},
-    doi          = {10.5281/zenodo.3647603},
-    url          = {https://doi.org/10.5281/zenodo.3647603}
+    version      = {v0.1.1},
+    doi          = {10.5281/zenodo.4939048},
+    url          = {https://doi.org/10.5281/zenodo.4939048}
     }
 
 ---

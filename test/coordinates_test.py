@@ -85,18 +85,14 @@ def test_grid_coords_neg_cell_size():
 
 # instantiate a Gridder object with mock visibilities
 def test_grid_coords_fit(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
+    uu, vv, weight, data_re, data_im = mock_visibility_data
 
     coords = coordinates.GridCoords(cell_size=0.005, npix=800)
     coords.check_data_fit(uu, vv)
 
 
 def test_grid_coords_fail(mock_visibility_data):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
+    uu, vv, weight, data_re, data_im = mock_visibility_data
 
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 

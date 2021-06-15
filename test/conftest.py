@@ -9,11 +9,11 @@ from mpol import coordinates, gridding
 
 # fixture to provide tuple of uu, vv, weight, data_re, and data_im values
 @pytest.fixture(scope="session")
-def mock_visibility_data():
+def mock_visibility_archive():
 
     # use astropy routines to cache data
     fname = download_file(
-        "https://zenodo.org/record/4498439/files/logo_cube.npz",
+        "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
         cache=True,
         pkgname="mpol",
     )
@@ -22,14 +22,28 @@ def mock_visibility_data():
 
 
 @pytest.fixture
-def mock_visibility_data_cont(mock_visibility_data):
+def mock_visibility_data(mock_visibility_archive):
+    d = mock_visibility_archive
+    uu = d["uu"]
+    vv = d["vv"]
+    weight = d["weight"]
+    data = d["data"]
+    data_re = np.real(data)
+    data_im = np.imag(data)  # CASA convention
+
+    return uu, vv, weight, data_re, data_im
+
+
+@pytest.fixture
+def mock_visibility_data_cont(mock_visibility_archive):
     chan = 4
-    d = mock_visibility_data
+    d = mock_visibility_archive
     uu = d["uu"][chan]
     vv = d["vv"][chan]
     weight = d["weight"][chan]
-    data_re = d["data_re"][chan]
-    data_im = -d["data_im"][chan]  # CASA convention
+    data = d["data"][chan]
+    data_re = np.real(data)
+    data_im = np.imag(data)  # CASA convention
 
     return uu, vv, weight, data_re, data_im
 
@@ -41,12 +55,7 @@ def coords():
 
 @pytest.fixture
 def dataset(mock_visibility_data, coords):
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-    weight = d["weight"]
-    data_re = d["data_re"]
-    data_im = -d["data_im"]  # CASA convention
+    uu, vv, weight, data_re, data_im = mock_visibility_data
 
     gridder = gridding.Gridder(
         coords=coords,
@@ -61,16 +70,9 @@ def dataset(mock_visibility_data, coords):
 
 
 @pytest.fixture
-def dataset_cont(mock_visibility_data, coords):
+def dataset_cont(mock_visibility_data_cont, coords):
 
-    chan = 4
-    d = mock_visibility_data
-    uu = d["uu"][chan]
-    vv = d["vv"][chan]
-    weight = d["weight"][chan]
-    data_re = d["data_re"][chan]
-    data_im = -d["data_im"][chan]  # CASA convention
-
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
     gridder = gridding.Gridder(
         coords=coords,
         uu=uu,
@@ -89,12 +91,7 @@ def crossvalidation_products(mock_visibility_data):
     # better matched to the extremes of the mock dataset
     coords = coordinates.GridCoords(cell_size=0.04, npix=256)
 
-    d = mock_visibility_data
-    uu = d["uu"]
-    vv = d["vv"]
-    weight = d["weight"]
-    data_re = d["data_re"]
-    data_im = -d["data_im"]  # CASA convention
+    uu, vv, weight, data_re, data_im = mock_visibility_data
 
     gridder = gridding.Gridder(
         coords=coords,
