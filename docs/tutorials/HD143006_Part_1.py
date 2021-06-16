@@ -122,7 +122,7 @@ ax.set_title(r'$U$, $V$ Visibilities')
 
 # ### Creating the Gridder
 #
-# To create the MPoL Gridder object, we need a `cell_size` and the number of pixels in the width of our image, `npix`. You can read more about these properties in the [GridCoords](https://mpol-dev.github.io/MPoL/api.html#mpol.coordinates.GridCoords) API Documentation.  In the fits header we see our image is 3000x3000 pixels, so `npix=3000`. Getting our cell size in terms of arcseconds is a bit more tricky. Our fits image has a header called `CDELT1` which is the scaling in degrees. To get this into arcseconds we multiply by 3600. We save this as `cdelt_scaling`. `cdelt_scaling` can be negative, and cell_size must be positive so we will take the absolute value of this.
+# To create the MPoL Gridder object, we need a `cell_size` and the number of pixels in the width of our image, `npix`. You can read more about these properties in the [GridCoords](https://mpol-dev.github.io/MPoL/api.html#mpol.coordinates.GridCoords) API Documentation.  In the fits header we see our image is 3000x3000 pixels, this is very large. For our purposes we can get away with `npix=520`. Getting our cell size in terms of arcseconds is a bit more tricky. Our fits image has a header called `CDELT1` which is the scaling in degrees. To get this into arcseconds we multiply by 3600. We save this as `cdelt_scaling`. `cdelt_scaling` can be negative, and cell_size must be positive so we will take the absolute value of this.
 
 # opening the fits file
 dfits = fits.open(fname_F)
@@ -137,7 +137,7 @@ dfits.close()
 from mpol import gridding, coordinates
 
 # creating Gridder object
-coords = coordinates.GridCoords(cell_size=cell_size, npix=3000)
+coords = coordinates.GridCoords(cell_size=cell_size, npix=512)
 gridder = gridding.Gridder(
     coords = coords,
     uu=uu,
@@ -182,7 +182,7 @@ plot(img3, imtitle="robust_-1.0")
 
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
 fig, ax = plt.subplots(nrows = 2)
-ax[0].imshow(np.squeeze(clean_fits), **kw)
+ax[0].imshow(np.squeeze(clean_fits), origin="lower", extent=ext)
 ax[0].set_title('DSHARP CLEAN Image')
 ax[0].set_xlim(left=.75, right=-.75)
 ax[0].set_ylim(bottom=-.75, top=.75)
