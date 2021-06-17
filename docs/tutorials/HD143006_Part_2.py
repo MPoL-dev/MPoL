@@ -170,6 +170,54 @@ plt.tight_layout()
 #
 # Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because ....?.... Let us do that now.
 
+
+def log_figure(model, residuals):
+    """
+    Create a matplotlib figure showing the current image state.
+
+    Args:
+        model: neural net model
+    """
+
+    # populate residual connector
+    residuals()
+
+    fig, ax = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
+    im = ax[0, 0].imshow(
+        np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+    )
+    plt.colorbar(im, ax=ax[0, 0])
+
+    im = ax[0, 1].imshow(
+        np.squeeze(residuals.sky_cube.detach().cpu().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.img_ext,
+    )
+    plt.colorbar(im, ax=ax[0, 1])
+
+    im = ax[1, 0].imshow(
+        np.squeeze(torch.log(model.fcube.ground_amp.detach()).cpu().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.vis_ext,
+    )
+    plt.colorbar(im, ax=ax[1, 0])
+
+    im = ax[1, 1].imshow(
+        np.squeeze(torch.log(residuals.ground_amp.detach()).cpu().numpy()),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.vis_ext,
+    )
+    plt.colorbar(im, ax=ax[1, 1])
+
+    return fig
+
+
 from mpol import losses, connectors
 
 
