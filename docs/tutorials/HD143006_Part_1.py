@@ -109,12 +109,12 @@ data = dnpz['data']
 
 # Let's quickly plot the U,V visibilities as seen in the [Cross Validation Tutorial](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) and the [Visread docs](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
 
-# fig, ax = plt.subplots(nrows=1)
-# ax.scatter(uu,vv, s=.5, rasterized=True, linewidths=0.0, c='k')
-# ax.scatter(-uu,-vv, s=.5, rasterized=True, linewidths=0.0, c='k')
-# ax.set_xlabel(r"$u$ [k$\lambda$]")
-# ax.set_ylabel(r"$v$ [k$\lambda$]")
-# ax.set_title(r'$U$, $V$ Visibilities')
+fig, ax = plt.subplots(nrows=1)
+ax.scatter(uu,vv, s=.5, rasterized=True, linewidths=0.0, c='k')
+ax.scatter(-uu,-vv, s=.5, rasterized=True, linewidths=0.0, c='k')
+ax.set_xlabel(r"$u$ [k$\lambda$]")
+ax.set_ylabel(r"$v$ [k$\lambda$]")
+ax.set_title(r'$U$, $V$ Visibilities')
 
 # As you can see, there are very few visibilities > 7,000 ($k\lambda$), and a very dense region of visibilities between -2000 and 2000 ($k\lambda$). This indicates outliers at the higher frequencies while the bulk of our data stems from these lower frequencies.
 
@@ -149,47 +149,67 @@ gridder = gridding.Gridder(
 #
 # *Note: when `robust=-2.0` the result is similar to that of the Uniform scale*
 
-# Great! Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
-#
-# def plot(img, imtitle="image"):
-#     kw = {"origin": "lower", "extent": gridder.coords.img_ext}
-#     fig, ax = plt.subplots(ncols=1)
-#     im = ax.imshow(np.squeeze(img), **kw)
-#     plt.colorbar(im)
-#     ax.set_title(imtitle)
-#     ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-#     ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-#     plt.xlim(left=.75, right=-.75)
-#     plt.ylim(bottom=-.75, top=.75)
-#
-# img, beam = gridder.get_dirty_image(weighting='uniform')
-# img1, beam1 = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
-# img2, beam2 = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
-# img3, beam3 = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
-#
-# plot(img, imtitle="uniform")
-# plot(img1, imtitle="robust_1.0")
-# plot(img2, imtitle="robust_0")
-# plot(img3, imtitle="robust_-1.0")
-#
-# # Below we plot the DSHARP CLEAN image alongside the MPoL Dirty Image weighted with the Briggs scale and `robust=0.0` for comparison.
-#
-# kw = {"origin": "lower", "extent": gridder.coords.img_ext}
-# fig, ax = plt.subplots(nrows = 2)
-# ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
-# ax[0].set_xlim(left=.75, right=-.75)
-# ax[0].set_ylim(bottom=-.75, top=.75)
-# ax[0].set_title('DSHARP CLEAN Image')
-# ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-# ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-# ax[1].imshow(np.squeeze(img), **kw)
-# ax[1].set_title('MPoL Dirty Image')
-# ax[1].set_xlim(left=.75, right=-.75)
-# ax[1].set_ylim(bottom=-.75, top=.75)
-# ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-# ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-# fig.set_figheight(10)
-# plt.tight_layout()
+# Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
+
+# reclaiming memory from no-longer-needed variables
+# needed for doc building on github
+import gc
+get_ipython().run_line_magic('reset_selective', '-f dfits')
+get_ipython().run_line_magic('reset_selective', '-f dnpz')
+get_ipython().run_line_magic('reset_selective', '-f uu')
+get_ipython().run_line_magic('reset_selective', '-f uu')
+get_ipython().run_line_magic('reset_selective', '-f weight')
+get_ipython().run_line_magic('reset_selective', '-f data')
+get_ipython().run_line_magic('reset_selective', '-f data_re')
+get_ipython().run_line_magic('reset_selective', '-f data_im')
+get_ipython().run_line_magic('reset_selective', '-f fig')
+get_ipython().run_line_magic('reset_selective', '-f ax')
+gc.collect()
+
+def plot(img, imtitle="image"):
+    kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+    fig, ax = plt.subplots(ncols=1)
+    im = ax.imshow(np.squeeze(img), **kw)
+    plt.colorbar(im)
+    ax.set_title(imtitle)
+    ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+    ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+    plt.xlim(left=.75, right=-.75)
+    plt.ylim(bottom=-.75, top=.75)
+
+img, beam = gridder.get_dirty_image(weighting='uniform')
+plot(img, imtitle="uniform")
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+plot(img, imtitle="robust_1.0")
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
+plot(img, imtitle="robust_-1.0")
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
+plot(img, imtitle="robust_0")
+
+# Below we plot the DSHARP CLEAN image alongside the MPoL Dirty Image weighted with the Briggs scale and `robust=0.0` for comparison.
+
+
+kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+# reclaiming memory
+get_ipython().run_line_magic('reset_selective', '-f gridder')
+fig, ax = plt.subplots(nrows = 2)
+ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
+ax[0].set_xlim(left=.75, right=-.75)
+ax[0].set_ylim(bottom=-.75, top=.75)
+ax[0].set_title('DSHARP CLEAN Image')
+ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+ax[1].imshow(np.squeeze(img), **kw)
+ax[1].set_title('MPoL Dirty Image')
+ax[1].set_xlim(left=.75, right=-.75)
+ax[1].set_ylim(bottom=-.75, top=.75)
+ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+fig.set_figheight(10)
+plt.tight_layout()
 
 # As you can see there are many similarities between the diagnostic dirty image and the image produced by the DSHARP survey using the CLEAN algorithm ([Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract)). While the dirty image is more noisy, it still maintains many distinct features present in the CLEAN image. In the next part of the HD143006 tutorial, we will be cleaning the diagnostic dirty image using RML through Neural Networks, Optimization, and Cross Validation with help from [PyTorch](pytorch.org).
 #
