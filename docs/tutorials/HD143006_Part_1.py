@@ -150,46 +150,46 @@ gridder = gridding.Gridder(
 # *Note: when `robust=-2.0` the result is similar to that of the Uniform scale*
 
 # Great! Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
-
-def plot(img, imtitle="image"):
-    kw = {"origin": "lower", "extent": gridder.coords.img_ext}
-    fig, ax = plt.subplots(ncols=1)
-    im = ax.imshow(np.squeeze(img), **kw)
-    plt.colorbar(im)
-    ax.set_title(imtitle)
-    ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-    ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-    plt.xlim(left=.75, right=-.75)
-    plt.ylim(bottom=-.75, top=.75)
-
-img, beam = gridder.get_dirty_image(weighting='uniform')
-img1, beam1 = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
-img2, beam2 = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
-img3, beam3 = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
-
-plot(img, imtitle="uniform")
-plot(img1, imtitle="robust_1.0")
-plot(img2, imtitle="robust_0")
-plot(img3, imtitle="robust_-1.0")
-
-# Below we plot the DSHARP CLEAN image alongside the MPoL Dirty Image weighted with the Briggs scale and `robust=0.0` for comparison.
-
-kw = {"origin": "lower", "extent": gridder.coords.img_ext}
-fig, ax = plt.subplots(nrows = 2)
-ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
-ax[0].set_xlim(left=.75, right=-.75)
-ax[0].set_ylim(bottom=-.75, top=.75)
-ax[0].set_title('DSHARP CLEAN Image')
-ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].imshow(np.squeeze(img), **kw)
-ax[1].set_title('MPoL Dirty Image')
-ax[1].set_xlim(left=.75, right=-.75)
-ax[1].set_ylim(bottom=-.75, top=.75)
-ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-fig.set_figheight(10)
-plt.tight_layout()
+#
+# def plot(img, imtitle="image"):
+#     kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+#     fig, ax = plt.subplots(ncols=1)
+#     im = ax.imshow(np.squeeze(img), **kw)
+#     plt.colorbar(im)
+#     ax.set_title(imtitle)
+#     ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+#     ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+#     plt.xlim(left=.75, right=-.75)
+#     plt.ylim(bottom=-.75, top=.75)
+#
+# img, beam = gridder.get_dirty_image(weighting='uniform')
+# img1, beam1 = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+# img2, beam2 = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
+# img3, beam3 = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
+#
+# plot(img, imtitle="uniform")
+# plot(img1, imtitle="robust_1.0")
+# plot(img2, imtitle="robust_0")
+# plot(img3, imtitle="robust_-1.0")
+#
+# # Below we plot the DSHARP CLEAN image alongside the MPoL Dirty Image weighted with the Briggs scale and `robust=0.0` for comparison.
+#
+# kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+# fig, ax = plt.subplots(nrows = 2)
+# ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
+# ax[0].set_xlim(left=.75, right=-.75)
+# ax[0].set_ylim(bottom=-.75, top=.75)
+# ax[0].set_title('DSHARP CLEAN Image')
+# ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+# ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+# ax[1].imshow(np.squeeze(img), **kw)
+# ax[1].set_title('MPoL Dirty Image')
+# ax[1].set_xlim(left=.75, right=-.75)
+# ax[1].set_ylim(bottom=-.75, top=.75)
+# ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+# ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+# fig.set_figheight(10)
+# plt.tight_layout()
 
 # As you can see there are many similarities between the diagnostic dirty image and the image produced by the DSHARP survey using the CLEAN algorithm ([Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract)). While the dirty image is more noisy, it still maintains many distinct features present in the CLEAN image. In the next part of the HD143006 tutorial, we will be cleaning the diagnostic dirty image using RML through Neural Networks, Optimization, and Cross Validation with help from [PyTorch](pytorch.org).
 #
