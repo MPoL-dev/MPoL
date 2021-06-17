@@ -1,6 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
 
+# + [markdown] cell_id="00000-bfed870b-7d25-4899-b633-234d9e47dfa7" deepnote_cell_type="markdown"
 # # HD143006 Tutorial Part 2
 #
 # This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial and will follow the MPoL tutorials on [Optimization](https://mpol-dev.github.io/MPoL/tutorials/optimization.html) and [Cross Validation](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html).It is assumed the users have familiarized themselves with these tutorials before hand.
@@ -10,9 +22,7 @@
 #
 # *You can either download these two files (HD143006_continuum.fits and HD143006_continuum.npz) directly to your working directory, or use astropy to download them during run time.*
 
-# In[25]:
-
-
+# + cell_id="00001-be94721b-eee2-4e2e-96e2-dc65b9fd4f5b" deepnote_cell_type="code" deepnote_to_be_reexecuted=false execution_millis=663 execution_start=1623447169390 source_hash="4f0f20f8" tags=[]
 from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np
@@ -43,10 +53,7 @@ cell_size = abs(cdelt_scaling)  # [arcsec]
 # close fits file
 dfits.close()
 
-
-# In[26]:
-
-
+# + cell_id="00008-d56e3afe-45cf-4fe5-a4e7-1803f28deec4" deepnote_cell_type="code" deepnote_to_be_reexecuted=false execution_millis=27 execution_start=1623441758279 source_hash="b76fed2d"
 from mpol import gridding, coordinates
 
 # creating Gridder object
@@ -59,7 +66,7 @@ gridder = gridding.Gridder(
     data_re=data.real,  # seperating the real and imaginary values of our data
     data_im=data.imag,
 )
-
+# -
 
 # We now have everything from the last tutorial loaded and can begin the process of Optimization and Cross Validation to improve our image quality.
 #
@@ -67,34 +74,23 @@ gridder = gridding.Gridder(
 #
 # First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as these options lead to an already well optimized image (see [Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html)).
 
-# In[27]:
-
-
 import torch
 
 img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
 # taking the dirty image and making it a tensor
 dirty_image = torch.tensor(img.copy())
 
-
 # Now we create the model.
-
-# In[28]:
-
 
 from mpol.precomposed import SimpleNet
 
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
-
 
 # ### Loss and Training Functions
 #
 # Now that we have our model and data, we need a loss function so we can help direct the Neural Network's learning. For this tutorial, will will use the MSELoss function which is part of the PyTorch library. We also want to create a Writer object so we can observe our Network's state at any point.
 #
 # *(i think this is correct about the writer, a little unsure)*
-
-# In[29]:
-
 
 from torch.utils.tensorboard import SummaryWriter
 
@@ -103,8 +99,6 @@ writer = SummaryWriter()
 
 
 # Now let us create a training function to train our SimpleNet
-
-# In[30]:
 
 
 def train(model, dset, config, optimizer, loss_fn, writer):
@@ -123,24 +117,14 @@ def train(model, dset, config, optimizer, loss_fn, writer):
 
 # Now let's make our optimizer and our `config` variable. For the optimizer we will be following the [Cross Validation](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) tutorial and for the `config` we will start with a non-agressive learning rate and a low number of epochs.
 
-# In[31]:
-
-
 config = {"lr": 0.5, "epochs": 500}
 optim = torch.optim.Adam(model.parameters(), lr=config["lr"])
 
-
 # Finally, lets run our training function and then plot the results.
-
-# In[32]:
-
 
 train(model, dirty_image, config, optim, loss, writer)
 
-
-# In[33]:
-
-
+# +
 fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
 
 im = ax[0].imshow(
@@ -169,18 +153,15 @@ ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 ax[1].set_title("MPoL Optimized Dirty Image")
 plt.tight_layout()
 
-
-# In[34]:
-
-
+# +
 # EDIT/MOVE this is the loss function
 
-get_ipython().run_line_magic("load_ext", "tensorboard")
-get_ipython().run_line_magic("tensorboard", "--logdir logs")
+# %load_ext tensorboard
+# %tensorboard --logdir logs
 
 # NOTE- The tensorboard info can also be accessed from the terminal using
 # tensorboard --logdir=runs
-
+# -
 
 # Will be changing code around and updating this a little, just wanted to see the as-is results from optimization loop
 #
@@ -188,9 +169,6 @@ get_ipython().run_line_magic("tensorboard", "--logdir logs")
 # ### Cross Validation
 #
 # Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because ....?.... Let us do that now.
-
-# In[10]:
-
 
 from mpol import losses, connectors
 
@@ -250,17 +228,12 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
 
 # Just like in the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) we will need a `test` function and a `cross_validate` function. We impliment these below.
 
-# In[11]:
-
 
 def test(model, dataset):
     model.eval()
     vis = model.forward()
     loss = losses.nll_gridded(vis, dataset)
     return loss.item()
-
-
-# In[12]:
 
 
 def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
@@ -289,14 +262,9 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
 
 # Now we will impliment hyperparameter tuning with Ray\[Tune\]. To do this, we need a function that only takes a `config` variable as input. We will call this `trainable`. Using Ray\[Tune\] is rather straight forward. You set up a `tune.run()` object with your function and the parameters and it will calculate the best parameters (this needs to be worded better).
 
-# In[13]:
-
 
 def trainable(config):
     cross_validate(model, config, k_fold_datasets, model_state)
-
-
-# In[14]:
 
 
 from mpol import datasets
@@ -307,10 +275,6 @@ dataset = gridder.to_pytorch_dataset()
 k = 5
 cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed=42)
 k_fold_datasets = [(train, test) for (train, test) in cv]
-
-
-# In[15]:
-
 
 from ray import tune
 import ray
@@ -332,10 +296,7 @@ analysis = tune.run(
 )
 print("Best config: ", analysis.get_best_config(metric="cv_score", mode="min"))
 
-
-# In[16]:
-
-
+# +
 fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
 
 im = ax[0].imshow(
@@ -363,12 +324,6 @@ ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 ax[1].set_title("MPoL Optimized Dirty Image")
 plt.tight_layout()
-
-
-# In[17]:
-
+# -
 
 torch.save(model.state_dict(), "model1.pt")
-
-
-# In[ ]:
