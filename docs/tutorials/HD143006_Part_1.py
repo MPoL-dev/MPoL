@@ -109,12 +109,12 @@ data = dnpz['data']
 
 # Let's quickly plot the U,V visibilities as seen in the [Cross Validation Tutorial](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) and the [Visread docs](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
 
-fig, ax = plt.subplots(nrows=1)
-ax.scatter(uu,vv, s=.5, rasterized=True, linewidths=0.0, c='k')
-ax.scatter(-uu,-vv, s=.5, rasterized=True, linewidths=0.0, c='k')
-ax.set_xlabel(r"$u$ [k$\lambda$]")
-ax.set_ylabel(r"$v$ [k$\lambda$]")
-ax.set_title(r'$U$, $V$ Visibilities')
+# fig, ax = plt.subplots(nrows=1)
+# ax.scatter(uu,vv, s=.5, rasterized=True, linewidths=0.0, c='k')
+# ax.scatter(-uu,-vv, s=.5, rasterized=True, linewidths=0.0, c='k')
+# ax.set_xlabel(r"$u$ [k$\lambda$]")
+# ax.set_ylabel(r"$v$ [k$\lambda$]")
+# ax.set_title(r'$U$, $V$ Visibilities')
 
 # As you can see, there are very few visibilities > 7,000 ($k\lambda$), and a very dense region of visibilities between -2000 and 2000 ($k\lambda$). This indicates outliers at the higher frequencies while the bulk of our data stems from these lower frequencies.
 
