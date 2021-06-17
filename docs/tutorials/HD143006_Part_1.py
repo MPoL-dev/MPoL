@@ -95,15 +95,13 @@ plt.ylim(top=0.75, bottom=-0.75)
 plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 
-# This is the image produced by the CLEAN algorithm used by the DSHARP team.  In Part 1 of this tutorial we will be creating an MPoL Gridder object and  the diagnostic dirty image. [**Part 2**](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_2.html) of the tutorial will cover the optimization loop of the model to create the RML image. 
-#
-# ### Plotting the Visibilities
+# This is the image produced by the CLEAN algorithm used by the DSHARP team.  In Part 1 of this tutorial we will be creating an MPoL Gridder object and  the diagnostic dirty image. [**Part 2**](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_2.html) of the tutorial will cover the optimization loop of the model to create the RML image.
 #
 # To create the dirty image, we will use the extracted visibilities from the npz file and the MPoL Gridder and Coordinates packages.
 #
 
 # load extracted visibilities from npz file
-dnpz = np.load(fname_EV) 
+dnpz = np.load(fname_EV)
 uu = dnpz['uu']
 vv = dnpz['vv']
 weight = dnpz['weight']
@@ -120,9 +118,7 @@ ax.set_title(r'$U$, $V$ Visibilities')
 
 # As you can see, there are very few visibilities > 7,000 ($k\lambda$), and a very dense region of visibilities between -2000 and 2000 ($k\lambda$). This indicates outliers at the higher frequencies while the bulk of our data stems from these lower frequencies.
 
-# ### Creating the Gridder
-#
-# To create the MPoL Gridder object, we need a `cell_size` and the number of pixels in the width of our image, `npix`. You can read more about these properties in the [GridCoords](https://mpol-dev.github.io/MPoL/api.html#mpol.coordinates.GridCoords) API Documentation.  In the fits header we see our image is 3000x3000 pixels, this is very large. For our purposes we can get away with `npix=520`. Getting our cell size in terms of arcseconds is a bit more tricky. Our fits image has a header called `CDELT1` which is the scaling in degrees. To get this into arcseconds we multiply by 3600. We save this as `cdelt_scaling`. `cdelt_scaling` can be negative, and cell_size must be positive so we will take the absolute value of this.
+# To create the MPoL Gridder object, we need a `cell_size` and the number of pixels in the width of our image, `npix`. You can read more about these properties in the [GridCoords](https://mpol-dev.github.io/MPoL/api.html#mpol.coordinates.GridCoords) API Documentation.  In the fits header we see our image is 3000x3000 pixels, so `npix=3000`. Getting our cell size in terms of arcseconds is a bit more tricky. Our fits image has a header called `CDELT1` which is the scaling in degrees. To get this into arcseconds we multiply by 3600. We save this as `cdelt_scaling`. `cdelt_scaling` can be negative, and cell_size must be positive so we will take the absolute value of this.
 
 # opening the fits file
 dfits = fits.open(fname_F)
@@ -137,27 +133,21 @@ dfits.close()
 from mpol import gridding, coordinates
 
 # creating Gridder object
+data_re = data.real
+data_im = data.imag
 coords = coordinates.GridCoords(cell_size=cell_size, npix=512)
 gridder = gridding.Gridder(
-    coords = coords,
+    coords=coords,
     uu=uu,
     vv=vv,
     weight=weight,
-    data_re=data.real, # separating the real and imaginary values of our data
-    data_im=data.imag
+    data_re=data_re, # separating the real and imaginary values of our data
+    data_im=data_im
 )
 
-# ### The Dirty Image
+# We now have everything we need to get the MPoL dirty image. No RML methods will be applied in Part 1 of this tutorial. Here we are using [Gridder.get_dirty_image()](../api.rst#mpol.gridding.Gridder.get_dirty_image) to average the visibilities to the grid defined by gridder and from there we get our dirty image and dirty beam. There are different ways to average the visibilities, called weighting, and here we use Uniform and Briggs weighting to find and produce a dirty image that resembles the CLEAN image. More info on the weighting can be read in the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting). For the Briggs weighting, we will use three different values for the `robust` variable. This dictates how aggresive our weight scaling is towards image resolution or image sensitivity.
 #
-# We now have everything we need to get the MPoL dirty image. No RML methods will be applied in Part 1 of this tutorial. Here we are using [Gridder.get_dirty_image()](../api.rst#mpol.gridding.Gridder.get_dirty_image) to average the visibilities to the grid defined by gridder and from there we get our dirty image and dirty beam. There are different ways to average the visibilities, called weighting, and here we use Uniform and Briggs weighting to find and produce a dirty image that resembles the CLEAN image. More info on the weighting can be read in the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting). For the Briggs weighting, we will use three different values for the `robust` variable. This dictates how aggresive our weight scaling is towards image resolution or image sensitivity. 
-# 
 # *Note: when `robust=-2.0` the result is similar to that of the Uniform scale*
-
-img, beam = gridder.get_dirty_image(weighting='uniform')
-img1, beam1 = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
-img2, beam2 = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
-img3, beam3 = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
-
 
 # Great! Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
 
@@ -171,7 +161,11 @@ def plot(img, imtitle="image"):
     ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
     plt.xlim(left=.75, right=-.75)
     plt.ylim(bottom=-.75, top=.75)
-    return ax
+
+img, beam = gridder.get_dirty_image(weighting='uniform')
+img1, beam1 = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+img2, beam2 = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
+img3, beam3 = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
 
 plot(img, imtitle="uniform")
 plot(img1, imtitle="robust_1.0")
@@ -182,13 +176,13 @@ plot(img3, imtitle="robust_-1.0")
 
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
 fig, ax = plt.subplots(nrows = 2)
-ax[0].imshow(np.squeeze(clean_fits), origin="lower", extent=ext)
-ax[0].set_title('DSHARP CLEAN Image')
+ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
 ax[0].set_xlim(left=.75, right=-.75)
 ax[0].set_ylim(bottom=-.75, top=.75)
+ax[0].set_title('DSHARP CLEAN Image')
 ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].imshow(np.squeeze(img2), **kw)
+ax[1].imshow(np.squeeze(img), **kw)
 ax[1].set_title('MPoL Dirty Image')
 ax[1].set_xlim(left=.75, right=-.75)
 ax[1].set_ylim(bottom=-.75, top=.75)
@@ -197,5 +191,5 @@ ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 fig.set_figheight(10)
 plt.tight_layout()
 
-# As you can see there are many similarities between the diagnostic dirty image and the image produced by the DSHARP survey using the CLEAN algorithm ([Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract)). While the dirty image is more noisy, it still maintains many distinct features present in the CLEAN image. In the next part of the HD143006 tutorial, we will be cleaning the diagnostic dirty image using RML through Neural Networks, Optimization, and Cross Validation with help from [PyTorch](pytorch.org). 
-# 
+# As you can see there are many similarities between the diagnostic dirty image and the image produced by the DSHARP survey using the CLEAN algorithm ([Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract)). While the dirty image is more noisy, it still maintains many distinct features present in the CLEAN image. In the next part of the HD143006 tutorial, we will be cleaning the diagnostic dirty image using RML through Neural Networks, Optimization, and Cross Validation with help from [PyTorch](pytorch.org).
+#
