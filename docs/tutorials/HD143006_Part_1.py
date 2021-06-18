@@ -151,19 +151,18 @@ gridder = gridding.Gridder(
 
 # reclaiming memory from no-longer-needed variables
 # needed for doc building on github
-import gc
-from IPython import get_ipython
-get_ipython().run_line_magic('reset_selective', '-f dfits')
-get_ipython().run_line_magic('reset_selective', '-f dnpz')
-get_ipython().run_line_magic('reset_selective', '-f uu')
-get_ipython().run_line_magic('reset_selective', '-f uu')
-get_ipython().run_line_magic('reset_selective', '-f weight')
-get_ipython().run_line_magic('reset_selective', '-f data')
-get_ipython().run_line_magic('reset_selective', '-f data_re')
-get_ipython().run_line_magic('reset_selective', '-f data_im')
-get_ipython().run_line_magic('reset_selective', '-f fig')
-get_ipython().run_line_magic('reset_selective', '-f ax')
-gc.collect()
+# + nbsphinx="hidden"
+# %%reset_selective -f dfits
+# %reset_selective -f dnpz
+# %reset_selective -f uu
+# %reset_selective -f vv
+# %reset_selective -f weight
+# %reset_selective -f data
+# %reset_selective -f data_re
+# %reset_selective -f data_im
+# %reset_selective -f fig
+# %reset_selective -f ax
+
 
 def plot(img, imtitle="image"):
     kw = {"origin": "lower", "extent": gridder.coords.img_ext}
@@ -177,14 +176,14 @@ def plot(img, imtitle="image"):
     plt.ylim(bottom=-.75, top=.75)
     return ax
 
-img, beam = gridder.get_dirty_image(weighting='uniform')
-plot(img, imtitle="uniform")
-
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
-plot(img, imtitle="robust_1.0")
-
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
-plot(img, imtitle="robust_-1.0")
+# img, beam = gridder.get_dirty_image(weighting='uniform')
+# plot(img, imtitle="uniform")
+#
+# img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+# plot(img, imtitle="robust_1.0")
+#
+# img, beam = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
+# plot(img, imtitle="robust_-1.0")
 
 img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
 plot(img, imtitle="robust_0")
@@ -192,7 +191,6 @@ plot(img, imtitle="robust_0")
 # Below we plot the DSHARP CLEAN image alongside the MPoL Dirty Image weighted with the Briggs scale and `robust=0.0` for comparison.
 
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
-get_ipython().run_line_magic('reset_selective', '-f gridder')
 fig, ax = plt.subplots(nrows = 2)
 ax[0].imshow(np.squeeze(clean_fits), origin='lower', extent=ext)
 ax[0].set_xlim(left=.75, right=-.75)
