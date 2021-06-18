@@ -15,7 +15,7 @@
 # + [markdown] cell_id="00000-bfed870b-7d25-4899-b633-234d9e47dfa7" deepnote_cell_type="markdown"
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial and will follow the MPoL tutorials on [Optimization](https://mpol-dev.github.io/MPoL/tutorials/optimization.html) and [Cross Validation](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html).It is assumed the users have familiarized themselves with these tutorials before hand.
+# This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial and will follow the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html). It is assumed the users have familiarized themselves with these tutorials before hand.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html)) and create the MPoL Gridder object.
@@ -73,7 +73,7 @@ gridder = gridding.Gridder(
 #
 # ### Getting the Dirty Image and Creating the Model
 #
-# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as these options lead to an already well optimized image (see [Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html)).
+# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as these options lead to an already well optimized image (see [Part 1](HD143006_Part_1.html)).
 
 import torch
 
@@ -81,33 +81,115 @@ img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arc
 # taking the dirty image and making it a tensor
 dirty_image = torch.tensor(img.copy())
 
-# Now we create the model.
+# Now we create the RML model.
 
 from mpol.precomposed import SimpleNet
 
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
 
-# ### Loss and Training Functions
+# ### Initializing Model with the Dirty Image
 #
-# Now that we have our model and data, we need a loss function so we can help direct the Neural Network's learning. For this tutorial, will will use the MSELoss function which is part of the PyTorch library. We also want to create a Writer object so we can observe our Network's state at any point.
+# We now have our model and data, but before we set out trying to optimize the image we should create a better starting point for our future optimization loops. A good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image containes negative flux pixels, while we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to become as close to the dirty image as possible (while retaining image positivity).
+#
+# We also want to create a Writer object so we can observe our Network's state at any point.
 #
 # *(i think this is correct about the writer, a little unsure)*
 
-from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter  # setting up the writer
 import os
-loss = torch.nn.MSELoss()
+
 logs_base_dir = "./logs"
 writer = SummaryWriter(logs_base_dir)
-os.makedirs(logs_base_dir, exist_ok = True)
-#%load_ext tensorboard
-#uncomment above line in jupyter notebook
-#still working on what to do with that for .py
+os.makedirs(logs_base_dir, exist_ok=True)
+# %load_ext tensorboard
+# uncomment above line in jupyter notebook
+# still working on what to do with that for .py
 
+
+# Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and Pytorch contain many different optimizers and loss functions, each one suiting different applications.
+
+optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
+loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
+# https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html
+
+# +
+# %%time
+
+
+for iteration in range(500):
+
+    optimizer.zero_grad()
+
+    model.forward()  # get the predicted model
+    sky_cube = model.icube.sky_cube
+
+    loss = loss_fn(sky_cube, dirty_image)  # calculates the loss
+
+    loss.backward()  # caulculate gradients of parameters
+    optimizer.step()  # updates the parameters
+# -
+
+# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from the this clean and better starting point each time. [Information on saving and loading models and the state_dict can be found here.](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+
+torch.save(model.state_dict(), "model.pt")
+
+# Now we can see the results, the image cube now closely resembles the dirty image (constrained by the fact that it can contain no negative values).
+
+# +
+
+fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
+
+imin, imax = np.amin(img), np.amax(img)
+
+im = ax[0].imshow(
+    np.squeeze(dirty_image.detach().cpu().numpy()),
+    origin="lower",
+    interpolation="none",
+    extent=model.icube.coords.img_ext,
+    vmin=imin,
+    vmax=imax,
+    # cmap = "Spectral", have these here in case of wanting a more obvious way of seeing negative values
+)
+
+im = ax[1].imshow(
+    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
+    origin="lower",
+    interpolation="none",
+    extent=model.icube.coords.img_ext,
+    vmin=imin,
+    vmax=imax,
+    # cmap = "Spectral", ditto
+)
+
+ax[0].set_xlim(left=0.75, right=-0.75)
+ax[0].set_ylim(bottom=-0.75, top=0.75)
+ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+ax[0].set_title("Dirty Image")
+ax[1].set_xlim(left=0.75, right=-0.75)
+ax[1].set_ylim(bottom=-0.75, top=0.75)
+ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+ax[1].set_title("Image Cube")
+plt.tight_layout()
+
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.84, 0.17, 0.03, 0.7])
+fig.colorbar(im, cax=cbar_ax)
+# -
+
+# ## Training Function
+
+# ## Still need to revamp this and the crossvalidation one
+#
+# Need to make this one using the train function that's under cross validation and then cross validaiton just has the cross validation part. Submitting what I have for rn though. Right now the training function part we had was the initializing part.
 
 # Now let us create a training function to train our SimpleNet
 
 
-def train(model, dset, config, optimizer, loss_fn, writer):
+def train(
+    model, dset, config, optimizer, writer
+):  # thisis all stuff meant to initialize model
     model.train()
     for iteration in range(config["epochs"]):
         optimizer.zero_grad()
@@ -117,8 +199,6 @@ def train(model, dset, config, optimizer, loss_fn, writer):
         writer.add_scalar("loss", loss.item(), iteration)
         loss.backward()
         optimizer.step()
-    # save the model
-    torch.save(model.state_dict(), "model.pt")
 
 
 # Now let's make our optimizer and our `config` variable. For the optimizer we will be following the [Cross Validation](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) tutorial and for the `config` we will start with a non-agressive learning rate and a low number of epochs.
@@ -128,7 +208,7 @@ optim = torch.optim.Adam(model.parameters(), lr=config["lr"])
 
 # Finally, lets run our training function and then plot the results.
 
-train(model, dirty_image, config, optim, loss, writer)
+train(model, dirty_image, config, optim, writer)
 
 # +
 fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
@@ -160,15 +240,14 @@ ax[1].set_title("MPoL Optimized Dirty Image")
 plt.tight_layout()
 
 # +
-# EDIT/MOVE this is the loss function
 
 # %tensorboard --logdir {logs_base_dir}
 
 # NOTE- The tensorboard info can also be accessed from the terminal using
 # tensorboard --logdir=runs
-#change runs to whereever file is saved
-#possible sol'n: save each tensorboard data in sep file
-#then access later with a command in terminal?
+# change runs to whereever file is saved
+# possible sol'n: save each tensorboard data in sep file
+# then access later with a command in terminal?
 # -
 
 # Will be changing code around and updating this a little, just wanted to see the as-is results from optimization loop
@@ -242,8 +321,6 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
         )
-        
-        
 
         if (iteration % logevery == 0) and writer is not None:
             writer.add_scalar("loss", loss.item(), iteration)
