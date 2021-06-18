@@ -27,6 +27,7 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.utils.data import download_file
+from torch.utils import tensorboard
 
 # downloading fits file
 fname_F = download_file(
@@ -93,9 +94,14 @@ model = SimpleNet(coords=coords, nchan=gridder.nchan)
 # *(i think this is correct about the writer, a little unsure)*
 
 from torch.utils.tensorboard import SummaryWriter
-
+import os
 loss = torch.nn.MSELoss()
-writer = SummaryWriter()
+logs_base_dir = "./logs"
+writer = SummaryWriter(logs_base_dir)
+os.makedirs(logs_base_dir, exist_ok = True)
+#%load_ext tensorboard
+#uncomment above line in jupyter notebook
+#still working on what to do with that for .py
 
 
 # Now let us create a training function to train our SimpleNet
@@ -156,11 +162,13 @@ plt.tight_layout()
 # +
 # EDIT/MOVE this is the loss function
 
-# %load_ext tensorboard
-# %tensorboard --logdir logs
+# %tensorboard --logdir {logs_base_dir}
 
 # NOTE- The tensorboard info can also be accessed from the terminal using
 # tensorboard --logdir=runs
+#change runs to whereever file is saved
+#possible sol'n: save each tensorboard data in sep file
+#then access later with a command in terminal?
 # -
 
 # Will be changing code around and updating this a little, just wanted to see the as-is results from optimization loop
@@ -168,7 +176,7 @@ plt.tight_layout()
 
 # ### Cross Validation
 #
-# Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because ....?.... Let us do that now.
+# Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because to calculate the residuals. Let us do that now.
 
 
 def log_figure(model, residuals):
@@ -223,6 +231,7 @@ from mpol import losses, connectors
 
 def train(model, dataset, optimizer, config, writer=None, report=False, logevery=50):
     model.train()
+    residuals = connectors.GriddedResidualConnector(model.fcube, dataset)
     for iteration in range(config["epochs"]):
         optimizer.zero_grad()
         vis = model.forward()
@@ -233,8 +242,8 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
         )
-        residuals = connectors.GriddedResidualConnector(vis.fcube, dataset)
-        residuals.forward()
+        
+        
 
         if (iteration % logevery == 0) and writer is not None:
             writer.add_scalar("loss", loss.item(), iteration)
