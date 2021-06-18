@@ -135,7 +135,7 @@ from mpol import gridding, coordinates
 # creating Gridder object
 coords = coordinates.GridCoords(cell_size=cell_size, npix=512)
 gridder = gridding.Gridder(
-    coords = coords,
+    coords=coords,
     uu=uu,
     vv=vv,
     weight=weight,
@@ -152,7 +152,7 @@ gridder = gridding.Gridder(
 # reclaiming memory from no-longer-needed variables
 # needed for doc building on github
 # + nbsphinx="hidden"
-# %%reset_selective -f dfits
+# %reset_selective -f dfits
 # %reset_selective -f dnpz
 # %reset_selective -f uu
 # %reset_selective -f vv
@@ -174,7 +174,6 @@ def plot(img, imtitle="image"):
     ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
     plt.xlim(left=.75, right=-.75)
     plt.ylim(bottom=-.75, top=.75)
-    return ax
 
 # img, beam = gridder.get_dirty_image(weighting='uniform')
 # plot(img, imtitle="uniform")
