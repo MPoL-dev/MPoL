@@ -149,9 +149,9 @@ gridder = gridding.Gridder(
 
 # Great! Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
 
+# + nbsphinx="hidden"
 # reclaiming memory from no-longer-needed variables
 # needed for doc building on github
-# + nbsphinx="hidden"
 # %reset_selective -f dfits
 # %reset_selective -f dnpz
 # %reset_selective -f uu
@@ -162,7 +162,7 @@ gridder = gridding.Gridder(
 # %reset_selective -f data_im
 # %reset_selective -f fig
 # %reset_selective -f ax
-
+# -
 
 def plot(img, imtitle="image"):
     kw = {"origin": "lower", "extent": gridder.coords.img_ext}
@@ -175,14 +175,14 @@ def plot(img, imtitle="image"):
     plt.xlim(left=.75, right=-.75)
     plt.ylim(bottom=-.75, top=.75)
 
-# img, beam = gridder.get_dirty_image(weighting='uniform')
-# plot(img, imtitle="uniform")
-#
-# img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
-# plot(img, imtitle="robust_1.0")
-#
-# img, beam = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
-# plot(img, imtitle="robust_-1.0")
+img, beam = gridder.get_dirty_image(weighting='uniform')
+plot(img, imtitle="uniform")
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+plot(img, imtitle="robust_1.0")
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=-1.0, unit="Jy/arcsec^2")
+plot(img, imtitle="robust_-1.0")
 
 img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
 plot(img, imtitle="robust_0")
@@ -203,7 +203,6 @@ ax[1].set_xlim(left=.75, right=-.75)
 ax[1].set_ylim(bottom=-.75, top=.75)
 ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-# fig.set_figwidth(14)
 fig.set_figheight(10)
 plt.tight_layout()
 
