@@ -67,6 +67,7 @@ gridder = gridding.Gridder(
     data_re=data.real,  # seperating the real and imaginary values of our data
     data_im=data.imag,
 )
+
 # -
 
 # We now have everything from the last tutorial loaded and can begin the process of Optimization and Cross Validation to improve our image quality.
@@ -176,6 +177,8 @@ plt.tight_layout()
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.84, 0.17, 0.03, 0.7])
 fig.colorbar(im, cax=cbar_ax)
+
+
 # -
 
 # ## Training Function
@@ -183,79 +186,6 @@ fig.colorbar(im, cax=cbar_ax)
 # ## Still need to revamp this and the crossvalidation one
 #
 # Need to make this one using the train function that's under cross validation and then cross validaiton just has the cross validation part. Submitting what I have for rn though. Right now the training function part we had was the initializing part.
-
-# Now let us create a training function to train our SimpleNet
-
-
-def train(
-    model, dset, config, optimizer, writer
-):  # thisis all stuff meant to initialize model
-    model.train()
-    for iteration in range(config["epochs"]):
-        optimizer.zero_grad()
-        model.forward()
-        sky_cube = model.icube.sky_cube
-        loss = loss_fn(sky_cube, dirty_image)
-        writer.add_scalar("loss", loss.item(), iteration)
-        loss.backward()
-        optimizer.step()
-
-
-# Now let's make our optimizer and our `config` variable. For the optimizer we will be following the [Cross Validation](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) tutorial and for the `config` we will start with a non-agressive learning rate and a low number of epochs.
-
-config = {"lr": 0.5, "epochs": 500}
-optim = torch.optim.Adam(model.parameters(), lr=config["lr"])
-
-# Finally, lets run our training function and then plot the results.
-
-train(model, dirty_image, config, optim, writer)
-
-# +
-fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
-
-im = ax[0].imshow(
-    np.squeeze(dirty_image.detach().cpu().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-
-im = ax[1].imshow(
-    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-
-ax[0].set_xlim(left=0.75, right=-0.75)
-ax[0].set_ylim(bottom=-0.75, top=0.75)
-ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[0].set_title("MPoL Dirty Image")
-ax[1].set_xlim(left=0.75, right=-0.75)
-ax[1].set_ylim(bottom=-0.75, top=0.75)
-ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].set_title("MPoL Optimized Dirty Image")
-plt.tight_layout()
-
-# +
-
-# %tensorboard --logdir {logs_base_dir}
-
-# NOTE- The tensorboard info can also be accessed from the terminal using
-# tensorboard --logdir=runs
-# change runs to whereever file is saved
-# possible sol'n: save each tensorboard data in sep file
-# then access later with a command in terminal?
-# -
-
-# Will be changing code around and updating this a little, just wanted to see the as-is results from optimization loop
-#
-
-# ### Cross Validation
-#
-# Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because to calculate the residuals. Let us do that now.
 
 
 def log_figure(model, residuals):
@@ -307,6 +237,9 @@ def log_figure(model, residuals):
 
 from mpol import losses, connectors
 
+model.load_state_dict(torch.load("model.pt"))
+dataset = gridder.to_pytorch_dataset()
+
 
 def train(model, dataset, optimizer, config, writer=None, report=False, logevery=50):
     model.train()
@@ -320,6 +253,7 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
             losses.nll_gridded(vis, dataset)
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
+            + config["entropy"] * losses.entropy(sky_cube, config["prior_intensity"])
         )
 
         if (iteration % logevery == 0) and writer is not None:
@@ -328,37 +262,59 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
 
         loss.backward()
         optimizer.step()
+
     if report:
         tune.report(loss=loss.item())
 
     return loss.item()
 
 
-# from mpol import losses, connectors
-# def train(model, dataset, optimizer, config, writer=None, report=False, logevery=50):
-#     model.train()
-#     residuals = connectors.GriddedResidualConnector(model.fcube, dataset)
-#     for iteration in range(config["epochs"]):
-#         optimizer.zero_grad()
-#         vis = model.forward()
-#         sky_cube = model.icube.sky_cube
-#         # computing loss through MPoL loss function with more parameters
-#         loss = (
-#             losses.nll_gridded(vis, dataset)
-#             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
-#             + config["lambda_TV"] * losses.TV_image(sky_cube)
-#         )
+config = {
+    "lr": 0.3,
+    "lambda_sparsity": 7.076022085822013e-05,
+    "lambda_TV": 0.00,
+    "entropy": 1e-03,
+    "prior_intensity": 1.597766235483388e-07,
+    "epochs": 1000,
+}
+
+optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
+
+# +
+# %%time
+
+train(model, dataset, optimizer, config, writer=writer, report="True")
+
+# +
+fig, ax = plt.subplots(nrows=1, figsize=(8, 8))
+im = ax.imshow(
+    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
+    origin="lower",
+    interpolation="none",
+    extent=model.icube.coords.img_ext,
+)
+plt.colorbar(im)
+
+
+def scale(I):
+    a = 0.02
+    return np.arcsinh(I / a) / np.arcsinh(1 / a)
+
+
+fig, ax = plt.subplots(nrows=1, figsize=(8, 8))
+im = ax.imshow(
+    scale(np.squeeze(model.icube.sky_cube.detach().cpu().numpy())),
+    origin="lower",
+    interpolation="none",
+    extent=model.icube.coords.img_ext,
+)
+plt.colorbar(im)
+
+# -
+
+# ### Cross Validation
 #
-#         if (iteration % logevery == 0) and writer is not None:
-#             writer.add_scalar("loss", loss.item(), iteration)
-#             writer.add_figure("image", log_figure(model, residuals), iteration)
-#
-#         loss.backward()
-#         optimizer.step()
-#     if report:
-#         tune.report(loss=loss.item())
-#
-#     return loss.item()
+# Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because to calculate the residuals. Let us do that now.
 
 # Just like in the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) we will need a `test` function and a `cross_validate` function. We impliment these below.
 
@@ -375,7 +331,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
 
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
         # reset model
-        model.load_state_dict(model_state)
+        model.load_state_dict(MODEL_PATH)
 
         # create a new optimizer for this k_fold
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
@@ -398,37 +354,45 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
 
 
 def trainable(config):
-    cross_validate(model, config, k_fold_datasets, model_state)
+    cross_validate(model, config, k_fold_datasets, MODEL_PATH)
 
 
 from mpol import datasets
 
 dartboard = datasets.Dartboard(coords=coords)
-dataset = gridder.to_pytorch_dataset()
 # create cross validator using this "dartboard"
 k = 5
 cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed=42)
 k_fold_datasets = [(train, test) for (train, test) in cv]
 
-from ray import tune
 import ray
+from ray import tune
 
+# +
 # making sure that we don't initialize ray if its already initialized
 ray.shutdown()
 ray.init()
 MODEL_PATH = "./model.pt"
-model_state = torch.load(MODEL_PATH)
 analysis = tune.run(
     trainable,
     config={
         "lr": 0.3,
         "lambda_sparsity": tune.loguniform(1e-8, 1e-4),
         "lambda_TV": tune.loguniform(1e-4, 1e1),
+        "entropy": tune.loguniform(1e-7, 1e-1),
+        "prior_intensity": tune.loguniform(1e-8, 1e-4),
         "epochs": 1000,
     },
+    num_samples=24,
     resources_per_trial={"cpu": 3},
 )
+
 print("Best config: ", analysis.get_best_config(metric="cv_score", mode="min"))
+# -
+
+# Get a dataframe for analyzing trial results.
+df = analysis.results_df
+print(df)
 
 # +
 fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
@@ -451,13 +415,11 @@ ax[0].set_xlim(left=0.75, right=-0.75)
 ax[0].set_ylim(bottom=-0.75, top=0.75)
 ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[0].set_title("MPoL Dirty Image")
+ax[0].set_title("Dirty Image")
 ax[1].set_xlim(left=0.75, right=-0.75)
 ax[1].set_ylim(bottom=-0.75, top=0.75)
 ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].set_title("MPoL Optimized Dirty Image")
+ax[1].set_title("Optimized Image")
 plt.tight_layout()
 # -
-
-torch.save(model.state_dict(), "model1.pt")
