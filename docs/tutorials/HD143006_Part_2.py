@@ -88,7 +88,7 @@ from mpol.precomposed import SimpleNet
 
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
 
-# ### Initializing Model with the Dirty Image
+# ## Initializing Model with the Dirty Image
 #
 # We now have our model and data, but before we set out trying to optimize the image we should create a better starting point for our future optimization loops. A good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image containes negative flux pixels, while we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to become as close to the dirty image as possible (while retaining image positivity).
 #
@@ -108,6 +108,10 @@ os.makedirs(logs_base_dir, exist_ok=True)
 
 
 # Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and Pytorch contain many different optimizers and loss functions, each one suiting different applications.
+
+from mpol import (
+    losses,
+)  # an MPol loss function is not being used here, but MPoL contains ones that will be used
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -181,27 +185,28 @@ fig.colorbar(im, cax=cbar_ax)
 
 # -
 
-# ## Training Function
+# ## Training and Imaging Part 1
 
-# ## Still need to revamp this and the crossvalidation one
-#
-# Need to make this one using the train function that's under cross validation and then cross validaiton just has the cross validation part. Submitting what I have for rn though. Right now the training function part we had was the initializing part.
+# Now that we have a better stating point, we can work on optimizing our image using a training function that we will be able to configure the training parameters of. This part of the tutorial will also use tensorboard to allow us to see the loss function and the change in the image as it goes through the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model).
 
 
-def log_figure(model, residuals):
-    """
-    Create a matplotlib figure showing the current image state.
+# Here we are setting up the tools that will allows us to visualize the results of the loop in tensorboard.
 
-    Args:
-        model: neural net model
-    """
+import ray  # module used to tune hyperparameters, it is present in the function but we will not use it until the next section
+from ray import tune
+from mpol import connectors  # require to calculate the residuals  in log_figure
+
+
+def log_figure(
+    model, residuals
+):  # this function takes a snapshot of the image state, will expand on what a residual is?
 
     # populate residual connector
     residuals()
 
     fig, ax = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
     im = ax[0, 0].imshow(
-        np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
+        np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),  #
         origin="lower",
         interpolation="none",
         extent=model.icube.coords.img_ext,
@@ -209,7 +214,7 @@ def log_figure(model, residuals):
     plt.colorbar(im, ax=ax[0, 0])
 
     im = ax[0, 1].imshow(
-        np.squeeze(residuals.sky_cube.detach().cpu().numpy()),
+        np.squeeze(residuals.sky_cube.detach().cpu().numpy()),  #
         origin="lower",
         interpolation="none",
         extent=residuals.coords.img_ext,
@@ -217,7 +222,7 @@ def log_figure(model, residuals):
     plt.colorbar(im, ax=ax[0, 1])
 
     im = ax[1, 0].imshow(
-        np.squeeze(torch.log(model.fcube.ground_amp.detach()).cpu().numpy()),
+        np.squeeze(torch.log(model.fcube.ground_amp.detach()).cpu().numpy()),  #
         origin="lower",
         interpolation="none",
         extent=residuals.coords.vis_ext,
@@ -225,7 +230,7 @@ def log_figure(model, residuals):
     plt.colorbar(im, ax=ax[1, 0])
 
     im = ax[1, 1].imshow(
-        np.squeeze(torch.log(residuals.ground_amp.detach()).cpu().numpy()),
+        np.squeeze(torch.log(residuals.ground_amp.detach()).cpu().numpy()),  #
         origin="lower",
         interpolation="none",
         extent=residuals.coords.vis_ext,
@@ -235,10 +240,7 @@ def log_figure(model, residuals):
     return fig
 
 
-from mpol import losses, connectors
-
-model.load_state_dict(torch.load("model.pt"))
-dataset = gridder.to_pytorch_dataset()
+# With these we can now set up on making our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are what are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions it uses and can be read about [here](../api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, report=False, logevery=50):
@@ -246,7 +248,7 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
     residuals = connectors.GriddedResidualConnector(model.fcube, dataset)
     for iteration in range(config["epochs"]):
         optimizer.zero_grad()
-        vis = model.forward()
+        vis = model.forward()  # get the predicted model
         sky_cube = model.icube.sky_cube
         # computing loss through MPoL loss function with more parameters
         loss = (
@@ -256,34 +258,51 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
             + config["entropy"] * losses.entropy(sky_cube, config["prior_intensity"])
         )
 
-        if (iteration % logevery == 0) and writer is not None:
+        if (
+            iteration % logevery == 0
+        ) and writer is not None:  # logging the loss and image for visualization and analysis
             writer.add_scalar("loss", loss.item(), iteration)
             writer.add_figure("image", log_figure(model, residuals), iteration)
 
-        loss.backward()
-        optimizer.step()
+        loss.backward()  # calculate gradient of the parameters
+        optimizer.step()  # update the model parameters
 
-    if report:
+    if report:  # for reporting in ray tune.
         tune.report(loss=loss.item())
 
     return loss.item()
 
 
-config = {
-    "lr": 0.3,
-    "lambda_sparsity": 7.076022085822013e-05,
-    "lambda_TV": 0.00,
-    "entropy": 1e-03,
-    "prior_intensity": 1.597766235483388e-07,
-    "epochs": 1000,
-}
+# With our function done, all that is left is to set the variables including loading the intialized model, setting our hyperparameters, creating our optimizer, and putting the data in the correct format.
 
-optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
+model.load_state_dict(
+    torch.load("model.pt")
+)  # loads our intialized model from the previous section
+dataset = (
+    gridder.to_pytorch_dataset()
+)  # exports the visibilities from gridder to a PyTorch dataset
+
+config = (
+    {  # config includes the hyperparameters used in the function and in the optimizer
+        "lr": 0.3,
+        "lambda_sparsity": 7.076022085822013e-05,
+        "lambda_TV": 0.00,
+        "entropy": 1e-03,
+        "prior_intensity": 1.597766235483388e-07,
+        "epochs": 1000,
+    }
+)
+
+optimizer = torch.optim.Adam(
+    model.parameters(), lr=config["lr"]
+)  # creating our optimizer, using the learning rate from config
 
 # +
 # %%time
 
-train(model, dataset, optimizer, config, writer=writer, report="True")
+train(
+    model, dataset, optimizer, config, writer=writer, report="False"
+)  # here report is set to False as ray tune is not being used
 
 # (Edit) Below we can see the loss function, images, and residuals for every saved iteration.
 # Be sure that your window is wide enough such that you can navigate to the images tab within tensorboard
@@ -302,7 +321,7 @@ im = ax.imshow(
 plt.colorbar(im)
 
 
-def scale(I):
+def scale(I):  # need to read more on this
     a = 0.02
     return np.arcsinh(I / a) / np.arcsinh(1 / a)
 
@@ -318,7 +337,7 @@ plt.colorbar(im)
 
 # -
 
-# ### Cross Validation
+# ## Training and Imaging Part 2: Cross Validation
 #
 # Now we will move into the realm of Cross Validation. To do this we will be utilizing the [Ray[Tune]](https://docs.ray.io/en/master/tune/index.html) python package for hyperparameter tuning. In order to get the best fit, we will be modifying our `train` function to encorperate a stronger loss function. We will import this from `mpol.losses`. We also need the `mpol.connectors` package because to calculate the residuals. Let us do that now.
 
@@ -371,14 +390,11 @@ k = 5
 cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed=42)
 k_fold_datasets = [(train, test) for (train, test) in cv]
 
-import ray
-from ray import tune
-
 # +
 # making sure that we don't initialize ray if its already initialized
 ray.shutdown()
 ray.init()
-MODEL_PATH = "./model.pt"
+MODEL_PATH = "model.pt"
 analysis = tune.run(
     trainable,
     config={
