@@ -285,7 +285,13 @@ optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
 
 train(model, dataset, optimizer, config, writer=writer, report="True")
 
+# (Edit) Below we can see the loss function, images, and residuals for every saved iteration.
+# Be sure that your window is wide enough such that you can navigate to the images tab within tensorboard
+
+# %tensorboard --logdir {logs_base_dir}
+
 # +
+# Note- the first image produced below is not necessary as it is included in tensorboard- maybe remove?
 fig, ax = plt.subplots(nrows=1, figsize=(8, 8))
 im = ax.imshow(
     np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
