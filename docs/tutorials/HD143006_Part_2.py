@@ -337,7 +337,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
 
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
         # reset model
-        model.load_state_dict(MODEL_PATH)
+        model.load_state_dict(torch.load(MODEL_PATH))
 
         # create a new optimizer for this k_fold
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
