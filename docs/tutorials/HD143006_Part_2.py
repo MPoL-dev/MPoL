@@ -192,8 +192,6 @@ fig.colorbar(im, cax=cbar_ax)
 
 # Here we are setting up the tools that will allows us to visualize the results of the loop in Tensorboard.
 
-import ray  # module used to tune hyperparameters, it is present in the function but we will not use it until the next section
-from ray import tune
 from mpol import connectors  # require to calculate the residuals in log_figure
 
 
@@ -243,7 +241,7 @@ def log_figure(
 # With these we can now set up on making our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are what are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions it uses and can be read about [here](../api.html#module-mpol.losses).
 
 
-def train(model, dataset, optimizer, config, writer=None, report=False, logevery=50):
+def train(model, dataset, optimizer, config, writer=None, logevery=50):
     model.train()
     residuals = connectors.GriddedResidualConnector(model.fcube, dataset)
     for iteration in range(config["epochs"]):
@@ -267,20 +265,20 @@ def train(model, dataset, optimizer, config, writer=None, report=False, logevery
         loss.backward()  # calculate gradient of the parameters
         optimizer.step()  # update the model parameters
 
-    if report:  # for reporting in Ray Tune.
-        tune.report(loss=loss.item())
-
     return loss.item()
 
 
 # With our function done, all that is left is to set the variables including loading the intialized model, setting our hyperparameters, creating our optimizer, and putting the data in the correct format.
 
+# +
 model.load_state_dict(
     torch.load("model.pt")
 )  # loads our intialized model from the previous section
+
 dataset = (
     gridder.to_pytorch_dataset()
 )  # exports the visibilities from gridder to a PyTorch dataset
+# -
 
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
@@ -299,9 +297,12 @@ optimizer = torch.optim.Adam(
 
 # We are now ready to run the training loop with all of the variables needed for it, after it's done we will be able to view the results and steps it took by looking at images and loss functions from during the loop through Tensorboard.
 
-train(
-    model, dataset, optimizer, config, writer=writer, report="False"
-)  # here report is set to False as Ray Tune is not being used
+# +
+# %%time
+
+
+train(model, dataset, optimizer, config, writer=writer)
+# -
 
 # And here we have it, an image optimized to fit our data (better phrasing required probably) and the steps it took to get there.
 
@@ -345,7 +346,7 @@ plt.colorbar(im)
 #
 # Since we now have successfully Now we will move into the realm of Cross Validation. Cross validation is a technique that allows a model to be more efficiently trained (better predict an outcome, hard pressed to pick the best phrasing) by having it take a dataset and store one chunk of it as the test dataset and have the rest of the dataset be used to train the model. The model then sees the difference between the predicted testa dataset and the actual test dataset (this is the cross validaiton score). The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
 #
-# In this tutorial we will also be using the tool [Ray Tune](https://docs.ray.io/en/master/tune/index.html) to analyze the results of the cross validation and configure the hyperparameters to minimize the cross validation score. Ray Tune will also allows us to visualize the results similar to Tensorboard. RAY TUNE IS BEING FINNICKY FOR ME SO THAT FINAL LINE MAY BE A LIE - ROBERT
+# Just like in the previous section we will be viewing our results in Tensorboard, but we will also be logging the cross_validation score as well.
 
 # Cross Validation requires a `test` function (to determine the Cross Validaiton score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We impliment these below.
 
@@ -362,26 +363,25 @@ def test(model, dataset):
 def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     test_scores = []
 
-    # enter MPoL directory to obtain model.pt
-    os.chdir(MODEL_PATH)
-
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
+
         # reset model
-        model.load_state_dict(torch.load("model.pt"))
+        model.load_state_dict(torch.load(MODEL_PATH))
 
         # create a new optimizer for this k_fold
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
 
         # train for a while
-        train(model, train_dset, optimizer, config, writer=writer, report=True)
+        train(model, train_dset, optimizer, config, writer=writer)
         # evaluate the test metric
         test_scores.append(test(model, test_dset))
 
+        # adds cross validation score at each point
+        if writer is not None:
+            writer.add_scalar("Cross Validation", test_scores, k_fold)
+
     # aggregate all test scores and sum to evaluate cross val metric
     test_score = np.sum(np.array(test_scores))
-
-    # log to ray tune
-    tune.report(cv_score=test_score)
 
     return test_score
 
@@ -406,43 +406,36 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
 
-# Now we will impliment hyperparameter tuning with Ray\[Tune\] and run the Cross Validaiton optimization loop on our dataset. To do this, we need a function that only takes a `config` variable as input. We will call this `trainable`. Using Ray\[Tune\] is rather straight forward. You set up a `tune.run()` object with your function and the parameters and it will calculate the best parameters (this needs to be worded better).
-
-
-def trainable(config):
-    cross_validate(model, config, k_fold_datasets, MODEL_PATH)
-
+# Before we can run our function we first need to define the MODEL_PATH to our initialized model and we will put a new config file here for ease of access in case we want to change around the hyperparemters.
 
 # +
-# making sure that we don't initialize ray if its already initialized
-ray.shutdown()
-ray.init()
+MODEL_PATH = "model.pt"
 
-MODEL_PATH = "str(os.getcwd())"
-
-analysis = tune.run(
-    trainable,
-    config={
+new_config = (
+    {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
-        "lambda_sparsity": tune.loguniform(1e-8, 1e-4),  # the hyperparameters
-        "lambda_TV": tune.loguniform(1e-4, 1e1),
-        "entropy": tune.loguniform(1e-7, 1e-1),
-        "prior_intensity": tune.loguniform(1e-8, 1e-4),
+        "lambda_sparsity": 7.076022085822013e-05,
+        "lambda_TV": 0.00,
+        "entropy": 1e-03,
+        "prior_intensity": 1.597766235483388e-07,
         "epochs": 1000,
-    },
-    num_samples=24,
-    resources_per_trial={"cpu": 3},
-    local_dir="./ray_logs",
+    }
 )
-
-print("Best config: ", analysis.get_best_config(metric="cv_score", mode="min"))
 # -
 
-# Now we are finally ready to see our final results.
 
-# Get a dataframe for analyzing trial results.
-df = analysis.results_df
-print(df)
+# We are now ready to run our optimizer using cross validaiton, after it is done we will be reviewing our results in Tensorboard. Feel free to run this a few times while changing hyperparameters in the config to lower the cross validation score.
+
+# +
+# %%time
+
+
+cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+# -
+
+# And here are the results:
+
+# %tensorboard --logdir {logs_base_dir}
 
 # +
 fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
