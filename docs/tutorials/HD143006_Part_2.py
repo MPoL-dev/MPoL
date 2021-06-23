@@ -354,9 +354,11 @@ def test(model, dataset):
 def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     test_scores = []
 
+    # enter MPoL directory to obtain model.pt
+    os.chdir(MODEL_PATH)
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
         # reset model
-        model.load_state_dict(torch.load(MODEL_PATH))
+        model.load_state_dict(torch.load("model.pt"))
 
         # create a new optimizer for this k_fold
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
@@ -394,7 +396,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 # making sure that we don't initialize ray if its already initialized
 ray.shutdown()
 ray.init()
-MODEL_PATH = "model.pt"
+MODEL_PATH = str(os.getcwd())
 analysis = tune.run(
     trainable,
     config={
@@ -407,6 +409,7 @@ analysis = tune.run(
     },
     num_samples=24,
     resources_per_trial={"cpu": 3},
+    local_dir="./ray_logs",
 )
 
 print("Best config: ", analysis.get_best_config(metric="cv_score", mode="min"))
