@@ -362,6 +362,9 @@ def test(model, dataset):
 def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     test_scores = []
 
+    # enter MPoL directory to obtain model.pt
+    os.chdir(MODEL_PATH)
+
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
         # reset model
         model.load_state_dict(torch.load("model.pt"))
@@ -414,9 +417,6 @@ def trainable(config):
 # making sure that we don't initialize ray if its already initialized
 ray.shutdown()
 ray.init()
-
-# enter MPoL directory to obtain model.pt
-os.chdir(MODEL_PATH)
 
 MODEL_PATH = "str(os.getcwd())"
 
