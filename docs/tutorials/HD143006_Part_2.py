@@ -64,7 +64,7 @@ gridder = gridding.Gridder(
     uu=uu,
     vv=vv,
     weight=weight,
-    data_re=data.real,  # seperating the real and imaginary values of our data
+    data_re=data.real,  # separating the real and imaginary values of our data
     data_im=data.imag,
 )
 
@@ -103,8 +103,6 @@ logs_base_dir = "./logs"
 writer = SummaryWriter(logs_base_dir)
 os.makedirs(logs_base_dir, exist_ok=True)
 # %load_ext tensorboard
-# uncomment above line in jupyter notebook
-# still working on what to do with that for .py
 
 
 # Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and Pytorch contain many different optimizers and loss functions, each one suiting different applications.
@@ -134,7 +132,7 @@ for iteration in range(500):
     optimizer.step()  # updates the parameters
 # -
 
-# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from the this clean and better starting point each time. [Information on saving and loading models and the state_dict can be found here.](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here.](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
 
 torch.save(model.state_dict(), "model.pt")
 
@@ -238,7 +236,7 @@ def log_figure(
     return fig
 
 
-# With these we can now set up on making our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are what are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions it uses and can be read about [here](../api.html#module-mpol.losses).
+# With these we can now set up on making our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -268,16 +266,16 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     return loss.item()
 
 
-# With our function done, all that is left is to set the variables including loading the intialized model, setting our hyperparameters, creating our optimizer, and putting the data in the correct format.
+# With our function done, all that is left is to set the variables, load the intialized model, set our hyperparameters, create our optimizer, and put the data in the correct format.
 
 # +
 model.load_state_dict(
     torch.load("model.pt")
-)  # loads our intialized model from the previous section
+)  # load our intialized model from the previous section
 
 dataset = (
     gridder.to_pytorch_dataset()
-)  # exports the visibilities from gridder to a PyTorch dataset
+)  # export the visibilities from gridder to a PyTorch dataset
 # -
 
 config = (
@@ -293,9 +291,9 @@ config = (
 
 optimizer = torch.optim.Adam(
     model.parameters(), lr=config["lr"]
-)  # creating our optimizer, using the learning rate from config
+)  # create our optimizer, using the learning rate from config
 
-# We are now ready to run the training loop with all of the variables needed for it, after it's done we will be able to view the results and steps it took by looking at images and loss functions from during the loop through Tensorboard.
+# We are now ready to run the training loop.
 
 # +
 # %%time
@@ -304,11 +302,10 @@ optimizer = torch.optim.Adam(
 train(model, dataset, optimizer, config, writer=writer)
 # -
 
-# And here we have it, an image optimized to fit our data (better phrasing required probably) and the steps it took to get there.
+# Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, image residuals, visibility amplitudes, visibility residuals. You can use the slider to view different iterations.
 
 # +
-# (Edit) Below we can see the loss function, images, and residuals for every saved iteration.
-# Be sure that your window is wide enough such that you can navigate to the images tab within Tensorboard
+
 
 # %tensorboard --logdir {logs_base_dir}
 
