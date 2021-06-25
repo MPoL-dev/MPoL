@@ -15,7 +15,9 @@
 # + [markdown] cell_id="00000-bfed870b-7d25-4899-b633-234d9e47dfa7" deepnote_cell_type="markdown"
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial and will follow the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html). It is assumed the users have familiarized themselves with these tutorials before hand.
+# This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
+#
+# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to improve the process through crossvalidation, and how to analyze the results of our work with Tensorboard.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html)) and create the MPoL Gridder object.
@@ -304,40 +306,7 @@ train(model, dataset, optimizer, config, writer=writer)
 
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, image residuals, visibility amplitudes, visibility residuals. You can use the slider to view different iterations.
 
-# +
-
-
-# %tensorboard --logdir {logs_base_dir}
-
-# +
-# Note- the first image produced below is not necessary as it is included in tensorboard- maybe remove?
-# sure probably, rn tensorboard has decided it won't load for me -_-, no idea why was working before
-# comment convo
-fig, ax = plt.subplots(nrows=1, figsize=(8, 8))
-im = ax.imshow(
-    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-plt.colorbar(im)
-
-
-def scale(I):  # need to read more on this/if we should even have it
-    a = 0.02
-    return np.arcsinh(I / a) / np.arcsinh(1 / a)
-
-
-fig, ax = plt.subplots(nrows=1, figsize=(8, 8))
-im = ax.imshow(
-    scale(np.squeeze(model.icube.sky_cube.detach().cpu().numpy())),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-plt.colorbar(im)
-
-# -
+# %tensorboard --logdir {logs_base_dir + '/'}
 
 # ## Training and Imaging Part 2: Cross Validation
 #
@@ -373,12 +342,12 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
         # evaluate the test metric
         test_scores.append(test(model, test_dset))
 
-        # adds cross validation score at each point
-        if writer is not None:
-            writer.add_scalar("Cross Validation", test_scores, k_fold)
-
     # aggregate all test scores and sum to evaluate cross val metric
     test_score = np.sum(np.array(test_scores))
+
+    # adds cross validation score
+    if writer is not None:
+        writer.add_scalar("Cross Validation", test_score)
 
     return test_score
 
@@ -430,38 +399,8 @@ new_config = (
 cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
 # -
 
-# And here are the results:
+# And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score.
 
-# %tensorboard --logdir {logs_base_dir}
+# %tensorboard --logdir {logs_base_dir + '/'}
 
-# +
-fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
-
-im = ax[0].imshow(
-    np.squeeze(dirty_image.detach().cpu().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-
-im = ax[1].imshow(
-    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=model.icube.coords.img_ext,
-)
-
-ax[0].set_xlim(left=0.75, right=-0.75)
-ax[0].set_ylim(bottom=-0.75, top=0.75)
-ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[0].set_title("Dirty Image")
-ax[1].set_xlim(left=0.75, right=-0.75)
-ax[1].set_ylim(bottom=-0.75, top=0.75)
-ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].set_title("Optimized Image")
-plt.tight_layout()
-# -
-
-# Conclusion to be added
+# Now with this tutorial done we can see the results of RML imaging, an image optimized to fit the provided dataset, using a more basic procedure and then using the cross validation to better train and image the model. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training and optimization loops (and also whatever else is fully happening the third part of the tutorial). This conclusion could probably be much better, but I wrote this at 4 am.
