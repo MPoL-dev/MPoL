@@ -146,7 +146,7 @@ gridder = gridding.Gridder(
 
 # We now have everything we need to get the MPoL dirty image. No RML methods will be applied in Part 1 of this tutorial. Here we are using [Gridder.get_dirty_image()](../api.rst#mpol.gridding.Gridder.get_dirty_image) to average the visibilities to the grid defined by gridder and from there we get our dirty image and dirty beam. There are different ways to average the visibilities, called weighting, and here we use Uniform and Briggs weighting to find and produce a dirty image that resembles the CLEAN image. More info on the weighting can be read in the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting). For the Briggs weighting, we will use three different values for the `robust` variable. This dictates how aggresive our weight scaling is towards image resolution or image sensitivity.
 #
-# *Note: when `robust=-2.0` the result is similar to that of the Uniform scale*
+# *Note: Briggs weighting with `robust=-2.0` is similar to uniform weighting.
 
 # Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
 
