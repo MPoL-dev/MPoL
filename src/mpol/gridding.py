@@ -26,8 +26,12 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
 
     assert np.all(weight > 0.0), "Not all thermal weights are positive, check inputs."
 
-    assert data_re.dtype == np.float64, "data_re should be type np.float64"
-    assert data_im.dtype == np.float64, "data_im should be type np.float64"
+    assert (data_re.dtype == np.single) or (
+        data_re.dtype == np.double
+    ), "data_re should be type single or double"
+    assert (data_im.dtype == np.single) or (
+        data_im.dtype == np.double
+    ), "data_im should be type single or double"
 
     if uu.ndim == 1:
         uu = np.atleast_2d(uu)
