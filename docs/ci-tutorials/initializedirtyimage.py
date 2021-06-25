@@ -34,11 +34,12 @@
 #
 # Here we will set up the ALMA Logo image dataset and display it. Consult the [Gridding and Diagnostic Images Tutorial](gridder.html) for reference.
 
-import torch
-import numpy as np
 import matplotlib.pyplot as plt
-from mpol import gridding, coordinates, precomposed, losses, utils
+import numpy as np
+import torch
 from astropy.utils.data import download_file
+
+from mpol import coordinates, gridding, losses, precomposed, utils
 
 # When saving and loading a model, it is important to make sure that ``cell_size``, ``nchan``, and ``npix`` remain the same. More info on coordinates can be found [here](../api.rst#mpol.coordinates.GridCoords).
 
