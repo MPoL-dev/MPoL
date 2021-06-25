@@ -118,10 +118,10 @@ test/*.png
 venv/
 
 # notebooks produced from jupytext
-docs/tutorials/*.ipynb
+docs/ci-tutorials/*.ipynb
 
 # tensorboard outputs
-docs/tutorials/runs
+docs/ci-tutorials/runs
 
 # testing cache
 tmp_cache
