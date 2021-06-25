@@ -224,7 +224,7 @@ To summarize, to write a large tutorial:
 
 1. copy and rename one of the existing ``.py`` files in ``docs/ci-tutorials`` to the ``docs/large-tutorials`` folder
 2. use jupytext to convert the ``.py`` to an ``.ipynb`` file and execute it on your local resources. You may want to add a line to the ``docs/large-tutorials/Makefile`` for your tutorial
-3. commit the ``.ipynb`` to the MPoL repository, if you haven't already
+3. commit the ``.ipynb`` to the MPoL repository, if you haven't already (i.e., you'll be committing *both* the ``.py`` and ``.ipynb`` files in this case).
 4. if you run your notebook is run on a cluster, please also commit your submission script (e.g., SLURM, torque, moab). You may also consider additionally pasting the contents of the build script as a text cell inside the ``.ipynb`` for reference.
 
 When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the ``large-tutorials/gpus.py`` file, add a ``large-tutorials/gpus`` line to the table of contents.
