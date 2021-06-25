@@ -15,7 +15,7 @@ Million Points of Light (MPoL)
 .. |Discussions badge| image:: https://img.shields.io/badge/community-Github%20Discussions-orange
    :target: https://github.com/MPoL-dev/MPoL/discussions
 
-MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and kernel phase interferometry.
+MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.
 
 To get a sense of how MPoL works, please take a look at the tutorials down below. If you have any questions, please join us on our `Github discussions page <https://github.com/MPoL-dev/MPoL/discussions>`__.
 
