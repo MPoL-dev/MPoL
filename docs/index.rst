@@ -34,12 +34,13 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    :maxdepth: 2
    :caption: Tutorials
 
-   tutorials/PyTorch
-   tutorials/gridder
-   tutorials/optimization
-   tutorials/crossvalidation
-   tutorials/gpu_setup.rst
-   tutorials/initializedirtyimage
+   ci-tutorials/PyTorch
+   ci-tutorials/gridder
+   ci-tutorials/optimization
+   ci-tutorials/crossvalidation
+   ci-tutorials/gpu_setup.rst
+   ci-tutorials/initializedirtyimage
+   large-tutorials/HD143006_Part_1
 
 .. toctree::
    :hidden:

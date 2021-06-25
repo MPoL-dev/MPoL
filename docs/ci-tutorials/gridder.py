@@ -36,7 +36,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.utils.data import download_file
 
-
 # load the mock dataset of the ALMA logo
 fname = download_file(
     "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
@@ -55,7 +54,7 @@ data_im = np.imag(data)
 
 # ## The GridCoords object
 
-from mpol import gridding, coordinates
+from mpol import coordinates, gridding
 
 #  The first MPoL object we'll familiarize ourselves with is GridCoords. Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and Fourier space.
 
