@@ -216,14 +216,14 @@ Larger tutorials requiring substantial computational resources
 
 Radio interferometric datasets are frequently large, and sometimes realistic tutorials with real data require substantial computational resources beyond those provided in github workflows. Though more burdensome to package, these "end-to-end" tutorials are often the most useful for users.
 
-Larger tutorials are not contributed in a continuously-integrated fashion, but instead are built and executed using local computational resources (these could be your laptop or a university research cluster). Then, the ``.ipynb`` containing the cell output is committed directly to the github repostory. The expectation is that these tutorials will only be rerun when the tutorial is updated, so the git diff issue is not as large a concern as it was with the continuously-integrated smaller tutorials. Like before, during the documentation build process the  `nbsphinx <https://nbsphinx.readthedocs.io/>`_ plugin will see a Jupyter notebook and incorporate it into the build.
+Larger tutorials are not contributed in a continuously-integrated fashion, but instead are built and executed using local computational resources (these could be your laptop or a university research cluster). We still recommend that you write your tutorial as a ``.py`` file like the smaller tutorials, and update the ``large-tutorials/Makefile`` with your new filenames. The difference here is that after you build the ``.ipynb`` version of your tutorial (you could use ``make all`` inside the ``large-tutorials`` directory, or just run ``jupytext --to ipynb --execute my_tutorial.py``) you'll want to commit the ``.ipynb`` file containing the cell output directly to the git repository.
 
-Because the larger tutorials are not continuously integrated, however, there is some concern that the codebase could diverge from that used to generate the tutorial, rendering the tutorial stale. We believe this risk is acceptable given the benefit that these larger tutorials provide and we intend to check the tutorials for staleness with at least every minor release.
+The expectation is that these tutorials will only be rerun when the tutorial is updated, so the git diff issue is not as large a concern as it was with the continuously-integrated smaller tutorials. Like before, during the documentation build process the  `nbsphinx <https://nbsphinx.readthedocs.io/>`_ plugin will see a Jupyter notebook and incorporate it into the build. Because the larger tutorials are not continuously integrated, however, there is some concern that the codebase could diverge from that used to generate the tutorial, rendering the tutorial stale. We believe this risk is acceptable given the benefit that these larger tutorials provide and we intend to check the tutorials for staleness with at least every minor release.
 
-To write a large tutorial:
+To summarize, to write a large tutorial:
 
-1. create an ``.ipynb`` notebook  in the ``docs/large-tutorials`` folder.
-2. execute the notebook on your local resources
+1. copy and rename one of the existing ``.py`` files in ``docs/ci-tutorials`` to the ``docs/large-tutorials`` folder
+2. use jupytext to convert the ``.py`` to an ``.ipynb`` file and execute it on your local resources. You may want to add a line to the ``docs/large-tutorials/Makefile`` for your tutorial
 3. commit the ``.ipynb`` to the MPoL repository, if you haven't already
 4. if you run your notebook is run on a cluster, please also commit your submission script (e.g., SLURM, torque, moab). You may also consider additionally pasting the contents of the build script as a text cell inside the ``.ipynb`` for reference.
 
