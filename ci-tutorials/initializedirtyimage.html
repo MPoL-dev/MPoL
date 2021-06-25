@@ -49,7 +49,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="next" title="HD143006 Tutorial Part 1" href="../large-tutorials/HD143006_Part_1.html" />
     <link rel="prev" title="GPU Acceleration" href="gpu_setup.html" /> 
 </head>
 
@@ -123,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#Conclusion">Conclusion</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -181,7 +182,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/initializedirtyimage.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/initializedirtyimage.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -457,17 +458,25 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">utils</span>
 </pre></div>
 </div>
 </div>
 <p>When saving and loading a model, it is important to make sure that <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>, <code class="docutils literal notranslate"><span class="pre">nchan</span></code>, and <code class="docutils literal notranslate"><span class="pre">npix</span></code> remain the same. More info on coordinates can be found <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords"><span class="std std-ref">here</span></a>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -506,7 +515,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -518,7 +527,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </div>
 <p>Now let’s take a look at the dirty image. We’ve used a different colormap to highlight the many negative flux pixels contained in this image.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -536,12 +545,12 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f3d3177a460&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff134c2e580&gt;
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -556,7 +565,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_initializedirtyimage_9_2.png" class="no-scaled-link" src="../_images/tutorials_initializedirtyimage_9_2.png" style="width: 483px; height: 416px;" />
+<img alt="../_images/ci-tutorials_initializedirtyimage_10_2.png" class="no-scaled-link" src="../_images/ci-tutorials_initializedirtyimage_10_2.png" style="width: 483px; height: 416px;" />
 </div>
 </div>
 </section>
@@ -564,7 +573,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 <h2>Model and Optimization Setup<a class="headerlink" href="#Model-and-Optimization-Setup" title="Permalink to this headline">¶</a></h2>
 <p>Here we set the optimizer and the image model (RML). If this is unfamiliar please reference the <a class="reference external" href="optimization.html">Optimization tutorial</a>. The initial parameters of the model are also displayed and can be contrasted with them after the optimization loop.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -578,7 +587,7 @@ logo first used in the Gridding and Diagnostic Images tutorial.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -609,7 +618,7 @@ is the squared L2 norm so we will be using the squareroot of that.</p>
 <h2>Training Loop<a class="headerlink" href="#Training-Loop" title="Permalink to this headline">¶</a></h2>
 <p>Now we train using this loss function to optimize our parameters.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -641,13 +650,13 @@ is the squared L2 norm so we will be using the squareroot of that.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 371 ms, sys: 7.9 ms, total: 378 ms
-Wall time: 195 ms
+CPU times: user 243 ms, sys: 0 ns, total: 243 ms
+Wall time: 125 ms
 </pre></div></div>
 </div>
 <p>We see that the optimization has completed successfully</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -659,7 +668,7 @@ Wall time: 195 ms
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -671,12 +680,12 @@ Text(0, 0.5, &#39;loss&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_initializedirtyimage_17_1.png" class="no-scaled-link" src="../_images/tutorials_initializedirtyimage_17_1.png" style="width: 475px; height: 451px;" />
+<img alt="../_images/ci-tutorials_initializedirtyimage_18_1.png" class="no-scaled-link" src="../_images/ci-tutorials_initializedirtyimage_18_1.png" style="width: 475px; height: 451px;" />
 </div>
 </div>
 <p>Finally, we can save the state of the optimized parameters using the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>, which is a dictionary containing the current state of the model parameters. <a class="reference external" href="https://pytorch.org/tutorials/beginner/saving_loading_models.html">Information on saving and loading models and the state_dict can be found here.</a></p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -686,7 +695,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 <p>Let’s visualize the resulting image cube representation. We see that the cube closely resembles the dirty image, however it contains no negative values.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -695,7 +704,7 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -717,7 +726,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -735,24 +744,24 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f3d3159f340&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff134a4f400&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_initializedirtyimage_22_1.png" class="no-scaled-link" src="../_images/tutorials_initializedirtyimage_22_1.png" style="width: 456px; height: 393px;" />
+<img alt="../_images/ci-tutorials_initializedirtyimage_23_1.png" class="no-scaled-link" src="../_images/ci-tutorials_initializedirtyimage_23_1.png" style="width: 456px; height: 393px;" />
 </div>
 </div>
 <p>We can also plot this with a normal colormap,</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -771,19 +780,19 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f3d31531700&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7ff134975280&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_initializedirtyimage_24_1.png" class="no-scaled-link" src="../_images/tutorials_initializedirtyimage_24_1.png" style="width: 456px; height: 393px;" />
+<img alt="../_images/ci-tutorials_initializedirtyimage_25_1.png" class="no-scaled-link" src="../_images/ci-tutorials_initializedirtyimage_25_1.png" style="width: 456px; height: 393px;" />
 </div>
 </div>
 </section>
@@ -791,7 +800,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <h2>Loading the Model<a class="headerlink" href="#Loading-the-Model" title="Permalink to this headline">¶</a></h2>
 <p>To demonstrate the saving and loading of the model here we will be resetting the parameters of the model and then reloading them.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -801,7 +810,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -824,7 +833,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <p>Here you can clearly see the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> returning to its original state from the beginning of the tutorial, before the training loop changed the paramters through the optimization function. Once we reload it, the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> now contains the values from when it was saved after the training loop.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -834,7 +843,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -873,7 +882,7 @@ process</a> like <a class="reference external" href="https://casa.nrao.edu/docs/
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../large-tutorials/HD143006_Part_1.html" class="btn btn-neutral float-right" title="HD143006 Tutorial Part 1" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="gpu_setup.html" class="btn btn-neutral float-left" title="GPU Acceleration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

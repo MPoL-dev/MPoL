@@ -122,6 +122,7 @@
 <li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -180,7 +181,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/gridder.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/gridder.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -500,7 +501,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span>
+<span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
 </pre></div>
 </div>
 </div>
@@ -633,7 +634,7 @@ gridded visibilities, frequently called the “dirty beam” and “dirty image�
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_gridder_23_0.png" class="no-scaled-link" src="../_images/tutorials_gridder_23_0.png" style="width: 654px; height: 344px;" />
+<img alt="../_images/ci-tutorials_gridder_23_0.png" class="no-scaled-link" src="../_images/ci-tutorials_gridder_23_0.png" style="width: 654px; height: 344px;" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline

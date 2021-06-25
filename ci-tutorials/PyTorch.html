@@ -121,6 +121,7 @@
 <li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -179,7 +180,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/PyTorch.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/PyTorch.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -452,9 +453,9 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 </pre></div>
 </div>
 </div>
@@ -639,7 +640,7 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_PyTorch_22_0.png" class="no-scaled-link" src="../_images/tutorials_PyTorch_22_0.png" style="width: 459px; height: 459px;" />
+<img alt="../_images/ci-tutorials_PyTorch_22_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_22_0.png" style="width: 459px; height: 459px;" />
 </div>
 </div>
 <p>We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:</p>
@@ -709,7 +710,7 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_PyTorch_24_0.png" class="no-scaled-link" src="../_images/tutorials_PyTorch_24_0.png" style="width: 459px; height: 459px;" />
+<img alt="../_images/ci-tutorials_PyTorch_24_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_24_0.png" style="width: 459px; height: 459px;" />
 </div>
 </div>
 <p>The gradient at our new point (shown in orange) is still not close to zero, meaning we haven’t reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We’ll say we’ve reached the bottom of the valley when the absolute value of the gradient is <span class="math notranslate nohighlight">\(&lt;0.1\)</span>:</p>
@@ -762,7 +763,7 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_PyTorch_26_0.png" class="no-scaled-link" src="../_images/tutorials_PyTorch_26_0.png" style="width: 459px; height: 459px;" />
+<img alt="../_images/ci-tutorials_PyTorch_26_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_26_0.png" style="width: 459px; height: 459px;" />
 </div>
 </div>
 <p>This works, but it takes a long time since we have several small steps.</p>
@@ -821,7 +822,7 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_PyTorch_28_0.png" class="no-scaled-link" src="../_images/tutorials_PyTorch_28_0.png" style="width: 485px; height: 451px;" />
+<img alt="../_images/ci-tutorials_PyTorch_28_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_28_0.png" style="width: 485px; height: 451px;" />
 </div>
 </div>
 <p><em>Note the change in scale.</em> With only one step, we already see that we stepped <em>right over</em> the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we’d find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large

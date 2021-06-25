@@ -126,6 +126,7 @@
 <li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -184,7 +185,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/tutorials/optimization.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/optimization.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -456,10 +457,9 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span><span class="p">,</span> <span class="n">display</span>
 </pre></div>
@@ -467,6 +467,15 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">utils</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -492,7 +501,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -516,7 +525,7 @@ div.rendered_html tbody tr:hover {
 <p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <code class="docutils literal notranslate"><span class="pre">to_pytorch_dataset</span></code> routine grids the visibilities with “uniform” weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the <code class="docutils literal notranslate"><span class="pre">to_pytorch_dataset</span></code> routine automatically checks the
 visibility scatter and raises a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the <a class="reference external" href="gridder.html">Gridding and Diagnostic Images Tutorial</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -539,7 +548,7 @@ this dataset has 1 channel
 <p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We’ve bundled the most common modules for imaging together in a <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a> meta-module, which we’ll use here.</p>
 <p>This diagram shows how the primitive modules, like <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a>, <a class="reference external" href="../api.html#mpol.images.ImageCube">ImageCube</a>, etc… are connected together to form <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>. In this workflow, the pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> are the core model parameters representing the image. More information about all of these components is available in the <a class="reference external" href="../api.html">API documentation</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -551,12 +560,12 @@ this dataset has 1 channel
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_10_0.svg" src="../_images/tutorials_optimization_10_0.svg" /></div>
+<img alt="../_images/ci-tutorials_optimization_11_0.svg" src="../_images/ci-tutorials_optimization_11_0.svg" /></div>
 </div>
 <p>It isn’t necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves <a class="reference external" href="../_modules/mpol/precomposed.html#SimpleNet">(following the SimpleNet source code as an example)</a> and swap in/out modules as we saw fit.</p>
 <p>We then initialize SimpleNet with the relevant information</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -575,7 +584,7 @@ this dataset has 1 channel
 </ol>
 <p>We’ll start by creating the optimizer</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -595,7 +604,7 @@ problem, this is not a sufficient constraint by itself. In later tutorials, we w
 <h2>Gradient descent<a class="headerlink" href="#Gradient-descent" title="Permalink to this headline">¶</a></h2>
 <p>Let’s walk through how we calculate a loss value and optimize the parameters. To start, let’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/saving_loading_models.html">examine the parameters of the model</a></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -604,7 +613,7 @@ problem, this is not a sufficient constraint by itself. In later tutorials, we w
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -628,7 +637,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <p>These are the default values that were used to initialize the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> component of the <a class="reference external" href="../api.html#mpol.precomposed.SimpleNet">SimpleNet</a>.</p>
 <p>For demonstration purposes, lets access and plot the base cube with matplotlib. In a normal workflow you probably won’t need to do this, but to access the basecube in sky orientation, we do</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -638,7 +647,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">bcube</span></code> is still a PyTorch tensor, but matplotlib requires numpy arrays. To convert back, we need to first <a class="reference external" href="https://stackoverflow.com/questions/63582590/why-do-we-call-detach-before-calling-numpy-on-a-pytorch-tensor">“detach” the computational graph</a> from the PyTorch tensor (used to propagate gradients) and then call the numpy conversion routine.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -657,7 +666,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <p>lastly, we remove the channel dimension to plot the 2D image using <code class="docutils literal notranslate"><span class="pre">np.squeeze</span></code></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -673,25 +682,25 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f5eb9793a00&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fe3d15e0a30&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_25_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_25_1.png" style="width: 468px; height: 393px;" />
+<img alt="../_images/ci-tutorials_optimization_26_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_26_1.png" style="width: 468px; height: 393px;" />
 </div>
 </div>
 <p>A blank image is not that exciting, but hopefully this demonstrates the state of the parameters at the start of optimization.</p>
 <p>Because we’ll want to compute a clean set of gradient values in a later step, we “zero out” any gradients attached to the tensor components so that they aren’t counted twice.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -701,7 +710,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <p>Most modules in MPoL are designed to work in a “feed forward” manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -722,10 +731,10 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
          [ 7.1800e-03+2.8196e-05j,  4.4902e-06+3.5266e-08j,
           -4.4899e-06-5.2898e-08j,  ...,
            4.4899e-06-3.5264e-08j, -4.4902e-06+1.7633e-08j,
-           4.4903e-06-3.8083e-22j],
+           4.4903e-06+4.9217e-19j],
          [-7.1797e-03-5.6390e-05j, -4.4899e-06-5.2898e-08j,
            4.4895e-06+7.0527e-08j,  ...,
-          -4.4899e-06+1.7632e-08j,  4.4901e-06+1.1980e-21j,
+          -4.4899e-06+1.7632e-08j,  4.4901e-06-6.4302e-19j,
           -4.4902e-06-1.7633e-08j],
          ...,
          [ 7.1791e-03-8.4581e-05j,  4.4899e-06-3.5264e-08j,
@@ -733,10 +742,10 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
            4.4885e-06-1.0578e-07j, -4.4891e-06+8.8154e-08j,
            4.4895e-06-7.0526e-08j],
          [-7.1797e-03+5.6390e-05j, -4.4902e-06+1.7633e-08j,
-           4.4901e-06-1.6480e-21j,  ...,
+           4.4901e-06+6.4011e-19j,  ...,
           -4.4891e-06+8.8154e-08j,  4.4895e-06-7.0527e-08j,
           -4.4899e-06+5.2898e-08j],
-         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-1.4745e-21j,
+         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-4.9292e-19j,
           -4.4902e-06-1.7633e-08j,  ...,
            4.4895e-06-7.0526e-08j, -4.4899e-06+5.2898e-08j,
            4.4902e-06-3.5266e-08j]]], dtype=torch.complex128,
@@ -746,7 +755,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 <p>Of course, these aren’t that exciting since they just reflect the constant value image.</p>
 <p>But, exciting things are about to happen! We can calculate the loss between these model visibilities and the data</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -766,7 +775,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <p>and then we can calculate the gradient of the loss function with respect to the parameters</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -785,7 +794,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <p>We can even visualize what the gradient of the <a class="reference external" href="../api.html#mpol.images.BaseCube">BaseCube</a> looks like (using a similar <code class="docutils literal notranslate"><span class="pre">.detach()</span></code> call as before)</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -803,24 +812,24 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f5eb76148b0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fe3cf46b160&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_36_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_36_1.png" style="width: 441px; height: 414px;" />
+<img alt="../_images/ci-tutorials_optimization_37_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_37_1.png" style="width: 441px; height: 414px;" />
 </div>
 </div>
 <p>The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -830,7 +839,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 <p>We can see that the parameter values have changed</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -839,7 +848,7 @@ tensor([[[ 1.1481e+01+0.0000e+00j,  7.1800e-03+2.8196e-05j,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -862,7 +871,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <p>as has the base image</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -878,19 +887,19 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f5eb4549f40&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fe3cc39d8e0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_42_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_42_1.png" style="width: 460px; height: 393px;" />
+<img alt="../_images/ci-tutorials_optimization_43_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_43_1.png" style="width: 460px; height: 393px;" />
 </div>
 </div>
 </section>
@@ -899,7 +908,7 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 <p>Now that we’ve covered how to use gradient descent to optimize a set of image parameters, let’s wrap these steps into a training loop and iterate a few hundred times to converge to a final product.</p>
 <p>In addition to the steps just outlined, we’ll also track the loss values as we optimize.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -931,12 +940,12 @@ OrderedDict([(&#39;bcube.base_cube&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-CPU times: user 34.9 s, sys: 10.5 s, total: 45.4 s
-Wall time: 25.1 s
+CPU times: user 28.1 s, sys: 8.11 s, total: 36.2 s
+Wall time: 19.8 s
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -948,7 +957,7 @@ Wall time: 25.1 s
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -960,7 +969,7 @@ Text(0, 0.5, &#39;loss&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_45_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_45_1.png" style="width: 469px; height: 451px;" />
+<img alt="../_images/ci-tutorials_optimization_46_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_46_1.png" style="width: 469px; height: 451px;" />
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
@@ -970,7 +979,7 @@ Text(0, 0.5, &#39;loss&#39;)
 <h2>Visualizing output<a class="headerlink" href="#Visualizing-output" title="Permalink to this headline">¶</a></h2>
 <p>Let’s visualize the final product. The bounds for <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> are available in the <code class="docutils literal notranslate"><span class="pre">img_ext</span></code> parameter.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -987,19 +996,19 @@ Text(0, 0.5, &#39;loss&#39;)
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.colorbar.Colorbar at 0x7f5eb44602b0&gt;
+&lt;matplotlib.colorbar.Colorbar at 0x7fe3cc2a6ca0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_optimization_48_1.png" class="no-scaled-link" src="../_images/tutorials_optimization_48_1.png" style="width: 424px; height: 393px;" />
+<img alt="../_images/ci-tutorials_optimization_49_1.png" class="no-scaled-link" src="../_images/ci-tutorials_optimization_49_1.png" style="width: 424px; height: 393px;" />
 </div>
 </div>
 </section>
