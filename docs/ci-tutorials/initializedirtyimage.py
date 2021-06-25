@@ -20,7 +20,7 @@
 # %run notebook_setup
 # -
 
-# ## Initializing Model with the Dirty Image
+# ## Initializing with the Dirty Image
 #
 # The core computational process required to synthesize an image with a regularized maximum likelihood (RML) algorithm is an optimization loop (as seen in the [Optimization Tutorial](optimization.html)) powered by gradient descent. In theory, we could start this optimization process from a random or neutral starting point (e.g., a blank image), and with enough iterations of the optimization algorithm, we will eventually converge to the "optimal" image (assuming there is a single, global maximum). If we could choose a "better" starting point, however, we'll need fewer iterations of our optimization loop to converge to the optimal image. A reasonable starting point is the dirty image, since it is already a maximum likelihood fit the data (though of course, it is unregularized).
 #
@@ -180,17 +180,17 @@ torch.save(rml.state_dict(), "dirty_image_model.pt")
 
 # ### Loading the Model
 #
-# Now let's create a new model so that we can demonstrate how to load state.
+# Now let's assume we're about to start an optimization loop in a new file, and we've just created a new model.
 
 rml = precomposed.SimpleNet(coords=coords)
 rml.state_dict()  # the now uninitialized parameters of the model (the ones we started with)
 
-# Here you can clearly see the ``state_dict`` returning to its original state from the beginning of the tutorial, before the training loop changed the paramters through the optimization function. Loading state into a model is as simple as
+# Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the paramters through the optimization function. Loading our saved dirty image state into the model is as simple as
 
 rml.load_state_dict(torch.load("dirty_image_model.pt"))
 rml.state_dict()  # the reloaded parameters of the model
 
-# The image is now ready to be optimized against the visibility data.
+# Now you can proceed with optimizing the model against the visibility data as before, but you should hopefully have a much better starting point.
 
 # ### Conclusion
 #
