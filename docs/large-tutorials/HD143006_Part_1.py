@@ -150,21 +150,6 @@ gridder = gridding.Gridder(
 
 # Now let's make a plotting function to show us the MPoL dirty image. If you have read through other MPoL tutorials, then this code should look familiar. We are going to plot all four of the different weightings, so creating a plotting function simplifies our code a lot.
 
-# + nbsphinx="hidden"
-# reclaiming memory from no-longer-needed variables
-# needed for doc building on github
-# %reset_selective -f dfits
-# %reset_selective -f dnpz
-# %reset_selective -f uu
-# %reset_selective -f vv
-# %reset_selective -f weight
-# %reset_selective -f data
-# %reset_selective -f data_re
-# %reset_selective -f data_im
-# %reset_selective -f fig
-# %reset_selective -f ax
-# -
-
 
 def plot(img, imtitle="image"):
     kw = {"origin": "lower", "extent": gridder.coords.img_ext}
