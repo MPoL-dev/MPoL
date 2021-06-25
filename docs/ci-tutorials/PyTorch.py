@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -92,23 +92,23 @@ x.grad  # returns the grad attribute (the gradient) of y with respect to x
 #
 # We wouldn't be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we'd know when to stop when the ground felt flat.
 #
-# One other thing we'd have to consider is our step size. If we take very small steps in the direction of the descent, it will take us a longer time than if we take larger steps. However, if we take enormous steps, we might completely miss the flat part of the valley, and start ascending the other side of the valley.
+# Before we leap, though, we need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.
 #
 # We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
 
-# +
-def y(x_input):
-    y = torch.square(x_input)
-    return y
+
+def y(x):
+    return torch.square(x)
 
 
-# -
-
-# We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent. Tensors cannot be passed into Matplotlib.pyplot functions so we use ``.item()`` to only obtain the value within the tensor:
+# We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent.
+#
+# Note that Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional ``detach().numpy()`` or ``.item()`` calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively. When it comes time to use MPoL for RML imaging, or any large production run, we'll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.
 
 # +
 x = torch.linspace(-5, 5, 100)
-plt.plot(x, y(x))  # plot y = x ** 2
+plt.plot(x, y(x))
+
 x_start = torch.tensor(
     -4.0, requires_grad=True
 )  # tensor with x coordinate of starting point
@@ -116,11 +116,14 @@ y_start = y(x_start)  # tensor with y coordinate of starting point
 
 plt.scatter(x_start.item(), y_start.item())  # plot starting point
 
+# we can calculate the derivative of y = x ** 2 evaluated at x_start
 y_start.backward()  # populate x_start.grad
-slope_start = (
-    x_start.grad
-)  # tensor containing derivative of y = x ** 2 evaluated at x_start
-plt.plot(x, slope_start.item() * (x - x_start.item()) + y_start.item())  # tangent line
+slope_start = x_start.grad
+
+# and use this to evaluate the tangent line
+tangent_line = slope_start * (x - x_start) + y_start
+
+plt.plot(x, tangent_line.detach().numpy())
 plt.xlabel(r"$x$")
 plt.ylabel(r"$y$")
 plt.xlim(xmin=-5, xmax=5)
