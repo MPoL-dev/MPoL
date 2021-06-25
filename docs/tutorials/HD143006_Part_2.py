@@ -101,17 +101,13 @@ model = SimpleNet(coords=coords, nchan=gridder.nchan)
 from torch.utils.tensorboard import SummaryWriter  # setting up the writer
 import os
 
-logs_base_dir = "./logs"
+logs_base_dir = "./logs/"
 writer = SummaryWriter(logs_base_dir)
 os.makedirs(logs_base_dir, exist_ok=True)
 # %load_ext tensorboard
 
 
-# Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and Pytorch contain many different optimizers and loss functions, each one suiting different applications.
-
-from mpol import (
-    losses,
-)  # an MPol loss function is not being used here, but MPoL contains ones that will be used
+# Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we will use PyTorch.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -192,7 +188,10 @@ fig.colorbar(im, cax=cbar_ax)
 
 # Here we are setting up the tools that will allows us to visualize the results of the loop in Tensorboard.
 
-from mpol import connectors  # require to calculate the residuals in log_figure
+from mpol import (
+    losses, # here MPoL loss functions will be used
+    connectors  # require to calculate the residuals in log_figure
+) 
 
 
 def log_figure(
@@ -238,7 +237,7 @@ def log_figure(
     return fig
 
 
-# With these we can now set up on making our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
+# With these set up, we can now make our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -300,17 +299,16 @@ optimizer = torch.optim.Adam(
 # +
 # %%time
 
-
 train(model, dataset, optimizer, config, writer=writer)
 # -
 
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, image residuals, visibility amplitudes, visibility residuals. You can use the slider to view different iterations.
 
-# %tensorboard --logdir {logs_base_dir + '/'}
+# %tensorboard --logdir {logs_base_dir}
 
 # ## Training and Imaging Part 2: Cross Validation
 #
-# Since we now have successfully Now we will move into the realm of Cross Validation. Cross validation is a technique that allows a model to be more efficiently trained (better predict an outcome, hard pressed to pick the best phrasing) by having it take a dataset and store one chunk of it as the test dataset and have the rest of the dataset be used to train the model. The model then sees the difference between the predicted testa dataset and the actual test dataset (this is the cross validaiton score). The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
+# Now we will move into the realm of Cross Validation. Cross validation is a technique that allows a model to be more efficiently trained (better predict an outcome, hard pressed to pick the best phrasing) by having it take a dataset and store one chunk of it as the test dataset and have the rest of the dataset be used to train the model. The model then sees the difference between the predicted testa dataset and the actual test dataset (this is the cross validaiton score). The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
 #
 # Just like in the previous section we will be viewing our results in Tensorboard, but we will also be logging the cross_validation score as well.
 
@@ -352,7 +350,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     return test_score
 
 
-# Now with our functions defined we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. This is visualized in the [Cross Validation tutorial](crossvalidation.html).
+# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. This is visualized in the [Cross Validation tutorial](crossvalidation.html).
 
 from mpol import datasets
 
@@ -372,7 +370,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
 
-# Before we can run our function we first need to define the MODEL_PATH to our initialized model and we will put a new config file here for ease of access in case we want to change around the hyperparemters.
+# If you recall, we saved the trained model's state above. Here we will be utilizing this. `MODEL_PATH` will be defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will repeat this process for a few different configurations, starting with the ones found in `config`, defined above.
 
 # +
 MODEL_PATH = "model.pt"
@@ -390,17 +388,58 @@ new_config = (
 # -
 
 
-# We are now ready to run our optimizer using cross validaiton, after it is done we will be reviewing our results in Tensorboard. Feel free to run this a few times while changing hyperparameters in the config to lower the cross validation score.
+# We are now ready to run our optimizer using cross validaiton, after it is done we will be reviewing our results in Tensorboard. We run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with tensorboard.
 
 # +
 # %%time
 
+# # new directory to write the progress of our Cross Val. loop to
+# cv_log_dir = logs_base_dir + "cv/"
+# cv_writer = SummaryWriter(cv_log_dir + "cv1/")
+# os.makedirs(cv_log_dir, exist_ok=True)
 
-cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+cv_score1 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+print(f"Cross Validation Score: {cv_score1}")
+
+# +
+# %%time
+
+new_config = (
+    {  # config includes the hyperparameters used in the function and in the optimizer
+        "lr": 0.3,
+        "lambda_sparsity": 1.0e-4,
+        "lambda_TV": 1.0e-4,
+        "entropy": 1e-02,
+        "prior_intensity": 2.0e-09,
+        "epochs": 850,
+    }
+)
+cv_score2 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+print(f"Cross Validation Score: {cv_score2}")
+
+
+# +
+# %%time
+
+new_config = (
+    {  # config includes the hyperparameters used in the function and in the optimizer
+        "lr": 0.3,
+        "lambda_sparsity": 1.0e-3,
+        "lambda_TV": 1.2e-4,
+        "entropy": 1e-02,
+        "prior_intensity": 2.0e-09,
+        "epochs": 400,
+    }
+)
+
+cv_score3 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+print(f"Cross Validation Score: {cv_score3}")
 # -
 
 # And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score.
 
-# %tensorboard --logdir {logs_base_dir + '/'}
+# %tensorboard --logdir {logs_base_dir}
 
-# Now with this tutorial done we can see the results of RML imaging, an image optimized to fit the provided dataset, using a more basic procedure and then using the cross validation to better train and image the model. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training and optimization loops (and also whatever else is fully happening the third part of the tutorial). This conclusion could probably be much better, but I wrote this at 4 am.
+# Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. Using a more basic procedure and then using the cross validation to train and image the model we are able to speed up the training process. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
+
+
