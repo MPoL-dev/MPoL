@@ -4,14 +4,19 @@
 Introduction to Regularized Maximum Likelihood Imaging
 ======================================================
 
-The real domain is linked to the Fourier domain, also called the visibility domain, via the Fourier transform
+This document is an attempt to provide a whirlwind introduction to what Regularized Maximum Likelihood (RML) imaging is, and why you might want to use this MPoL package to perform it with your interferometric dataset. Of course, the field is rich, varied, and this short introduction couldn't possibly do justice to cover the entire field. We recommend that you check out many of the links and suggestions in this document for further reading.
+
+Data in the Fourier domain
+--------------------------
+
+First, we'll introduce the type of interferometric astronomical data that MPoL is designed to work with. Currently, we are most focused on modeling datasets from radio interferometers like the `Atacama Large Millimeter Array <https://almascience.nrao.edu/>`__ (ALMA), so most of the terminology will follow that specific use case. But the idea of interferometric modeling is general, and the MPoL package could be equally applied to imaging problems involving Fourier data from optical and infrared telescopes (please get in touch, if this is your use case).
+
+Intereferometers acquire data samples in the Fourier domain, also called the visibility domain. The visibility domain is the Fourier transform of the image sky brightness
 
 .. math::
 
-    {\cal V}(u,v) = \int \int I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.
+    {\cal V}(u,v) = \iint I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.
 
-
-Intereferometers sample the visibility.
 
 Acquire a collection of datapoints, contain real and imaginary values. Other instruments might only provide robust products like closure phase.
 
@@ -34,14 +39,29 @@ Where :math:`\epsilon` itself is a complex-valued noise draw. Alternatively, we 
     \epsilon_\Re \sim \mathcal{N}(0, \sigma) \\
     \epsilon_\Im \sim \mathcal{N}(0, \sigma)
 
+and
+
+.. math::
+
+    \epsilon = \epsilon_\Re + i \epsilon_\Im
+
 Radio interferometers will commonly represent the standard deviation as a "weight" :math:`w` where the relationship between the two is
 
 .. math::
 
     w = \frac{1}{\sigma^2}
 
-Forward modeling
-----------------
+Additional References
++++++++++++++++++++++
+
+* Getting started in radio astronomy (links to textbooks, lecture materials, and good lectures)
+* Essential radio astronomy
+* TMS textbook
+* NRAO summer school lectures
+
+
+Inference with forward models
+-----------------------------
 
 Typically, when astronomers are fitting a model to some dataset :math:`\boldsymbol{D} = \{D_1, D_2, \ldots \}_{i=1}^N`, like a line to a series of :math:`x` and :math:`y` points, we require a likelihood function. This specifies the probability of the data, given the model.
 
@@ -56,10 +76,10 @@ Our statement about the measurement process (:math:`V_i = \mathcal{V}(u_i, v_i) 
     \mathcal{L}(\boldsymbol{V} | \boldsymbol{\theta}) =
 
 
+A side note that this type of parameter inference is entirely `possible with the MPoL package <https://github.com/MPoL-dev/MPoL/issues/33>`__. In fact, the gradient-based nature of things should make this very fast and use advanced sampler like Hamiltonian Monte Carlo.
 
-
-RML imaging as non-parametric model fitting
--------------------------------------------
+RML images as non-parametric models
+-----------------------------------
 
 Examples of splines vs. polynomials.
 
@@ -68,7 +88,6 @@ What is RML imaging?
 Is
 
 What does that mean?
-
 
 
 In general, we are working with Fourier datasets. Meaning that we are trying to reconstruct images of the sky, but the datasets we have are related to the Fourier transform of that.
@@ -80,10 +99,28 @@ Some advantages to doing RML imaging. Provides an alternative to assessing image
 Essentially model fitting
 Likelihood. Loss functions. (link). Different formulations between Bayesian probability and/or regularizer formulation. An excellent resource here is the EHT-IV paper.
 
+All of this is in contrast to the CLEAN algorithm, which operates as an image-plane deconvolution algorithm.
+
+
+Additional references for RML imaging
++++++++++++++++++++++++++++++++++++++
+
+* Narayan and Nityananda
+* EHT IV
+
+Additional refereces for CLEAN imaging
+++++++++++++++++++++++++++++++++++++++
+
+* NRAO summer schools
+* CASA documentation
+
+
+
+The MPoL package for Regularized Maximum Likelihood imaging
+-----------------------------------------------------------
 
 What's new here? Autodifferentiation. Opportunities for expansion. And the tight integration with PyTorch and neural networks. Easy to run on the GPU (link)
 
-1) Getting started in radio astronomy (links to textbooks, lecture materials, and good lectures)
 2) Getting started with imaging (links to CASA, other imaging software)
 3) Getting started with PyTorch
 
