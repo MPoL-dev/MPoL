@@ -188,27 +188,49 @@ The idea behind `GNU make <https://www.gnu.org/software/make/manual/make.html>`_
 Contributing tutorials
 ----------------------
 
-Like with the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ codebase, MPoL tutorials are written as ``.py`` python files and converted to Jupyter notebooks using `jupytext <https://jupytext.readthedocs.io/en/latest/>`_. You can learn more about this neat plugin on the `jupytext <https://jupytext.readthedocs.io/en/latest/>`_ page. You don't need to worry about pairing notebooks---we're only interested in keeping the ``.py`` file up to date and committed to source control. For small tutorials, the ``.py`` file you create is the only thing you need to commit to the github repo (don't commit the ``.ipynb`` file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.
+If your tutorial is self-contained in scope and has limited computational needs (will complete on a single CPU in < 30 seconds), we recommend you provide the source file as a Jupytext ``.py`` file so that we can build and test it as part of the continuous integration github workflow. If your tutorial requires more significant computational resources (e.g., a GPU, multiple CPS, or > 30 seconds runtime), we suggest executing the notebook on your local computing resources and commiting the ``.ipynb`` (with output cells) directly to the repository. Both types of tutorial formats are described in more detail below.
+
+Small(ish) tutorials requiring only a CPU
++++++++++++++++++++++++++++++++++++++++++
+
+Like with the `exoplanet <https://docs.exoplanet.codes/en/stable/user/dev/>`_ codebase, MPoL tutorials are written as ``.py`` python files and converted to Jupyter notebooks using `jupytext <https://jupytext.readthedocs.io/en/latest/>`_. You can learn more about this neat plugin on the `jupytext <https://jupytext.readthedocs.io/en/latest/>`_ page. For smaller, "continuously-integrated" tutorials, you don't need to worry about pairing notebooks---we're only interested in keeping the ``.py`` file up to date and committed to source control. For these smaller tutorials, the ``.py`` file you create is the only thing you need to commit to the github repo (don't commit the ``.ipynb`` file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.
 
 To write a tutorial:
 
-1. copy and rename one of the existing ``.py`` files in ``docs/tutorials/`` to ``docs/tutorials/your-new-tutorial``, being sure to keep the header metadata
+1. copy and rename one of the existing ``.py`` files in ``docs/ci-tutorials/`` to ``docs/ci-tutorials/your-new-tutorial``, being sure to keep the header metadata
 2. start a Jupyter notebook kernel
 3. open the ``.py`` file as a notebook and edit it like you would any other Jupyter notebook. If you've already installed the `jupytext <https://jupytext.readthedocs.io/en/latest/>`_ tool (as part of ``pip install -e ".[dev]"``), your changes in the Jupyter notebook window should be automatically saved back to the ``.py`` file. As you progress, make sure you commit your changes in the ``.py`` file back to the repository (but don't commit the ``.ipynb`` file).
 
-When done, add a reference to your tutorial in the table of contents in ``docs/index.rst``. E.g., if your contribution is the ``tutorials/gridder.py`` file, add a ``tutorials/gridder`` line. You should also add the name of your tutorial with the ``.ipynb`` extension (e.g., ``tutorials/gridder.ipynb``) to the ``NOTEBOOKS`` variable in ``docs/Makefile``.
+When done, add a reference to your tutorial in the table of contents in ``docs/index.rst``. E.g., if your contribution is the ``ci-tutorials/gridder.py`` file, add a ``ci-tutorials/gridder`` line. You should also add the name of your tutorial with the ``.ipynb`` extension (e.g., ``ci-tutorials/gridder.ipynb``) to the ``NOTEBOOKS`` variable in ``docs/Makefile``.
 
 Then, you should be able to build the documentation as normal (i.e., ``make html``) and your tutorial will be included in the documentation. Behind the scenes, the Makefile includes the line ::
 
-    jupytext --to ipynb --execute tutorials/*.py
+    jupytext --to ipynb --execute ci-tutorials/*.py
 
 which converts your ``.py`` file to a ``.ipynb`` file and executes its contents, storing the cell output to the notebook. Then, when Sphinx builds the documentation, the `nbsphinx <https://nbsphinx.readthedocs.io/>`_ plugin sees a Jupyter notebook and incorporates it into the build.
 
 If your tutorial requires any extra build dependencies, please add them to the ``EXTRA_REQUIRES['docs']`` list in ``setup.py``.
 
------------------------
-Best practices
------------------------
+Larger tutorials requiring substantial computational resources
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Radio interferometric datasets are frequently large, and sometimes realistic tutorials with real data require substantial computational resources beyond those provided in github workflows. Though more burdensome to package, these "end-to-end" tutorials are often the most useful for users.
+
+Larger tutorials are not contributed in a continuously-integrated fashion, but instead are built and executed using local computational resources (these could be your laptop or a university research cluster). We still recommend that you write your tutorial as a ``.py`` file like the smaller tutorials, and update the ``large-tutorials/Makefile`` with your new filenames. The difference here is that after you build the ``.ipynb`` version of your tutorial (you could use ``make all`` inside the ``large-tutorials`` directory, or just run ``jupytext --to ipynb --execute my_tutorial.py``) you'll want to commit the ``.ipynb`` file containing the cell output directly to the git repository.
+
+The expectation is that these tutorials will only be rerun when the tutorial is updated, so the git diff issue is not as large a concern as it was with the continuously-integrated smaller tutorials. Like before, during the documentation build process the  `nbsphinx <https://nbsphinx.readthedocs.io/>`_ plugin will see a Jupyter notebook and incorporate it into the build. Because the larger tutorials are not continuously integrated, however, there is some concern that the codebase could diverge from that used to generate the tutorial, rendering the tutorial stale. We believe this risk is acceptable given the benefit that these larger tutorials provide and we intend to check the tutorials for staleness with at least every minor release.
+
+To summarize, to write a large tutorial:
+
+1. copy and rename one of the existing ``.py`` files in ``docs/ci-tutorials`` to the ``docs/large-tutorials`` folder
+2. use jupytext to convert the ``.py`` to an ``.ipynb`` file and execute it on your local resources. You may want to add a line to the ``docs/large-tutorials/Makefile`` for your tutorial
+3. commit the ``.ipynb`` to the MPoL repository, if you haven't already (i.e., you'll be committing *both* the ``.py`` and ``.ipynb`` files in this case).
+4. if you run your notebook is run on a cluster, please also commit your submission script (e.g., SLURM, torque, moab). You may also consider additionally pasting the contents of the build script as a text cell inside the ``.ipynb`` for reference.
+
+When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the ``large-tutorials/gpus.py`` file, add a ``large-tutorials/gpus`` line to the table of contents.
+
+Tutorial best practices
++++++++++++++++++++++++
 
 Tutorials should be self-contained. If the tutorial requires a dataset, the dataset should be publicly available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo and/or as part of the `mpoldatasets repository <https://github.com/MPoL-dev/mpoldatasets>`__). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.
 

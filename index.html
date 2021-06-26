@@ -106,13 +106,13 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch Tensors and Gradient Descent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/crossvalidation.html">Cross validation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -188,7 +188,7 @@
 <h1>Million Points of Light (MPoL)<a class="headerlink" href="#million-points-of-light-mpol" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml"><img alt="Tests badge" src="https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg" /></a>
 <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions"><img alt="Discussions badge" src="https://img.shields.io/badge/community-Github%20Discussions-orange" /></a></p>
-<p>MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and kernel phase interferometry.</p>
+<p>MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.</p>
 <p>To get a sense of how MPoL works, please take a look at the tutorials down below. If you have any questions, please join us on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
 <p>If you’d like to help build the MPoL package, please check out the <a class="reference internal" href="developer-documentation.html#developer-documentation-label"><span class="std std-ref">Developer Documentation</span></a> to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization <a class="reference external" href="https://mpol-dev.github.io/">website</a> and <a class="reference external" href="https://github.com/MPoL-dev">github</a> repository hosting the source code.</p>
 <div class="toctree-wrapper compound">
@@ -231,7 +231,7 @@
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch Tensors and Gradient Descent</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/PyTorch.html#Introduction-to-Tensors">Introduction to Tensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/PyTorch.html#Calculating-Gradients">Calculating Gradients</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/PyTorch.html#Optimizing-a-Function-with-Gradient-Descent">Optimizing a Function with Gradient Descent</a></li>
@@ -272,19 +272,22 @@
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gpu_setup.html#using-the-gpu-as-part-of-pytorch-and-mpol">Using the GPU as part of PyTorch and MPoL</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing Model with the Dirty Image</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Image-Setup">Image Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Model-and-Optimization-Setup">Model and Optimization Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Loss-Function">Loss Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Training-Loop">Training Loop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Saving-the-Model">Saving the Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Loading-the-Model">Loading the Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html#Conclusion">Conclusion</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_Part_1.html#Introduction-to-Regularized-Maximum-Likelihood-(RML)-Imaging">Introduction to Regularized Maximum Likelihood (RML) Imaging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_Part_1.html#Loading-Data">Loading Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_Part_1.html#Plotting-Visibilities">Plotting Visibilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#Viewing-the-CLEAN-image">Viewing the CLEAN image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#Plotting-the-Baselines">Plotting the Baselines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#The-MPoL-Gridder-Object">The MPoL Gridder Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#Making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#Comparing-Dirty-and-CLEANed-Images">Comparing Dirty and CLEANed Images</a></li>
 </ul>
 </li>
 </ul>

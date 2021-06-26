@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction to PyTorch Tensors and Gradient Descent &mdash; MPoL 0.1.1 documentation</title>
+  <title>Introduction to PyTorch: Tensors and Gradient Descent &mdash; MPoL 0.1.1 documentation</title>
   
 
   
@@ -109,7 +109,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to PyTorch Tensors and Gradient Descent</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to PyTorch: Tensors and Gradient Descent</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Introduction-to-Tensors">Introduction to Tensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Calculating-Gradients">Calculating Gradients</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Optimizing-a-Function-with-Gradient-Descent">Optimizing a Function with Gradient Descent</a></li>
@@ -120,8 +120,8 @@
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing Model with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_Part_1.html">HD143006 Tutorial Part 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -174,7 +174,7 @@
     
   <li class="breadcrumb"><a href="../index.html">MPoL</a> &raquo;</li>
     
-  <li class="breadcrumb">Introduction to PyTorch Tensors and Gradient Descent</li>
+  <li class="breadcrumb">Introduction to PyTorch: Tensors and Gradient Descent</li>
 
     
       <li class="wy-breadcrumbs-aside">
@@ -441,8 +441,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<section id="Introduction-to-PyTorch-Tensors-and-Gradient-Descent">
-<h1>Introduction to PyTorch Tensors and Gradient Descent<a class="headerlink" href="#Introduction-to-PyTorch-Tensors-and-Gradient-Descent" title="Permalink to this headline">¶</a></h1>
+<section id="Introduction-to-PyTorch:-Tensors-and-Gradient-Descent">
+<h1>Introduction to PyTorch: Tensors and Gradient Descent<a class="headerlink" href="#Introduction-to-PyTorch:-Tensors-and-Gradient-Descent" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.</p>
 <section id="Introduction-to-Tensors">
 <h2>Introduction to Tensors<a class="headerlink" href="#Introduction-to-Tensors" title="Permalink to this headline">¶</a></h2>
@@ -595,27 +595,28 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <h2>Optimizing a Function with Gradient Descent<a class="headerlink" href="#Optimizing-a-Function-with-Gradient-Descent" title="Permalink to this headline">¶</a></h2>
 <p>If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how would we do it?</p>
 <p>We wouldn’t be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we’d know when to stop when the ground felt flat.</p>
-<p>One other thing we’d have to consider is our step size. If we take very small steps in the direction of the descent, it will take us a longer time than if we take larger steps. However, if we take enormous steps, we might completely miss the flat part of the valley, and start ascending the other side of the valley.</p>
+<p>Before we leap, though, we need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.</p>
 <p>We can look at the gradient descent from a more mathematical lense by looking at the graph <span class="math notranslate nohighlight">\(y = x^2\)</span>:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="n">x_input</span><span class="p">):</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x_input</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">y</span>
+<span></span><span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent. Tensors cannot be passed into Matplotlib.pyplot functions so we use <code class="docutils literal notranslate"><span class="pre">.item()</span></code> to only obtain the value within the tensor:</p>
+<p>We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent.</p>
+<p>Note that Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional <code class="docutils literal notranslate"><span class="pre">detach().numpy()</span></code> or <code class="docutils literal notranslate"><span class="pre">.item()</span></code> calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively. When it comes time to use MPoL for RML imaging, or any large production run, we’ll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># plot y = x ** 2</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
 <span class="n">x_start</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
     <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>  <span class="c1"># tensor with x coordinate of starting point</span>
@@ -623,11 +624,14 @@ with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_start</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">y_start</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>  <span class="c1"># plot starting point</span>
 
+<span class="c1"># we can calculate the derivative of y = x ** 2 evaluated at x_start</span>
 <span class="n">y_start</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_start.grad</span>
-<span class="n">slope_start</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">x_start</span><span class="o">.</span><span class="n">grad</span>
-<span class="p">)</span>  <span class="c1"># tensor containing derivative of y = x ** 2 evaluated at x_start</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope_start</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_start</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">+</span> <span class="n">y_start</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>  <span class="c1"># tangent line</span>
+<span class="n">slope_start</span> <span class="o">=</span> <span class="n">x_start</span><span class="o">.</span><span class="n">grad</span>
+
+<span class="c1"># and use this to evaluate the tangent line</span>
+<span class="n">tangent_line</span> <span class="o">=</span> <span class="n">slope_start</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_start</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_start</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tangent_line</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
