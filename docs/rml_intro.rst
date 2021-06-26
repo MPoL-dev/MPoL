@@ -1,0 +1,62 @@
+What is RML imaging?
+
+What does that mean?
+
+
+
+In general, we are working with Fourier datasets. Meaning that we are trying to reconstruct images of the sky, but the datasets we have are related to the Fourier transform of that.
+
+These types of datasets appear in radio interferometry (such as with ALMA, the JVLA, or very long baseline arrays like the Event Horizon Telescope), or optical interferometry, such as with sparse aperture masking.
+
+Some advantages to doing RML imaging. Provides an alternative to assessing image quality w/ tclean.
+
+Essentially model fitting
+Likelihood. Loss functions. (link). Different formulations between Bayesian probability and/or regularizer formulation. An excellent resource here is the EHT-IV paper.
+
+
+What's new here? Autodifferentiation. Opportunities for expansion. And the tight integration with PyTorch and neural networks. Easy to run on the GPU (link)
+
+1) Getting started in radio astronomy (links to textbooks, lecture materials, and good lectures)
+2) Getting started with imaging (links to CASA, other imaging software)
+3) Getting started with PyTorch
+
+
+Existing RML packages. Encourage you to check out.
+
+This package is meant to be modular.
+
+
+### Introduction to Regularized Maximum Likelihood (RML) Imaging
+
+Regularized Maximum Likelihood (RML) imaging is a forward modeling methodology. We predict an image then represent it as an array of pixels. This is brought to the visibility domain through a forward Fourier transform. This is then compared to the measured data to ensure it is a viable predicted image. Due to information loss of the true image when obtaining the measured data, several predicted images- including incorrect ones- will match. To get to our best predicted image, we make new predictions by choosing the most likely (Maximum Likelihood) configuration and favoring specified criteria (Regularized). These criteria or regularizers, are chosen by the user. Some examples of favored criteria are smoothness and sparsity. The likeliness and how well a predicted image meet a certain criterion is mathematically represented in a loss function that contains hyperparameters used to weight data and regularizers. We minimize this loss function by performing a gradient descent, in which we adjust the pixel value intensities. Within this optimization run, hyperparameters are usually held fixed, but can be tuned between runs to produce a better image. When the loss function is minimized, our predicted image is at its best version to fit the collected data and follow our specified criterion.
+
+
+
+- Package for synthesis imaging and model fitting from interferometric data.
+- Built on PyTorch provides state of the art autodifferentiation capabilities
+- Well tested, stable, on supported Python versions. Always a goal of core, usable routines in PyPi releases (i.e., `pip install mpol`). Maintainability.
+- Scalability. By keeping modules modular, and *open* and emphasizing the building of imaging components rather than a single, monolithic function, the interested user can expand their applications.
+
+Show the example of HD 143006 CLEAN vs. RML as example of why you might want to use this package… resolution, sensitivity, independent characterization of interesting features.
+
+
+These could be nice videos, but aspects of them probably need to be tutorials first.
+
+ * Autodifferentiation
+     * neural networks, deep learning, graident descent, JAX
+ * Layers + Nodes w/in Neural landscape
+    * Input and Output connections.
+    * Relation of "loss" to Bayesian inference
+ * RML Imaging as forward modeling
+     * optimization as training
+
+Following on from the layer discussion, and the relationship to Bayesian inference, the idea is that there is some set of parameters that maximize the posterior.
+
+
+One approach would be to combine all of the data into a single container, and just train/optimize off of that.
+
+
+But let's say you had a combination of multiple datasets, from different telescope and there was an unknown calibration factor for each telescope.
+
+
+This approach would be to "batch" the data in the training loop, and train in each step. This training loop is commonly to other neural network architectures.
