@@ -72,7 +72,7 @@ gridder = gridding.Gridder(
 
 # -
 
-# We now have everything from the last tutorial loaded and can begin the process of Optimization and Cross Validation to improve our image quality.
+# We now have everything from the last tutorial loaded and can begin the process of optimization and cross validation to improve our image quality.
 #
 # ### Getting the Dirty Image and Creating the Model
 #
@@ -92,26 +92,14 @@ model = SimpleNet(coords=coords, nchan=gridder.nchan)
 
 # ## Initializing Model with the Dirty Image
 #
-# We now have our model and data, but before we set out trying to optimize the image we should create a better starting point for our future optimization loops. A good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image containes negative flux pixels, while we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to become as close to the dirty image as possible (while retaining image positivity).
+# We now have our model and data, but before we set out trying to optimize the image we should create a better starting point for our future optimization loops. A good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains negative flux pixels, while we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to become as close to the dirty image as possible (while retaining image positivity).
 #
-# We also want to create a Writer object so we can observe our Network's state at any point.
-#
-# *(i think this is correct about the writer, a little unsure)*
-
-from torch.utils.tensorboard import SummaryWriter  # setting up the writer
-import os
-
-logs_base_dir = "./logs/"
-writer = SummaryWriter(logs_base_dir)
-os.makedirs(logs_base_dir, exist_ok=True)
-# %load_ext tensorboard
 
 
-# Now we will create our training loop using a [loss function](../api.html#module-mpol.losses) (here we use the mean squared error between the RML model image pixel fluxes and the dirty image pixel flues) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we will use PyTorch.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim).. MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
-# https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html
 
 # +
 # %%time
@@ -124,17 +112,17 @@ for iteration in range(500):
     model.forward()  # get the predicted model
     sky_cube = model.icube.sky_cube
 
-    loss = loss_fn(sky_cube, dirty_image)  # calculates the loss
+    loss = loss_fn(sky_cube, dirty_image)  # calculate the loss
 
-    loss.backward()  # caulculate gradients of parameters
-    optimizer.step()  # updates the parameters
+    loss.backward()  # calculate gradients of parameters
+    optimizer.step()  # update the parameters
 # -
 
-# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here.](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
 
 torch.save(model.state_dict(), "model.pt")
 
-# Now we can see the results, the image cube now closely resembles the dirty image (constrained by the fact that it can contain no negative values).
+# Now we can see the results, the image cube now closely resembles the dirty image (constrained by the fact that it can contain no negative flux pixel values).
 
 # +
 
@@ -149,7 +137,6 @@ im = ax[0].imshow(
     extent=model.icube.coords.img_ext,
     vmin=imin,
     vmax=imax,
-    # cmap = "Spectral", have these here in case of wanting a more obvious way of seeing negative values
 )
 
 im = ax[1].imshow(
@@ -159,7 +146,6 @@ im = ax[1].imshow(
     extent=model.icube.coords.img_ext,
     vmin=imin,
     vmax=imax,
-    # cmap = "Spectral", ditto
 )
 
 ax[0].set_xlim(left=0.75, right=-0.75)
@@ -183,20 +169,31 @@ fig.colorbar(im, cax=cbar_ax)
 
 # ## Training and Imaging Part 1
 
-# Now that we have a better stating point, we can work on optimizing our image using a training function that we will be able to configure the training parameters of. This part of the tutorial will also use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) to allow us to see the loss function and the change in the image as it goes through the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model).
+# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model).
 
 
 # Here we are setting up the tools that will allows us to visualize the results of the loop in Tensorboard.
 
 from mpol import (
-    losses, # here MPoL loss functions will be used
-    connectors  # require to calculate the residuals in log_figure
-) 
+    losses,  # here MPoL loss functions will be used
+    connectors,  # required to calculate the residuals in log_figure
+)
+
+
+# Setting up Writer to log values and images for display in tensorboard
+from torch.utils.tensorboard import SummaryWriter
+import os
+
+
+logs_base_dir = "./logs/"
+writer = SummaryWriter(logs_base_dir)
+os.makedirs(logs_base_dir, exist_ok=True)
+# %load_ext tensorboard
 
 
 def log_figure(
     model, residuals
-):  # this function takes a snapshot of the image state, will expand on what a residual is?
+):  # this function takes a snapshot of the image state, imaged residuals, amplitude of model visibilities, and amplitude of residuals
 
     # populate residual connector
     residuals()
@@ -398,7 +395,9 @@ new_config = (
 # cv_writer = SummaryWriter(cv_log_dir + "cv1/")
 # os.makedirs(cv_log_dir, exist_ok=True)
 
-cv_score1 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+cv_score1 = cross_validate(
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+)
 print(f"Cross Validation Score: {cv_score1}")
 
 # +
@@ -414,7 +413,9 @@ new_config = (
         "epochs": 850,
     }
 )
-cv_score2 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+cv_score2 = cross_validate(
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+)
 print(f"Cross Validation Score: {cv_score2}")
 
 
@@ -432,7 +433,9 @@ new_config = (
     }
 )
 
-cv_score3 = cross_validate(model, new_config, k_fold_datasets, MODEL_PATH, writer=writer)
+cv_score3 = cross_validate(
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+)
 print(f"Cross Validation Score: {cv_score3}")
 # -
 
@@ -441,5 +444,3 @@ print(f"Cross Validation Score: {cv_score3}")
 # %tensorboard --logdir {logs_base_dir}
 
 # Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. Using a more basic procedure and then using the cross validation to train and image the model we are able to speed up the training process. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
-
-
