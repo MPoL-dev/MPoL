@@ -9,17 +9,29 @@ Million Points of Light (MPoL)
 |Tests badge|
 |Discussions badge|
 
+
 .. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg
    :target: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml
 
 .. |Discussions badge| image:: https://img.shields.io/badge/community-Github%20Discussions-orange
    :target: https://github.com/MPoL-dev/MPoL/discussions
 
+.. raw:: html
+
+   <!-- Place this tag where you want the button to render. -->
+   <a class="github-button" href="https://github.com/MPoL-dev/MPoL" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star MPoL-dev/MPoL on GitHub">Star</a>
+   <a class="github-button" href="https://github.com/MPoL-dev/MPoL/discussions" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-comment-discussion" data-size="large" aria-label="Discuss MPoL-dev/MPoL on GitHub">Discuss</a>
+
+
 MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.
+
+
 
 To get a sense of how MPoL works, please take a look at the tutorials down below. If you have any questions, please join us on our `Github discussions page <https://github.com/MPoL-dev/MPoL/discussions>`__.
 
 If you'd like to help build the MPoL package, please check out the :ref:`developer-documentation-label` to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization `website <https://mpol-dev.github.io/>`_ and `github <https://github.com/MPoL-dev>`__ repository hosting the source code.
+
+
 
 .. toctree::
    :maxdepth: 2

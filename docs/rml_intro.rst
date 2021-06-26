@@ -1,4 +1,31 @@
+======================================================
+Introduction to Regularized Maximum Likelihood Imaging
+======================================================
+
+The real domain is linked to the Fourier domain, also called the visibility domain, via the Fourier transform
+
+.. math::
+
+    {\cal V}(u,v) = \int \int I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.
+
+
+Intereferometers sample the visibility.
+
+Acquire a collection of datapoints, contain real and imaginary values. Other instruments might only provide robust products like closure phase.
+
+
+Forward modeling
+----------------
+
+
+RML imaging as non-parametric model fitting
+-------------------------------------------
+
+Examples of splines vs. polynomials.
+
 What is RML imaging?
+=
+Is
 
 What does that mean?
 
