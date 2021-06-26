@@ -40,7 +40,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    ci-tutorials/crossvalidation
    ci-tutorials/gpu_setup.rst
    ci-tutorials/initializedirtyimage
-   large-tutorials/HD143006_Part_1
+   large-tutorials/HD143006_part_1
 
 .. toctree::
    :hidden:
