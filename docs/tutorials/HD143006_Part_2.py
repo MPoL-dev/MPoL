@@ -84,7 +84,7 @@ img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arc
 # taking the dirty image and making it a tensor
 dirty_image = torch.tensor(img.copy())
 
-# Now we create the RML model.
+# Now we'll create the RML model.
 
 from mpol.precomposed import SimpleNet
 
@@ -361,13 +361,13 @@ cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed
 
 # ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.
 # Because we'll want to revisit the individual datasets
-# several times in this tutorial, we're storeing them into a list
+# several times in this tutorial, we're storing them into a list
 
 k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
 
-# If you recall, we saved the trained model's state above. Here we will be utilizing this. `MODEL_PATH` will be defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will repeat this process for a few different configurations, starting with the ones found in `config`, defined above.
+# If you recall, we saved the trained model's state. Here we will be utilizing this. `MODEL_PATH` will be defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will run the cross validation loops for a few different configurations, starting with the hyperparameters found in `config`, defined above in Training and Imaging Part 1 of this tutorial. This configuration has been included in the following cell for convenience.
 
 # +
 MODEL_PATH = "model.pt"
@@ -385,23 +385,28 @@ new_config = (
 # -
 
 
-# We are now ready to run our optimizer using cross validaiton, after it is done we will be reviewing our results in Tensorboard. We run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with tensorboard.
+# We are now ready to run our cross validation loop, after it is done we will be reviewing our results in Tensorboard. We run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with tensorboard.
 
 # +
 # %%time
 
-# # new directory to write the progress of our Cross Val. loop to
-# cv_log_dir = logs_base_dir + "cv/"
-# cv_writer = SummaryWriter(cv_log_dir + "cv1/")
-# os.makedirs(cv_log_dir, exist_ok=True)
+# new directory to write the progress of our first cross val. loop to
+cv_log_dir1 = logs_base_dir + "cv/cv1/"
+cv_writer1 = SummaryWriter(cv_log_dir1)
+os.makedirs(cv_log_dir1, exist_ok=True)
 
 cv_score1 = cross_validate(
-    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=cv_writer1
 )
 print(f"Cross Validation Score: {cv_score1}")
 
 # +
 # %%time
+
+# new directory to write the progress of our second cross val. loop to
+cv_log_dir2 = logs_base_dir + "cv/cv2/"
+cv_writer2 = SummaryWriter(cv_log_dir2)
+os.makedirs(cv_log_dir2, exist_ok=True)
 
 new_config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
@@ -414,13 +419,18 @@ new_config = (
     }
 )
 cv_score2 = cross_validate(
-    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=cv_writer2
 )
 print(f"Cross Validation Score: {cv_score2}")
 
 
 # +
 # %%time
+
+# new directory to write the progress of our third cross val. loop to
+cv_log_dir3 = logs_base_dir + "cv/cv3/"
+cv_writer3 = SummaryWriter(cv_log_dir3)
+os.makedirs(cv_log_dir3, exist_ok=True)
 
 new_config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
@@ -434,13 +444,14 @@ new_config = (
 )
 
 cv_score3 = cross_validate(
-    model, new_config, k_fold_datasets, MODEL_PATH, writer=writer
+    model, new_config, k_fold_datasets, MODEL_PATH, writer=cv_writer3
 )
 print(f"Cross Validation Score: {cv_score3}")
 # -
 
 # And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score.
 
-# %tensorboard --logdir {logs_base_dir}
+cv_log_dir = logs_base_dir + "cv/"
+# %tensorboard --logdir {cv_log_dir}
 
 # Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. Using a more basic procedure and then using the cross validation to train and image the model we are able to speed up the training process. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
