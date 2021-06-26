@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -20,11 +20,13 @@
 # %run notebook_setup
 # -
 
-# ## Initializing Model with the Dirty Image
+# ## Initializing with the Dirty Image
 #
-# In MPoL, the Regularized Maximum Likelihood (RML) algorithm is written as an optimization loop (as seen in the [Optimization Tutorial](optimization.html)). With a better starting point for the model parameters, fewer iterations of the loop will be needed to reach the optimal point. A default uniform image (as shown in the optimization tutorial) is usually not a great guess as to the final image. A better guess is the dirty image, since it is already a maximum likelihood fit the data (of course, it is unregularized).
+# The core computational process required to synthesize an image with a regularized maximum likelihood (RML) algorithm is an optimization loop (as seen in the [Optimization Tutorial](optimization.html)) powered by gradient descent. In theory, we could start this optimization process from a random or neutral starting point (e.g., a blank image), and with enough iterations of the optimization algorithm, we will eventually converge to the "optimal" image (assuming there is a single, global maximum). If we could choose a "better" starting point, however, we'll need fewer iterations of our optimization loop to converge to the optimal image. A reasonable starting point is the dirty image, since it is already a maximum likelihood fit the data (though of course, it is unregularized).
 #
-# The problem with the dirty image is that it usually contains negative flux pixels and we'd like to impose the (rather strong) prior that the astrophysical source must have positive intensity values (i.e., no negative flux values are permitted, the implementation is taken care of via the [BaseCube](../api.html#mpol.images.BaseCube) parameterization). So how do we initialize the RML image model to the dirty image if we can't represent negative flux pixels?
+# The problem with the dirty image is that it usually contains negative flux pixels and we'd like to impose the (rather strong) prior that the astrophysical source must have positive intensity values (i.e., no negative flux values are permitted). Image positivity is enforced by default through the [BaseCube](../api.html#mpol.images.BaseCube) parameterization.
+#
+# So the question is how can we initialize the RML image model to the dirty image if we can't represent negative flux pixels?
 #
 # This tutorial will demonstrate one initialization solution, which is to create a loss function corresponding to the mean squared error between the RML model image pixel fluxes and the dirty image pixel fluxes and then optimize the RML model. We will also cover how to save and load the starting point configuration. After saving and loading it, it can be then optimized against the visibility data to complete it (though this will not be done in this tutorial). We will use the dataset of the ALMA logo first used in the Gridding and Diagnostic Images tutorial.
 #
@@ -46,7 +48,7 @@ from mpol import coordinates, gridding, losses, precomposed, utils
 # +
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4498439/files/logo_cube.npz",
+    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -59,10 +61,9 @@ d = np.load(fname)
 uu = d["uu"][chan]
 vv = d["vv"][chan]
 weight = d["weight"][chan]
-data_re = d["data_re"][chan]
-data_im = -d["data_im"][
-    chan
-]  # We're converting from CASA convention to regular TMS convention by complex conjugating the visibilities
+data = d["data"][chan]
+data_re = data.real
+data_im = data.imag
 
 # define the image dimensions, making sure they are big enough to fit all
 # of the expected emission
@@ -75,52 +76,49 @@ gridder = gridding.Gridder(
 
 # export to PyTorch dataset
 dset = gridder.to_pytorch_dataset()
-
-# +
-# Show the dirty image
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/beam")
-imin, imax = np.amin(img), np.amax(img)
 # -
 
-# Now let's take a look at the dirty image. We've used a different colormap to highlight the many negative flux pixels contained in this image.
+# Now let's calculate the dirty image. Here we're using Briggs weighting with a robust value of 1.0, but you can use whichever weighting scheme you think looks best for your dataset.
 
-# +
+# Calculate the dirty image
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/beam")
+
+# Let's visualize this dirty image. Here we're using an aggressive colormap to highlight the many negative flux pixels contained in this image.
+
 plt.set_cmap(
     "Spectral"
 )  # using Matplotlib diverging colormap to accentuate negative values
 kw = {"origin": "lower", "extent": gridder.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
-snp = ax.imshow(np.squeeze(img), **kw, vmin=imin, vmax=imax)
+snp = ax.imshow(np.squeeze(img), **kw)
 ax.set_title("image")
 ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(snp)
-# -
+
+# We can see that there are a number of pixels with negative flux values
+
+np.sum(img < 0)
 
 # ### Model and Optimization Setup
 #
-# Here we set the optimizer and the image model (RML). If this is unfamiliar please reference the [Optimization tutorial](optimization.html). The initial parameters of the model are also displayed and can be contrasted with them after the optimization loop.
+# Here we set the optimizer and the image model (RML). If this is unfamiliar please reference the [Optimization tutorial](optimization.html).
 
 dirty_image = torch.tensor(img.copy())  # turns it into a pytorch tensor
 rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
 optimizer = torch.optim.SGD(
-    rml.parameters(), lr=500.0
+    rml.parameters(), lr=1000.0
 )  # multiple different possiple optimizers
-rml.state_dict()  # parameters of the model
 
 
 # ### Loss Function
 
-# The [loss function](../api.html#module-mpol.losses) that will be used to optimize the initial part of the image is the pixel-to-pixel L2 norm (also known as the Euclidian Norm). It calculates the loss based off of the image-plane distance between the dirty image and the state of the ImageCube in order to make the state of the ImageCube closer to the dirty image. [Pytorch provides a loss function for mean squared error](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) which is the squared L2 norm so we will be using the squareroot of that.
+# The [loss function](../api.html#module-mpol.losses) that will be used to optimize the initial part of the image is the pixel-to-pixel L2 norm (also known as the Euclidian Norm). It calculates the loss based off of the image-plane distance between the dirty image and the state of the ImageCube in order to make the state of the ImageCube closer to the dirty image. [Pytorch provides a loss function for mean squared error](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) which is the squared L2 norm so we will be using the square root of that.
 
 
 # ### Training Loop
 #
 # Now we train using this loss function to optimize our parameters.
-
-# +
-# %%time
-
 
 loss_tracker = []
 for iteration in range(50):
@@ -139,7 +137,6 @@ for iteration in range(50):
     loss_tracker.append(loss.item())
     loss.backward()
     optimizer.step()
-# -
 #
 # We see that the optimization has completed successfully
 
@@ -148,56 +145,53 @@ ax.plot(loss_tracker)
 ax.set_xlabel("iteration")
 ax.set_ylabel("loss")
 
-#  Finally, we can save the state of the optimized parameters using the ``state_dict``, which is a dictionary containing the current state of the model parameters. [Information on saving and loading models and the state_dict can be found here.](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+# Let's visualize the resulting image cube representation.
 
-torch.save(rml.state_dict(), "dirty_image_model.pt")
-
-# Let's visualize the resulting image cube representation. We see that the cube closely resembles the dirty image, however it contains no negative values.
-
-rml.state_dict()
-
+img = np.squeeze(rml.icube.sky_cube.detach().numpy())
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
-    np.squeeze(rml.icube.sky_cube.detach().numpy()),
-    origin="lower",
-    interpolation="none",
-    extent=rml.icube.coords.img_ext,
-    vmin=imin,
-    vmax=imax,
+    img, origin="lower", interpolation="none", extent=rml.icube.coords.img_ext
 )
 plt.colorbar(im)
+
+# We see that the cube resembles the dirty image, but it contains no pixels with negative flux values.
+
+np.sum(img < 0)
 
 # We can also plot this with a normal colormap,
 
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
-    np.squeeze(rml.icube.sky_cube.detach().numpy()),
+    img,
     origin="lower",
     interpolation="none",
     extent=rml.icube.coords.img_ext,
-    vmin=imin,
-    vmax=imax,
     cmap="viridis",
 )
 plt.colorbar(im)
 
+# ### Saving the Model
+#
+# Now that we're happy that the state of the image cube model is approximately initialized to the dirty image, we can save it to disk so that we may easily reuse it in future optimization loops. This is as simple as
+
+torch.save(rml.state_dict(), "dirty_image_model.pt")
+
+# For more information on saving and loading models in PyTorch, please consult the official [documentation](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
+
 # ### Loading the Model
 #
-# To demonstrate the saving and loading of the model here we will be resetting the parameters of the model and then reloading them.
+# Now let's assume we're about to start an optimization loop in a new file, and we've just created a new model.
 
 rml = precomposed.SimpleNet(coords=coords)
 rml.state_dict()  # the now uninitialized parameters of the model (the ones we started with)
 
-# Here you can clearly see the ``state_dict`` returning to its original state from the beginning of the tutorial, before the training loop changed the paramters through the optimization function. Once we reload it, the ``state_dict`` now contains the values from when it was saved after the training loop.
+# Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the paramters through the optimization function. Loading our saved dirty image state into the model is as simple as
 
 rml.load_state_dict(torch.load("dirty_image_model.pt"))
 rml.state_dict()  # the reloaded parameters of the model
 
-# The image is now ready to be optimized against the visibility data.
+# Now you can proceed with optimizing the model against the visibility data as before, but you should hopefully have a much better starting point.
 
 # ### Conclusion
 #
-# This tutorial shows how to work towards a better starting point for RML optimization by starting from the dirty image. We should note, however, that RML optimization does not *need* to start from the dirty image---it's entirely possible to start from a blank image or even a random image. In that sense, the RML imaging process is more accurately described as an optimization process, as opposed to a [deconvolution process](https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/synthesis-imaging/deconvolution-algorithms#:~:text=Deconvolution%20refers%20to%20the%20process,spread%2Dfunction%20of%20the%20instrument) like [CASA tclean](https://casa.nrao.edu/docs/taskref/tclean-task.html).
-
-# For more information also see the [Optimization](optimization.html) and [Cross Validation](crossvalidation.html) tutorials.
-#
+# This tutorial shows how to work towards a better starting point for RML optimization by starting from the dirty image. We should note, however, that RML optimization does not *need* to start from the dirty image---it's entirely possible to start from a blank image or even a random image. In that sense, the RML imaging process could be described as an optimization process compared to a [deconvolution process](https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/synthesis-imaging/deconvolution-algorithms#:~:text=Deconvolution%20refers%20to%20the%20process,spread%2Dfunction%20of%20the%20instrument) like [CASA tclean](https://casa.nrao.edu/docs/taskref/tclean-task.html).
