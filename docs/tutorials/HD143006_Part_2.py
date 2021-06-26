@@ -269,7 +269,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
 # +
 model.load_state_dict(
     torch.load("model.pt")
-)  # load our intialized model from the previous section
+)  # load our initialized model from the previous section
 
 dataset = (
     gridder.to_pytorch_dataset()
@@ -299,17 +299,17 @@ optimizer = torch.optim.Adam(
 train(model, dataset, optimizer, config, writer=writer)
 # -
 
-# Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, image residuals, visibility amplitudes, visibility residuals. You can use the slider to view different iterations.
+# Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
 # %tensorboard --logdir {logs_base_dir}
 
 # ## Training and Imaging Part 2: Cross Validation
 #
-# Now we will move into the realm of Cross Validation. Cross validation is a technique that allows a model to be more efficiently trained (better predict an outcome, hard pressed to pick the best phrasing) by having it take a dataset and store one chunk of it as the test dataset and have the rest of the dataset be used to train the model. The model then sees the difference between the predicted testa dataset and the actual test dataset (this is the cross validaiton score). The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
+# Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
 #
-# Just like in the previous section we will be viewing our results in Tensorboard, but we will also be logging the cross_validation score as well.
+# Just like in the previous section we will be viewing our results in Tensorboard, with the addition of the cross validation score log.
 
-# Cross Validation requires a `test` function (to determine the Cross Validaiton score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We impliment these below.
+# Cross validation requires a `test` function (to determine the cross calidation score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We implement these below.
 
 
 def test(model, dataset):
