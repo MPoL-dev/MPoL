@@ -20,7 +20,7 @@
 # %run notebook_setup
 # -
 
-# # Introduction to PyTorch Tensors and Gradient Descent
+# # Introduction to PyTorch: Tensors and Gradient Descent
 
 # This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.
 #

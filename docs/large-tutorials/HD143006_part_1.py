@@ -84,7 +84,7 @@ plt.ylim(top=r, bottom=-r)
 plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 
-# ## Plotting the Visibilities
+# ## Plotting the Baselines
 #
 # Now that we have an idea of what we're looking to image, let's load up the actual dataset. First, we'll download the raw visibilities. To speed things along for the purpose of this tutorial (and avoid introducing CASA as a package dependency), we've already extracted the visibility data as a `.npz` file, which we've made available on Zenodo.
 #
@@ -169,11 +169,11 @@ def image_and_plot(weighting, robust=None):
 
     title = weighting
     if robust is not None:
-        title += "_r={:.1f}".format(robust)
+        title += " r={:.1f}".format(robust)
     ax.set_title(title)
     ax.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
     ax.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-    r = 0.8
+    r = 0.7
     plt.xlim(left=r, right=-r)
     plt.ylim(bottom=-r, top=r)
 
@@ -182,19 +182,19 @@ def image_and_plot(weighting, robust=None):
 
 # Uniform weighting frequently produces images with the best spatial resolution, but at the expense of sensitivity.
 
-image_and_plot(weighting="uniform")
+_ = image_and_plot(weighting="uniform")
 
 # Natural weighting frequently produces images with the best sensitivity to point sources, but at the expense of spatial resolution.
 
-image_and_plot(weighting="natural")
+_ = image_and_plot(weighting="natural")
 
 # Robust weigting provides a (nonlinear) tradeoff between these two regimes, and some form of robust weighting is typically chosen for ALMA imaging.
 
-image_and_plot(weighting="briggs", robust=-1.0)
+_ = image_and_plot(weighting="briggs", robust=-1.0)
 
 img_robust_0 = image_and_plot(weighting="briggs", robust=0.0)
 
-# ## Comparing Dirty Image to CLEAN Algorthim
+# ## Comparing Dirty and CLEANed Images
 #
 # All in all, it looks like our diagnostic dirty images produced by the MPoL gridder look similar enough in scale and orientation to the DSHARP CLEAN image that we have some confidence that we're reading in the visibility data correctly.
 #
