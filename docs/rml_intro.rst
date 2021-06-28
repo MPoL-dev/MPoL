@@ -254,10 +254,6 @@ where
 
 and :math:`C` is a normalization factor.
 
-The "model" could be very full featured, extending the model to do `self-calibration <https://github.com/MPoL-dev/MPoL/issues/24>`__, or more complex datasets.
-
-
-
 .. seealso::
 
     That's RML imaging in a nutshell, but we've barely scratched the surface. We highly recommend checking out the following excellent resources.
@@ -281,27 +277,43 @@ The "model" could be very full featured, extending the model to do `self-calibra
 The MPoL package for Regularized Maximum Likelihood imaging
 -----------------------------------------------------------
 
-*Million Points of Light* or "MPoL" is a Python package that is used to perform regularized maximum likelihood imaging. By that we mean that the package provides the building blocks to create flexible image models and optimize them to fit interferometric datasets. The package is developed completely in the open on `Github <https://github.com/MPoL-dev/MPoL>`__. - Well tested, stable, on supported Python versions. Always a goal of core, usable routines in PyPi releases (i.e., `pip install mpol`). Maintainability.
-- Scalability. By keeping modules modular, and *open* and emphasizing the building of imaging components rather than a single, monolithic function, the interested user can expand their applications.
+*Million Points of Light* or "MPoL" is a Python package that is used to perform regularized maximum likelihood imaging. By that we mean that the package provides the building blocks to create flexible image models and optimize them to fit interferometric datasets. The package is developed completely in the open on `Github <https://github.com/MPoL-dev/MPoL>`__.
 
+We strive to
+
+* create an open, welcoming, and supportive community for new users and contributors (see our `code of conduct <https://github.com/MPoL-dev/MPoL/blob/main/CODE_OF_CONDUCT.md>`__ and `developer documentation <developer-documentation.html>`__)
+* support well-tested (|Tests badge|) and stable releases (i.e., ``pip install mpol``) that run on all currently-supported Python versions, on Linux, MacOS, and Windows
+* maintain up-to-date `API documentation <api.html>`__
+* cultivate tutorials covering real-world applications
+
+.. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml
 
 .. seealso::
 
-    We also recommend checking out several other excellent packages for RML imaging, since they may be better suited to your particular application.
+    We also recommend checking out several other excellent packages for RML imaging:
 
     * `SMILI <https://github.com/astrosmili/smili>`__
     * `eht-imaging <https://github.com/achael/eht-imaging>`__
     * `GPUVMEM <https://github.com/miguelcarcamov/gpuvmem>`__
 
-We are focusing primarily on continuum and spectral line ALMA and JVLA observations.
 
-There are a few features of MPoL that we believe make it an appealing platform for RML modeling. Several of these features are enabled by build off of the PyTorch package. It's easy to get started and isn't too different from writing numpy code.
+There are a few things about  MPoL that we believe make it an appealing platform for RML modeling.
 
-1) What's new here? Autodifferentiation (easy to write priors) and powerful optimizers that would normally be used to train neural networks help us reach maximum.
-2) Easy to run on the GPU (link)
-3) Built on PyTorch, opportunities for expansion. This package is meant to be modular. This includes packing layers into more extended applications (like combination single dish + interferometric data) as well as integration with PyTorch and neural networks.
+**Built on PyTorch**: Many of MPoL's exciting features stem from the fact that it is built on top of a rich computational library that supports autodifferentiation and construction of complex neural networks. Autodifferentiation libraries like `Theano/Aesara <https://github.com/aesara-devs/aesara>`__, `Tensorflow <https://www.tensorflow.org/>`__, `PyTorch <https://pytorch.org/>`__, and `JAX <https://jax.readthedocs.io/>`__ have revolutionized the way we compute and optimize functions. For now, PyTorch is the library that best satisfies our needs, but we're keeping a close eye on the Python autodifferentiation ecosystem should a more suitable framework arrive. If you are familiar with scientific computing with Python but haven't yet tried any of these frameworks, don't worry, the syntax is easy to pick up and quite similar to working with numpy arrays. For example, check out our tutorial `introduction to PyTorch <ci-tutorials/PyTorch.html>`__.
 
-To get started with MPoL, we recommend `installing the package <installation.html>`__ and reading through the tutorial series.
+**Autodifferentiation**: PyTorch gives MPoL the capacity to autodifferentiate through a model. The *gradient* of the objective function is exceptionally useful for finding the "downhill" direction in a large parameter space (such as the set of image pixels). Traditionally, these gradients would have needed to been calculated analytically (by hand) or via finite-difference methods which can be noisy in high dimensions. By leveraging the autodifferentiation capabilities, this allows us to rapidly formulate and implement complex prior distributions which would otherwise be difficult to differentiate by hand.
+
+**Optimization**: PyTorch provides a full-featured suite of research-grade `optimizers <https://pytorch.org/docs/stable/optim.html>`__ designed to train deep neural networks. These same optimizers can be employed to quickly find the optimum RML image.
+
+**GPU acceleration**: PyTorch wraps CUDA libraries, making it seamless to take advantage of (multi-)GPU acceleration to optimize images. No need to use a single line of CUDA.
+
+**Model composability**: Rather than being a monolithic program for single-click RML imaging, MPoL strives to be a flexible, composable, RML imaging *library* that provides primitives that can be used to easily solve your particular imaging challenge. One way we do this is by mimicking the PyTorch ecosystem and writing the RML imaging workflow using `PyTorch modules <https://pytorch.org/tutorials/beginner/nn_tutorial.html>`__. This makes it easy to mix and match modules to construct arbitrarily complex imaging workflows. We're working on tutorials that describe these ideas in depth, but one example would be the ability tu use a single latent space image model to simultaneously fit single dish and interferometric data.
+
+**A bridge to the machine learning/neural network community**: MPoL will happily calculate RML images for you using "traditional" image priors, lest you are the kind of person that the word "machine learning" or "neural networks" give you pause. However, if you are the kind of person that sees opportunity in these tools, because MPoL is built on PyTorch, it is straightforward to take advantage of them for RML imaging. For example, if one were to train a variational autoencoder on protoplanetary disk emission morphologies, the latent space + decoder architecture could be easily plugged in to MPoL and serve as an imaging basis set.
+
+To get started with MPoL, we recommend `installing the package <installation.html>`__ and reading through the tutorial series. If you have any questions about the package, we invite you to join us on our `Github discussions page <https://github.com/MPoL-dev/MPoL/discussions>`__.
+
 
 .. rubric:: Footnotes
 
