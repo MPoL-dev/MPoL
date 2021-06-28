@@ -106,7 +106,7 @@ Assuming that the uncertainty (:math:`\sigma`) on each data point is known (and 
 
     \ln \mathcal{L}(\boldsymbol{Y} |\,\boldsymbol{\theta}) = - \frac{1}{2} \chi^2 (\boldsymbol{Y} |\,\boldsymbol{\theta}) + C
 
-where :math:`C` is a constant with respect to the model parameters. It is common to use shorthand to say that "the likelihood function is :math:`\chi^2`" to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values :math:`\hat{\boldsymbol{\theta}}` which maximize the likelihood function. Unsurprisingly, these parameters are called the *maximum likelihood estimate* (or MLE), and usually they represent something like a "best-fit" model. [#mle_solution]_
+where :math:`C` is a constant with respect to the model parameters. It is common to use shorthand to say that "the likelihood function is :math:`\chi^2`" to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values :math:`\boldsymbol{\theta}_\mathrm{MLE}` which maximize the likelihood function. Unsurprisingly, these parameters are called the *maximum likelihood estimate* (or MLE), and usually they represent something like a "best-fit" model. [#mle_solution]_
 
 When it comes time to do parameter inference, however, it's important to keep in mind
 
@@ -188,13 +188,105 @@ Now that we've introduced what it means to forward-model a dataset and how to ca
 
 Say that our :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` dataset looked a bit more structured than a simple :math:`y = mx + b` relationship. We could expand the model by adding more parameters, for example, by adding quadratic and cubic terms, e.g., :math:`y = a_0 + a_1 x + a_2 x^2 + a_3 x^3`. This would be a reasonable approach, especially if the parameters :math:`a_2`, :math:`a_3`, etc... had physical meaning. But if all that we're interested in is modeling the relationship between :math:`y = f(x)` in order to make predictions, we could just as easily use a `non-parametric model <https://www.section.io/engineering-education/parametric-vs-nonparametric/>`__, like a `spline <https://en.wikipedia.org/wiki/Spline_(mathematics)>`__ or a `Gaussian process <https://distill.pub/2019/visual-exploration-gaussian-processes/>`__.
 
-With RML imaging, we're trying to come up with a model that will fit the dataset. But rather than using a parametric model like a protoplanetary disk structure model or a series of Gaussian rings, we're using a non-parametric model of *the image itself*. This is very much like using a spline or Gaussian process to fit a series of :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` points. Perhaps the most straightforward formulation of the non-parametric model is the pixel basis set, but we could also use other basis sets like a set of wavelet coefficients, or even more exotic basis sets constructed from trained neural networks.
+With RML imaging, we're trying to come up with a model that will fit the dataset. But rather than using a parametric model like a protoplanetary disk structure model or a series of Gaussian rings, we're using a non-parametric model of *the image itself*. This could be as simple as parameterizing the image using the intensity values of the pixels themselves, i.e.,
 
-To start with, let's just focus on the "maximum likelihood" part of "regularized maximum likelihood" imaging.
-That's great, and in fact, the dirty image (under uniform weighting) is one such image that will maximize the likelihood funciton.
-But, so will any other image which contains non-zero amplitude of *unsampled* Fourier components.
+.. math::
 
-This is where the regularization comes in.
+    \boldsymbol{\theta} = \{I_1, I_2, \ldots, I_{N^2} \}
+
+assuming we have an :math:`N \times N` image.
+
+A flexible image model is mostly analogous to using a spline or Gaussian process to fit a series of :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` points---the model will nearly always have enough flexibility to capture the structure that exists in the dataset. The most straightforward formulation of a non-parametric image model is the pixel basis set, but we could also use more sophisticated basis sets like a set of wavelet coefficients, or even more exotic basis sets constructed from trained neural networks. These may have some serious advantages when it comes to the "regularizing" part of "regularized maximum likelihood" imaging. But first, let's talk about the "maximum likelihood" part.
+
+Given some image parameterization, we would like to find the maximum likelihood image :math:`\boldsymbol{\theta}_\mathrm{MLE}`. Fortunately, because the Fourier transform is a linear operation, we can analytically calculate the maximum solution (the same way we might find the best-fit slope and intercept for the line example). This maximum likelihood solution is called (in the radio astronomy world) the dirty image, and its associated point spread function is called the dirty beam.
+
+In the construction of the dirty image, all unsampled spatial frequencies are set to zero power. This means that the image will only contain spatial frequencies about which we have at least some data. This assumption, however, rarely translates into good image fidelity, especially if there are many unsampled spatial frequencies which carry significant power. The dirty image is also not unique as an image that maximizes the likelihood function. From the perspective of the likelihood calculation, we could set those unsampled spatial frequencies to whatever power we might like, and, because they are *unsampled*, the value of the likelihood calculation won't change, i.e., it will still remain maximal.
+
+When synthesis imaging is described as an "ill-posed inverse problem," this is what is meant. There is a (potentially infinite) range of images that could *exactly* fit the dataset, and without additional information we have no way of discriminating which is best. As you might suspect, this is now where the "regularization" part of "regularized maximum likelihood" imaging comes in.
+
+There are a number of different ways to talk about regularization. If one wants to be Bayesian about it, one would talk about specifying *priors*, i.e., we introduce terms like :math:`p(\boldsymbol{\theta})` such that we might calculate the maximum a posteriori (MAP) image :math:`\boldsymbol{\theta}_\mathrm{MAP}` using the posterior probability distribution
+
+.. math::
+
+    p(\boldsymbol{\theta} |\, \boldsymbol{V}) \propto \mathcal{L}(\boldsymbol{V} |\, \boldsymbol{\theta}) \, p(\boldsymbol{\theta}).
+
+For computational reasons related to numerical over/underflow, we would most likely use the logarithm of the posterior probability distribution
+
+.. math::
+
+    \ln p(\boldsymbol{\theta} |\, \boldsymbol{V}) \propto \ln \mathcal{L}(\boldsymbol{V} |\, \boldsymbol{\theta}) + \ln p(\boldsymbol{\theta}).
+
+One could accomplish the same goal without necessarily invoking the Bayesian language by simply talking about which parameters :math:`\boldsymbol{\theta}` optimize some objective function.
+
+We'll adopt the perspective that we have some objective "cost" function that we'd like to *minimize* to obtain the optimal parameters :math:`\hat{\boldsymbol{\theta}}`. The machine learning community calls this a "loss" function :math:`L(\boldsymbol{\theta})`, and so we'll borrow that terminology here. For an unregularized fit, an acceptable loss function is just the negative log likelihood ("nll") term,
+
+.. math::
+
+    L(\boldsymbol{\theta}) = L_\mathrm{nll}(\boldsymbol{\theta}) = - \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta})
+
+If we're only interested in :math:`\hat{\boldsymbol{\theta}}`, it doesn't matter whether we include the :math:`1/2` prefactor in front of :math:`\chi^2`, the loss function will still have the same optimum. However, when it comes time to add additional terms to the loss function, these prefactors matter in controlling the relative strength of each term.
+
+When phrased in the terminology of function optimization, additional terms can be described as regularization penalties. To be specific, let's add a term that regularizes the sparsity of an image.
+
+.. math::
+
+    L_\mathrm{sparsity}(\boldsymbol{\theta}) = \sum_i |I_i|
+
+This prior is described in more detail in the `API documentation <api.html#mpol.losses.sparsity>`__. In short, the L1 norm promotes sparse solutions (solutions where many pixel values are zero). The combination of these two terms leads to a new loss function
+
+.. math::
+
+    L(\boldsymbol{\theta}) = L_\mathrm{nll}(\boldsymbol{\theta}) + \lambda_\mathrm{sparsity} L_\mathrm{sparsity}(\boldsymbol{\theta})
+
+Where we control the relative "strength" of the regularization via the scalar prefactor :math:`\lambda_\mathrm{sparsity}`. If :math:`\lambda_\mathrm{sparsity} = 0`, no sparsity regularization is applied. Non-zero values of :math:`\lambda_\mathrm{sparsity}` will add in regularization that penalizes non-sparse :math:`\boldsymbol{\theta}` values. How strong this penalization is depends on the strength relative to the other terms in the loss calculation. [#relative_strength]_
+
+We can equivalently specify this using Bayesian terminology, such that
+
+.. math::
+
+    p(\boldsymbol{\theta} |\,\boldsymbol{V}) = \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \, p(\boldsymbol{\theta})
+
+where
+
+.. math::
+
+    p(\boldsymbol{\theta}) = C \exp \left (-\lambda_\mathrm{sparsity} \sum_i | I_i| \right)
+
+and :math:`C` is a normalization factor.
+
+.. seealso::
+
+    That's RML imaging in a nutshell, but we've barely scratched the surface. We highly recommend checking out the following excellent resources.
+
+    * The fourth paper in the 2019 `Event Horizon Telescope Collaboration series <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`__ describing the imaging principles
+    * `Maximum entropy image restoration in astronomy <https://ui.adsabs.harvard.edu/abs/1986ARA%26A..24..127N/abstract>`__ AR&A by Narayan and Nityananda 1986
+    * `Multi-GPU maximum entropy image synthesis for radio astronomy   <https://ui.adsabs.harvard.edu/abs/2018A%26C....22...16C/abstract>`__ by Cárcamo et al. 2018
+
+.. note::
+
+    RML imaging is different from CLEAN imaging, which operates as a deconvolution procedure in the image plane. At least at sub-mm and radio wavelengths, CLEAN is by far the dominant algorithm used to synthesize images from interferometric data. Therefore, if you're interested in RML imaging, it's worth first understanding the basics of the CLEAN algorithm.
+
+    Here are some useful resources on the CLEAN algorithm.
+
+    * `Interferometry and Synthesis in Radio Astronomy <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`__ Chapter 11.1
+    * `CASA documentation on tclean <https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging>`__
+    * David Wilner's lecture on `Imaging and Deconvolution in Radio Astronomy <https://www.youtube.com/watch?v=mRUZ9eckHZg>`__
+
+
+The MPoL package for Regularized Maximum Likelihood imaging
+-----------------------------------------------------------
+
+Hopefully we've provided.
+
+What's new here? Autodifferentiation. Opportunities for expansion. And the tight integration with PyTorch and neural networks. Easy to run on the GPU (link)
+
+2) Getting started with imaging (links to CASA, other imaging software)
+3) Getting started with PyTorch
+
+
+Existing RML packages. Encourage you to check out.
+
+This package is meant to be modular.
 
 
 Some advantages to doing RML imaging. Provides an alternative to assessing image quality w/ tclean.
@@ -207,37 +299,6 @@ All of this is in contrast to the CLEAN algorithm, which operates as an image-pl
 Machine learning language as a "loss."
 
 Writing things outside of Bayesian language, we can also state this as a likelihood function, or
-
-.. seealso::
-
-    The following are some excellent resources for getting started with RML imaging.
-
-    * EHT IV
-    * Narayan and Nityananda
-    * Carcamo
-
-.. note::
-
-    RML imaging is different from CLEAN imaging, which is image plane deconvolution. If you're interested in radio astronomy imaging, it's a very good idea to understand the CLEAN algorithm as well. Here are some useful resources to get started.
-
-    * NRAO summer schools
-    * CASA documentation
-    * TMS chapter 11?
-
-
-
-The MPoL package for Regularized Maximum Likelihood imaging
------------------------------------------------------------
-
-What's new here? Autodifferentiation. Opportunities for expansion. And the tight integration with PyTorch and neural networks. Easy to run on the GPU (link)
-
-2) Getting started with imaging (links to CASA, other imaging software)
-3) Getting started with PyTorch
-
-
-Existing RML packages. Encourage you to check out.
-
-This package is meant to be modular.
 
 
 ### Introduction to Regularized Maximum Likelihood (RML) Imaging
@@ -253,6 +314,14 @@ Regularized Maximum Likelihood (RML) imaging is a forward modeling methodology. 
 
 Show the example of HD 143006 CLEAN vs. RML as example of why you might want to use this package… resolution, sensitivity, independent characterization of interesting features.
 
+
+.. seealso::
+
+    We also recommend checking out several of the other excellent packages for RML imaging.
+
+    * SMILI
+    * eht-imaging
+    * GPUVMEM
 
 These could be nice videos, but aspects of them probably need to be tutorials first.
 
@@ -280,3 +349,5 @@ This approach would be to "batch" the data in the training loop, and train in ea
 .. rubric:: Footnotes
 
 .. [#mle_solution] There's actually a lot to unpack here. When your model has many parameters (i.e., the posterior distribution is high dimensional), the MLE (or MAP) solution is unlikely to represent a *typical* realization of your model parameters. This is a quirk of the geometry of high dimensional spaces. For more information, we recommend checking out Chapter 1 of `Betancourt 2017 <https://arxiv.org/abs/1701.02434>`__. Still, the MLE solution is often a useful quantity to communicate.
+
+.. [#relative_strength] This is where the factor of :math:`1/2` in front of :math:`\chi^2` becomes important. You could use something like :math:`L_\mathrm{nll}(\boldsymbol{\theta}) = \chi^2(\boldsymbol{\theta})`, but then you'd need to change the value of :math:`\lambda_\mathrm{sparsity}` to achieve the same relative regularization.
