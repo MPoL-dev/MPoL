@@ -298,7 +298,7 @@ channel (<code class="docutils literal notranslate"><span class="pre">central_ch
 </div>
 <p>Next we’ll create a <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> module to train to our
 data. For more detailed
-information, see the <a class="reference external" href="https://mpol-dev.github.io/MPoL/tutorials/optimization.html">Optimization
+information, see the <a class="reference external" href="optimization.html">Optimization
 Loop</a>
 tutorial or the MPoL SimpleNet <a class="reference external" href="https://mpol-dev.github.io/MPoL/_modules/mpol/precomposed.html#SimpleNet">Source
 Code</a>.</p>
@@ -310,9 +310,9 @@ Code</a>.</p>
 functionality common to most PyTorch objects. One can
 also use the <code class="docutils literal notranslate"><span class="pre">tensor.cuda()</span></code> to move the tensor to the default CUDA
 device. Both of these methods return a <em>copy</em> of the object on the GPU.</p>
-<p>We’ve borrowed a <code class="docutils literal notranslate"><span class="pre">config</span></code> dictionary from the <a class="reference external" href="https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html">Cross Validation
+<p>We’ve borrowed a <code class="docutils literal notranslate"><span class="pre">config</span></code> dictionary from the <a class="reference external" href="crossvalidation.html">Cross Validation
 Tutorial</a>, which basically contains a set of parameters that resulted in a strong cross validation score for this particular dataset. For more
-details on these variables, see the <a class="reference external" href="https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html">Cross Validation
+details on these variables, see the <a class="reference external" href="crossvalidation.html">Cross Validation
 Tutorial</a>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
