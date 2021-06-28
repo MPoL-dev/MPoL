@@ -103,7 +103,7 @@ vv = d["vv"]
 weight = d["weight"]
 data = d["data"]
 
-# To get an idea of the $u,v$ coverage of the dataset, let's plot the $u,v$ coordinates of the visibilities, as we've done in the [cross-validation tutorial](crossvalidation.html) and the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
+# To get an idea of the $u,v$ coverage of the dataset, let's plot the $u,v$ coordinates of the visibilities, as we've done in the [cross-validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) and the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
 
 fig, ax = plt.subplots(nrows=1)
 ax.scatter(uu, vv, s=0.5, rasterized=True, linewidths=0.0, c="k")
