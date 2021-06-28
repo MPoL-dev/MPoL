@@ -227,7 +227,7 @@ ax.set_ylabel("loss")
 
 # and we see that we've reasonably converged to a set of parameters without much further improvement in the loss value.
 #
-# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](https://mpol-dev.github.io/MPoL/tutorials/gpu_setup_tutorial.html).
+# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](gpu_setup_tutorial.html).
 
 
 # ### Visualizing output
