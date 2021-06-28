@@ -190,28 +190,12 @@ Say that our :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\bol
 
 With RML imaging, we're trying to come up with a model that will fit the dataset. But rather than using a parametric model like a protoplanetary disk structure model or a series of Gaussian rings, we're using a non-parametric model of *the image itself*. This is very much like using a spline or Gaussian process to fit a series of :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` points. Perhaps the most straightforward formulation of the non-parametric model is the pixel basis set, but we could also use other basis sets like a set of wavelet coefficients, or even more exotic basis sets constructed from trained neural networks.
 
+To start with, let's just focus on the "maximum likelihood" part of "regularized maximum likelihood" imaging.
+That's great, and in fact, the dirty image (under uniform weighting) is one such image that will maximize the likelihood funciton.
+But, so will any other image which contains non-zero amplitude of *unsampled* Fourier components.
 
+This is where the regularization comes in.
 
-To start with, let's just focus on the "maximum likelihood" part of "regularized maximum likelihood" imaging. As the term suggests, we're searching for those model parameters
-
-
-
-line example were a bit more complicated
-
-
-Examples of splines vs. polynomials.
-
-What is RML imaging?
-=
-Is
-
-What does that mean?
-
-
-
-In general, we are working with Fourier datasets. Meaning that we are trying to reconstruct images of the sky, but the datasets we have are related to the Fourier transform of that.
-
-These types of datasets appear in radio interferometry (such as with ALMA, the JVLA, or very long baseline arrays like the Event Horizon Telescope), or optical interferometry, such as with sparse aperture masking.
 
 Some advantages to doing RML imaging. Provides an alternative to assessing image quality w/ tclean.
 
@@ -224,19 +208,21 @@ Machine learning language as a "loss."
 
 Writing things outside of Bayesian language, we can also state this as a likelihood function, or
 
+.. seealso::
 
-Additional references for RML imaging
-+++++++++++++++++++++++++++++++++++++
+    The following are some excellent resources for getting started with RML imaging.
 
-* Hogg and Villar
-* Narayan and Nityananda
-* EHT IV
+    * EHT IV
+    * Narayan and Nityananda
+    * Carcamo
 
-Additional refereces for CLEAN imaging
-++++++++++++++++++++++++++++++++++++++
+.. note::
 
-* NRAO summer schools
-* CASA documentation
+    RML imaging is different from CLEAN imaging, which is image plane deconvolution. If you're interested in radio astronomy imaging, it's a very good idea to understand the CLEAN algorithm as well. Here are some useful resources to get started.
+
+    * NRAO summer schools
+    * CASA documentation
+    * TMS chapter 11?
 
 
 
