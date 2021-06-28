@@ -22,12 +22,12 @@
 
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is a continuation of the [HD143006 Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
+# This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
 # This tutorial will be going through how to initialize the model, the imaging and optimization process, how to improve the process through crossvalidation, and how to analyze the results of our work with Tensorboard.
 #
 # ### Loading Data
-# Let's load the data as we did in the previous HD143006 tutorial ([Part 1](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_1.html)) and create the MPoL Gridder object.
+# Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
 #
 # *You can either download these two files (HD143006_continuum.fits and HD143006_continuum.npz) directly to your working directory, or use astropy to download them during run time.*
 
@@ -308,7 +308,7 @@ train(model, dataset, optimizer, config, writer=writer)
 
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
-# %tensorboard --logdir {logs_base_dir}
+# #%tensorboard --logdir {logs_base_dir}
 
 # ## Training and Imaging Part 2: Cross Validation
 #
@@ -459,6 +459,6 @@ print(f"Cross Validation Score: {cv_score3}")
 # And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score.
 
 cv_log_dir = logs_base_dir + "cv/"
-# %tensorboard --logdir {cv_log_dir}
+# #%tensorboard --logdir {cv_log_dir}
 
 # Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. Using a more basic procedure and then using the cross validation to train and image the model we are able to speed up the training process. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
