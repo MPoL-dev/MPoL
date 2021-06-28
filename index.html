@@ -31,6 +31,7 @@
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -47,7 +48,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="installation.html" /> 
+    <link rel="next" title="Introduction to Regularized Maximum Likelihood Imaging" href="rml_intro.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,7 +100,8 @@
             
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">MPoL Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -188,13 +190,22 @@
 <h1>Million Points of Light (MPoL)<a class="headerlink" href="#million-points-of-light-mpol" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml"><img alt="Tests badge" src="https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg" /></a>
 <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions"><img alt="Discussions badge" src="https://img.shields.io/badge/community-Github%20Discussions-orange" /></a></p>
-<p>MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.</p>
-<p>To get a sense of how MPoL works, please take a look at the tutorials down below. If you have any questions, please join us on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
+<!-- Place this tag where you want the button to render. -->
+<a class="github-button" href="https://github.com/MPoL-dev/MPoL" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star MPoL-dev/MPoL on GitHub">Star</a>
+<a class="github-button" href="https://github.com/MPoL-dev/MPoL/discussions" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-comment-discussion" data-size="large" aria-label="Discuss MPoL-dev/MPoL on GitHub">Discuss</a><p>MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.</p>
+<p>To get a sense of how MPoL works, please take a look at the <a class="reference internal" href="rml_intro.html#rml-intro-label"><span class="std std-ref">Introduction to Regularized Maximum Likelihood Imaging</span></a> and then the tutorials down below. If you have any questions, please join us on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
 <p>If you’d like to help build the MPoL package, please check out the <a class="reference internal" href="developer-documentation.html#developer-documentation-label"><span class="std std-ref">Developer Documentation</span></a> to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization <a class="reference external" href="https://mpol-dev.github.io/">website</a> and <a class="reference external" href="https://github.com/MPoL-dev">github</a> repository hosting the source code.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rml_intro.html#data-in-the-fourier-domain">Data in the Fourier domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rml_intro.html#likelihood-functions-and-parameter-inference">Likelihood functions and parameter inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rml_intro.html#rml-images-as-non-parametric-models">RML images as non-parametric models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rml_intro.html#the-mpol-package-for-regularized-maximum-likelihood-imaging">The MPoL package for Regularized Maximum Likelihood imaging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">MPoL Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#using-pip">Using pip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#from-source">From source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#upgrading">Upgrading</a></li>
@@ -326,7 +337,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="rml_intro.html" class="btn btn-neutral float-right" title="Introduction to Regularized Maximum Likelihood Imaging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
