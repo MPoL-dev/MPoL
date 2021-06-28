@@ -106,7 +106,7 @@ Assuming that the uncertainty (:math:`\sigma`) on each data point is known (and 
 
     \ln \mathcal{L}(\boldsymbol{Y} |\,\boldsymbol{\theta}) = - \frac{1}{2} \chi^2 (\boldsymbol{Y} |\,\boldsymbol{\theta}) + C
 
-where :math:`C` is a constant with respect to the model parameters. It is common to use shorthand to say that "the likelihood function is :math:`\chi^2`" to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values :math:`\hat{\boldsymbol{\theta}}` which maximize the likelihood function. Unsurprisingly, these parameters are called the *maximum likelihood solution*, and usually they represent something like a "best-fit" model. [#mle_solution]_
+where :math:`C` is a constant with respect to the model parameters. It is common to use shorthand to say that "the likelihood function is :math:`\chi^2`" to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values :math:`\hat{\boldsymbol{\theta}}` which maximize the likelihood function. Unsurprisingly, these parameters are called the *maximum likelihood estimate* (or MLE), and usually they represent something like a "best-fit" model. [#mle_solution]_
 
 When it comes time to do parameter inference, however, it's important to keep in mind
 
@@ -120,17 +120,18 @@ To be specific, :math:`\chi^2` is not the end of the story when we'd like to per
 
     p(\boldsymbol{\theta}|\,\boldsymbol{Y}) = \frac{p(\boldsymbol{Y}|\,\boldsymbol{\theta})\, p(\boldsymbol{\theta})}{p(\boldsymbol{Y})}
 
-As long as the model specification remains the same, the denominator is a constant, and we have
+The denominator is a constant so long as the model specification remains the same, leaving
 
 .. math::
 
     p(\boldsymbol{\theta}|\,\boldsymbol{Y}) \propto p(\boldsymbol{Y}|\,\boldsymbol{\theta})\, p(\boldsymbol{\theta}).
 
-So we need a prior probability distribution :math:`p(\boldsymbol{\theta})` in addition to the likelihood function to calculate the posterior probability distribution of the model parameters.
+So we need a prior probability distribution :math:`p(\boldsymbol{\theta})` in addition to the likelihood function to calculate the posterior probability distribution of the model parameters. Analogous to the maximum likelihood estimate, there is also the *maximum a posteriori* estimate (or MAP), which includes the effect of the prior probability distribution.
 
 .. seealso::
 
     Useful resources on Bayesian inference include
+
     * `Data Analysis: A Bayesian Tutorial <https://www.amazon.com/Data-Analysis-Bayesian-Devinderjit-Sivia/dp/0198568320>`__ by Sivia and Skilling
     * `Data analysis recipes: Fitting a model to data <https://ui.adsabs.harvard.edu/abs/2010arXiv1008.4686H/abstract>`__ by Hogg, Bovy, and Lang
     * `Data analysis recipes: Probability calculus for inference <https://ui.adsabs.harvard.edu/abs/2012arXiv1205.4446H/abstract>`__ by Hogg
@@ -183,7 +184,20 @@ Now with the likelihood function specified, we can add prior probability distrib
 RML images as non-parametric models
 -----------------------------------
 
-Now that we've introduced what it means to forward-model a dataset and
+Now that we've introduced what it means to forward-model a dataset and how to calculate a likelihood function, let's talk about non-parametric models.
+
+Say that our :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` dataset looked a bit more structured than a simple :math:`y = mx + b` relationship. We could expand the model by adding more parameters, for example, by adding quadratic and cubic terms, e.g., :math:`y = a_0 + a_1 x + a_2 x^2 + a_3 x^3`. This would be a reasonable approach, especially if the parameters :math:`a_2`, :math:`a_3`, etc... had physical meaning. But if all that we're interested in is modeling the relationship between :math:`y = f(x)` in order to make predictions, we could just as easily use a `non-parametric model <https://www.section.io/engineering-education/parametric-vs-nonparametric/>`__, like a `spline <https://en.wikipedia.org/wiki/Spline_(mathematics)>`__ or a `Gaussian process <https://distill.pub/2019/visual-exploration-gaussian-processes/>`__.
+
+With RML imaging, we're trying to come up with a model that will fit the dataset. But rather than using a parametric model like a protoplanetary disk structure model or a series of Gaussian rings, we're using a non-parametric model of *the image itself*. This is very much like using a spline or Gaussian process to fit a series of :math:`\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}` and :math:`\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}` points. Perhaps the most straightforward formulation of the non-parametric model is the pixel basis set, but we could also use other basis sets like a set of wavelet coefficients, or even more exotic basis sets constructed from trained neural networks.
+
+
+
+To start with, let's just focus on the "maximum likelihood" part of "regularized maximum likelihood" imaging. As the term suggests, we're searching for those model parameters
+
+
+
+line example were a bit more complicated
+
 
 Examples of splines vs. polynomials.
 
@@ -192,6 +206,7 @@ What is RML imaging?
 Is
 
 What does that mean?
+
 
 
 In general, we are working with Fourier datasets. Meaning that we are trying to reconstruct images of the sky, but the datasets we have are related to the Fourier transform of that.
@@ -205,10 +220,15 @@ Likelihood. Loss functions. (link). Different formulations between Bayesian prob
 
 All of this is in contrast to the CLEAN algorithm, which operates as an image-plane deconvolution algorithm.
 
+Machine learning language as a "loss."
+
+Writing things outside of Bayesian language, we can also state this as a likelihood function, or
+
 
 Additional references for RML imaging
 +++++++++++++++++++++++++++++++++++++
 
+* Hogg and Villar
 * Narayan and Nityananda
 * EHT IV
 
@@ -273,4 +293,4 @@ This approach would be to "batch" the data in the training loop, and train in ea
 
 .. rubric:: Footnotes
 
-.. [#mle_solution] There's actually a lot to unpack here. When your model has many parameters, the MLE solution is unlikely to represent a *typical* realization of your model parameters. This is a quirk of the geometry of high dimensional spaces. For more information, we recommend checking out Chapter 1 of `Betancourt 2017 <https://arxiv.org/abs/1701.02434>`__. Still, the MLE solution is often a useful quantity to communicate.
+.. [#mle_solution] There's actually a lot to unpack here. When your model has many parameters (i.e., the posterior distribution is high dimensional), the MLE (or MAP) solution is unlikely to represent a *typical* realization of your model parameters. This is a quirk of the geometry of high dimensional spaces. For more information, we recommend checking out Chapter 1 of `Betancourt 2017 <https://arxiv.org/abs/1701.02434>`__. Still, the MLE solution is often a useful quantity to communicate.
