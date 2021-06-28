@@ -254,6 +254,10 @@ where
 
 and :math:`C` is a normalization factor.
 
+The "model" could be very full featured, extending the model to do `self-calibration <https://github.com/MPoL-dev/MPoL/issues/24>`__, or more complex datasets.
+
+
+
 .. seealso::
 
     That's RML imaging in a nutshell, but we've barely scratched the surface. We highly recommend checking out the following excellent resources.
@@ -271,80 +275,33 @@ and :math:`C` is a normalization factor.
     * `Interferometry and Synthesis in Radio Astronomy <https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract>`__ Chapter 11.1
     * `CASA documentation on tclean <https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging>`__
     * David Wilner's lecture on `Imaging and Deconvolution in Radio Astronomy <https://www.youtube.com/watch?v=mRUZ9eckHZg>`__
+    * For a discussion on using both CLEAN and RML techniques to robustly interpret kinematic data of protoplanetary disks, see Section 3 of `Visualizing the Kinematics of Planet Formation <https://ui.adsabs.harvard.edu/abs/2020arXiv200904345D/abstract>`__ by The Disk Dynamics Collaboration
 
 
 The MPoL package for Regularized Maximum Likelihood imaging
 -----------------------------------------------------------
 
-Hopefully we've provided.
-
-What's new here? Autodifferentiation. Opportunities for expansion. And the tight integration with PyTorch and neural networks. Easy to run on the GPU (link)
-
-2) Getting started with imaging (links to CASA, other imaging software)
-3) Getting started with PyTorch
-
-
-Existing RML packages. Encourage you to check out.
-
-This package is meant to be modular.
-
-
-Some advantages to doing RML imaging. Provides an alternative to assessing image quality w/ tclean.
-
-Essentially model fitting
-Likelihood. Loss functions. (link). Different formulations between Bayesian probability and/or regularizer formulation. An excellent resource here is the EHT-IV paper.
-
-All of this is in contrast to the CLEAN algorithm, which operates as an image-plane deconvolution algorithm.
-
-Machine learning language as a "loss."
-
-Writing things outside of Bayesian language, we can also state this as a likelihood function, or
-
-
-### Introduction to Regularized Maximum Likelihood (RML) Imaging
-
-Regularized Maximum Likelihood (RML) imaging is a forward modeling methodology. We predict an image then represent it as an array of pixels. This is brought to the visibility domain through a forward Fourier transform. This is then compared to the measured data to ensure it is a viable predicted image. Due to information loss of the true image when obtaining the measured data, several predicted images- including incorrect ones- will match. To get to our best predicted image, we make new predictions by choosing the most likely (Maximum Likelihood) configuration and favoring specified criteria (Regularized). These criteria or regularizers, are chosen by the user. Some examples of favored criteria are smoothness and sparsity. The likeliness and how well a predicted image meet a certain criterion is mathematically represented in a loss function that contains hyperparameters used to weight data and regularizers. We minimize this loss function by performing a gradient descent, in which we adjust the pixel value intensities. Within this optimization run, hyperparameters are usually held fixed, but can be tuned between runs to produce a better image. When the loss function is minimized, our predicted image is at its best version to fit the collected data and follow our specified criterion.
-
-
-
-- Package for synthesis imaging and model fitting from interferometric data.
-- Built on PyTorch provides state of the art autodifferentiation capabilities
-- Well tested, stable, on supported Python versions. Always a goal of core, usable routines in PyPi releases (i.e., `pip install mpol`). Maintainability.
+*Million Points of Light* or "MPoL" is a Python package that is used to perform regularized maximum likelihood imaging. By that we mean that the package provides the building blocks to create flexible image models and optimize them to fit interferometric datasets. The package is developed completely in the open on `Github <https://github.com/MPoL-dev/MPoL>`__. - Well tested, stable, on supported Python versions. Always a goal of core, usable routines in PyPi releases (i.e., `pip install mpol`). Maintainability.
 - Scalability. By keeping modules modular, and *open* and emphasizing the building of imaging components rather than a single, monolithic function, the interested user can expand their applications.
-
-Show the example of HD 143006 CLEAN vs. RML as example of why you might want to use this package… resolution, sensitivity, independent characterization of interesting features.
 
 
 .. seealso::
 
-    We also recommend checking out several of the other excellent packages for RML imaging.
+    We also recommend checking out several other excellent packages for RML imaging, since they may be better suited to your particular application.
 
-    * SMILI
-    * eht-imaging
-    * GPUVMEM
+    * `SMILI <https://github.com/astrosmili/smili>`__
+    * `eht-imaging <https://github.com/achael/eht-imaging>`__
+    * `GPUVMEM <https://github.com/miguelcarcamov/gpuvmem>`__
 
-These could be nice videos, but aspects of them probably need to be tutorials first.
+We are focusing primarily on continuum and spectral line ALMA and JVLA observations.
 
- * Autodifferentiation
-     * neural networks, deep learning, graident descent, JAX
- * Layers + Nodes w/in Neural landscape
-    * Input and Output connections.
-    * Relation of "loss" to Bayesian inference
- * RML Imaging as forward modeling
-     * optimization as training
+There are a few features of MPoL that we believe make it an appealing platform for RML modeling. Several of these features are enabled by build off of the PyTorch package. It's easy to get started and isn't too different from writing numpy code.
 
-Following on from the layer discussion, and the relationship to Bayesian inference, the idea is that there is some set of parameters that maximize the posterior.
+1) What's new here? Autodifferentiation (easy to write priors) and powerful optimizers that would normally be used to train neural networks help us reach maximum.
+2) Easy to run on the GPU (link)
+3) Built on PyTorch, opportunities for expansion. This package is meant to be modular. This includes packing layers into more extended applications (like combination single dish + interferometric data) as well as integration with PyTorch and neural networks.
 
-
-One approach would be to combine all of the data into a single container, and just train/optimize off of that.
-
-
-But let's say you had a combination of multiple datasets, from different telescope and there was an unknown calibration factor for each telescope.
-
-
-This approach would be to "batch" the data in the training loop, and train in each step. This training loop is commonly to other neural network architectures.
-
-
+To get started with MPoL, we recommend `installing the package <installation.html>`__ and reading through the tutorial series.
 
 .. rubric:: Footnotes
 
