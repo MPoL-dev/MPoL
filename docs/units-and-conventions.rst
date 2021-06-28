@@ -1,3 +1,5 @@
+.. _units-conventions-label:
+
 Units and Conventions
 =====================
 
