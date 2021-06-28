@@ -1,12 +1,12 @@
-Installation
-============
+MPoL Installation
+=================
 
 MPoL requires ``python >= 3.6``.
 
 Using pip
 ---------
 
-Stable versions are hosted on PyPI and installable via ::
+Stable versions are hosted on PyPI and are installed via ::
 
     $ pip install MPoL
 
