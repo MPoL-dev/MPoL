@@ -24,7 +24,7 @@
 #
 # This tutorial is the first of an eventual three part series covering a real world application of RML imaging to the HD 143006 protoplanetary disk dataset observed as part of the DSHARP survey ([Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract)). In this tutorial (Part 1), we'll provide a brief introduction to the dataset itself, the MPoL package, and perform some brief diagnostic imaging to make sure we have the basics configured properly.
 #
-# [Part 2](https://mpol-dev.github.io/MPoL/tutorials/HD143006_Part_2.html) of the tutorial will demonstrate how to set up the optimization loop and to create an RML image.
+# [Part 2](HD143006_Part_2.html) of the tutorial will demonstrate how to set up the optimization loop and to create an RML image.
 #
 #
 # ## Viewing the CLEAN image
@@ -103,7 +103,7 @@ vv = d["vv"]
 weight = d["weight"]
 data = d["data"]
 
-# To get an idea of the $u,v$ coverage of the dataset, let's plot the $u,v$ coordinates of the visibilities, as we've done in the [cross-validation tutorial](https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html) and the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
+# To get an idea of the $u,v$ coverage of the dataset, let's plot the $u,v$ coordinates of the visibilities, as we've done in the [cross-validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) and the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines).
 
 fig, ax = plt.subplots(nrows=1)
 ax.scatter(uu, vv, s=0.5, rasterized=True, linewidths=0.0, c="k")
