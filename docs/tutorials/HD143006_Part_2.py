@@ -308,8 +308,10 @@ train(model, dataset, optimizer, config, writer=writer)
 
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
-# #%tensorboard --logdir {logs_base_dir}
-# # uncomment the above line when running to view Tensorboard
+# +
+# # %tensorboard --logdir {logs_base_dir}
+## uncomment the above line when running to view Tensorboard
+# -
 
 # ## Training and Imaging Part 2: Cross Validation
 #
@@ -457,10 +459,10 @@ cv_score3 = cross_validate(
 print(f"Cross Validation Score: {cv_score3}")
 # -
 
-# And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score.
+# And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score. Also note that while it may seem strange that the loss values are not lowest with the lowest cross validation scores, different config files increase the weight of some loss functions (and others remove some completely) so the loss values are not perfectly equal representations across each configuration and run.
 
 cv_log_dir = logs_base_dir + "cv/"
 # #%tensorboard --logdir {cv_log_dir}
-# # uncomment the above line when running to view Tensorboard
+## uncomment the above line when running to view Tensorboard
 
-# From the Tensorboard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
+# Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. By initializing the model with the dirty image we were able to have our model converge to the optimal image in fewer iterations and we were able to arrive at a more accurate image by using cross validation. From the Tensorboard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
