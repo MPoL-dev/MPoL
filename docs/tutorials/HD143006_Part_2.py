@@ -24,7 +24,7 @@
 #
 # This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
-# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use crossvalidation to improve the choice of hyperparameters in the model in order to more accurately predict new data, and how to analyze the results of our work with Tensorboard.
+# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model in order to more accurately predict new data, and how to analyze the results of our work with Tensorboard.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
@@ -79,7 +79,7 @@ gridder = gridding.Gridder(
 
 # -
 
-# We now have everything from the last tutorial loaded and can begin the process of optimizing our model to set a better starting point.
+# We now have everything from the last tutorial loaded and can begin the process of optimization to improve our image quality and perform cross validation on our model to better determine hyperparameters.
 #
 # ### Getting the Dirty Image and Creating the Model
 #
@@ -125,7 +125,7 @@ for iteration in range(500):
     optimizer.step()  # update the parameters
 # -
 
-# In this tutorial we will be running through multiple optimization loops and comparing them so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
+# In this tutorial we will be using different configurations of regularization strengths in our RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
 
 torch.save(model.state_dict(), "model.pt")
 
