@@ -176,7 +176,7 @@ fig.colorbar(im, cax=cbar_ax)
 
 # ## Training and Imaging Part 1
 
-# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model).
+# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that in order to display the Tensorboard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this will be displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this magic command in Jupyter Notebook to open the dashboard.
 
 
 # Here we are setting up the tools that will allows us to visualize the results of the loop in Tensorboard.
@@ -309,6 +309,7 @@ train(model, dataset, optimizer, config, writer=writer)
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
 # #%tensorboard --logdir {logs_base_dir}
+# # uncomment the above line when running to view Tensorboard
 
 # ## Training and Imaging Part 2: Cross Validation
 #
@@ -460,5 +461,6 @@ print(f"Cross Validation Score: {cv_score3}")
 
 cv_log_dir = logs_base_dir + "cv/"
 # #%tensorboard --logdir {cv_log_dir}
+# # uncomment the above line when running to view Tensorboard
 
 # Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. Using a more basic procedure and then using the cross validation to train and image the model we are able to speed up the training process. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
