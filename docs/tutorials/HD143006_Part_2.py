@@ -24,7 +24,7 @@
 #
 # This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
-# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use crossvalidation to improve the choice of hyperparameters in the model in order to more accurately predict new data, and how to analyze the results of our work with Tensorboard.
+# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model in order to more accurately predict new data, and how to analyze the results of our work with Tensorboard.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
@@ -79,7 +79,7 @@ gridder = gridding.Gridder(
 
 # -
 
-# We now have everything from the last tutorial loaded and can begin the process of optimizing our model to set a better starting point.
+# We now have everything from the last tutorial loaded and can begin the process of optimization to improve our image quality and perform cross validation on our model to better determine hyperparameters.
 #
 # ### Getting the Dirty Image and Creating the Model
 #
