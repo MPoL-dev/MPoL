@@ -271,7 +271,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     return loss.item()
 
 
-# With our function done, all that is left is to load the initialized model, set our hyperparameters, create our optimizer, and put the data in the correct format.
+# With our function done, all that is left is to load the initialized model, export the visibilities to a PyTorch dataset, set our hyperparameters, and create our optimizer.
 
 # +
 model.load_state_dict(
