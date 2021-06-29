@@ -24,7 +24,7 @@
 #
 # This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
-# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to improve the process through crossvalidation, and how to analyze the results of our work with Tensorboard.
+# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to improve the choice of hyperparameters through cross validation, and how to analyze the results of our work with Tensorboard.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
@@ -79,11 +79,11 @@ gridder = gridding.Gridder(
 
 # -
 
-# We now have everything from the last tutorial loaded and can begin the process of optimization and cross validation to improve our image quality.
+# We now have everything from the last tutorial loaded and can begin the process of optimization to improve our image quality and perform cross validation on our model to better determine hyperparameters.
 #
 # ### Getting the Dirty Image and Creating the Model
 #
-# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as these options lead to an already well optimized image (see [Part 1](HD143006_Part_1.html)).
+# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as these options lead to a dirty image that has similar features to what we'd expect our final CLEANed image to resemble based on the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
 
 import torch
 
@@ -125,7 +125,7 @@ for iteration in range(500):
     optimizer.step()  # update the parameters
 # -
 
-# In this tutorial we will be using different methods of RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
+# In this tutorial we will be using different configurations of regularization strengths in our RML optimization so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
 
 torch.save(model.state_dict(), "model.pt")
 
@@ -271,7 +271,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     return loss.item()
 
 
-# With our function done, all that is left is to set the variables, load the initialized model, set our hyperparameters, create our optimizer, and put the data in the correct format.
+# With our function done, all that is left is to load the initialized model, export the visibilities to a PyTorch dataset, set our hyperparameters, and create our optimizer.
 
 # +
 model.load_state_dict(
@@ -317,7 +317,7 @@ train(model, dataset, optimizer, config, writer=writer)
 #
 # Just like in the previous section we will be viewing our results in Tensorboard, with the addition of the cross validation score log.
 
-# Cross validation requires a `test` function (to determine the cross calidation score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We implement these below.
+# Cross validation requires a `test` function (to determine the cross validation score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We implement these below.
 
 
 def test(model, dataset):
