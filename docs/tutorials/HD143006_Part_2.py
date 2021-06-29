@@ -125,7 +125,7 @@ for iteration in range(500):
     optimizer.step()  # update the parameters
 # -
 
-# In this tutorial we will be running through multiple optimization loops and comparing them so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
+# In this tutorial we will be running through RML optimization multiple times with different configurations of hyperparameters and then comparing them so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
 
 torch.save(model.state_dict(), "model.pt")
 
@@ -458,6 +458,17 @@ cv_score3 = cross_validate(
 )
 print(f"Cross Validation Score: {cv_score3}")
 # -
+
+# Here is the final result for our model with the lowest cross validation score:
+
+fig, ax = plt.subplots()
+im = ax.imshow(
+    np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
+    origin="lower",
+    interpolation="none",
+    extent=model.icube.coords.img_ext,
+)
+plt.colorbar(im)
 
 # And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work towards a lower cross validation score. Also note that while it may seem strange that the loss values are not lowest with the lowest cross validation scores, different config files increase the weight of some loss functions (and others remove some completely) so the loss values are not perfectly equal representations across each configuration and run.
 
