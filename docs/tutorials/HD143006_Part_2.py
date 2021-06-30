@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.11.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -24,12 +24,12 @@
 #
 # This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
-# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model in order to more accurately predict new data, and how to analyze the results of our work with Tensorboard.
+# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model to more accurately predict new data, and how to analyze the results of our work with TensorBoard.
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
 #
-# *You can either download these two files (HD143006_continuum.fits and HD143006_continuum.npz) directly to your working directory, or use astropy to download them during run time.*
+# *You can either download these two files (HD143006_continuum.fits and HD143006_continuum.npz) directly to your working directory, or use Astropy to download them during run time.*
 
 # + cell_id="00001-be94721b-eee2-4e2e-96e2-dc65b9fd4f5b" deepnote_cell_type="code" deepnote_to_be_reexecuted=false execution_millis=663 execution_start=1623447169390 source_hash="4f0f20f8" tags=[]
 from astropy.io import fits
@@ -82,7 +82,7 @@ gridder = gridding.Gridder(
 #
 # ### Getting the Dirty Image and Creating the Model
 #
-# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
+# First, we are going to get the dirty image from our Gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
 
 import torch
 
@@ -102,7 +102,7 @@ model = SimpleNet(coords=coords, nchan=gridder.nchan)
 #
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -169,16 +169,17 @@ plt.tight_layout()
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.84, 0.17, 0.03, 0.7])
 fig.colorbar(im, cax=cbar_ax)
+plt.tight_layout()
 
 
 # -
 
 # ## Training and Imaging Part 1
 
-# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that in order to display the Tensorboard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this will be displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this magic command in Jupyter Notebook to open the dashboard.
+# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that to display the TensorBoard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this is displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this IPython line magic command in Jupyter Notebook to open the dashboard.
 
 
-# Here we are setting up the tools that will allows us to visualize the results of the loop in Tensorboard.
+# Here we set up the tools that will allow us to visualize the results of the loop in TensorBoard.
 
 from mpol import (
     losses,  # here MPoL loss functions will be used
@@ -186,7 +187,7 @@ from mpol import (
 )
 
 
-# setting up Writer to log values and images for display in tensorboard
+# setting up Writer to log values and images for display in TensorBoard
 from torch.utils.tensorboard import SummaryWriter
 import os
 
@@ -240,7 +241,7 @@ def log_figure(
     return fig
 
 
-# With these set up, we can now make our training function (a function instead of just a loop so variables, such as hyperparameters, are more easily modified). The hyperparameters are contained under `config` such as epochs and lambda_TV. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
+# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters, such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -270,7 +271,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     return loss.item()
 
 
-# With our function done, all that is left is to load the initialized model, export the visibilities to a PyTorch dataset, set our hyperparameters, and create our optimizer.
+# With our function created, all that is left is to load the initialized model, export the visibilities to a PyTorch dataset, set our hyperparameters, and create our optimizer.
 
 # +
 model.load_state_dict(
@@ -305,18 +306,18 @@ optimizer = torch.optim.Adam(
 train(model, dataset, optimizer, config, writer=writer)
 # -
 
-# Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within Tensorboard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
+# Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within TensorBoard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
 # +
 # # %tensorboard --logdir {logs_base_dir}
-## uncomment the above line when running to view Tensorboard
+## uncomment the above line when running to view TensorBoard
 # -
 
 # ## Training and Imaging Part 2: Cross Validation
 #
 # Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
 #
-# Just like in the previous section we will be viewing our results in Tensorboard, with the addition of the cross validation score log.
+# Just like in the previous section we will be viewing our results in TensorBoard, with the addition of the cross validation score log.
 
 # Cross validation requires a `test` function (to determine the cross validation score) and a `cross_validate` function (to utilize cross validation with the previous `train` function). We implement these below.
 
@@ -376,7 +377,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
 
-# If you recall, we saved the trained model's state. Here we will be utilizing this. `MODEL_PATH` will be defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will run the cross validation loops for a few different configurations, starting with the hyperparameters found in `config`, defined above in Training and Imaging Part 1 of this tutorial. This configuration has been included in the following cell for convenience.
+# If you recall, we saved the trained model's state. Here we will be utilizing this. `MODEL_PATH` is defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will run the cross validation loops for a few different configurations, starting with the hyperparameters found in `config`, defined above in *Training and Imaging Part 1* of this tutorial. This configuration has been included in the following cell for convenience.
 
 # +
 MODEL_PATH = "model.pt"
@@ -394,7 +395,7 @@ new_config = (
 # -
 
 
-# We are now ready to run our cross validation loop. We'll run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with Tensorboard.
+# We are now ready to run our cross validation loop. We'll run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with TensorBoard.
 
 # +
 # %%time
@@ -469,10 +470,12 @@ im = ax.imshow(
 )
 plt.colorbar(im)
 
-# Below are the results in the Tensorboard. Note that while it may seem strange that the lowest loss values do not correspond with the lowest cross validation scores, different hyperparameters in the config dictionaries increase the weight of some loss functions (and others, such as hyperparameters set to zero, remove some loss function components completely) so the loss values are not perfectly equal representations across each configuration and run.
+# Below are the results in the TensorBoard. Note that while it may seem strange that the lowest loss values do not correspond with the lowest cross validation scores, different hyperparameters in the config dictionaries increase the weight of some loss functions (and others, such as hyperparameters set to zero, remove some loss function components completely) so the loss values are not perfectly equal representations across each configuration and run.
 
 cv_log_dir = logs_base_dir + "cv/"
-# #%tensorboard --logdir {cv_log_dir}
-## uncomment the above line when running to view Tensorboard
+# # %tensorboard --logdir {cv_log_dir}
+## uncomment the above line when running to view TensorBoard
 
-# Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. By initializing the model with the dirty image we are able to have our model converge to the optimal image in fewer iterations and we are able to arrive at a more accurate image by using cross validation. From the Tensorboard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
+# Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. By initializing the model with the dirty image we are able to have our model converge to the optimal image in fewer iterations. We were also able to arrive at a more statistically accurate image by using cross validation. From the TensorBoard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations, we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. If you would like to compare these results yourself, please run TensorBoard locally. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
+
+
