@@ -82,7 +82,7 @@ gridder = gridding.Gridder(
 #
 # ### Getting the Dirty Image and Creating the Model
 #
-# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image. (see [Part 1](HD143006_Part_1.html)).
+# First, we are going to get the dirty image from our gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
 
 import torch
 
@@ -102,7 +102,7 @@ model = SimpleNet(coords=coords, nchan=gridder.nchan)
 #
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim).. MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many different optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -394,7 +394,7 @@ new_config = (
 # -
 
 
-# We are now ready to run our cross validation loop, after it is done we will be reviewing our results in Tensorboard. We run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with tensorboard.
+# We are now ready to run our cross validation loop. We'll run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with Tensorboard.
 
 # +
 # %%time
@@ -469,7 +469,7 @@ im = ax.imshow(
 )
 plt.colorbar(im)
 
-# And here are the results in the Tensorboard. As we run through this optimizer using different hyperparameters in the config file we can analyze the different results to work toward a lower cross validation score. Also note that while it may seem strange that the lowest loss values do not correspond with the lowest cross validation scores, different hyperparameters in the config dictionaries increase the weight of some loss functions (and others, such as hyperparameters set to zero, remove some loss function components completely) so the loss values are not perfectly equal representations across each configuration and run.
+# Below are the results in the Tensorboard. Note that while it may seem strange that the lowest loss values do not correspond with the lowest cross validation scores, different hyperparameters in the config dictionaries increase the weight of some loss functions (and others, such as hyperparameters set to zero, remove some loss function components completely) so the loss values are not perfectly equal representations across each configuration and run.
 
 cv_log_dir = logs_base_dir + "cv/"
 # #%tensorboard --logdir {cv_log_dir}
