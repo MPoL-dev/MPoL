@@ -282,7 +282,7 @@ dataset = (
 )  # export the visibilities from gridder to a PyTorch dataset
 # -
 
-# Here we introduce new priors to our model. We reference these as the *hyperparameters*. Introducing multiply priors help to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). Later in the tutorial, we will see how these can affect the resulting image. 
+# Here we introduce new priors to our model. Introducing multiply priors help to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). Later in the tutorial, we will see how these can affect the resulting image. 
 
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
