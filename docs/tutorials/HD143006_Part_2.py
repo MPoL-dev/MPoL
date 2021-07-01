@@ -99,7 +99,7 @@ dirty_image = torch.tensor(img.copy())
 
 # ## Initializing Model with the Dirty Image
 #
-# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to invoke a better image given the dirty image and our positive flux prior.
+# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good choice is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to invoke a better image given the dirty image and our positive flux prior.
 #
 
 
