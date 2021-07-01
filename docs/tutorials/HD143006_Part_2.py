@@ -22,7 +22,7 @@
 
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](optimization.html), [Initalizing with the Dirty Image](initializedirtyimage.html), and [Cross Validation](crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
+# This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html), [Initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html), and [Cross Validation](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
 #
 # This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model to more accurately predict new data, and how to analyze the results of our work with TensorBoard.
 #
@@ -103,7 +103,7 @@ dirty_image = torch.tensor(img.copy())
 #
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) tutorial. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](.https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) tutorial. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -242,7 +242,7 @@ def log_figure(
     return fig
 
 
-# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](rml_intro.html) ), such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
+# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html) ), such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -318,7 +318,7 @@ train(model, dataset, optimizer, config, writer=writer)
 
 # ## Training and Imaging Part 2: Cross Validation
 #
-# Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](crossvalidation.html).
+# Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html).
 #
 # Just like in the previous section we will be viewing our results in TensorBoard, with the addition of the cross validation score log.
 
@@ -360,7 +360,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     return test_score
 
 
-# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read about why and how this works, and to visualize this, please see [Choosing the K-folds](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](crossvalidation.html).
+# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read about why and how this works, and to visualize this, please see [Choosing the K-folds](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html).
 
 from mpol import datasets
 
