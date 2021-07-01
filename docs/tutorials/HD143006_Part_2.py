@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.11.3
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -99,11 +99,11 @@ dirty_image = torch.tensor(img.copy())
 
 # ## Initializing Model with the Dirty Image
 #
-# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good choice is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to invoke a better image given the dirty image and our positive flux prior.
+# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good choice is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and impose the requirement that our sources must have all positive flux values. Our solution then is to train the RML model so that its parameters more closely resemble the dirty image while enforcing the positive flux prior .
 #
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](.https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) tutorial. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](.https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) and [Initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html) tutorials. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -177,7 +177,7 @@ plt.tight_layout()
 
 # ## Training and Imaging Part 1
 
-# Now that we have a better starting point, we can work on optimizing our image using a training function. This part of the tutorial will also use [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that to display the TensorBoard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this is displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this IPython line magic command in Jupyter Notebook to open the dashboard.
+# Now that we have a better starting point, we can work on optimizing our image using a more complex training function that has additional priors and regularizers. This part of the tutorial will also use [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that to display the TensorBoard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this is displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this IPython line magic command in Jupyter Notebook to open the dashboard.
 
 
 # Here we set up the tools that will allow us to visualize the results of the loop in TensorBoard.
@@ -242,7 +242,7 @@ def log_figure(
     return fig
 
 
-# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html) ), such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses).
+# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations, the configurations consisting of changed hyperparameter values). Our new training function includes additional priors and loss functions, this helps to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Later in the tutorial, we will see how these can affect the resulting image.
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -284,7 +284,7 @@ dataset = (
 )  # export the visibilities from gridder to a PyTorch dataset
 # -
 
-# Here we introduce new priors to our model. Introducing multiple priors help to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). Later in the tutorial, we will see how these can affect the resulting image.
+# Here is where we define the hyperparameters under the `config` dictionary. The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses).
 
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
