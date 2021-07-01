@@ -89,9 +89,11 @@ img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arc
 # We now have everything from the last tutorial loaded and we can create the model.
 
 from mpol.precomposed import SimpleNet
+
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
 
 import torch
+
 # taking the dirty image and making it a tensor
 dirty_image = torch.tensor(img.copy())
 
@@ -240,7 +242,7 @@ def log_figure(
     return fig
 
 
-# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters, such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
+# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations). The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](rml_intro.html) ), such as `epochs` and `lambda_TV`, are contained under `config`. Most of them are used in the loss functions and can be read about [here](../api.html#module-mpol.losses).
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -282,7 +284,7 @@ dataset = (
 )  # export the visibilities from gridder to a PyTorch dataset
 # -
 
-# Here we introduce new priors to our model. Introducing multiply priors help to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). Later in the tutorial, we will see how these can affect the resulting image. 
+# Here we introduce new priors to our model. Introducing multiple priors help to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). Later in the tutorial, we will see how these can affect the resulting image.
 
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
@@ -478,5 +480,3 @@ cv_log_dir = logs_base_dir + "cv/"
 ## uncomment the above line when running to view TensorBoard
 
 # Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. By initializing the model with the dirty image we are able to have our model converge to the optimal image in fewer iterations. We were also able to arrive at a more statistically accurate image by using cross validation. From the TensorBoard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations, we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. If you would like to compare these results yourself, please run TensorBoard locally. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
-
-
