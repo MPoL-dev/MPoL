@@ -84,25 +84,24 @@ gridder = gridding.Gridder(
 #
 # First, we are going to get the dirty image from our Gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
 
-import torch
-
 img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
-# taking the dirty image and making it a tensor
-dirty_image = torch.tensor(img.copy())
 
 # We now have everything from the last tutorial loaded and we can create the model.
 
 from mpol.precomposed import SimpleNet
-
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
+
+import torch
+# taking the dirty image and making it a tensor
+dirty_image = torch.tensor(img.copy())
 
 # ## Initializing Model with the Dirty Image
 #
-# We now have our model and data, but before we set out trying to optimize the image we should create a better starting point for our future optimization loops. A good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains negative flux pixels, while we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to become as close to the dirty image as possible (while retaining image positivity).
+# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good idea for the starting point is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and we impose the requirement that our sources must have all positive flux values. Our solution then is to optimize the RML model to invoke a better image given the dirty image and our positive flux prior.
 #
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
+# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](../api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) tutorial. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
 loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
@@ -283,6 +282,8 @@ dataset = (
 )  # export the visibilities from gridder to a PyTorch dataset
 # -
 
+# Here we introduce new priors to our model. We reference these as the *hyperparameters*. These help guide our model's learning in a direction based on some assumptions we make; the sparsity of the image (`lambda_sparsity`), the **lambda_TV prior** (`lambda_TV`) or the intensity of **entropy prior**(`prior_intensity` and `entropy`). Later in the tutorial, we will see how these can affect the resulting image. 
+
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
@@ -357,7 +358,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     return test_score
 
 
-# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. This is visualized in the [Cross Validation tutorial](crossvalidation.html).
+# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read about why and how this works, and to visualize this, please see [Choosing the K-folds](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](crossvalidation.html).
 
 from mpol import datasets
 
