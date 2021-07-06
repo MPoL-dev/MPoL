@@ -27,24 +27,25 @@
 #
 # We'll continue with the same central channel of the ALMA logo measurement set as before. If these commands don't make sense, please consult the previous tutorials.
 
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
 # +
 import torch
-import numpy as np
-import matplotlib.pyplot as plt
 from astropy.io import fits
-import matplotlib
-
-from mpol import (
-    gridding,
-    coordinates,
-    precomposed,
-    losses,
-    images,
-    datasets,
-    connectors,
-)
 from astropy.utils.data import download_file
 from torch.utils.tensorboard import SummaryWriter
+
+from mpol import (
+    connectors,
+    coordinates,
+    datasets,
+    gridding,
+    images,
+    losses,
+    precomposed,
+)
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
@@ -69,12 +70,7 @@ data_im = np.imag(data)
 # of the expected emission
 coords = coordinates.GridCoords(cell_size=0.03, npix=180)
 gridder = gridding.Gridder(
-    coords=coords,
-    uu=uu,
-    vv=vv,
-    weight=weight,
-    data_re=data_re,
-    data_im=data_im,
+    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
 )
 
 # export to PyTorch dataset
@@ -203,17 +199,10 @@ for i, (train, test) in enumerate(k_fold_datasets):
         cmap="GnBu",
     )
 
-    ax[i, 1].imshow(
-        train_chan.detach().numpy(),
-        origin="lower",
-        extent=img_ext,
-    )
+    ax[i, 1].imshow(train_chan.detach().numpy(), origin="lower", extent=img_ext)
 
     ax[i, 2].imshow(
-        test_mask.detach().numpy(),
-        origin="lower",
-        extent=vis_ext,
-        cmap="GnBu",
+        test_mask.detach().numpy(), origin="lower", extent=vis_ext, cmap="GnBu"
     )
 
     ax[i, 0].set_ylabel("k-fold {:}".format(i))
@@ -324,14 +313,12 @@ def train_and_image(pars):
     img_ext = rml.coords.img_ext
     fig, ax = plt.subplots()
     ax.imshow(
-        np.squeeze(rml.icube.sky_cube.detach().numpy()),
-        origin="lower",
-        extent=img_ext,
+        np.squeeze(rml.icube.sky_cube.detach().numpy()), origin="lower", extent=img_ext
     )
     return fig, ax
 
 
-# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](https://mpol-dev.github.io/MPoL/tutorials/gpu_setup_tutorial.html).
+# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](gpu_setup.html).
 
 
 # # Results

@@ -27,12 +27,13 @@
 # ### Gridding recap
 # Let's set up the gridder and coordinates as before
 
-import torch
-import numpy as np
 import matplotlib.pyplot as plt
-from mpol import gridding, coordinates, precomposed, losses, utils
+import numpy as np
+import torch
 from astropy.utils.data import download_file
 from IPython.display import SVG, display
+
+from mpol import coordinates, gridding, losses, precomposed, utils
 
 # +
 # load the mock dataset of the ALMA logo
@@ -226,7 +227,7 @@ ax.set_ylabel("loss")
 
 # and we see that we've reasonably converged to a set of parameters without much further improvement in the loss value.
 #
-# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](https://mpol-dev.github.io/MPoL/tutorials/gpu_setup_tutorial.html).
+# All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the [GPU Setup Tutorial](gpu_setup.html).
 
 
 # ### Visualizing output
