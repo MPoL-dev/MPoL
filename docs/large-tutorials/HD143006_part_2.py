@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -22,9 +22,14 @@
 
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is a continuation of the [HD143006 Part 1](HD143006_Part_1.html) tutorial. It covers the same content as the MPoL tutorials on [Optimization](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html), [Initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html), and [Cross Validation](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) but in a streamlined fashion and using real data. These other tutorials provide a more comprehensive breakdown of each step in this tutorial.
+# This tutorial is part 2 of the HD 143006 tutorial series (part 1 can be found [here](HD143006_Part_1.html)).
+#
+# We'll be covering much of the same content in the tutorials on [optimization](../ci-tutorials/optimization.html), [initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html), and [cross Validation](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) as part of an integrated workflow using real data. For more information on a particular step, we recommend referencing the individual tutorials.
 #
 # This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model to more accurately predict new data, and how to analyze the results of our work with TensorBoard.
+#
+#
+# .. _my-reference-label:
 #
 # ### Loading Data
 # Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
