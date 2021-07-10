@@ -22,54 +22,45 @@
 
 # # HD143006 Tutorial Part 2
 #
-# This tutorial is part 2 of the HD 143006 tutorial series (part 1 can be found [here](HD143006_Part_1.html)).
+# This tutorial is part 2 of the HD 143006 tutorial series (part 1 can be found [here](HD143006_part_1.ipynb)).
 #
-# We'll be covering much of the same content in the tutorials on [optimization](../ci-tutorials/optimization.html), [initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html), and [cross Validation](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html) as part of an integrated workflow using real data. For more information on a particular step, we recommend referencing the individual tutorials.
+# We'll be covering much of the same content in the tutorials on [optimization](../ci-tutorials/optimization.ipynb), [initalizing with the dirty image](../ci-tutorials/initializedirtyimage.ipynb), and [cross validation](../ci-tutorials/crossvalidation.ipynb) as part of an integrated workflow using real data. For more information on a particular step, we recommend referencing the individual tutorials.
 #
-# This tutorial will be going through how to initialize the model, the imaging and optimization process, how to use cross validation to improve the choice of hyperparameters in the model to more accurately predict new data, and how to analyze the results of our work with TensorBoard.
+# This tutorial will cover model initialization, optimization, and cross validation, as well as touch on how to use [TensorBoard](https://www.tensorflow.org/tensorboard) to analyze the results.
 #
-#
-# .. _my-reference-label:
 #
 # ### Loading Data
-# Let's load the data as we did in the previous HD143006 tutorial ([Part 1](HD143006_Part_1.html)) and create the MPoL Gridder object.
+# Let's load the data as we did in the previous HD143006 tutorial ([part 1](HD143006_part_1.ipynb)) and create an MPoL Gridder object.
 #
-# *You can either download these two files (HD143006_continuum.fits and HD143006_continuum.npz) directly to your working directory, or use Astropy to download them during run time.*
+# *You can download the extracted visibilities (`HD143006_continuum.npz`) directly to your working directory, or use the Astropy `download_file` utility to download it during run time.*
 
 # + cell_id="00001-be94721b-eee2-4e2e-96e2-dc65b9fd4f5b" deepnote_cell_type="code" deepnote_to_be_reexecuted=false execution_millis=663 execution_start=1623447169390 source_hash="4f0f20f8" tags=[]
-from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.io import fits
 from astropy.utils.data import download_file
+import torch
 from torch.utils import tensorboard
 
-# downloading fits file
-fname_F = download_file(
-    "https://almascience.nrao.edu/almadata/lp/DSHARP/images/HD143006_continuum.fits",
-    cache=True,
-    pkgname="mpol",
-)
 # downloading extracted visibilities file
-fname_EV = download_file(
+fname = download_file(
     "https://zenodo.org/record/4904794/files/HD143006_continuum.npz",
     cache=True,
     pkgname="mpol",
 )
+
 # load extracted visibilities from npz file
-dnpz = np.load(fname_EV)
-uu = dnpz["uu"]
-vv = dnpz["vv"]
-weight = dnpz["weight"]
-data = dnpz["data"]
-# opening the fits file
-dfits = fits.open(fname_F)
-cdelt_scaling = dfits[0].header["CDELT1"] * 3600  # scaling [arcsec]
-cell_size = abs(cdelt_scaling)  # [arcsec]
-# close fits file
-dfits.close()
+d = np.load(fname)
+uu = d["uu"]
+vv = d["vv"]
+weight = d["weight"]
+data = d["data"]
 
 # + cell_id="00008-d56e3afe-45cf-4fe5-a4e7-1803f28deec4" deepnote_cell_type="code" deepnote_to_be_reexecuted=false execution_millis=27 execution_start=1623441758279 source_hash="b76fed2d"
 from mpol import gridding, coordinates
+
+# we'll assume the same cell_size as before
+cell_size = 0.003  # arcseconds
 
 # creating Gridder object
 coords = coordinates.GridCoords(cell_size=cell_size, npix=512)
@@ -78,44 +69,52 @@ gridder = gridding.Gridder(
     uu=uu,
     vv=vv,
     weight=weight,
-    data_re=data.real,  # separating the real and imaginary values of our data
+    data_re=data.real,
     data_im=data.imag,
 )
-
 # -
 
 #
 # ### Getting the Dirty Image and Creating the Model
 #
-# First, we are going to get the dirty image from our Gridder object. We will use the Briggs weighting scale and set `robust=0.0` here as this option leads to a dirty image resembling the DSHARP CLEAN image (see [Part 1](HD143006_Part_1.html)).
+# First, we will use the Gridder to solve for a dirty image, so that we can
+#
+# 1. confirm that we've loaded the visibilities correctly and that the dirty image looks roughly as we'd expect (as in [part 1](HD143006_part_1.ipynb))
+# 2. use the dirty image to initialize the RML model image state (as in the [initalizing with the dirty image](../ci-tutorials/initializedirtyimage.ipynb) tutorial)
+#
+# We will use Briggs weighting with `robust=0.0`, since this similar to what the DSHARP team used.
 
 img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
 
-# We now have everything from the last tutorial loaded and we can create the model.
+# Now is also a good time to export the gridded visibilities to a PyTorch dataset, to be used later during the RML imaging loop.
 
+dataset = (
+    gridder.to_pytorch_dataset()
+)  # export the visibilities from gridder to a PyTorch dataset
+
+# Now let's import a [SimpleNet](api.html#mpol.precomposed.SimpleNet) model for RML imaging.
+
+# +
 from mpol.precomposed import SimpleNet
 
 model = SimpleNet(coords=coords, nchan=gridder.nchan)
-
-import torch
-
-# taking the dirty image and making it a tensor
-dirty_image = torch.tensor(img.copy())
+# -
 
 # ## Initializing Model with the Dirty Image
 #
-# We now have our model and data, but before we set out trying to optimize the image we need to choose a starting point for our future optimization loops. This starting point could be anything, but a good choice is the dirty image, since it is already a maximum likelihood fit to the data. The problem with this is that the dirty image contains noise and negative flux pixels, while we seek to limit noise and impose the requirement that our sources must have all positive flux values. Our solution then is to train the RML model so that its parameters more closely resemble the dirty image while enforcing the positive flux prior. This then provides us a starting point that works for the model and is a maximum likelihood fit to our data.
-#
+# Before we begin the optimization process, we need to choose a set of starting values for our image model. So long as we run the optimization process to convergence, this starting point could be anything. But, it's also true that "better" guesses will lead us to convergence faster. A fairly decent starting guess is the dirty image itself, since it is already a maximum likelihood fit to the data. The problem, though, is that the dirty image contains pixels with negative flux, while by construction our [SimpleNet](api.html#mpol.precomposed.SimpleNet) model enforces image positivity. One solution is to train the RML model such that the mean squared error between its image plane component and the dirty image are minimized. This "mini" optimization loop is just to find a starting point for the actual RML optimization loop, which will be described later in this tutorial.
 
 
-# To optimize the RML model toward the dirty image, we will create our training loop using a [loss function](.https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and an [optimizer](https://pytorch.org/docs/stable/optim.html#module-torch.optim). This process is described in greater detail in the [Optimization Loop](https://mpol-dev.github.io/MPoL/ci-tutorials/optimization.html) and [Initalizing with the Dirty Image](https://mpol-dev.github.io/MPoL/ci-tutorials/initializedirtyimage.html) tutorials. MPoL and PyTorch both contain many optimizers and loss functions, each one suiting different applications. Here we use PyTorch's [mean squared error function](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) between the RML model image pixel fluxes and the dirty image pixel fluxes.
-
-optimizer = torch.optim.Adam(model.parameters(), lr=0.5)  # creating the optimizer
-loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
+# Following the [initalizing with the dirty image](../ci-tutorials/initializedirtyimage.html) tutorial, we use PyTorch's [mean squared error](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) function to calculate the loss between the RML model image and the dirty image.
 
 # +
-# %%time
+# convert the dirty image into a tensor
+dirty_image = torch.tensor(img.copy())
 
+# initialize an optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=0.5)
+loss_fn = torch.nn.MSELoss()  # creating the MSEloss function from Pytorch
+# -
 
 for iteration in range(500):
 
@@ -128,92 +127,86 @@ for iteration in range(500):
 
     loss.backward()  # calculate gradients of parameters
     optimizer.step()  # update the parameters
-# -
 
-# In this tutorial we will be running through RML optimization multiple times with different configurations of hyperparameters and then comparing them so we have to save the model, letting us start from this clean starting point each time. Information on saving and loading models and the state_dict can be found [here](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
-
-torch.save(model.state_dict(), "model.pt")
-
-# Now we can see the results, the image cube now closely resembles the dirty image (constrained by the fact that it can contain no negative flux pixel values).
+# Let's visualize the actual dirty image and our "pseudo-dirty image" that results from the optimization process.
 
 # +
+fig, ax = plt.subplots(ncols=2, figsize=(6.5, 4))
 
-fig, ax = plt.subplots(ncols=2, figsize=(8, 4))
-
-imin, imax = np.amin(img), np.amax(img)
-
-im = ax[0].imshow(
+ax[0].imshow(
     np.squeeze(dirty_image.detach().cpu().numpy()),
     origin="lower",
     interpolation="none",
     extent=model.icube.coords.img_ext,
-    vmin=imin,
-    vmax=imax,
 )
 
-im = ax[1].imshow(
+ax[1].imshow(
     np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
     origin="lower",
     interpolation="none",
     extent=model.icube.coords.img_ext,
-    vmin=imin,
-    vmax=imax,
 )
 
-ax[0].set_xlim(left=0.75, right=-0.75)
-ax[0].set_ylim(bottom=-0.75, top=0.75)
-ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[0].set_title("Dirty Image")
-ax[1].set_xlim(left=0.75, right=-0.75)
-ax[1].set_ylim(bottom=-0.75, top=0.75)
-ax[1].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-ax[1].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-ax[1].set_title("Image Cube")
-plt.tight_layout()
+r = 0.75
+for a in ax:
+    a.set_xlim(left=0.75, right=-0.75)
+    a.set_ylim(bottom=-0.75, top=0.75)
+    a.axis("off")
 
-fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.84, 0.17, 0.03, 0.7])
-fig.colorbar(im, cax=cbar_ax)
-plt.tight_layout()
+ax[0].set_title("Dirty Image")
+_ = ax[1].set_title("Pseudo-Dirty Image")
 
 
 # -
 
-# ## Training and Imaging Part 1
+# We can confirm that the pseudo-dirty image contains no negative flux values
 
-# Now that we have a better starting point, we can work on optimizing our image using a more complex training function that has additional priors and regularizers. This part of the tutorial will also use [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html) to display the loss function and changes in the image through each saved iteration of the training loop. This will allow us to better determine the hyperparameters to be used (a hyperparameter is a parameter of the model set by the user to control the learning process and can not be predicted by the model). Note that to display the TensorBoard dashboards referenced in this tutorial, you will need to run these commands on your own device. The code necessary to do this is displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this IPython line magic command in Jupyter Notebook to open the dashboard.
+np.min(model.icube.sky_cube.detach().cpu().numpy())
+
+# Later in this tutorial, we'll want to run many RML optimization loops with different hyperparameter configurations. To make this process easier, we'll save the model state to disk, making it easy for us restart from the pseudo-dirty image each time. More information on saving and loading models (and the `state_dict`) can be found in the [PyTorch documentation](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
+
+torch.save(model.state_dict(), "model.pt")
+
+# ## Visualization utilities
+
+# In this section we'll set up some visualization tools, including [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html).
 
 
-# Here we set up the tools that will allow us to visualize the results of the loop in TensorBoard.
+# Note that to display the TensorBoard dashboards referenced in this tutorial, you will need to run a TensorBoard instance on your own device. The code necessary to do this is displayed in this tutorial as ``#%tensorboard --logdir <directory>``. Uncomment and execute this IPython line magic command in Jupyter Notebook to open the dashboard.
 
-from mpol import (
-    losses,  # here MPoL loss functions will be used
-    connectors,  # required to calculate the residuals in log_figure
-)
-
-
-# setting up Writer to log values and images for display in TensorBoard
+# +
 from torch.utils.tensorboard import SummaryWriter
 import os
-
 
 logs_base_dir = "./logs/"
 writer = SummaryWriter(logs_base_dir)
 os.makedirs(logs_base_dir, exist_ok=True)
 # %load_ext tensorboard
+# -
 
 
-def log_figure(
-    model, residuals
-):  # this function takes a snapshot of the image state, imaged residuals, amplitude of model visibilities, and amplitude of residuals
+# Here we'll define a plotting routine that will visualize the image plane model cube, the image plane residuals, the amplitude of the Fourier plane model, and the amplitude of the Fourier plane residuals.
+
+
+def log_figure(model, residuals):
+    """
+    Args:
+        model: the SimpleNet model instanceS
+        residuals: the mpol ResidualConnector instance
+
+    Returns:
+        matplotlib figure with plots corresponding to image
+        plane model cube, the image plane residuals, the amplitude
+        of the Fourier plane model, and the amplitude of the Fourier
+        plane residuals.
+    """
 
     # populate residual connector
     residuals()
 
     fig, ax = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
     im = ax[0, 0].imshow(
-        np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),  #
+        np.squeeze(model.icube.sky_cube.detach().cpu().numpy()),
         origin="lower",
         interpolation="none",
         extent=model.icube.coords.img_ext,
@@ -221,7 +214,7 @@ def log_figure(
     plt.colorbar(im, ax=ax[0, 0])
 
     im = ax[0, 1].imshow(
-        np.squeeze(residuals.sky_cube.detach().cpu().numpy()),  #
+        np.squeeze(residuals.sky_cube.detach().cpu().numpy()),
         origin="lower",
         interpolation="none",
         extent=residuals.coords.img_ext,
@@ -229,7 +222,7 @@ def log_figure(
     plt.colorbar(im, ax=ax[0, 1])
 
     im = ax[1, 0].imshow(
-        np.squeeze(torch.log(model.fcube.ground_amp.detach()).cpu().numpy()),  #
+        np.squeeze(torch.log(model.fcube.ground_amp.detach()).cpu().numpy()),
         origin="lower",
         interpolation="none",
         extent=residuals.coords.vis_ext,
@@ -237,7 +230,7 @@ def log_figure(
     plt.colorbar(im, ax=ax[1, 0])
 
     im = ax[1, 1].imshow(
-        np.squeeze(torch.log(residuals.ground_amp.detach()).cpu().numpy()),  #
+        np.squeeze(torch.log(residuals.ground_amp.detach()).cpu().numpy()),
         origin="lower",
         interpolation="none",
         extent=residuals.coords.vis_ext,
@@ -247,7 +240,15 @@ def log_figure(
     return fig
 
 
-# With these set up, we can now make our training function (instead of a loop, we use a function here since the training loop will be ran multiple times with different configurations, the configurations consisting of changed hyperparameter values). Our new training function includes additional priors and loss functions, this helps to further guide our model's learning in a direction based on some assumptions we make. To learn more information about these, please see the [Losses API](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses) and the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Later in the tutorial, we will see how these can affect the resulting image.
+# ## Training loop
+
+# Now lets encapsulate the training loop into a function which we can easily re-run with different configuration values.
+#
+# To learn more information about the components of this training loop, please see the [Losses API](api.html#module-mpol.losses).
+
+
+# +
+from mpol import losses, connectors
 
 
 def train(model, dataset, optimizer, config, writer=None, logevery=50):
@@ -255,9 +256,9 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     residuals = connectors.GriddedResidualConnector(model.fcube, dataset)
     for iteration in range(config["epochs"]):
         optimizer.zero_grad()
-        vis = model.forward()  # get the predicted model
+        vis = model.forward()  # calculate the predicted model
         sky_cube = model.icube.sky_cube
-        # computing loss through MPoL loss function with more parameters
+
         loss = (
             losses.nll_gridded(vis, dataset)
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
@@ -277,19 +278,15 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
     return loss.item()
 
 
-# With our function created, all that is left is to load the initialized model, export the visibilities to a PyTorch dataset, set our hyperparameters, and create our optimizer.
+# -
 
-# +
+# Now lets initialize the model to the pseudo-dirty image, set our hyperparameters, and create our optimizer.
+
 model.load_state_dict(
     torch.load("model.pt")
 )  # load our initialized model from the previous section
 
-dataset = (
-    gridder.to_pytorch_dataset()
-)  # export the visibilities from gridder to a PyTorch dataset
-# -
-
-# Here is where we define the hyperparameters under the `config` dictionary. The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses).
+# Here is where we define the hyperparameters under the `config` dictionary. Most of these hyperparameters, such as `lambda_TV` and `entropy`, correspond to the scalar prefactors $\lambda$ as described in the [intro to RML](rml_intro.html).
 
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
@@ -308,11 +305,7 @@ optimizer = torch.optim.Adam(
 
 # We are now ready to run the training loop.
 
-# +
-# %%time
-
 train(model, dataset, optimizer, config, writer=writer)
-# -
 
 # Below we can see the loss function, images, and residuals for every saved iteration including our final result. To view the loss function, navigate to the scalars tab. To view the four images, be sure your window is wide enough to navigate to the images tab within TensorBoard. The images, in order from left-right top-bottom are: image cube representation, imaged residuals, visibility amplitudes of model on a log scale, residual amplitudes on a log scale. You can use the slider to view different iterations.
 
@@ -321,7 +314,7 @@ train(model, dataset, optimizer, config, writer=writer)
 ## uncomment the above line when running to view TensorBoard
 # -
 
-# ## Training and Imaging Part 2: Cross Validation
+# ## Cross Validation
 #
 # Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html).
 #
