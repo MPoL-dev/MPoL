@@ -96,3 +96,23 @@ def test_entropy_cube():
 
     cube = torch.ones((nchan, npix, npix), dtype=torch.float64)
     losses.entropy(cube, 0.01)
+
+
+def test_tsv():
+    cube = torch.rand((1, 3, 3))
+    tsv_val = losses.TSV(cube)
+    for_val = 0
+    for i in range(2):
+        for j in range(2):
+            for_val += (cube[:, i+1, j] - cube[:, i, j]) ** 2 + (cube[:, i, j+1] - cube[:, i, j]) ** 2
+    assert tsv_val == for_val
+
+
+def test_tv_image():
+    cube = torch.rand((1, 3, 3))
+    tsv_val = losses.TV_image(cube, epsilon=0)
+    for_val = 0
+    for i in range(2):
+        for j in range(2):
+            for_val += torch.sqrt((cube[:, i+1, j] - cube[:, i, j]) ** 2 + (cube[:, i, j+1] - cube[:, i, j]) ** 2)
+    assert tsv_val == for_val
