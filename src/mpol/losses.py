@@ -103,7 +103,7 @@ def TV_image(sky_cube, epsilon=1e-10):
     Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
 
     Args:
-        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension. Should be in sky format representation.
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.
         epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.
 
     Returns:
@@ -144,7 +144,7 @@ def TV_channel(cube, epsilon=1e-10):
     """
     # calculate the difference between the n+1 cube and the n cube
     diff_vel = cube[1:] - cube[0:-1]
-    loss = torch.sqrt(torch.sum(diff_vel ** 2 + epsilon))
+    loss = torch.sum(torch.sqrt(diff_vel ** 2 + epsilon))
 
     return loss
 
@@ -265,5 +265,32 @@ def PSD(qs, psd, l):
 
     # evaluate the chi^2 for the PSD, making sure it broadcasts across all channels
     loss = torch.sum(psd / expected_PSD)
+
+    return loss
+
+
+def TSV(sky_cube):
+    r"""
+    Calculate the total square variation (TSV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be edge smoothed which may be a better reoresentation of the truth image `K. Kuramochi et al 2018 <https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract>`_.
+
+    Args:
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.
+
+    Returns:
+        torch.double: total square variation loss
+
+    .. math::
+
+        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 + (I_{l, m+1, v} - I_{l, m, v})^2
+
+    """
+
+    # diff the cube in ll and remove the last row
+    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
+
+    # diff the cube in mm and remove the last column
+    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
+
+    loss = torch.sum(diff_ll ** 2 + diff_mm ** 2)
 
     return loss
