@@ -98,21 +98,39 @@ def test_entropy_cube():
     losses.entropy(cube, 0.01)
 
 
+# Here we test the losses.TSV(). Since for-loops in python are typically slow, it is
+# unreasonable to use this format in the TSV() function so a vector math format is used. Here we test to ensure that
+# this vector math is calculates correctly and results in the same value as would come from the for-loop.
 def test_tsv():
-    cube = torch.rand((1, 3, 3))
+    # setting the size of our image
+    npix = 3
+    # creating the test cube
+    cube = torch.rand((1, npix, npix))
+    # finding the value that our TSV function returns
     tsv_val = losses.TSV(cube)
     for_val = 0
-    for i in range(2):
-        for j in range(2):
+    # calculating the TSV loss through a for loop
+    for i in range(npix - 1):
+        for j in range(npix - 1):
             for_val += (cube[:, i+1, j] - cube[:, i, j]) ** 2 + (cube[:, i, j+1] - cube[:, i, j]) ** 2
+    # asserting that these two values calculated above are equivalent
     assert tsv_val == for_val
 
 
+# Here we test the losses.TV_image(). Since for-loops in python are typically slow, it is
+# unreasonable to use this format in the TV_image() function so a vector math format is used. Here we test to ensure
+# that this vector math is calculates correctly and results in the same value as would come from the for-loop.
 def test_tv_image():
-    cube = torch.rand((1, 3, 3))
+    # setting the size of our image
+    npix = 3
+    # creating the test cube
+    cube = torch.rand((1, npix, npix))
+    # finding the value that our TV_image function returns, we set epsilon=0 for a simpler for-loop
     tsv_val = losses.TV_image(cube, epsilon=0)
     for_val = 0
-    for i in range(2):
-        for j in range(2):
+    # calculating the TV_image loss through a for loop
+    for i in range(npix - 1):
+        for j in range(npix - 1):
             for_val += torch.sqrt((cube[:, i+1, j] - cube[:, i, j]) ** 2 + (cube[:, i, j+1] - cube[:, i, j]) ** 2)
+    # asserting that these two values calculated above are equivalent
     assert tsv_val == for_val
