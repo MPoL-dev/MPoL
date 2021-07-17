@@ -96,7 +96,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">MPoL Installation</a></li>
@@ -104,7 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
@@ -288,7 +288,7 @@
 <span class="sd">    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A., :math:`m` is DEC, and :math:`v` is the channel (velocity or frequency) dimension. Should be in sky format representation.</span>
+<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.</span>
 <span class="sd">        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.</span>
 
 <span class="sd">    Returns:</span>
@@ -329,7 +329,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># calculate the difference between the n+1 cube and the n cube</span>
     <span class="n">diff_vel</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cube</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">diff_vel</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_vel</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 
@@ -450,6 +450,33 @@
 
     <span class="c1"># evaluate the chi^2 for the PSD, making sure it broadcasts across all channels</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">psd</span> <span class="o">/</span> <span class="n">expected_PSD</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">loss</span></div>
+
+
+<div class="viewcode-block" id="TSV"><a class="viewcode-back" href="../../api.html#mpol.losses.TSV">[docs]</a><span class="k">def</span> <span class="nf">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the total square variation (TSV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the image to be edge smoothed which may be a better reoresentation of the truth image `K. Kuramochi et al 2018 &lt;https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract&gt;`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: total square variation loss</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 + (I_{l, m+1, v} - I_{l, m, v})^2</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># diff the cube in ll and remove the last row</span>
+    <span class="n">diff_ll</span> <span class="o">=</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># diff the cube in mm and remove the last column</span>
+    <span class="n">diff_mm</span> <span class="o">=</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">diff_ll</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">diff_mm</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 </pre></div>
