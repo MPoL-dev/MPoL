@@ -286,8 +286,7 @@ model.load_state_dict(
     torch.load("model.pt")
 )  # load our initialized model from the previous section
 
-# Here is where we define the hyperparameters under the `config` dictionary. Most of these hyperparameters, such as `lambda_TV` and `entropy`, correspond to the scalar prefactors $\lambda$ as described in the [intro to RML](rml_intro.html).
-
+#Here is where we define the hyperparameters under the `config` dictionary. The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). We pull these specific values from a past hyperparameter tuning trial. We chose these values as they result in a decent image while maintaining a larger crossvalidation score when compared to the other values that will be used in the crossvalidation loops at the end of this tutorial. Using this as a starting point, we can show image improvement as we find better hyperparameters. When working with a different dataset, these values will change. Hyperparameter values are not a "one size fits all" metric and, therefore, the specific values used here are just examples for one interpretation of this dataset. To find your own hyperparameters, we recommend looking into [Ray Tune](https://docs.ray.io/en/master/tune/index.html), [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html), or your favorite hyperparameter tuning library.
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
