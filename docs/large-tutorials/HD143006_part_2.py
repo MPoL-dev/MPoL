@@ -248,7 +248,7 @@ def log_figure(model, residuals):
 
 # Now lets encapsulate the training loop into a function which we can easily re-run with different configuration values.
 #
-# To learn more information about the components of this training loop, please see the [Losses API](api.html#module-mpol.losses).
+# To learn more information about the components of this training loop, please see the [Losses API](../api.html#module-mpol.losses).
 
 
 # +
@@ -286,7 +286,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
 
 # Now lets initialize the model to the pseudo-dirty image, set our hyperparameters in a `config` dictionary, and create our optimizer.
 #
-# The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](api.html#module-mpol.losses). We chose these specific values from a past hyperparameter tuning trial, since they result in a decent image but still have a suboptimal crossvalidation score, leaving something for us to do in the crossvalidation loops at the end of this tutorial.
+# The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](../rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](api.html#module-mpol.losses). We chose these specific values from a past hyperparameter tuning trial, since they result in a decent image but still have a suboptimal crossvalidation score, leaving something for us to do in the crossvalidation loops at the end of this tutorial.
 #
 # Hyperparameter values are not a "one size fits all" metric, so if you are working with a different dataset you will most likely find successful images with a different set of hyperparameters. To find your own hyperparameters, we recommend looking into [Ray Tune](https://docs.ray.io/en/master/tune/index.html), [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html), or your favorite hyperparameter tuning library.
 
@@ -366,7 +366,7 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     return test_score
 
 
-# Now that we have our functions defined, we need to divide our dataset into training and test datasets. There are many ways of going about this; here we are splitting the dataset into radial and azimuthal chunks in a dartboard-like pattern. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read more, please see [Choosing the K-folds](ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](../ci-tutorials/crossvalidation.html).
+# Now that we have our functions defined, we need to divide our dataset into training and test datasets. There are many ways of going about this; here we are splitting the dataset into radial and azimuthal chunks in a dartboard-like pattern. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read more, please see [Choosing the K-folds](../ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](../ci-tutorials/crossvalidation.html).
 
 # +
 from mpol import datasets
