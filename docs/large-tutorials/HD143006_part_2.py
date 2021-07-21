@@ -161,7 +161,11 @@ _ = ax[1].set_title("Pseudo-Dirty Image")
 
 # We can confirm that the pseudo-dirty image contains no negative flux values
 
-np.min(model.icube.sky_cube.detach().cpu().numpy())
+print(
+    "Minimum flux value {:.4f} Jy/arcsec^2".format(
+        np.min(model.icube.sky_cube.detach().cpu().numpy())
+    )
+)
 
 # Later in this tutorial, we'll want to run many RML optimization loops with different hyperparameter configurations. To make this process easier, we'll save the model state to disk, making it easy for us restart from the pseudo-dirty image each time. More information on saving and loading models (and the `state_dict`) can be found in the [PyTorch documentation](https://pytorch.org/tutorials/beginner/saving_loading_models.html).
 
@@ -280,20 +284,23 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
 
 # -
 
-# Now lets initialize the model to the pseudo-dirty image, set our hyperparameters, and create our optimizer.
+# Now lets initialize the model to the pseudo-dirty image, set our hyperparameters in a `config` dictionary, and create our optimizer.
+#
+# The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](api.html#module-mpol.losses). We chose these specific values from a past hyperparameter tuning trial, since they result in a decent image but still have a suboptimal crossvalidation score, leaving something for us to do in the crossvalidation loops at the end of this tutorial.
+#
+# Hyperparameter values are not a "one size fits all" metric, so if you are working with a different dataset you will most likely find successful images with a different set of hyperparameters. To find your own hyperparameters, we recommend looking into [Ray Tune](https://docs.ray.io/en/master/tune/index.html), [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html), or your favorite hyperparameter tuning library.
 
 model.load_state_dict(
     torch.load("model.pt")
 )  # load our initialized model from the previous section
 
-#Here is where we define the hyperparameters under the `config` dictionary. The hyperparameters (also referred to as scalar prefactors in the [Introduction to Regularized Maxium Likelihood Imaging page](https://mpol-dev.github.io/MPoL/rml_intro.html). Most of these hyperparameters, such as `lambda_TV` and `entropy` are used in the loss functions and can be read about [here](https://mpol-dev.github.io/MPoL/api.html#module-mpol.losses). We pull these specific values from a past hyperparameter tuning trial. We chose these values as they result in a decent image while maintaining a larger crossvalidation score when compared to the other values that will be used in the crossvalidation loops at the end of this tutorial. Using this as a starting point, we can show image improvement as we find better hyperparameters. When working with a different dataset, these values will change. Hyperparameter values are not a "one size fits all" metric and, therefore, the specific values used here are just examples for one interpretation of this dataset. To find your own hyperparameters, we recommend looking into [Ray Tune](https://docs.ray.io/en/master/tune/index.html), [TensorBoard](https://pytorch.org/docs/stable/tensorboard.html), or your favorite hyperparameter tuning library.
 config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
-        "lambda_sparsity": 7.076022085822013e-05,
+        "lambda_sparsity": 7.0e-05,
         "lambda_TV": 0.00,
         "entropy": 1e-03,
-        "prior_intensity": 1.597766235483388e-07,
+        "prior_intensity": 1.5e-07,
         "epochs": 1000,
     }
 )
@@ -315,7 +322,9 @@ train(model, dataset, optimizer, config, writer=writer)
 
 # ## Cross Validation
 #
-# Now we will move into the realm of cross validation. Cross validation is a technique used to assess model validity. This is completed by storing one chunk of a dataset as the test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score. The advantage of cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html).
+# Now we will move onto cross validation, which is a technique used to assess model validity. The general idea is that we store some fraction of the dataset as a test dataset and using the remaining data to train the model. Once the model is trained, it is used to predict the missing values of the data in the test dataset. These predicted values are compared to the values from the test dataset, producing a cross validation score.
+#
+# The advantage of $k$-fold cross validation is that it allows one dataset to be used to train the model multiple times since it can take different chunks out for the test dataset. For more information see the [Cross Validation tutorial](../ci-tutorials/crossvalidation.ipynb).
 #
 # Just like in the previous section we will be viewing our results in TensorBoard, with the addition of the cross validation score log.
 
@@ -357,11 +366,11 @@ def cross_validate(model, config, k_fold_datasets, MODEL_PATH, writer=None):
     return test_score
 
 
-# Now, with our functions defined, we need to do the critical part of dividing our dataset into training and test datasets. There are many ways of going about this but here we are splitting it radially and azimuthally and removing chunks. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read about why and how this works, and to visualize this, please see [Choosing the K-folds](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html).
-
-from mpol import datasets
+# Now that we have our functions defined, we need to divide our dataset into training and test datasets. There are many ways of going about this; here we are splitting the dataset into radial and azimuthal chunks in a dartboard-like pattern. MPoL's `Dartboard` presents an easy built-in way to get the polar coordinate grid of a dataset. To to read more, please see [Choosing the K-folds](ci-tutorials/crossvalidation.html#Choosing-the-K-folds) in the [Cross Validation tutorial](../ci-tutorials/crossvalidation.html).
 
 # +
+from mpol import datasets
+
 # create a radial and azimuthal partition for the dataset
 dartboard = datasets.Dartboard(coords=coords)
 
@@ -376,8 +385,7 @@ cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed
 k_fold_datasets = [(train, test) for (train, test) in cv]
 # -
 
-
-# If you recall, we saved the trained model's state. Here we will be utilizing this. `MODEL_PATH` is defined below so we can reset the model between cross validation loops by reloading `model.pt`. We will run the cross validation loops for a few different configurations, starting with the hyperparameters found in `config`, defined above in *Training and Imaging Part 1* of this tutorial. This configuration has been included in the following cell for convenience.
+# `MODEL_PATH` is defined below so we can reset the model between cross validation loops by reloading the `model.pt` we saved, which contained the state of the model initialized to the pseudo-dirty image. We will run the cross validation loops for a few different configurations, starting with the hyperparameters found in `config`, defined above in this tutorial. This configuration has been included in the following cell for convenience.
 
 # +
 MODEL_PATH = "model.pt"
@@ -385,10 +393,10 @@ MODEL_PATH = "model.pt"
 new_config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
-        "lambda_sparsity": 7.076022085822013e-05,
+        "lambda_sparsity": 7.0e-05,
         "lambda_TV": 0.00,
         "entropy": 1e-03,
-        "prior_intensity": 1.597766235483388e-07,
+        "prior_intensity": 1.5e-07,
         "epochs": 1000,
     }
 )
@@ -398,8 +406,6 @@ new_config = (
 # We are now ready to run our cross validation loop. We'll run this a few times while changing hyperparameters in the config to lower the cross validation score then compare all three with TensorBoard.
 
 # +
-# %%time
-
 # new directory to write the progress of our first cross val. loop to
 cv_log_dir1 = logs_base_dir + "cv/cv1/"
 cv_writer1 = SummaryWriter(cv_log_dir1)
@@ -411,8 +417,6 @@ cv_score1 = cross_validate(
 print(f"Cross Validation Score: {cv_score1}")
 
 # +
-# %%time
-
 # new directory to write the progress of our second cross val. loop to
 cv_log_dir2 = logs_base_dir + "cv/cv2/"
 cv_writer2 = SummaryWriter(cv_log_dir2)
@@ -435,8 +439,6 @@ print(f"Cross Validation Score: {cv_score2}")
 
 
 # +
-# %%time
-
 # new directory to write the progress of our third cross val. loop to
 cv_log_dir3 = logs_base_dir + "cv/cv3/"
 cv_writer3 = SummaryWriter(cv_log_dir3)
@@ -470,10 +472,20 @@ im = ax.imshow(
 )
 plt.colorbar(im)
 
-# Below are the results in the TensorBoard. Note that while it may seem strange that the lowest loss values do not correspond with the lowest cross validation scores, different hyperparameters in the config dictionaries increase the weight of some loss functions (and others, such as hyperparameters set to zero, remove some loss function components completely) so the loss values are not perfectly equal representations across each configuration and run.
+# And you can visualize all of the results in TensorBoard.
+#
+# It may seem strange that the lowest total converged loss values do not correspond with the lowest cross validation scores. This is just a consequence of the fact that we are working with loss functions that correspond to the *logarithm* of the likelihood function and prior functions. This means that the normalization prefactors aren't required for each optimization loop (so we don't calculate them), which also has the consequence that we can't directly compare loss values across different hyperparameter settings (this is the role of cross-validation).
 
 cv_log_dir = logs_base_dir + "cv/"
 # # %tensorboard --logdir {cv_log_dir}
 ## uncomment the above line when running to view TensorBoard
 
-# Now with this tutorial done we can see the results of RML imaging; an image optimized to fit the provided dataset. By initializing the model with the dirty image we are able to have our model converge to the optimal image in fewer iterations. We were also able to arrive at a more statistically accurate image by using cross validation. From the TensorBoard, we are able to see how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. This process of changing the hyperparameters can be automated using Ray Tune, as we will explore in Part 3 of this tutorial series. Of the three configurations we've displayed above, the third has the lowest cross validation score. When we compare the final image of each of these three configurations, we see the third image is most similar to the image produced using the CLEAN algorithm and is an improvement from the dirty image we obtained in Part 1 of this tutorial series. The third image is less sparse than the first image, and it is less noisy than the second image and dirty image. If you would like to compare these results yourself, please run TensorBoard locally. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
+# Hopefully this tutorial has provided an introduction to RML imaging with an actual ALMA dataset.
+#
+# We started by initializing the RML model to a pseudo-dirty image, which allowed our model converge to the optimal image in fewer iterations.
+#
+# We also used cross validation to help us understand how well the model fits the dataset. Using TensorBoard, we were able to visualize how changing hyperparameters can result in a lower cross validation score, and therefore a better image, if done correctly. The process of changing the hyperparameters can be automated using a hyperparameter tuning library which we will explore in Part 3 of this tutorial series.
+#
+# Of the three hyperparameter configurations that we cross-validated above, the third has the lowest cross validation score, and so we might reasonably conclude that this image most closely matches reality because it generates well to new data.
+#
+# If you would like to compare these results yourself, please run TensorBoard locally. In the next part of the HD143006 tutorial we will be expanding on how to analyze the results of the training, optimization loops, hyperparameter tuning, and exploring the full pipeline of data analysis which can be adapted to any real world data.
