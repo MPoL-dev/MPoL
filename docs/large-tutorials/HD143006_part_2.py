@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.10.0
+#       jupytext_version: 1.11.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -268,6 +268,7 @@ def train(model, dataset, optimizer, config, writer=None, logevery=50):
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
             + config["entropy"] * losses.entropy(sky_cube, config["prior_intensity"])
+            + config["TSV"] * losses.TSV(sky_cube)
         )
 
         if (
@@ -301,6 +302,7 @@ config = (
         "lambda_TV": 0.00,
         "entropy": 1e-03,
         "prior_intensity": 1.5e-07,
+        "TSV": 0.00,
         "epochs": 1000,
     }
 )
@@ -397,6 +399,7 @@ new_config = (
         "lambda_TV": 0.00,
         "entropy": 1e-03,
         "prior_intensity": 1.5e-07,
+        "TSV": 0.00,
         "epochs": 1000,
     }
 )
@@ -429,6 +432,7 @@ new_config = (
         "lambda_TV": 1.0e-4,
         "entropy": 1e-02,
         "prior_intensity": 2.0e-09,
+        "TSV": 1.0e-6,
         "epochs": 850,
     }
 )
@@ -447,11 +451,12 @@ os.makedirs(cv_log_dir3, exist_ok=True)
 new_config = (
     {  # config includes the hyperparameters used in the function and in the optimizer
         "lr": 0.3,
-        "lambda_sparsity": 1.0e-3,
-        "lambda_TV": 1.2e-4,
-        "entropy": 1e-02,
-        "prior_intensity": 2.0e-09,
-        "epochs": 400,
+        'lambda_sparsity': 1.8e-4, 
+        'lambda_TV': 2.3e-5, 
+        'entropy': 7.4e-06, 
+        'prior_intensity': 5.0e-07, 
+        'TSV': 1.0e-02,
+        "epochs": 1000,
     }
 )
 
