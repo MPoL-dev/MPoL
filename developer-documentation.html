@@ -123,6 +123,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#building-the-documentation">Building the Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linking">Linking</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rst-file-to-rst-file"><code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file to <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#py-or-ipynb-file-linking-to-an-rst-file"><code class="docutils literal notranslate"><span class="pre">*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> file linking to an <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rst-file-linking-to-py-or-ipynb-notebook"><code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file linking to <code class="docutils literal notranslate"><span class="pre">*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> notebook</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a><ul>
@@ -149,6 +155,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
 <li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -336,6 +343,43 @@ $ coverage html
 </pre></div>
 </div>
 <p>For more information on the build process, take a look at the documentation makefile in <code class="docutils literal notranslate"><span class="pre">docs/Makefile</span></code>.</p>
+</section>
+<section id="linking">
+<h3>Linking<a class="headerlink" href="#linking" title="Permalink to this headline">¶</a></h3>
+<p>In general, it is good practice to link to relevant material where possible. Because the documentation is built by Sphinx from a series of disparate sources (<cite>.rst</cite> files, <cite>*.py</cite> files, and <cite>*.ipynb</cite> files that contain Markdown), it’s not always clear how to write relative hyperlinks that actually work. One solution is to just write all links as absolute hyperlinks (e.g., say to <code class="docutils literal notranslate"><span class="pre">https://mpol-dev.github.io/MPoL/rml_intro.html#introduction-to-likelihood-functions</span></code>), but we recommend against this because these types of links are brittle if the documentation structure were to change. It would be much better if we could use a relative link.</p>
+<p>Here are a few examples of linking practices covering the various forms of documentation source files.</p>
+<section id="rst-file-to-rst-file">
+<h4><code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file to <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file<a class="headerlink" href="#rst-file-to-rst-file" title="Permalink to this headline">¶</a></h4>
+<p>If you are writing <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> files directly with restructured text, and are referring to another <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file, we recommend following the Sphinx descriptions for <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#ref-role">Cross-referencing arbitrary locations</a>.</p>
+</section>
+<section id="py-or-ipynb-file-linking-to-an-rst-file">
+<h4><code class="docutils literal notranslate"><span class="pre">*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> file linking to an <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file<a class="headerlink" href="#py-or-ipynb-file-linking-to-an-rst-file" title="Permalink to this headline">¶</a></h4>
+<p>Tutorial notebooks are written as <code class="docutils literal notranslate"><span class="pre">*.py</span></code> files and processed/executed into <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files using Jupytext. The <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> file is then processed by Sphinx using the <a class="reference external" href="https://nbsphinx.readthedocs.io/">nbsphinx</a> plugin. Text within notebooks is written using Markdown (not restructured text), so links need to be written in Markdown.</p>
+<p>The <a class="reference external" href="https://nbsphinx.readthedocs.io/en/0.8.6/markdown-cells.html#Links-to-Other-Notebooks">Jupytext</a> documentation has several examples of how to accomplish various links from within notebooks.</p>
+<p>To link to another notebook in the same directory, you could write a Markdown cell containing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Descriptive</span> <span class="n">link</span> <span class="n">text</span><span class="p">](</span><span class="n">other</span><span class="o">-</span><span class="n">notebook</span><span class="o">.</span><span class="n">ipynb</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To link to another notebook in a different directory, you’ll need to navigate the directories between them using <code class="docutils literal notranslate"><span class="pre">../</span></code>, so you could write a Markdown cell containing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Descriptive</span> <span class="n">link</span> <span class="n">text</span><span class="p">](</span><span class="o">../</span><span class="n">other</span><span class="o">-</span><span class="n">directory</span><span class="o">/</span><span class="n">other</span><span class="o">-</span><span class="n">notebook</span><span class="o">.</span><span class="n">ipynb</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To link to an <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file, you could write a Markdown cell containing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Descriptive</span> <span class="n">link</span> <span class="n">text</span><span class="p">](</span><span class="n">a</span><span class="o">-</span><span class="n">normal</span><span class="o">-</span><span class="n">rst</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="n">rst</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also link to Sphinx Directives by using the <code class="docutils literal notranslate"><span class="pre">#</span></code> symbol. This is very helpful when referring to objects in the API description, for example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">See</span> <span class="n">the</span> <span class="p">[</span><span class="n">BaseCube</span> <span class="n">API</span><span class="p">](</span><span class="n">api</span><span class="o">.</span><span class="n">html</span><span class="c1">#mpol.images.BaseCube) for example.</span>
+</pre></div>
+</div>
+</section>
+<section id="rst-file-linking-to-py-or-ipynb-notebook">
+<h4><code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file linking to <code class="docutils literal notranslate"><span class="pre">*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> notebook<a class="headerlink" href="#rst-file-linking-to-py-or-ipynb-notebook" title="Permalink to this headline">¶</a></h4>
+<p>As far as we can tell, Sphinx directives are not picked up in <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> files, so the <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> to <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> linking strategy defined above wont work. Instead, we can write a normal restructured text hyperlink in a relative fashion. Let’s say we have a section heading within a notebook, that we wanted to refer to from an <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> file. We could write the following using restructured text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Check out the `descriptive link text &lt;ci-tutorials/gpu_setup.html#python-and-pytorch-gpu-configuration&gt;`_
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="contributing">
