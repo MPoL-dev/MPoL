@@ -122,9 +122,15 @@ docs/ci-tutorials/*.ipynb
 
 # tensorboard outputs
 docs/ci-tutorials/runs
+docs/large-tutorials/runs
+docs/large-tutorials/logs
 
 # testing cache
 tmp_cache
+
+# initialized dirty image
+model.pt
+dirty_image_model.pt
 
 # setup file
 project_setup.sh

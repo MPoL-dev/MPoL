@@ -144,6 +144,48 @@ You can clean up (delete) all of the built products by running ::
 
 For more information on the build process, take a look at the documentation makefile in ``docs/Makefile``.
 
+Linking
+-------
+
+In general, it is good practice to link to relevant material where possible. Because the documentation is built by Sphinx from a series of disparate sources (`.rst` files, `*.py` files, and `*.ipynb` files that contain Markdown), it's not always clear how to write relative hyperlinks that actually work. One solution is to just write all links as absolute hyperlinks (e.g., say to ``https://mpol-dev.github.io/MPoL/rml_intro.html#introduction-to-likelihood-functions``), but we recommend against this because these types of links are brittle if the documentation structure were to change. It would be much better if we could use a relative link.
+
+Here are a few examples of linking practices covering the various forms of documentation source files.
+
+``*.rst`` file to ``*.rst`` file
+++++++++++++++++++++++++++++++++
+
+If you are writing ``*.rst`` files directly with restructured text, and are referring to another ``*.rst`` file, we recommend following the Sphinx descriptions for `Cross-referencing arbitrary locations <https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#ref-role>`__.
+
+``*.py`` or ``*.ipynb`` file linking to an ``*.rst`` file
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Tutorial notebooks are written as ``*.py`` files and processed/executed into ``*.ipynb`` files using Jupytext. The ``*.ipynb`` file is then processed by Sphinx using the `nbsphinx <https://nbsphinx.readthedocs.io/>`__ plugin. Text within notebooks is written using Markdown (not restructured text), so links need to be written in Markdown.
+
+The `Jupytext <https://nbsphinx.readthedocs.io/en/0.8.6/markdown-cells.html#Links-to-Other-Notebooks>`__ documentation has several examples of how to accomplish various links from within notebooks.
+
+To link to another notebook in the same directory, you could write a Markdown cell containing ::
+
+    [Descriptive link text](other-notebook.ipynb)
+
+To link to another notebook in a different directory, you'll need to navigate the directories between them using ``../``, so you could write a Markdown cell containing ::
+
+    [Descriptive link text](../other-directory/other-notebook.ipynb)
+
+To link to an ``*.rst`` file, you could write a Markdown cell containing ::
+
+    [Descriptive link text](a-normal-rst-file.rst)
+
+You can also link to Sphinx Directives by using the ``#`` symbol. This is very helpful when referring to objects in the API description, for example ::
+
+    See the [BaseCube API](api.html#mpol.images.BaseCube) for example.
+
+
+``*.rst`` file linking to ``*.py`` or ``*.ipynb`` notebook
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+As far as we can tell, Sphinx directives are not picked up in ``.ipynb`` files, so the ``*.rst`` to ``*.rst`` linking strategy defined above wont work. Instead, we can write a normal restructured text hyperlink in a relative fashion. Let's say we have a section heading within a notebook, that we wanted to refer to from an ``*.rst`` file. We could write the following using restructured text::
+
+    Check out the `descriptive link text <ci-tutorials/gpu_setup.html#python-and-pytorch-gpu-configuration>`_
 
 Contributing
 ============
