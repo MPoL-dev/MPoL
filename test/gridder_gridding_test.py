@@ -56,16 +56,27 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
         np.max(gridder.data_re_gridded),
     )
 
-    assert pytest.approx(np.min(gridder.data_re_gridded), 0)
-    assert pytest.approx(np.max(gridder.data_im_gridded), 1)
-
     im = plt.imshow(
         gridder.ground_cube[4].real, origin="lower", extent=gridder.coords.vis_ext
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
 
+    plt.figure()
+
+    im2 = plt.imshow(
+        gridder.ground_cube[4].imag, origin="lower", extent=gridder.coords.vis_ext
+    )
+    plt.colorbar(im2)
+    plt.savefig(tmp_path / "gridded_im.png", dpi=300)
+
     plt.close("all")
+
+    assert np.min(gridder.data_re_gridded) == pytest.approx(0)
+    assert np.max(gridder.data_re_gridded) == pytest.approx(1)
+
+    assert np.min(gridder.data_im_gridded) == pytest.approx(0)
+    assert np.max(gridder.data_im_gridded) == pytest.approx(0)
 
 
 def test_weight_gridding(mock_visibility_data, tmp_path):

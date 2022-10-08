@@ -36,7 +36,7 @@ def test_beam_normalized(gridder):
         beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
 
         for i in range(gridder.nchan):
-            assert pytest.approx(np.max(beam[i]), 1.0)
+            assert np.max(beam[i]) == pytest.approx(1.0)
 
 
 def test_beam_null(gridder, tmp_path):
