@@ -8,10 +8,11 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+        args: ["--maxkb=5000"]
       - id: detect-private-key
       - id: name-tests-test
   - repo: https://github.com/psf/black
-    rev: 21.5b0
+    rev: 22.3.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
@@ -19,4 +20,4 @@ repos:
     hooks:
       - id: isort
         args: []
-        exclude: docs/tutorials
+        exclude: docs
