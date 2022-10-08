@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,7 +27,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -198,11 +200,11 @@
            <div itemprop="articleBody">
             
   <section id="gpu-acceleration">
-<h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this headline">¶</a></h1>
+<h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this heading">¶</a></h1>
 <section id="installation-and-configuration">
-<h2>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this headline">¶</a></h2>
+<h2>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this heading">¶</a></h2>
 <section id="installing-cuda-toolkit">
-<h3>Installing CUDA Toolkit<a class="headerlink" href="#installing-cuda-toolkit" title="Permalink to this headline">¶</a></h3>
+<h3>Installing CUDA Toolkit<a class="headerlink" href="#installing-cuda-toolkit" title="Permalink to this heading">¶</a></h3>
 <p>The first step in utilizing the computational power of your Nvidia GPU
 is to install the CUDA toolkit. (If you’ve already configured your GPU for other software, you may skip this step.) To download the installer, visit <a class="reference external" href="https://developer.nvidia.com/cuda-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10&amp;target_type=exe_network">this
 link</a>
@@ -213,7 +215,7 @@ the toolkit has been installed, follow the instructions in the installer
 GUI. Once complete, restart your computer.</p>
 </section>
 <section id="python-and-pytorch-gpu-configuration">
-<h3>Python and PyTorch GPU configuration<a class="headerlink" href="#python-and-pytorch-gpu-configuration" title="Permalink to this headline">¶</a></h3>
+<h3>Python and PyTorch GPU configuration<a class="headerlink" href="#python-and-pytorch-gpu-configuration" title="Permalink to this heading">¶</a></h3>
 <p>The next step is to check whether your Python and PyTorch installations are correctly configured to use your GPU. After installing MPoL, you can check whether everything installed correctly by opening up a Python interpreter, ard running</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
@@ -229,7 +231,7 @@ while another Windows 10 system using a Nvidia GTX 1660Ti worked with the defaul
 </section>
 </section>
 <section id="why-use-the-gpu">
-<h2>Why use the GPU?<a class="headerlink" href="#why-use-the-gpu" title="Permalink to this headline">¶</a></h2>
+<h2>Why use the GPU?<a class="headerlink" href="#why-use-the-gpu" title="Permalink to this heading">¶</a></h2>
 <p>Using a GPU can accelerate computing speeds up to 100x over CPUs, especially for operations on large images, like is common for MPoL. The following is a quick example showing the addition of two large vectors. Your exact timing may vary, but for our hardware this calculation took
 320 milliseconds seconds on the CPU, while it only took 3.1 milliseconds on the GPU.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -258,7 +260,7 @@ while another Windows 10 system using a Nvidia GTX 1660Ti worked with the defaul
 </div>
 </section>
 <section id="using-the-gpu-as-part-of-pytorch-and-mpol">
-<h2>Using the GPU as part of PyTorch and MPoL<a class="headerlink" href="#using-the-gpu-as-part-of-pytorch-and-mpol" title="Permalink to this headline">¶</a></h2>
+<h2>Using the GPU as part of PyTorch and MPoL<a class="headerlink" href="#using-the-gpu-as-part-of-pytorch-and-mpol" title="Permalink to this heading">¶</a></h2>
 <p>Here is a short example demonstrating how to initialize an MPoL model and run it on the GPU. First we will set our device to the CUDA device.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>

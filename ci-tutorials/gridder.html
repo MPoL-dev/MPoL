@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,12 +27,14 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "math|output_area"}}</script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -407,11 +409,12 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -420,10 +423,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -435,21 +442,24 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
 <section id="Gridding-and-diagnostic-images">
-<h1>Gridding and diagnostic images<a class="headerlink" href="#Gridding-and-diagnostic-images" title="Permalink to this headline">¶</a></h1>
+<h1>Gridding and diagnostic images<a class="headerlink" href="#Gridding-and-diagnostic-images" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial covers how to read visibility data, average it to a “grid”, and make diagnostic images.</p>
 <section id="Importing-data">
-<h2>Importing data<a class="headerlink" href="#Importing-data" title="Permalink to this headline">¶</a></h2>
+<h2>Importing data<a class="headerlink" href="#Importing-data" title="Permalink to this heading">¶</a></h2>
 <p>We’ll use a mock CASA measurement set that we produced as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets</a> package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a “monolithic” distribution with its own Python interpreter (which is difficult to install new packages into). Recently, <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/usingcasa/obtaining-and-installing">“modular”
 CASA</a> has made it possible to install the CASA routines into your own Python environment—however the package is only supported on Python 3.6 and RHEL 7 linux. To avoid propagating these restrictive installation requirements to MPoL, we assume that the user provides the arrays of complex visibilities directly. The data requirements of RML imaging are really that simple.</p>
 <p>In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA <code class="docutils literal notranslate"><span class="pre">table</span></code> and <code class="docutils literal notranslate"><span class="pre">ms</span></code> tools as described <a class="reference external" href="https://mpol-dev.github.io/visread/">here</a>. The user can use either “monolithic” or “modular” CASA to read the visibilities and save them to a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.9, MacOS) you can read these visibilities and pass them to the MPoL routines.</p>
@@ -459,8 +469,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
 </pre></div>
@@ -470,8 +479,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
     <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -485,8 +493,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 <span class="n">uu</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">]</span>
 <span class="n">vv</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">]</span>
 <span class="n">weight</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
@@ -498,13 +505,12 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 </div>
 </section>
 <section id="The-GridCoords-object">
-<h2>The GridCoords object<a class="headerlink" href="#The-GridCoords-object" title="Permalink to this headline">¶</a></h2>
+<h2>The GridCoords object<a class="headerlink" href="#The-GridCoords-object" title="Permalink to this heading">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
 </pre></div>
 </div>
 </div>
@@ -513,8 +519,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -523,8 +528,7 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span>  <span class="c1"># [arcsec]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span>  <span class="c1"># [arcsec]</span>
 </pre></div>
 </div>
 </div>
@@ -540,14 +544,13 @@ conjugate of the visibilities. So, if you find that your image appears upside do
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
 </section>
 <section id="The-Gridder-object">
-<h2>The Gridder object<a class="headerlink" href="#The-Gridder-object" title="Permalink to this headline">¶</a></h2>
+<h2>The Gridder object<a class="headerlink" href="#The-Gridder-object" title="Permalink to this heading">¶</a></h2>
 <p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
     <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
@@ -564,8 +567,7 @@ GridCoords and Gridder object in one shot by</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
     <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>  <span class="c1"># [arcsec]</span>
     <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
@@ -580,7 +582,7 @@ GridCoords and Gridder object in one shot by</p>
 <p>if you don’t want to specify your GridCoords object separately.</p>
 </section>
 <section id="Visualizing-the-images">
-<h2>Visualizing the images<a class="headerlink" href="#Visualizing-the-images" title="Permalink to this headline">¶</a></h2>
+<h2>Visualizing the images<a class="headerlink" href="#Visualizing-the-images" title="Permalink to this heading">¶</a></h2>
 <p>To visualize the images, you can call <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image"><span class="std std-ref">Gridder.get_dirty_image</span></a>. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities. There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the
 size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>. We are usually interested in the diagnostic beam and image cubes that correspond to these
 gridded visibilities, frequently called the “dirty beam” and “dirty image” by radio astronomers. Those are accessible via the following routine</p>
@@ -588,8 +590,7 @@ gridded visibilities, frequently called the “dirty beam” and “dirty image�
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -598,8 +599,7 @@ gridded visibilities, frequently called the “dirty beam” and “dirty image�
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -618,8 +618,7 @@ gridded visibilities, frequently called the “dirty beam” and “dirty image�
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">4</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">beam</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
@@ -644,7 +643,7 @@ gridded visibilities, frequently called the “dirty beam” and “dirty image�
 convention to the regular TMS baseline convention by conjugating your visibilities.</p>
 </section>
 <section id="Checking-data-weights">
-<h2>Checking data weights<a class="headerlink" href="#Checking-data-weights" title="Permalink to this headline">¶</a></h2>
+<h2>Checking data weights<a class="headerlink" href="#Checking-data-weights" title="Permalink to this heading">¶</a></h2>
 <p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute
 sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid—hence why these routines issue a warning.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>img, beam = gridder.get_dirty_image(

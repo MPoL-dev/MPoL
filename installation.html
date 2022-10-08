@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,7 +27,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -195,17 +197,17 @@
            <div itemprop="articleBody">
             
   <section id="mpol-installation">
-<h1>MPoL Installation<a class="headerlink" href="#mpol-installation" title="Permalink to this headline">¶</a></h1>
+<h1>MPoL Installation<a class="headerlink" href="#mpol-installation" title="Permalink to this heading">¶</a></h1>
 <p>MPoL requires <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">&gt;=</span> <span class="pre">3.6</span></code>.</p>
 <section id="using-pip">
-<h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
+<h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this heading">¶</a></h2>
 <p>Stable versions are hosted on PyPI and are installed via</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install MPoL
 </pre></div>
 </div>
 </section>
 <section id="from-source">
-<h2>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h2>
+<h2>From source<a class="headerlink" href="#from-source" title="Permalink to this heading">¶</a></h2>
 <p>If you’d like to install the package from source to access the latest development version, download or <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span></code> the MPoL repository and install</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/MPoL-dev/MPoL.git
 $ cd MPoL
@@ -216,7 +218,7 @@ $ pip install .
 <p>If you’re interested in contributing to the MPoL package, please see the <a class="reference internal" href="developer-documentation.html#developer-documentation-label"><span class="std std-ref">Developer Documentation</span></a>.</p>
 </section>
 <section id="upgrading">
-<h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
+<h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this heading">¶</a></h2>
 <p>If you installed from PyPI, to upgrade to the latest stable version of MPoL, do</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade MPoL
 </pre></div>
@@ -235,7 +237,7 @@ $ pip install .
 </div>
 </section>
 <section id="using-cuda-acceleration">
-<h2>Using CUDA acceleration<a class="headerlink" href="#using-cuda-acceleration" title="Permalink to this headline">¶</a></h2>
+<h2>Using CUDA acceleration<a class="headerlink" href="#using-cuda-acceleration" title="Permalink to this heading">¶</a></h2>
 <p>MPoL uses PyTorch for its Neural Networks as seen in the <cite>Optimization Loop</cite> tutorial. If you are interested in using PyTorch’s full potential by utilizing a Nvidia graphics card, then the CUDA tool kit will need to be installed (TensorVision is also required). More information on this is available in the <cite>GPU Tutorial</cite> page. It is worth noting that PyTorch may need to be (re)installed separately using a specific <cite>pip</cite> for your system.</p>
 <p>More information on this can be found on the PyTorch homepage: <a class="reference external" href="pytorch.org">pytorch.org</a>.</p>
 </section>
