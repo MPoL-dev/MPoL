@@ -3,6 +3,7 @@ r"""The ``images`` module provides the core functionality of MPoL via :class:`mp
 from __future__ import annotations
 
 import numpy as np
+from scipy.special import j1
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
@@ -250,6 +251,122 @@ class ImageCube(nn.Module):
 
         return self.cube
 
+    @property
+    def sky_cube(self):
+        """
+        The image cube arranged as it would appear on the sky.
+
+        Returns:
+            torch.double : 3D image cube of shape ``(nchan, npix, npix)``
+
+        """
+        return utils.packed_cube_to_sky_cube(self.cube)
+
+    def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
+        """
+        Export the image cube to a FITS file.
+
+        Args:
+            fname (str): the name of the FITS file to export to.
+            overwrite (bool): if the file already exists, overwrite?
+            header_kwargs (dict): Extra keyword arguments to write to the FITS header.
+
+        Returns:
+            None
+        """
+
+        try:
+            from astropy import wcs
+            from astropy.io import fits
+        except ImportError:
+            print(
+                "Please install the astropy package to use FITS export functionality."
+            )
+
+        w = wcs.WCS(naxis=2)
+
+        w.wcs.crpix = np.array([1, 1])
+        w.wcs.cdelt = (
+            np.array([self.coords.cell_size, self.coords.cell_size]) / 3600
+        )  # decimal degrees
+        w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+
+        header = w.to_header()
+
+        # add in the kwargs to the header
+        if header_kwargs is not None:
+            for k, v in header_kwargs.items():
+                header[k] = v
+
+        hdu = fits.PrimaryHDU(self.sky_cube.detach().cpu().numpy(), header=header)
+
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(fname, overwrite=overwrite)
+
+        hdul.close()
+
+        
+class PBCorrectedCube(nn.Module):
+    r"""
+    A ImageCube that has been corrected for the expected primary beam. Currently only implemented for ALMA.
+    
+     Args:
+        cell_size (float): the width of a pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the image
+    """
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        chan_freqs=None,
+        telescope="ALMA_12"
+    ):
+        nchan = len(np.at_least_1d(chan_freqs))
+        super().__init__()
+        
+        #_setup_coords(self, cell_size, npix, coords, nchan) TODO: update this
+        
+        self.telescope_to_radius = {"ALMA_12": 6.} # in meters
+        self.telescope_to_blocked_radius = {"ALMA_12": 0.375}
+        
+        assert (telescope in self.telescope_to_radius) and (telescope in self.telescope_to_blocked_radius)
+        
+        self.pb_mask = self.obscured_airy_disk(chan_freqs, telescope)
+
+
+    def forward(self, cube):
+        r"""Args:
+            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
+
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
+        """
+        return self.pb_mask * cube
+    
+    def obscured_airy_disk(self, telescope):
+        r"""
+        Generates airy disk primary beam correction mask assuming some is obscured
+        by secondary reflector.
+        """
+        
+        R = telescope_to_radius[telescope]
+        R_obs = telescope_to_blocked_radius[telescope]
+        
+        r_coords = np.sqrt(self.packed_x_centers_2D**2 + self.packed_y_centers_2D**2) # units of arcsec
+        r_coords_rads = r_coords * np.pi/648000. # radians
+        wl = 2.998e8 / self.chan_freqs[0] # TODO: handle multiple channels
+        x = np.pi * R * r_coords_rads / wl
+        
+        eps = R_obs / R
+        j1_x = scipy.special.j1(x)
+        j1_epsx = scipy.special.j1(eps * x)
+        mask = 4. * (j1_x  / x - eps * j1_epsx / x)**2 / (1. - eps**2)**2
+        
+        return mask
+        
     @property
     def sky_cube(self):
         """
