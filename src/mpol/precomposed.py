@@ -50,6 +50,11 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
+        
+        self.pbcube = images.PBCorrectedCube(
+            coords = self.coords, nchan=self.nchan, telescope="ALMA_12"
+        )
+        
         self.fcube = images.FourierCube(coords=self.coords)
 
     def forward(self):
@@ -61,5 +66,6 @@ class SimpleNet(torch.nn.Module):
         x = self.bcube.forward()
         x = self.conv_layer(x)
         x = self.icube.forward(x)
+        x = self.pbcube.forward(x)
         vis = self.fcube.forward(x)
         return vis
