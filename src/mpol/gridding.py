@@ -202,16 +202,16 @@ class GridderBase:
         weight=None,
         data_re=None,
         data_im=None,
-        freq=None,
+        chan_freq=None,
     ):
 
         # check frequency array is 1d or None, expand if not
-        freq = _check_freq_1d(freq)
+        chan_freq = _check_freq_1d(chan_freq)
         
         # check everything should be 2d, expand if not
         # also checks data does not contain Hermitian pairs
-        uu, vv, weight, data_re, data_im, freq = _check_data_inputs_2d(
-            uu, vv, weight, data_re, data_im, freq
+        uu, vv, weight, data_re, data_im, chan_freq = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im, chan_freq
         )
         
         # setup the coordinates object
@@ -228,6 +228,7 @@ class GridderBase:
         self.weight = weight
         self.data_re = data_re
         self.data_im = data_im
+        self.chan_freq = chan_freq
 
         # and register cell indices against data
         self._create_cell_indices()
