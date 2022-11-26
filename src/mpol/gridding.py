@@ -14,7 +14,7 @@ from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionErr
 from .datasets import GriddedDataset
 
 
-def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None):
+def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None, freq=None):
     """
     Check that all data inputs are the same shape, the weights are positive, and the data_re and data_im are floats.
 
@@ -33,6 +33,9 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         raise WrongDimensionError(
             "All dataset inputs must be the same input shape and size."
         )
+
+    if freq is not None: # TODO:change to wrongdimensionerror
+        assert len(uu) == len(freq), "uu must have same number of channels as freq array."
 
     if np.any(weight <= 0.0):
         raise ValueError("Not all thermal weights are positive, check inputs.")
@@ -53,7 +56,7 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
     # check to see that uu, vv and data do not contain Hermitian pairs
     verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
-    return uu, vv, weight, data_re, data_im
+    return uu, vv, weight, data_re, data_im, freq
 
 
 def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
@@ -144,6 +147,33 @@ def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     return False
 
 
+def _check_freq_1d(freq=None):
+    """
+    Check that the frequency input array contains only positive floats.
+
+    If the user supplied a float, convert to a 1D array. If no frequency array
+    was supplied, simply skip.
+
+    """
+    if freq is None:
+        return freq
+    
+    assert (
+        np.isscalar(freq) or freq.ndim == 1
+    ), "Input data vectors should be either None, scalar, or 1D array."
+
+    assert np.all(freq > 0.0), "Not all frequencies are positive, check inputs."
+    
+    if np.isscalar(freq):
+        freq = np.atleast_1d(freq)
+    
+    assert (freq.dtype == np.single) or (
+        freq.dtype == np.double
+    ), "freq should be type single or double"
+
+    return freq
+   
+    
 class GridderBase:
     r"""
     This class is not designed to be used directly, but rather to be subclassed.
@@ -172,13 +202,18 @@ class GridderBase:
         weight=None,
         data_re=None,
         data_im=None,
+        freq=None,
     ):
+
+        # check frequency array is 1d or None, expand if not
+        freq = _check_freq_1d(freq)
+        
         # check everything should be 2d, expand if not
         # also checks data does not contain Hermitian pairs
-        uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
-            uu, vv, weight, data_re, data_im
+        uu, vv, weight, data_re, data_im, freq = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im, freq
         )
-
+        
         # setup the coordinates object
         self.coords = coords
         self.nchan = len(uu)
