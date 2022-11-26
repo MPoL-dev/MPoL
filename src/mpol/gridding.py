@@ -6,7 +6,7 @@ from .coordinates import _setup_coords
 from .datasets import GriddedDataset
 
 
-def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None):
+def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None, freq=None):
     """
     Check that all data inputs are the same shape, the weights are positive, and the data_re and data_im are floats.
 
@@ -17,7 +17,11 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
     assert (
         uu.ndim == 2 or uu.ndim == 1
     ), "Input data vectors should be either 1D or 2D numpy arrays."
+    
     shape = uu.shape
+    
+    if freq is not None:
+        assert len(u) == len(freq), "uu must have same number of channels as freq array."
 
     for a in [vv, weight, data_re, data_im]:
         assert (
@@ -40,11 +44,36 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_re = np.atleast_2d(data_re)
         data_im = np.atleast_2d(data_im)
 
-    return uu, vv, weight, data_re, data_im
+    return uu, vv, weight, data_re, data_im, freq
 
     # expand to 2d with complex conjugates
 
+def _check_freq_1d(freq=None):
+    """
+    Check that the frequency input array contains only positive floats.
 
+    If the user supplied a float, convert to a 1D array. If no frequency array
+    was supplied, simply skip.
+
+    """
+    if freq is None:
+        return freq
+    
+    assert (
+        np.isscalar(freq) or freq.ndim == 1
+    ), "Input data vectors should be either None, scalar, or 1D array."
+
+    assert np.all(freq > 0.0), "Not all frequencies are positive, check inputs."
+    
+    if np.isscalar(freq):
+        freq = np.atleast_1d(freq)
+    
+    assert (freq.dtype == np.single) or (
+        freq.dtype == np.double
+    ), "freq should be type single or double"
+
+    return freq
+    
 class Gridder:
     r"""
     The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
@@ -77,13 +106,17 @@ class Gridder:
         weight=None,
         data_re=None,
         data_im=None,
+        freq=None,
     ):
 
+        # check frequency array is 1d or None, expand if not
+        freq = _check_freq_1d(freq)
+        
         # check everything should be 2d, expand if not
-        uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
-            uu, vv, weight, data_re, data_im
+        uu, vv, weight, data_re, data_im, freq = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im, freq
         )
-
+        
         # setup the coordinates object
         nchan = len(uu)
         _setup_coords(self, cell_size, npix, coords, nchan)
