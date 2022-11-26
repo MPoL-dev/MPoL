@@ -106,15 +106,15 @@ class Gridder:
         weight=None,
         data_re=None,
         data_im=None,
-        freq=None,
+        chan_freq=None,
     ):
 
         # check frequency array is 1d or None, expand if not
-        freq = _check_freq_1d(freq)
+        chan_freq = _check_freq_1d(chan_freq)
         
         # check everything should be 2d, expand if not
-        uu, vv, weight, data_re, data_im, freq = _check_data_inputs_2d(
-            uu, vv, weight, data_re, data_im, freq
+        uu, vv, weight, data_re, data_im, chan_freq = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im, chan_freq
         )
         
         # setup the coordinates object
@@ -133,6 +133,7 @@ class Gridder:
         self.weight = np.concatenate([weight, weight], axis=1)
         self.data_re = np.concatenate([data_re, data_re], axis=1)
         self.data_im = np.concatenate([data_im, -data_im], axis=1)
+        self.chan_freq = chan_freq
 
         # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
