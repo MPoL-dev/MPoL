@@ -11,6 +11,9 @@ from torch import nn
 from . import utils
 from .coordinates import GridCoords
 
+from .gridding import _check_freq_1d
+
+
 
 class BaseCube(nn.Module):
     r"""
@@ -305,36 +308,57 @@ class ImageCube(nn.Module):
 
         hdul.close()
 
-        
-class PBCorrectedCube(nn.Module):
+
+class PrimaryBeamCube(nn.Module):
     r"""
-    A ImageCube that has been corrected for the expected primary beam. Currently only implemented for ALMA.
+    A ImageCube representing the primary beam of a described dish type. Currently can correct for a
+    uniform or center-obscured dish. The forward() method multiplies an image cube by this primary beam mask.
     
      Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
+        dish_type (string): the type of dish to correct for. Either 'uniform' or 'obscured'.
+        dish_radius (float): the radius of the dish (in meters)
+        dish_kwargs (dict): any additional arguments needed for special dish types. Currently only uses:
+            dish_obscured_radius (float): the radius of the obscured portion of the dish
     """
     def __init__(
         self,
         cell_size=None,
         npix=None,
         coords=None,
+        nchan=None,
         chan_freqs=None,
-        telescope="ALMA_12"
+        dish_type=None,
+        dish_radius=None,
+        **dish_kwargs,
     ):
-        nchan = len(np.at_least_1d(chan_freqs))
         super().__init__()
         
         #_setup_coords(self, cell_size, npix, coords, nchan) TODO: update this
         
-        self.telescope_to_radius = {"ALMA_12": 6.} # in meters
-        self.telescope_to_blocked_radius = {"ALMA_12": 0.375}
+        _check_freq_1d(chan_freqs)
+        assert (chan_freqs is None) or (len(chan_freqs) == nchan), "Length of chan_freqs must be equal to nchan"
         
-        assert (telescope in self.telescope_to_radius) and (telescope in self.telescope_to_blocked_radius)
+        assert (dish_type is None) or (dish_type in ["uniform", "obscured"]), "Provided dish_type must be 'uniform' or 'obscured'"
         
-        self.pb_mask = self.obscured_airy_disk(chan_freqs, telescope)
+        self.default_mask = nn.Parameter(
+            torch.full(
+                (self.nchan, self.coords.npix, self.coords.npix),
+                fill_value=1.0,
+                requires_grad=False,
+                dtype=torch.double,
+            )
+        )
+        
+        if dish_type is None:
+            self.pb_mask = self.default_mask
+        elif dish_type == "uniform":
+            self.pb_mask = self.uniform_mask(chan_freqs, dish_radius)
+        elif dish_type == "obscured":
+            self.pb_mask = self.obscured_mask(chan_freqs, dish_radius, **dish_kwargs)
 
 
     def forward(self, cube):
@@ -344,43 +368,35 @@ class PBCorrectedCube(nn.Module):
         Returns:
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
         """
-        return self.pb_mask * cube
+        return torch.mul(self.pb_mask, cube)
     
-    def obscured_airy_disk(self, telescope):
+    def uniform_mask(self, chan_freqs, dish_radius):
         r"""
-        Generates airy disk primary beam correction mask assuming some is obscured
-        by secondary reflector.
+        Generates airy disk primary beam correction mask.
         """
-        
-        R = telescope_to_radius[telescope]
-        R_obs = telescope_to_blocked_radius[telescope]
-        
-        r_coords = np.sqrt(self.packed_x_centers_2D**2 + self.packed_y_centers_2D**2) # units of arcsec
-        r_coords_rads = r_coords * np.pi/648000. # radians
-        wl = 2.998e8 / self.chan_freqs[0] # TODO: handle multiple channels
-        x = np.pi * R * r_coords_rads / wl
-        
-        eps = R_obs / R
-        j1_x = scipy.special.j1(x)
-        j1_epsx = scipy.special.j1(eps * x)
-        mask = 4. * (j1_x  / x - eps * j1_epsx / x)**2 / (1. - eps**2)**2
-        
-        return mask
+        return self.default_mask
+    
+    def obscured_mask(self, chan_freqs, dish_radius, dish_obscured_radius=None, **extra_kwargs):
+        r"""
+        Generates airy disk primary beam correction mask.
+        """
+        assert dish_obscured_radius is not None, "Obscured dish requires kwarg 'dish_obscured_radius'"
+        return self.default_mask
         
     @property
     def sky_cube(self):
         """
-        The image cube arranged as it would appear on the sky.
+        The primary beam mask arranged as it would appear on the sky.
 
         Returns:
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
 
         """
-        return utils.packed_cube_to_sky_cube(self.cube)
+        return utils.packed_cube_to_sky_cube(self.pb_mask)
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
-        Export the image cube to a FITS file.
+        Export the primary beam cube to a FITS file.
 
         Args:
             fname (str): the name of the FITS file to export to.
@@ -414,7 +430,7 @@ class PBCorrectedCube(nn.Module):
             for k, v in header_kwargs.items():
                 header[k] = v
 
-        hdu = fits.PrimaryHDU(self.sky_cube.detach().cpu().numpy(), header=header)
+        hdu = fits.PrimaryHDU(self.pb_mask.detach().cpu().numpy(), header=header)
 
         hdul = fits.HDUList([hdu])
         hdul.writeto(fname, overwrite=overwrite)

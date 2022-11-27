@@ -35,7 +35,12 @@ class SimpleNet(torch.nn.Module):
         coords=None,
         nchan=1,
         base_cube=None,
+        chan_freqs=None,
+        dish_type=None,
+        dish_radius=None,
+        **dish_kwargs,
     ):
+            
         super().__init__()
 
         self.coords = coords
@@ -50,8 +55,13 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
-        self.pbcube = images.PBCorrectedCube(
-            coords = self.coords, nchan=self.nchan, telescope="ALMA_12"
+        self.pbcube = images.PrimaryBeamCube(
+            coords = self.coords,
+            nchan=self.nchan,
+            chan_freqs=chan_freqs,
+            dish_type=dish_type, 
+            dish_radius=dish_radius,
+            **dish_kwargs 
         )
         self.fcube = fourier.FourierCube(coords=self.coords)
 
