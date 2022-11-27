@@ -368,20 +368,48 @@ class PrimaryBeamCube(nn.Module):
         Returns:
             (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
         """
-        return torch.mul(self.pb_mask, cube)
+        return torch.mul(self.pbmask, cube)
     
     def uniform_mask(self, chan_freqs, dish_radius):
         r"""
         Generates airy disk primary beam correction mask.
         """
-        return self.default_mask
+        assert dish_radius > 0., "Dish radius must be positive"
+        ratio = 2. * dish_radius / chan_freqs
+        ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
+        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
+        r_cube = np.tile(r_2D,(self.nchan,1,1))
+        
+        r_normed_cube = np.pi * r_cube /R_cube
+        
+        mask = np.ones((self.nchan, self.npix, self.npix))
+        norm_factor = (2. * j1(1e-5) / 1e-5)**2
+        mask[r_normed_cube > 0.] = (2. * j1(r_normed_cube) / r_normed_cube)**2 / norm_factor
+        return torch.tensor(mask)
+        
     
     def obscured_mask(self, chan_freqs, dish_radius, dish_obscured_radius=None, **extra_kwargs):
         r"""
         Generates airy disk primary beam correction mask.
         """
         assert dish_obscured_radius is not None, "Obscured dish requires kwarg 'dish_obscured_radius'"
-        return self.default_mask
+        assert dish_radius > 0., "Dish radius must be positive"
+        assert dish_obscured_radius > 0., "Obscured dish radius must be positive"
+        assert dish_radius > dish_obscured_radius, "Primary dish radius must be greater than obscured radius"
+        
+        ratio = 2. * dish_radius / chan_freqs
+        ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
+        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
+        r_cube = np.tile(r_2D,(self.nchan,1,1))
+        
+        eps = dish_obscured_radius / dish_radius
+        r_normed_cube = np.pi * r_cube /R_cube
+        
+        mask = np.ones((self.nchan, self.npix, self.npix))
+        norm_factor = (j1(1e-5) / 1e-5 - eps*j1(eps*1e-5)/1e-5)**2
+        mask[r_normed_cube > 0.] = (j1(r_normed_cube) / r_normed_cube 
+                                    - eps*j1(eps*r_normed_cube) / r_normed_cube)**2 / norm_factor
+        return torch.tensor(mask)
         
     @property
     def sky_cube(self):
