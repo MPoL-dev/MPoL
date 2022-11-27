@@ -375,7 +375,7 @@ class PrimaryBeamCube(nn.Module):
         Generates airy disk primary beam correction mask.
         """
         assert dish_radius > 0., "Dish radius must be positive"
-        ratio = 2. * dish_radius / chan_freqs
+        ratio = 2. * dish_radius * chan_freqs / 2.998e8
         ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
         r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
         r_cube = np.tile(r_2D,(self.nchan,1,1))
@@ -397,7 +397,7 @@ class PrimaryBeamCube(nn.Module):
         assert dish_obscured_radius > 0., "Obscured dish radius must be positive"
         assert dish_radius > dish_obscured_radius, "Primary dish radius must be greater than obscured radius"
         
-        ratio = 2. * dish_radius / chan_freqs
+        ratio = 2. * dish_radius * chan_freqs / 2.998e8
         ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
         r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
         r_cube = np.tile(r_2D,(self.nchan,1,1))
