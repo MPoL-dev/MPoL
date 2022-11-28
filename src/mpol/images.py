@@ -370,21 +370,25 @@ class PrimaryBeamCube(nn.Module):
         """
         return torch.mul(self.pbmask, cube)
     
+    
     def uniform_mask(self, chan_freqs, dish_radius):
         r"""
         Generates airy disk primary beam correction mask.
         """
         assert dish_radius > 0., "Dish radius must be positive"
-        ratio = 2. * dish_radius * chan_freqs / 2.998e8
-        ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
-        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
-        r_cube = np.tile(r_2D,(self.nchan,1,1))
-        
-        r_normed_cube = np.pi * r_cube /R_cube
-        
-        mask = np.ones((self.nchan, self.npix, self.npix))
+        ratio = 2. * dish_radius * np.array([[chan_freqs]]).T / 2.998e8
+
+        ratio_cube = np.tile(ratio,(1,self.coords.npix,self.coords.npix))
+        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # arcsec
+        r_2D_rads = r_2D * np.pi / 180. / 60. / 60. # radians
+        r_cube = np.tile(r_2D_rads,(self.nchan,1,1))
+
+        r_normed_cube = np.pi * r_cube * ratio_cube
+
         norm_factor = (2. * j1(1e-5) / 1e-5)**2
-        mask[r_normed_cube > 0.] = (2. * j1(r_normed_cube) / r_normed_cube)**2 / norm_factor
+        mask = np.where(r_normed_cube > 0.,
+                        (2. * j1(r_normed_cube) / r_normed_cube)**2 / norm_factor,
+                        1.)
         return torch.tensor(mask)
         
     
@@ -397,18 +401,20 @@ class PrimaryBeamCube(nn.Module):
         assert dish_obscured_radius > 0., "Obscured dish radius must be positive"
         assert dish_radius > dish_obscured_radius, "Primary dish radius must be greater than obscured radius"
         
-        ratio = 2. * dish_radius * chan_freqs / 2.998e8
-        ratio_cube = np.tile(ratio,(1,self.npix,self.npix))
-        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # [arcsec]
-        r_cube = np.tile(r_2D,(self.nchan,1,1))
+        ratio = 2. * dish_radius * np.array([[chan_freqs]]).T / 2.998e8
+        ratio_cube = np.tile(ratio,(1,self.coords.npix,self.coords.npix))
+        r_2D = np.sqrt(self.coords.packed_x_centers_2D**2 + self.coords.packed_y_centers_2D**2)  # arcsec
+        r_2D_rads = r_2D * np.pi / 180. / 60. / 60. # radians
+        r_cube = np.tile(r_2D_rads,(self.nchan,1,1))
         
         eps = dish_obscured_radius / dish_radius
-        r_normed_cube = np.pi * r_cube /R_cube
+        r_normed_cube = np.pi * r_cube * ratio_cube
         
-        mask = np.ones((self.nchan, self.npix, self.npix))
         norm_factor = (j1(1e-5) / 1e-5 - eps*j1(eps*1e-5)/1e-5)**2
-        mask[r_normed_cube > 0.] = (j1(r_normed_cube) / r_normed_cube 
-                                    - eps*j1(eps*r_normed_cube) / r_normed_cube)**2 / norm_factor
+        mask = np.where(r_normed_cube > 0.,
+                        (j1(r_normed_cube) / r_normed_cube 
+                                    - eps*j1(eps*r_normed_cube) / r_normed_cube)**2 / norm_factor,
+                        1.)
         return torch.tensor(mask)
         
     @property
