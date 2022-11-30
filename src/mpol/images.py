@@ -355,9 +355,8 @@ class PrimaryBeamCube(nn.Module):
 
         r_normed_cube = np.pi * r_cube * ratio_cube
 
-        norm_factor = (2. * j1(1e-5) / 1e-5)**2
         mask = np.where(r_normed_cube > 0.,
-                        (2. * j1(r_normed_cube) / r_normed_cube)**2 / norm_factor,
+                        (2. * j1(r_normed_cube) / r_normed_cube)**2,
                         1.)
         return torch.tensor(mask)
         
@@ -380,7 +379,7 @@ class PrimaryBeamCube(nn.Module):
         eps = dish_obscured_radius / dish_radius
         r_normed_cube = np.pi * r_cube * ratio_cube
         
-        norm_factor = (j1(1e-5) / 1e-5 - eps*j1(eps*1e-5)/1e-5)**2
+        norm_factor = (1.-eps**2)**2
         mask = np.where(r_normed_cube > 0.,
                         (j1(r_normed_cube) / r_normed_cube 
                                     - eps*j1(eps*r_normed_cube) / r_normed_cube)**2 / norm_factor,
