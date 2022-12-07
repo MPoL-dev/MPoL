@@ -3,6 +3,11 @@
 Changelog
 =========
 
+v0.1.2
+------
+
+* Switched documentation backend to `MyST-NB <https://myst-nb.readthedocs.io/en/latest/index.html>`_.
+
 v0.1.1
 ------
 

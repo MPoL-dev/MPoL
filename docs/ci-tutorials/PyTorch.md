@@ -145,15 +145,15 @@ plt.show()
 
 We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:
 
-$x_{new} = x_{current} - \nabla y(x_{current}) * (step \: size)$
+$x_\mathrm{new} = x_\mathrm{current} - \nabla y(x_\mathrm{current}) * (\mathrm{step\,size})$
 
 where:
 
-- $x_{current}$ is our current x value
+- $x_\mathrm{current}$ is our current x value
 
-- $\nabla y(x_{current})$ is the gradient at our current point
+- $\nabla y(x_\mathrm{current})$ is the gradient at our current point
 
-- $(step \: size)$ is a value we choose that scales our steps
+- $(\mathrm{step\,size})$ is a value we choose that scales our steps
 
 We will choose ``step_size = 0.1``:
 
