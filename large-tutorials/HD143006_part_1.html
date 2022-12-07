@@ -32,9 +32,8 @@
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -47,6 +46,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
   <link rel="stylesheet" href="../_static/bullets.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
@@ -120,11 +120,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">HD143006 Tutorial Part 1</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Viewing-the-CLEAN-image">Viewing the CLEAN image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Plotting-the-Baselines">Plotting the Baselines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#The-MPoL-Gridder-Object">The MPoL Gridder Object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Comparing-Dirty-and-CLEANed-Images">Comparing Dirty and CLEANed Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#viewing-the-clean-image">Viewing the CLEAN image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-the-baselines">Plotting the Baselines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-mpol-gridder-object">The MPoL Gridder Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparing-dirty-and-cleaned-images">Comparing Dirty and CLEANed Images</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
@@ -199,603 +199,308 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<section id="HD143006-Tutorial-Part-1">
-<h1>HD143006 Tutorial Part 1<a class="headerlink" href="#HD143006-Tutorial-Part-1" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial is the first of an eventual three part series covering a real world application of RML imaging to the HD 143006 protoplanetary disk dataset observed as part of the DSHARP survey (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract">Andrews et al. 2018</a>). In this tutorial (Part 1), we’ll provide a brief introduction to the dataset itself, the MPoL package, and perform some brief diagnostic imaging to make sure we have the basics configured properly.</p>
-<p><a class="reference external" href="HD143006_Part_2.html">Part 2</a> of the tutorial will demonstrate how to set up the optimization loop and to create an RML image.</p>
-<section id="Viewing-the-CLEAN-image">
-<h2>Viewing the CLEAN image<a class="headerlink" href="#Viewing-the-CLEAN-image" title="Permalink to this heading">¶</a></h2>
+  <div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%matplotlib inline
+%run notebook_setup
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/ian/Documents/Research/Disks/RML/MPoL/docs/large-tutorials/notebook_setup.py:7: DeprecationWarning: `magic(...)` is deprecated since IPython 0.13 (warning added in 8.1), use run_line_magic(magic_name, parameter_s).
+  get_ipython().magic(&#39;config InlineBackend.figure_format = &quot;retina&quot;&#39;)
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="hd143006-tutorial-part-1">
+<h1>HD143006 Tutorial Part 1<a class="headerlink" href="#hd143006-tutorial-part-1" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial is the first of an eventual three part series covering a real world application of RML imaging to the HD 143006 protoplanetary disk dataset observed as part of the DSHARP survey (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract">Andrews et al. 2018</a>). In this tutorial (Part 1), we’ll provide a brief introduction to the dataset itself, the MPoL package, and perform some brief diagnostic imaging to make sure we have the basics configured properly.</p>
+<p><a class="reference internal" href="HD143006_part_2.html"><span class="doc std std-doc">Part 2</span></a> of the tutorial will demonstrate how to set up the optimization loop and to create an RML image.</p>
+<section id="viewing-the-clean-image">
+<h2>Viewing the CLEAN image<a class="headerlink" href="#viewing-the-clean-image" title="Permalink to this heading">¶</a></h2>
 <p>Before we dig into RML imaging or the MPoL package, let’s get our bearings by looking at the fiducial image provided by the DSHARP survey, synthesized using the CLEAN algorithm. We can download the FITS file directly from the DSHARP survey page</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
-<span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
+import numpy as np
+from astropy.io import fits
+from astropy.utils.data import download_file
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fname = download_file(
+    &quot;https://almascience.eso.org/almadata/lp/DSHARP/images/HD143006_continuum.fits&quot;,
+    cache=True,
+    pkgname=&quot;mpol&quot;,
+)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://almascience.eso.org/almadata/lp/DSHARP/images/HD143006_continuum.fits&quot;</span><span class="p">,</span>
-    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
 </div>
 </div>
 <p>The following commands load the FITS file and calculate the RA and DEC axes using information from the FITS header. For more information on reading FITS files in Python, please consult the <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/index.html">astropy documentation</a>.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>hdul = fits.open(fname)
+hdu = hdul[0]
+clean_img = np.squeeze(hdu.data)
+header = hdu.header
+hdul.close()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-<span class="n">hdu</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">clean_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-<span class="n">header</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span>
-<span class="n">hdul</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get the number of pixels in each direction</span>
-<span class="n">nx</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;NAXIS1&quot;</span><span class="p">]</span>
-<span class="n">ny</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;NAXIS2&quot;</span><span class="p">]</span>
-<span class="c1"># RA coordinates</span>
-<span class="n">CDELT1</span> <span class="o">=</span> <span class="mi">3600</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;CDELT1&quot;</span><span class="p">]</span>  <span class="c1"># Convert from units of degrees to arcsec</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># get the number of pixels in each direction
+nx = header[&quot;NAXIS1&quot;]
+ny = header[&quot;NAXIS2&quot;]
+# RA coordinates
+CDELT1 = 3600 * header[&quot;CDELT1&quot;]  # Convert from units of degrees to arcsec
 
-<span class="c1"># DEC coordinates</span>
-<span class="n">CDELT2</span> <span class="o">=</span> <span class="mi">3600</span> <span class="o">*</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;CDELT2&quot;</span><span class="p">]</span>  <span class="c1"># [arcsec]</span>
+# DEC coordinates
+CDELT2 = 3600 * header[&quot;CDELT2&quot;]  # [arcsec]
 
-<span class="c1"># calculate the RA and DEC pixel centers</span>
-<span class="n">RA</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span> <span class="o">-</span> <span class="n">nx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">CDELT1</span>  <span class="c1"># [arcsec]</span>
-<span class="n">DEC</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span> <span class="o">-</span> <span class="n">ny</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">CDELT2</span>  <span class="c1"># [arcsec]</span>
+# calculate the RA and DEC pixel centers
+RA = (np.arange(nx) - nx / 2) * CDELT1  # [arcsec]
+DEC = (np.arange(ny) - ny / 2) * CDELT2  # [arcsec]
 
-<span class="c1"># matplotlib imshow extent needs to include extra half-pixels.</span>
-<span class="n">ext</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">RA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">CDELT1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">RA</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">CDELT1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">DEC</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">CDELT2</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">DEC</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">CDELT2</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-<span class="p">)</span>  <span class="c1"># [arcsec]</span>
+# matplotlib imshow extent needs to include extra half-pixels.
+ext = (
+    RA[0] - CDELT1 / 2,
+    RA[-1] + CDELT1 / 2,
+    DEC[0] - CDELT2 / 2,
+    DEC[-1] + CDELT2 / 2,
+)  # [arcsec]
 </pre></div>
 </div>
 </div>
-<p>Here is the CLEAN image produced by the DSHARP team (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract">Andrews et al. 2018</a>).</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</div>
+<p>Here is the CLEAN image produced by the DSHARP team (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract">Andrews et al. 2018</a>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.imshow(clean_img, origin=&quot;lower&quot;, extent=ext)
+# zooming in a little to focus on the disk
+r = 0.8
+plt.xlim(left=r, right=-r)
+plt.ylim(top=r, bottom=-r)
+# axis labels
+plt.xlabel(r&quot;$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]&quot;)
+plt.ylabel(r&quot;$\Delta \delta$ [${}^{\prime\prime}$]&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">clean_img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
-<span class="c1"># zooming in a little to focus on the disk</span>
-<span class="n">r</span> <span class="o">=</span> <span class="mf">0.8</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">right</span><span class="o">=-</span><span class="n">r</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=-</span><span class="n">r</span><span class="p">)</span>
-<span class="c1"># axis labels</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_9_1.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_9_1.png" style="width: 481px; height: 460px;" />
+<img alt="../_images/519d33eac463f0e21b96735ed6fe8c4715d61332e7600b2369a2a83040aa547a.png" src="../_images/519d33eac463f0e21b96735ed6fe8c4715d61332e7600b2369a2a83040aa547a.png" />
 </div>
 </div>
 </section>
-<section id="Plotting-the-Baselines">
-<h2>Plotting the Baselines<a class="headerlink" href="#Plotting-the-Baselines" title="Permalink to this heading">¶</a></h2>
+<section id="plotting-the-baselines">
+<h2>Plotting the Baselines<a class="headerlink" href="#plotting-the-baselines" title="Permalink to this heading">¶</a></h2>
 <p>Now that we have an idea of what we’re looking to image, let’s load up the actual dataset. First, we’ll download the raw visibilities. To speed things along for the purpose of this tutorial (and avoid introducing CASA as a package dependency), we’ve already extracted the visibility data as a <code class="docutils literal notranslate"><span class="pre">.npz</span></code> file, which we’ve made available on Zenodo.</p>
 <p>More information on how to do this extraction in general is available on the <a class="reference external" href="https://mpol-dev.github.io/visread/">visread</a> documentation page, and the specific commands used to produce this <code class="docutils literal notranslate"><span class="pre">.npz</span></code> file are available in the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets/tree/main/products/HD143006-DSHARP-continuum">mpoldatasets</a> package.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4904794/files/HD143006_continuum.npz&quot;</span><span class="p">,</span>
-    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fname = download_file(
+    &quot;https://zenodo.org/record/4904794/files/HD143006_continuum.npz&quot;,
+    cache=True,
+    pkgname=&quot;mpol&quot;,
+)
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># load extracted visibilities from npz file
+d = np.load(fname)
+uu = d[&quot;uu&quot;]
+vv = d[&quot;vv&quot;]
+weight = d[&quot;weight&quot;]
+data = d[&quot;data&quot;]
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load extracted visibilities from npz file</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-<span class="n">uu</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">]</span>
-<span class="n">vv</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">]</span>
-<span class="n">weight</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
-</pre></div>
 </div>
 </div>
 <p>To get an idea of the <span class="math notranslate nohighlight">\(u,v\)</span> coverage of the dataset, let’s plot the <span class="math notranslate nohighlight">\(u,v\)</span> coordinates of the visibilities, as we’ve done in the <a class="reference external" href="https://mpol-dev.github.io/MPoL/ci-tutorials/crossvalidation.html">cross-validation tutorial</a> and the <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html#Get-the-baselines">visread documentation</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, ax = plt.subplots(nrows=1)
+ax.scatter(uu, vv, s=0.5, rasterized=True, linewidths=0.0, c=&quot;k&quot;)
+ax.scatter(-uu, -vv, s=0.5, rasterized=True, linewidths=0.0, c=&quot;k&quot;)
+ax.set_xlabel(r&quot;$u$ [k$\lambda$]&quot;)
+ax.set_ylabel(r&quot;$v$ [k$\lambda$]&quot;)
+ax.set_aspect(&quot;equal&quot;)
+ax.set_title(&quot;Baselines&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">-</span><span class="n">uu</span><span class="p">,</span> <span class="o">-</span><span class="n">vv</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$u$ [k$\lambda$]&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$v$ [k$\lambda$]&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Baselines&quot;</span><span class="p">)</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Baselines&#39;)
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Text(0.5, 1.0, &#39;Baselines&#39;)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_14_1.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_14_1.png" style="width: 414px; height: 480px;" />
+<img alt="../_images/566e158fa8ec839533def1206bb0e5498e1cbb523aec3e44cb0d27a8702b98a0.png" src="../_images/566e158fa8ec839533def1206bb0e5498e1cbb523aec3e44cb0d27a8702b98a0.png" />
 </div>
 </div>
 <p>As you can see, there is a very dense grouping of visibilities with <span class="math notranslate nohighlight">\(q &lt; 2000\, \mathrm{k}\lambda\)</span>, where <span class="math notranslate nohighlight">\(q=\sqrt{u^2 + v^2}\)</span>, which primarily consists of data taken in more compact ALMA configurations. There are also several visibilities with baselines &gt; 7,000 (<span class="math notranslate nohighlight">\(k\lambda\)</span>), which correspond to the extended ALMA configurations and is the reason why the DSHARP data can generate some of the highest spatial resolution images of protoplanetary disks to date.</p>
 </section>
-<section id="The-MPoL-Gridder-Object">
-<h2>The MPoL Gridder Object<a class="headerlink" href="#The-MPoL-Gridder-Object" title="Permalink to this heading">¶</a></h2>
+<section id="the-mpol-gridder-object">
+<h2>The MPoL Gridder Object<a class="headerlink" href="#the-mpol-gridder-object" title="Permalink to this heading">¶</a></h2>
 <p>Though we have lofty ambitions to make RML images with these DSHARP visibilities, our first goals are much humbler (and pragmatic). Basically, we want to make sure that we are loading the visibilities into MPoL correctly with the right units and in the right format.</p>
 <p>One of the simplest ways to do that is by instantiating an MPoL <a class="reference external" href="https://mpol-dev.github.io/MPoL/api.html#mpol.gridding.Gridder">Gridder</a> object, which can perform basic visibility averaging and inverse Fourier transforms as implemented in CASA. This allows us to check that we’re starting from the same basic understanding of the data by creating our own version of a dirty image.</p>
 <p>To instantiate an MPoL Gridder object, we need to make a choice for the size of the pixels <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and the number of pixels per side of our image, <code class="docutils literal notranslate"><span class="pre">npix</span></code>. You can read more about these properties in the <a class="reference external" href="https://mpol-dev.github.io/MPoL/api.html#mpol.coordinates.GridCoords">GridCoords</a> API Documentation.</p>
 <p>We’ll follow the CLEAN example and use the same <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> provided in the FITS image.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>cell_size = np.abs(header[&quot;CDELT1&quot;] * 3600)  # [arcsec]
+print(&quot;cell_size is {:.4f} arcseconds&quot;.format(cell_size))
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cell_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;CDELT1&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span>  <span class="c1"># [arcsec]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cell_size is </span><span class="si">{:.4f}</span><span class="s2"> arcseconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cell_size</span><span class="p">))</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>cell_size is 0.0030 arcseconds
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-cell_size is 0.0030 arcseconds
-</pre></div></div>
 </div>
 <p>The FITS image was a full 3000x3000 pixels. In general, it is good practice to synthesize an image the full size of the primary beam to avoid potential aliasing from bright sources at the edge of your field, or at least once to check that no bright sources exist in the field of view. That appears to be the rationale of the FITS images provided by the DSHARP team.</p>
 <p>Since the DSHARP team has already checked there are no bright sub-mm sources in the FOV, we can save time and just make a smaller image corresponding to the protoplanetary emission. If <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> is 0.003 arcseconds, <code class="docutils literal notranslate"><span class="pre">npix=512</span></code> pixels should be sufficient to make an image approximately 1.5 arcseconds on a side. Now, let’s import the relevant MPoL routines and instantiate the Gridder.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol import gridding
+
+gridder = gridding.Gridder(
+    cell_size=cell_size,
+    npix=512,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=data.real,  # separating the real and imaginary values of our data
+    data_im=data.imag,
+)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span>
-
-<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
-    <span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span>
-    <span class="n">npix</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
-    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
-    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
-    <span class="n">data_re</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">real</span><span class="p">,</span>  <span class="c1"># separating the real and imaginary values of our data</span>
-    <span class="n">data_im</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
 </div>
 </div>
 </section>
-<section id="Making-diagnostic-dirty-images">
-<h2>Making diagnostic dirty images<a class="headerlink" href="#Making-diagnostic-dirty-images" title="Permalink to this heading">¶</a></h2>
-<p>Now, we’ll use the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image"><span class="std std-ref">Gridder.get_dirty_image()</span></a> routine to average the visibilities to the grid defined by gridder, and perform an inverse Fourier transform to get the dirty image.</p>
+<section id="making-diagnostic-dirty-images">
+<h2>Making diagnostic dirty images<a class="headerlink" href="#making-diagnostic-dirty-images" title="Permalink to this heading">¶</a></h2>
+<p>Now, we’ll use the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.Gridder.get_dirty_image()</span></code></a> routine to average the visibilities to the grid defined by gridder, and perform an inverse Fourier transform to get the dirty image.</p>
 <p>There are different ways to weight the visibilities during the averaging process to promote certain image characteristics. More info on the weighting can be found in the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a>. The MPoL gridder is capable of averaging visibilities using uniform, natural, and Briggs robust weighting. We’ll demonstrate this functionality by making several different dirty images under different averaging schemes.</p>
 <p>We’ll write a function to calculate the dirty image and then plot it.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def image_and_plot(weighting, robust=None):
+
+    img, beam = gridder.get_dirty_image(
+        weighting=weighting, robust=robust, unit=&quot;Jy/arcsec^2&quot;
+    )
+
+    kw = {&quot;origin&quot;: &quot;lower&quot;, &quot;extent&quot;: gridder.coords.img_ext}
+    fig, ax = plt.subplots(ncols=1)
+    im = ax.imshow(np.squeeze(img), **kw)
+    cbar = plt.colorbar(im)
+    cbar.set_label(r&quot;$\mathrm{Jy}/\mathrm{arcsec}^2$&quot;)
+
+    title = weighting
+    if robust is not None:
+        title += &quot; r={:.1f}&quot;.format(robust)
+    ax.set_title(title)
+    ax.set_xlabel(r&quot;$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]&quot;)
+    ax.set_ylabel(r&quot;$\Delta \delta$ [${}^{\prime\prime}$]&quot;)
+    r = 0.7
+    plt.xlim(left=r, right=-r)
+    plt.ylim(bottom=-r, top=r)
+
+    return np.squeeze(img)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">image_and_plot</span><span class="p">(</span><span class="n">weighting</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
-    <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
-        <span class="n">weighting</span><span class="o">=</span><span class="n">weighting</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
-    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
-    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{Jy}</span><span class="s2">/\mathrm</span><span class="si">{arcsec}</span><span class="s2">^2$&quot;</span><span class="p">)</span>
-
-    <span class="n">title</span> <span class="o">=</span> <span class="n">weighting</span>
-    <span class="k">if</span> <span class="n">robust</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">title</span> <span class="o">+=</span> <span class="s2">&quot; r=</span><span class="si">{:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">robust</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="mf">0.7</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">right</span><span class="o">=-</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=-</span><span class="n">r</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-</pre></div>
 </div>
 </div>
 <p>Uniform weighting frequently produces images with the best spatial resolution, but at the expense of sensitivity.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>_ = image_and_plot(weighting=&quot;uniform&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">image_and_plot</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_24_0.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_24_0.png" style="width: 550px; height: 416px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/a1efa2a62a58ea0257a35fa70bd08c9d7ced2fa741ffca81380f48b064e96e4d.png" src="../_images/a1efa2a62a58ea0257a35fa70bd08c9d7ced2fa741ffca81380f48b064e96e4d.png" />
 </div>
 </div>
 <p>Natural weighting frequently produces images with the best sensitivity to point sources, but at the expense of spatial resolution.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>_ = image_and_plot(weighting=&quot;natural&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">image_and_plot</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;natural&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_26_0.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_26_0.png" style="width: 534px; height: 416px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/92188645c412bd593685cc1fa2ca97475b4183e964247646097483798e429bae.png" src="../_images/92188645c412bd593685cc1fa2ca97475b4183e964247646097483798e429bae.png" />
 </div>
 </div>
 <p>Robust weigting provides a (nonlinear) tradeoff between these two regimes, and some form of robust weighting is typically chosen for ALMA imaging.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">image_and_plot</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_28_0.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_28_0.png" style="width: 538px; height: 416px;" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img_robust_0</span> <span class="o">=</span> <span class="n">image_and_plot</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>_ = image_and_plot(weighting=&quot;briggs&quot;, robust=-1.0)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="cell_output docutils container">
+<img alt="../_images/02ecbdbe8763512ee8bbecb2e5aa9ec9a6ae151ea777712921d9a47596800c56.png" src="../_images/02ecbdbe8763512ee8bbecb2e5aa9ec9a6ae151ea777712921d9a47596800c56.png" />
 </div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_29_0.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_29_0.png" style="width: 550px; height: 416px;" />
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>img_robust_0 = image_and_plot(weighting=&quot;briggs&quot;, robust=0.0)
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/3fc7b8fbd18620e9f860000ce3229839ca5815a0b88eef744a6a28f9536a4021.png" src="../_images/3fc7b8fbd18620e9f860000ce3229839ca5815a0b88eef744a6a28f9536a4021.png" />
 </div>
 </div>
 </section>
-<section id="Comparing-Dirty-and-CLEANed-Images">
-<h2>Comparing Dirty and CLEANed Images<a class="headerlink" href="#Comparing-Dirty-and-CLEANed-Images" title="Permalink to this heading">¶</a></h2>
+<section id="comparing-dirty-and-cleaned-images">
+<h2>Comparing Dirty and CLEANed Images<a class="headerlink" href="#comparing-dirty-and-cleaned-images" title="Permalink to this heading">¶</a></h2>
 <p>All in all, it looks like our diagnostic dirty images produced by the MPoL gridder look similar enough in scale and orientation to the DSHARP CLEAN image that we have some confidence that we’re reading in the visibility data correctly.</p>
 <p>To wrap things up, let’s directly compare a dirty image with the DSHARP CLEAN image, which was produced using robust=0.0. (A slight <span class="math notranslate nohighlight">\(u,v\)</span> taper was also used, but we’ll ignore that detail here).</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, ax = plt.subplots(ncols=2, figsize=(5.5, 3))
+
+ax[0].imshow(clean_img, origin=&quot;lower&quot;, extent=ext)
+ax[0].set_title(&quot;DSHARP CLEAN&quot;)
+
+ax[1].imshow(img_robust_0, origin=&quot;lower&quot;, extent=gridder.coords.img_ext)
+ax[1].set_title(&quot;MPoL Dirty&quot;)
+
+for a in ax:
+    r = 0.7
+    a.set_xlim(left=r, right=-r)
+    a.set_ylim(bottom=-r, top=r)
+
+    a.xaxis.set_visible(False)
+    a.yaxis.set_visible(False)
+
+fig.subplots_adjust()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">5.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">clean_img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;DSHARP CLEAN&quot;</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_robust_0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;MPoL Dirty&quot;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="mf">0.7</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">right</span><span class="o">=-</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=-</span><span class="n">r</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
-
-    <span class="n">a</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">a</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">()</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/large-tutorials_HD143006_part_1_31_0.png" class="no-scaled-link" src="../_images/large-tutorials_HD143006_part_1_31_0.png" style="width: 541px; height: 290px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/79a635fad4a8ac8580c9742125065d21fc61ae20958bb1c34dc6875479d2d25d.png" src="../_images/79a635fad4a8ac8580c9742125065d21fc61ae20958bb1c34dc6875479d2d25d.png" />
 </div>
 </div>
 <p>All in all, it seems like we’re on the right track. The diagnostic dirty image that we’ve produced with the MPoL gridder object is approximately the same size and orientation as the DSHARP CLEAN image, and it retains many of the same morphological features as well. Of course, the dirty image is noisier because it still contains the sidelobe response of the dirty beam—it hasn’t been CLEANed yet!</p>

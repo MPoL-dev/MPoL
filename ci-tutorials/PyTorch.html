@@ -32,9 +32,8 @@
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -47,6 +46,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
   <link rel="stylesheet" href="../_static/bullets.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
@@ -114,10 +114,10 @@
 <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to PyTorch: Tensors and Gradient Descent</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Introduction-to-Tensors">Introduction to Tensors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Calculating-Gradients">Calculating Gradients</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Optimizing-a-Function-with-Gradient-Descent">Optimizing a Function with Gradient Descent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Additional-Resources">Additional Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-tensors">Introduction to Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#calculating-gradients">Calculating Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizing-a-function-with-gradient-descent">Optimizing a Function with Gradient Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
@@ -185,7 +185,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/ci-tutorials/PyTorch.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/ci-tutorials/PyTorch.md.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -198,640 +198,357 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<section id="Introduction-to-PyTorch:-Tensors-and-Gradient-Descent">
-<h1>Introduction to PyTorch: Tensors and Gradient Descent<a class="headerlink" href="#Introduction-to-PyTorch:-Tensors-and-Gradient-Descent" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.</p>
-<section id="Introduction-to-Tensors">
-<h2>Introduction to Tensors<a class="headerlink" href="#Introduction-to-Tensors" title="Permalink to this heading">¶</a></h2>
-<p>Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on PyTorch, and uses a form of gradient descent optimization to find the “best” image given a dataset and choice of regularizers.</p>
-<p>We’ll start this tutorial by importing the torch and numpy packages. Make sure you have <a class="reference external" href="https://pytorch.org/get-started/locally/">PyTorch installed</a> before proceeding.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+  <div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%matplotlib inline
+%run notebook_setup
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/MPoL/MPoL/docs/ci-tutorials/notebook_setup.py:7: DeprecationWarning: `magic(...)` is deprecated since IPython 0.13 (warning added in 8.1), use run_line_magic(magic_name, parameter_s).
+  get_ipython().magic(&#39;config InlineBackend.figure_format = &quot;retina&quot;&#39;)
 </pre></div>
+</div>
+</div>
+</details>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="introduction-to-pytorch-tensors-and-gradient-descent">
+<h1>Introduction to PyTorch: Tensors and Gradient Descent<a class="headerlink" href="#introduction-to-pytorch-tensors-and-gradient-descent" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.</p>
+<section id="introduction-to-tensors">
+<h2>Introduction to Tensors<a class="headerlink" href="#introduction-to-tensors" title="Permalink to this heading">¶</a></h2>
+<p>Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on PyTorch, and uses a form of gradient descent optimization to find the “best” image given a dataset and choice of regularizers.</p>
+<p>We’ll start this tutorial by importing the torch and numpy packages. Make sure you have <a class="reference external" href="https://pytorch.org/get-started/locally/">PyTorch installed</a> before proceeding.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
+import numpy as np
+import torch
+</pre></div>
+</div>
 </div>
 </div>
 <p>There are several <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html">ways to initialize a tensor</a>. A common method to create a tensor is from a numpy array:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">an_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-<span class="n">a_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">an_array</span><span class="p">)</span>  <span class="c1"># creates tensor of same size as an_array</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>an_array = np.array([[1, 2], [3, 4]])
+a_tensor = torch.tensor(an_array)  # creates tensor of same size as an_array
 
-<span class="nb">print</span><span class="p">(</span><span class="n">a_tensor</span><span class="p">)</span>
+print(a_tensor)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor([[1, 2],
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1, 2],
         [3, 4]])
-</pre></div></div>
+</pre></div>
+</div>
+</div>
 </div>
 <p>Tensors are similar to numpy arrays—many of the same <a class="reference external" href="https://pytorch.org/docs/stable/torch.html">operations</a> that we would perform on numpy arrays can easily be performed on PyTorch tensors. For example, we can compare how to calculate a matrix product using numpy and PyTorch</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>another_array = np.array([[5, 6, 7], [8, 9, 0]])  # create 2x3 array
+another_tensor = torch.tensor(
+    another_array
+)  # create another tensor of same size as above array
+
+# numpy array multiplication
+prod_array = np.matmul(an_array, another_array)
+
+# torch tensor multiplication
+prod_tensor = torch.matmul(a_tensor, another_tensor)
+
+print(f&quot;Numpy array multiplication result: {prod_array}&quot;)
+print(f&quot;Torch tensor multiplication result: {prod_tensor}&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">another_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>  <span class="c1"># create 2x3 array</span>
-<span class="n">another_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="n">another_array</span>
-<span class="p">)</span>  <span class="c1"># create another tensor of same size as above array</span>
-
-<span class="c1"># numpy array multiplication</span>
-<span class="n">prod_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">an_array</span><span class="p">,</span> <span class="n">another_array</span><span class="p">)</span>
-
-<span class="c1"># torch tensor multiplication</span>
-<span class="n">prod_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">a_tensor</span><span class="p">,</span> <span class="n">another_tensor</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Numpy array multiplication result: </span><span class="si">{</span><span class="n">prod_array</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Torch tensor multiplication result: </span><span class="si">{</span><span class="n">prod_tensor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Numpy array multiplication result: [[21 24  7]
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Numpy array multiplication result: [[21 24  7]
  [47 54 21]]
 Torch tensor multiplication result: tensor([[21, 24,  7],
         [47, 54, 21]])
-</pre></div></div>
+</pre></div>
+</div>
+</div>
 </div>
 </section>
-<section id="Calculating-Gradients">
-<h2>Calculating Gradients<a class="headerlink" href="#Calculating-Gradients" title="Permalink to this heading">¶</a></h2>
+<section id="calculating-gradients">
+<h2>Calculating Gradients<a class="headerlink" href="#calculating-gradients" title="Permalink to this heading">¶</a></h2>
 <p>PyTorch provides a key functionality—the ability to calculate the gradients on tensors. Let’s start by creating a tensor with a single value. Here we are setting <code class="docutils literal notranslate"><span class="pre">requires_grad</span> <span class="pre">=</span> <span class="pre">True</span></code>, we’ll see why this is important in a moment.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x = torch.tensor(3.0, requires_grad=True)
+x
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">x</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(3., requires_grad=True)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor(3., requires_grad=True)
-</pre></div></div>
 </div>
 <p>Let’s define some variable <span class="math notranslate nohighlight">\(y\)</span> in terms of <span class="math notranslate nohighlight">\(x\)</span>:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y = x ** 2
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
-</pre></div>
 </div>
 </div>
 <p>We see that the value of <span class="math notranslate nohighlight">\(y\)</span> is as we expect—nothing too strange here.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(f&quot;x: {x}&quot;)
+print(f&quot;y: {y}&quot;)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x: </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y: </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-x: 3.0
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x: 3.0
 y: 9.0
-</pre></div></div>
+</pre></div>
+</div>
+</div>
 </div>
 <p>But what if we wanted to calculate the gradient of <span class="math notranslate nohighlight">\(y\)</span> with respect to <span class="math notranslate nohighlight">\(x\)</span>? Using calculus, we find that the answer is <span class="math notranslate nohighlight">\(\frac{dy}{dx} = 2x\)</span>. The derivative evaluated at <span class="math notranslate nohighlight">\(x = 3\)</span> is <span class="math notranslate nohighlight">\(6\)</span>.</p>
 <p>The magic is that can use PyTorch to get the same answer—no analytic derivative needed!</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
+x.grad  # returns the grad attribute (the gradient) of y with respect to x
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populates gradient (.grad) attributes of y with respect to all of its independent variables</span>
-<span class="n">x</span><span class="o">.</span><span class="n">grad</span>  <span class="c1"># returns the grad attribute (the gradient) of y with respect to x</span>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(6.)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor(6.)
-</pre></div></div>
-</div>
-<p>PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a computational graph with several operations on <span class="math notranslate nohighlight">\(x\)</span> resulting in a final output <span class="math notranslate nohighlight">\(y\)</span> will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of <span class="math notranslate nohighlight">\(y\)</span>
-with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a computational graph with several operations on <span class="math notranslate nohighlight">\(x\)</span> resulting in a final output <span class="math notranslate nohighlight">\(y\)</span> will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of <span class="math notranslate nohighlight">\(y\)</span> with respect to <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </section>
-<section id="Optimizing-a-Function-with-Gradient-Descent">
-<h2>Optimizing a Function with Gradient Descent<a class="headerlink" href="#Optimizing-a-Function-with-Gradient-Descent" title="Permalink to this heading">¶</a></h2>
+<section id="optimizing-a-function-with-gradient-descent">
+<h2>Optimizing a Function with Gradient Descent<a class="headerlink" href="#optimizing-a-function-with-gradient-descent" title="Permalink to this heading">¶</a></h2>
 <p>If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how would we do it?</p>
 <p>We wouldn’t be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we’d know when to stop when the ground felt flat.</p>
 <p>Before we leap, though, we need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.</p>
 <p>We can look at the gradient descent from a more mathematical lense by looking at the graph <span class="math notranslate nohighlight">\(y = x^2\)</span>:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def y(x):
+    return torch.square(x)
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
 </div>
 </div>
 <p>We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent.</p>
 <p>Note that Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional <code class="docutils literal notranslate"><span class="pre">detach().numpy()</span></code> or <code class="docutils literal notranslate"><span class="pre">.item()</span></code> calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively. When it comes time to use MPoL for RML imaging, or any large production run, we’ll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x = torch.linspace(-5, 5, 100)
+plt.plot(x, y(x))
+
+x_start = torch.tensor(
+    -4.0, requires_grad=True
+)  # tensor with x coordinate of starting point
+y_start = y(x_start)  # tensor with y coordinate of starting point
+
+plt.scatter(x_start.item(), y_start.item())  # plot starting point
+
+# we can calculate the derivative of y = x ** 2 evaluated at x_start
+y_start.backward()  # populate x_start.grad
+slope_start = x_start.grad
+
+# and use this to evaluate the tangent line
+tangent_line = slope_start * (x - x_start) + y_start
+
+plt.plot(x, tangent_line.detach().numpy())
+plt.xlabel(r&quot;$x$&quot;)
+plt.ylabel(r&quot;$y$&quot;)
+plt.xlim(xmin=-5, xmax=5)
+plt.ylim(ymin=0, ymax=25)
+plt.show()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-
-<span class="n">x_start</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>  <span class="c1"># tensor with x coordinate of starting point</span>
-<span class="n">y_start</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_start</span><span class="p">)</span>  <span class="c1"># tensor with y coordinate of starting point</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_start</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">y_start</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>  <span class="c1"># plot starting point</span>
-
-<span class="c1"># we can calculate the derivative of y = x ** 2 evaluated at x_start</span>
-<span class="n">y_start</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_start.grad</span>
-<span class="n">slope_start</span> <span class="o">=</span> <span class="n">x_start</span><span class="o">.</span><span class="n">grad</span>
-
-<span class="c1"># and use this to evaluate the tangent line</span>
-<span class="n">tangent_line</span> <span class="o">=</span> <span class="n">slope_start</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_start</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_start</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tangent_line</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/ci-tutorials_PyTorch_22_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_22_0.png" style="width: 459px; height: 459px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/903b73ac1974c73e6bb75138595d44ebde563542c7c638c75139c3ac4c678dda.png" src="../_images/903b73ac1974c73e6bb75138595d44ebde563542c7c638c75139c3ac4c678dda.png" />
 </div>
 </div>
 <p>We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:</p>
-<p><span class="math notranslate nohighlight">\(x_{new} = x_{current} - \nabla y(x_{current}) * (step \: size)\)</span></p>
+<p><span class="math notranslate nohighlight">\(x_\mathrm{new} = x_\mathrm{current} - \nabla y(x_\mathrm{current}) * (\mathrm{step\,size})\)</span></p>
 <p>where:</p>
 <ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(x_{current}\)</span> is our current x value</p></li>
-<li><p><span class="math notranslate nohighlight">\(\nabla y(x_{current})\)</span> is the gradient at our current point</p></li>
-<li><p><span class="math notranslate nohighlight">\((step \: size)\)</span> is a value we choose that scales our steps</p></li>
+<li><p><span class="math notranslate nohighlight">\(x_\mathrm{current}\)</span> is our current x value</p></li>
+<li><p><span class="math notranslate nohighlight">\(\nabla y(x_\mathrm{current})\)</span> is the gradient at our current point</p></li>
+<li><p><span class="math notranslate nohighlight">\((\mathrm{step\,size})\)</span> is a value we choose that scales our steps</p></li>
 </ul>
 <p>We will choose <code class="docutils literal notranslate"><span class="pre">step_size</span> <span class="pre">=</span> <span class="pre">0.1</span></code>:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x = torch.linspace(-5, 5, 100)
+plt.plot(x, y(x), zorder=0)  # plot y = x ** 2
+
+step_size = 0.1
+
+# Tensors containing current coordinates at the starting point we chose:
+x_current = x_start
+y_current = y(x_current)
+
+# To keep track of our coordinates at each step, we will create 2 lists, initialized with the values at our chosen starting point
+# These lists will be used to plot points with Matplotlib.pyplot so we use .item() to only retain the value in the tensor
+x_coords = [x_current.item()]
+y_coords = [y_current.item()]
+
+# Slope at current point
+y_current.backward()  # populate x_current.grad
+slope_current = (
+    x_current.grad
+)  # tensor containing derivative of y = x ** 2 evaluated at current point
+
+# Using equation for x_new to get x coordinate of second point, store it in a tensor
+# We cannot use torch.tensor(...) to make a new tensor from previous tensors without altering the
+# computational graph. We use .item() to only use float values to create our new tensor
+x_new = torch.tensor(
+    x_current.item() - (slope_current.item()) * step_size, requires_grad=True
+)
+
+# Plug in x_new into y = x ** 2 to get y_new of second point
+y_new = y(x_new)
+
+
+# Store second point coordinates in our lists
+x_coords.append(x_new.item())
+y_coords.append(y_new.item())
+
+
+plt.scatter(x_coords, y_coords)  # plot points showing steps
+# replot the last point in a new color
+plt.scatter(x_coords[-1], y_coords[-1], c=&quot;C1&quot;, zorder=1)
+plt.text(-2, 5, &quot;step 1&quot;, va=&quot;center&quot;)
+
+plt.xlim(xmin=-5, xmax=5)
+plt.ylim(ymin=-1, ymax=25)
+plt.xlabel(r&quot;$x$&quot;)
+plt.ylabel(r&quot;$y$&quot;)
+plt.show()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># plot y = x ** 2</span>
-
-<span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.1</span>
-
-<span class="c1"># Tensors containing current coordinates at the starting point we chose:</span>
-<span class="n">x_current</span> <span class="o">=</span> <span class="n">x_start</span>
-<span class="n">y_current</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_current</span><span class="p">)</span>
-
-<span class="c1"># To keep track of our coordinates at each step, we will create 2 lists, initialized with the values at our chosen starting point</span>
-<span class="c1"># These lists will be used to plot points with Matplotlib.pyplot so we use .item() to only retain the value in the tensor</span>
-<span class="n">x_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_current</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
-<span class="n">y_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">y_current</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
-
-<span class="c1"># Slope at current point</span>
-<span class="n">y_current</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_current.grad</span>
-<span class="n">slope_current</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">x_current</span><span class="o">.</span><span class="n">grad</span>
-<span class="p">)</span>  <span class="c1"># tensor containing derivative of y = x ** 2 evaluated at current point</span>
-
-<span class="c1"># Using equation for x_new to get x coordinate of second point, store it in a tensor</span>
-<span class="c1"># We cannot use torch.tensor(...) to make a new tensor from previous tensors without altering the</span>
-<span class="c1"># computational graph. We use .item() to only use float values to create our new tensor</span>
-<span class="n">x_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="n">x_current</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">slope_current</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">*</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-
-<span class="c1"># Plug in x_new into y = x ** 2 to get y_new of second point</span>
-<span class="n">y_new</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
-
-
-<span class="c1"># Store second point coordinates in our lists</span>
-<span class="n">x_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-<span class="n">y_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_coords</span><span class="p">,</span> <span class="n">y_coords</span><span class="p">)</span>  <span class="c1"># plot points showing steps</span>
-<span class="c1"># replot the last point in a new color</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;step 1&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/ci-tutorials_PyTorch_24_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_24_0.png" style="width: 459px; height: 459px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/60082b91c572792ea9612bedb620596a03a17137c2a8adb6bc182484a21e8215.png" src="../_images/60082b91c572792ea9612bedb620596a03a17137c2a8adb6bc182484a21e8215.png" />
 </div>
 </div>
 <p>The gradient at our new point (shown in orange) is still not close to zero, meaning we haven’t reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We’ll say we’ve reached the bottom of the valley when the absolute value of the gradient is <span class="math notranslate nohighlight">\(&lt;0.1\)</span>:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x = torch.linspace(-5, 5, 100)
+plt.plot(x, y(x), zorder=0)  # plot y = x ** 2
+
+# We are now at our second point so we need to update our tensors containing our current coordinates
+x_current = x_new
+y_current = y_new
+
+
+# We automate this process with the following while loop
+y_current.backward()  # populate x_current.grad
+while abs(x_current.grad) &gt;= 0.1:  # Check to see if we&#39;re at minimum
+    # Get tensors containing new coordinates
+    x_new = torch.tensor(
+        x_current.item() - x_current.grad.item() * step_size, requires_grad=True
+    )
+    y_new = y(x_new)
+
+    # Add new coordinates to lists
+    x_coords.append(x_new.item())
+    y_coords.append(y_new.item())
+
+    # Update current position
+    x_current = x_new
+    y_current = y_new
+
+    # Update current slope
+    y_current.backward()  # populate x_current.grad
+
+
+plt.scatter(x_coords, y_coords)  # plot points showing steps
+plt.scatter(x_coords[-1], y_coords[-1], c=&quot;C1&quot;)  # highlight last point
+
+plt.xlim(xmin=-5, xmax=5)
+plt.ylim(ymin=-1, ymax=25)
+plt.xlabel(r&quot;$x$&quot;)
+plt.ylabel(r&quot;$y$&quot;)
+plt.show()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># plot y = x ** 2</span>
-
-<span class="c1"># We are now at our second point so we need to update our tensors containing our current coordinates</span>
-<span class="n">x_current</span> <span class="o">=</span> <span class="n">x_new</span>
-<span class="n">y_current</span> <span class="o">=</span> <span class="n">y_new</span>
-
-
-<span class="c1"># We automate this process with the following while loop</span>
-<span class="n">y_current</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_current.grad</span>
-<span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x_current</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">0.1</span><span class="p">:</span>  <span class="c1"># Check to see if we&#39;re at minimum</span>
-    <span class="c1"># Get tensors containing new coordinates</span>
-    <span class="n">x_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-        <span class="n">x_current</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">x_current</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">y_new</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
-
-    <span class="c1"># Add new coordinates to lists</span>
-    <span class="n">x_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-    <span class="n">y_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-
-    <span class="c1"># Update current position</span>
-    <span class="n">x_current</span> <span class="o">=</span> <span class="n">x_new</span>
-    <span class="n">y_current</span> <span class="o">=</span> <span class="n">y_new</span>
-
-    <span class="c1"># Update current slope</span>
-    <span class="n">y_current</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_current.grad</span>
-
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_coords</span><span class="p">,</span> <span class="n">y_coords</span><span class="p">)</span>  <span class="c1"># plot points showing steps</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>  <span class="c1"># highlight last point</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/ci-tutorials_PyTorch_26_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_26_0.png" style="width: 459px; height: 459px;" />
+<div class="cell_output docutils container">
+<img alt="../_images/7d94bcdae442cd202e2c4b90b550021ec902f20bb6b89eea1a40ba6c2cf10e95.png" src="../_images/7d94bcdae442cd202e2c4b90b550021ec902f20bb6b89eea1a40ba6c2cf10e95.png" />
 </div>
 </div>
 <p>This works, but it takes a long time since we have several small steps.</p>
 <p>Can we speed up the process by taking large steps? Most likely, yes. But there is a danger in taking step sizes that are too large. For example, let’s repeat this exercise with a step size of <span class="math notranslate nohighlight">\(1.5\)</span>. Our first step now looks like:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x_large_step = torch.linspace(-20, 20, 1000)
+plt.plot(x_large_step, y(x_large_step), zorder=0)  # plot y = x ** 2
+
+# Current values at starting point we chose:
+x_large_step_current = torch.tensor(-4.0, requires_grad=True)
+y_large_step_current = y(x_large_step_current)
+
+# Slope at current point
+y_large_step_current.backward()  # populate x_large_step_current.grad
+slope_large_step_current = (
+    x_large_step_current.grad
+)  # tensor containing derivative of y = x ** 2 evaluated at current point
+
+# To keep track of our coordinates at each step, we will create 2 lists, initialized with the coordinates at our chosen starting point
+# These lists will be used to plot points with Matplotlib.pyplot so we use .item() to only retain the value in the tensor
+x_large_coords = [x_large_step_current.item()]
+y_large_coords = [y_large_step_current.item()]
+
+# New step_size
+large_step_size = 1.5
+
+# Get coordinates of our second point using x_new equation and y = x ** 2
+x_large_step_new = torch.tensor(
+    x_large_step_current.item() - slope_large_step_current.item() * large_step_size,
+    requires_grad=True,
+)
+y_large_step_new = y(x_large_step_new)
+
+# Store second point coordinates in our lists
+x_large_coords.append(x_large_step_new.item())
+y_large_coords.append(y_large_step_new.item())
+
+
+plt.scatter(x_large_coords, y_large_coords)  # plot points showing steps
+plt.scatter(x_large_coords[-1], y_large_coords[-1], c=&quot;C1&quot;)
+
+
+plt.xlim(xmin=-20, xmax=20)
+plt.ylim(ymin=-1, ymax=260)
+plt.xlabel(r&quot;$x$&quot;)
+plt.ylabel(r&quot;$y$&quot;)
+plt.show()
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_large_step</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_large_step</span><span class="p">,</span> <span class="n">y</span><span class="p">(</span><span class="n">x_large_step</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># plot y = x ** 2</span>
-
-<span class="c1"># Current values at starting point we chose:</span>
-<span class="n">x_large_step_current</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">y_large_step_current</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_large_step_current</span><span class="p">)</span>
-
-<span class="c1"># Slope at current point</span>
-<span class="n">y_large_step_current</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># populate x_large_step_current.grad</span>
-<span class="n">slope_large_step_current</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">x_large_step_current</span><span class="o">.</span><span class="n">grad</span>
-<span class="p">)</span>  <span class="c1"># tensor containing derivative of y = x ** 2 evaluated at current point</span>
-
-<span class="c1"># To keep track of our coordinates at each step, we will create 2 lists, initialized with the coordinates at our chosen starting point</span>
-<span class="c1"># These lists will be used to plot points with Matplotlib.pyplot so we use .item() to only retain the value in the tensor</span>
-<span class="n">x_large_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_large_step_current</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
-<span class="n">y_large_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">y_large_step_current</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
-
-<span class="c1"># New step_size</span>
-<span class="n">large_step_size</span> <span class="o">=</span> <span class="mf">1.5</span>
-
-<span class="c1"># Get coordinates of our second point using x_new equation and y = x ** 2</span>
-<span class="n">x_large_step_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="n">x_large_step_current</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">slope_large_step_current</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">large_step_size</span><span class="p">,</span>
-    <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">y_large_step_new</span> <span class="o">=</span> <span class="n">y</span><span class="p">(</span><span class="n">x_large_step_new</span><span class="p">)</span>
-
-<span class="c1"># Store second point coordinates in our lists</span>
-<span class="n">x_large_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_large_step_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-<span class="n">y_large_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_large_step_new</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_large_coords</span><span class="p">,</span> <span class="n">y_large_coords</span><span class="p">)</span>  <span class="c1"># plot points showing steps</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_large_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_large_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
-
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">260</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/136ca26b71e8e43458941b15d98d5b526f40a1a964e198ed823e471a221d405a.png" src="../_images/136ca26b71e8e43458941b15d98d5b526f40a1a964e198ed823e471a221d405a.png" />
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/ci-tutorials_PyTorch_28_0.png" class="no-scaled-link" src="../_images/ci-tutorials_PyTorch_28_0.png" style="width: 485px; height: 451px;" />
-</div>
-</div>
-<p><em>Note the change in scale.</em> With only one step, we already see that we stepped <em>right over</em> the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we’d find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large
-render the optimization process invalid. In this case, a reasonable choice appears to be <code class="docutils literal notranslate"><span class="pre">step</span> <span class="pre">size</span> <span class="pre">=</span> <span class="pre">0.6</span></code>, which would have reached pretty close to the minimum after only 3 steps.</p>
+<p><em>Note the change in scale.</em> With only one step, we already see that we stepped <em>right over</em> the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we’d find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be <code class="docutils literal notranslate"><span class="pre">step</span> <span class="pre">size</span> <span class="pre">=</span> <span class="pre">0.6</span></code>, which would have reached pretty close to the minimum after only 3 steps.</p>
 <p>To sum up, optimizing a function with gradient descent consists of</p>
 <ol class="arabic simple">
 <li><p>Calculate the gradient at your current point</p></li>
@@ -840,8 +557,8 @@ render the optimization process invalid. In this case, a reasonable choice appea
 </ol>
 <p>Autodifferentiation frameworks like PyTorch allow us to easily calculate the gradient of complex functions, including a large set of prior/regularizer functions that we would want to use for Regularized Maximum Likelihood (RML) imaging. This makes it relatively easy to quickly and efficiently solve for the “optimal” image given a set of data and regularizer terms.</p>
 </section>
-<section id="Additional-Resources">
-<h2>Additional Resources<a class="headerlink" href="#Additional-Resources" title="Permalink to this heading">¶</a></h2>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/autograd.html">PyTorch documentation on autograd</a></p></li>
 <li><p><a class="reference external" href="https://anguswilliams91.github.io/statistics/computing/jax/">Angus Williams’ blog post on autodifferentiaton, JAX, and Laplace’s method</a></p></li>

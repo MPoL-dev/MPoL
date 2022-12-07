@@ -32,7 +32,6 @@
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -45,6 +44,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
   <link rel="stylesheet" href="../_static/bullets.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
@@ -200,7 +200,7 @@
            <div itemprop="articleBody">
             
   <section id="gpu-acceleration">
-<h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this heading">¶</a></h1>
+<span id="gpu-reference-label"></span><h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this heading">¶</a></h1>
 <section id="installation-and-configuration">
 <h2>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this heading">¶</a></h2>
 <section id="installing-cuda-toolkit">
@@ -217,8 +217,8 @@ GUI. Once complete, restart your computer.</p>
 <section id="python-and-pytorch-gpu-configuration">
 <h3>Python and PyTorch GPU configuration<a class="headerlink" href="#python-and-pytorch-gpu-configuration" title="Permalink to this heading">¶</a></h3>
 <p>The next step is to check whether your Python and PyTorch installations are correctly configured to use your GPU. After installing MPoL, you can check whether everything installed correctly by opening up a Python interpreter, ard running</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import torch
+print(torch.cuda.is_available())
 </pre></div>
 </div>
 <p>This command should return <code class="docutils literal notranslate"><span class="pre">True</span></code>. If not, then you may need to use a more specific installation process. Go to the <a class="reference external" href="https://pytorch.org/">PyTorch Official Site</a> and scroll down
@@ -234,36 +234,36 @@ while another Windows 10 system using a Nvidia GTX 1660Ti worked with the defaul
 <h2>Why use the GPU?<a class="headerlink" href="#why-use-the-gpu" title="Permalink to this heading">¶</a></h2>
 <p>Using a GPU can accelerate computing speeds up to 100x over CPUs, especially for operations on large images, like is common for MPoL. The following is a quick example showing the addition of two large vectors. Your exact timing may vary, but for our hardware this calculation took
 320 milliseconds seconds on the CPU, while it only took 3.1 milliseconds on the GPU.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">9.9e7</span><span class="p">)</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">B</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import torch
+import time
+N = int(9.9e7)
+A = torch.ones(N)
+B = torch.ones(N)
+start = time.time()
+C = A + B
+print(time.time() - start)
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span> <span class="c1"># emptying the cache on the gpu just incase there was any memory left over from an old operation</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>torch.cuda.empty_cache() # emptying the cache on the gpu just incase there was any memory left over from an old operation
+A = A.cuda()
+B = B.cuda()
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">end</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">start</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
-<span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">B</span>
-<span class="n">end</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">elapsed_time</span><span class="p">(</span><span class="n">end</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
+start.record()
+C = A + B
+end.record()
+torch.cuda.synchronize()
+print(start.elapsed_time(end))
 </pre></div>
 </div>
 </section>
 <section id="using-the-gpu-as-part-of-pytorch-and-mpol">
 <h2>Using the GPU as part of PyTorch and MPoL<a class="headerlink" href="#using-the-gpu-as-part-of-pytorch-and-mpol" title="Permalink to this heading">¶</a></h2>
 <p>Here is a short example demonstrating how to initialize an MPoL model and run it on the GPU. First we will set our device to the CUDA device.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>device = torch.device(&#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
+print(device)
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cuda</span><span class="p">:</span><span class="mi">0</span>
@@ -278,25 +278,25 @@ will assume that <code class="docutils literal notranslate"><span class="pre">de
 </div>
 <p>Now that we have our device set, we’ll initialize the MPoL dataset as in previous tutorials. This example uses a multi-channel dataset, but for demonstration purposes we will only use the central
 channel (<code class="docutils literal notranslate"><span class="pre">central_chan=4</span></code>).</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span>
-<span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s1">&#39;https://zenodo.org/record/4498439/files/logo_cube.npz&#39;</span><span class="p">,</span>
-    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-<span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
-<span class="n">central_chan</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
-    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
-    <span class="n">uu</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;uu&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
-    <span class="n">vv</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;vv&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
-    <span class="n">weight</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
-    <span class="n">data_re</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;data_re&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
-    <span class="n">data_im</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;data_im&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
-<span class="p">)</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from astropy.utils.data import download_file
+import numpy as np
+from mpol import gridding, coordinates
+fname = download_file(
+    &#39;https://zenodo.org/record/4498439/files/logo_cube.npz&#39;,
+    cache=True,
+    )
+d = np.load(fname)
+coords = coordinates.GridCoords(cell_size=0.03, npix=180)
+central_chan = 4
+gridder = gridding.Gridder(
+    coords=coords,
+    uu=d[&#39;uu&#39;][central_chan],
+    vv=d[&#39;vv&#39;][central_chan],
+    weight=d[&#39;weight&#39;][central_chan],
+    data_re=d[&#39;data_re&#39;][central_chan],
+    data_im=d[&#39;data_im&#39;][central_chan],
+)
+dataset = gridder.to_pytorch_dataset()
 </pre></div>
 </div>
 <p>Next we’ll create a <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> module to train to our
@@ -305,8 +305,8 @@ information, see the <a class="reference external" href="optimization.html">Opti
 Loop</a>
 tutorial or the MPoL SimpleNet <a class="reference external" href="https://mpol-dev.github.io/MPoL/_modules/mpol/precomposed.html#SimpleNet">Source
 Code</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol.precomposed</span> <span class="kn">import</span> <span class="n">SimpleNet</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol.precomposed import SimpleNet
+model = SimpleNet(coords=coords, nchan=dataset.nchan)
 </pre></div>
 </div>
 <p>We are now ready to move our model and data to the GPU using the <code class="docutils literal notranslate"><span class="pre">tensor.to(device)</span></code>
@@ -317,40 +317,40 @@ device. Both of these methods return a <em>copy</em> of the object on the GPU.</
 Tutorial</a>, which basically contains a set of parameters that resulted in a strong cross validation score for this particular dataset. For more
 details on these variables, see the <a class="reference external" href="crossvalidation.html">Cross Validation
 Tutorial</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span><span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;lambda_sparsity&#39;</span><span class="p">:</span><span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;lambda_TV&#39;</span><span class="p">:</span><span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;epochs&#39;</span><span class="p">:</span><span class="mi">600</span><span class="p">}</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dset = dataset.to(device)
+model = model.cuda()
+config = {&#39;lr&#39;:0.5, &#39;lambda_sparsity&#39;:1e-4, &#39;lambda_TV&#39;:1e-4, &#39;epochs&#39;:600}
+optimizer = torch.optim.Adam(model.parameters(), lr=config[&#39;lr&#39;])
 </pre></div>
 </div>
 <p>We are now ready to train our network on the GPU. We will use a for-loop
 with 600 iterations (epochs) in which we will calculate the loss and
 step our optimizer.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">losses</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol import losses
 
-<span class="c1"># set the model to training mode</span>
-<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]):</span>
-    <span class="c1"># set the model to zero grad</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+# set the model to training mode
+model.train()
+for i in range(config[&#39;epochs&#39;]):
+    # set the model to zero grad
+    model.zero_grad()
 
-    <span class="c1"># forward pass</span>
-    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+    # forward pass
+    vis = model.forward()
 
-    <span class="c1"># get skycube from our forward model</span>
-    <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
+    # get skycube from our forward model
+    sky_cube = model.icube.sky_cube
 
-    <span class="c1"># compute loss</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;lambda_sparsity&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">losses</span><span class="o">.</span><span class="n">sparsity</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;lambda_TV&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">losses</span><span class="o">.</span><span class="n">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">))</span>
+    # compute loss
+    loss = (
+        losses.nll_gridded(vis, dset)
+        + config[&#39;lambda_sparsity&#39;] * losses.sparsity(sky_cube)
+        + config[&#39;lambda_TV&#39;] * losses.TV_image(sky_cube))
 
-    <span class="c1"># perform a backward pass</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    # perform a backward pass
+    loss.backward()
 
-    <span class="c1"># update the weights</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    # update the weights
+    optimizer.step()
 </pre></div>
 </div>
 <p>Congratulations! You have now trained a neural network on your GPU. In general, the process for running on the GPU is designed to be simple. Once your
