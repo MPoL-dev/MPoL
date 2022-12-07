@@ -27,7 +27,6 @@ release = __version__
 extensions = [
     "faculty_sphinx_theme",
     "sphinx.ext.autodoc",
-    "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
@@ -35,11 +34,7 @@ extensions = [
     "myst_nb",
 ]
 
-myst_enable_extensions = ["dollarmath", "colon_fence"]
-
-mathjax_path = (
-    "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
 
@@ -50,15 +45,6 @@ templates_path = ["_templates"]
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
-# nbsphinx configuration
-suppress_warnings = ["nbsphinx"]
-
-nbsphinx_execute_arguments = [
-    "--InlineBackend.figure_format='retina'",
-    # "--InlineBackend.figure_format={'svg', 'pdf'}",
-    "--InlineBackend.rc={'figure.dpi': 200}",
-]
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "faculty-sphinx-theme"
