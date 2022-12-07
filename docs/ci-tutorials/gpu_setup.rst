@@ -1,3 +1,5 @@
+.. _gpu-reference-label:
+
 GPU Acceleration
 ----------------
 
@@ -118,7 +120,7 @@ channel (``central_chan=4``).
 Next we'll create a :class:`~mpol.precomposed.SimpleNet` module to train to our
 data. For more detailed
 information, see the `Optimization
-Loop <https://mpol-dev.github.io/MPoL/tutorials/optimization.html>`__
+Loop <optimization.html>`__
 tutorial or the MPoL SimpleNet `Source
 Code <https://mpol-dev.github.io/MPoL/_modules/mpol/precomposed.html#SimpleNet>`__.
 
@@ -133,9 +135,9 @@ also use the ``tensor.cuda()`` to move the tensor to the default CUDA
 device. Both of these methods return a *copy* of the object on the GPU.
 
 We've borrowed a ``config`` dictionary from the `Cross Validation
-Tutorial <https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html>`__, which basically contains a set of parameters that resulted in a strong cross validation score for this particular dataset. For more
+Tutorial <crossvalidation.html>`__, which basically contains a set of parameters that resulted in a strong cross validation score for this particular dataset. For more
 details on these variables, see the `Cross Validation
-Tutorial <https://mpol-dev.github.io/MPoL/tutorials/crossvalidation.html>`__.
+Tutorial <crossvalidation.html>`__.
 
 .. code:: ipython3
 
