@@ -34,6 +34,14 @@ extensions = [
     "myst_nb",
 ]
 
+# add in additional files
+source_suffix = {
+    ".ipynb": "myst-nb",
+    ".rst": "restructuredtext",
+    ".myst": "myst-nb",
+    ".md": "myst-nb",
+}
+
 myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
@@ -82,5 +90,5 @@ if os.getenv("CI"):
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
-# nb_execution_excludepatterns = ["large-tutorials/*"]
+nb_execution_excludepatterns = ["large-tutorials/HD143006_part_1.md"]
 myst_heading_anchors = 3
