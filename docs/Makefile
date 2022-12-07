@@ -1,5 +1,4 @@
 # makefile for Sphinx documentation
-#
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
@@ -41,9 +40,6 @@ _static/fftshift/build/plot.png: _static/fftshift/src/plot.py
 _static/mmd/build/%.svg: _static/mmd/src/%.mmd
 	mkdir -p _static/mmd/build
 	${MERMAID_PATH}mmdc -i $^ -o $@
-
-# html: ${CI-NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
-# 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
 
 html: ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
