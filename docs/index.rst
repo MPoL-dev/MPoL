@@ -38,7 +38,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    rml_intro.rst
    installation.rst
    units-and-conventions.rst
-   developer-documentation.rst
+   developer-documentation.md
    api.rst
 
 .. toctree::

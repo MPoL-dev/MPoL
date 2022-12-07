@@ -1,4 +1,4 @@
-> (changelog-reference-label)=
+(changelog-reference-label)=
 
 # Changelog
 
