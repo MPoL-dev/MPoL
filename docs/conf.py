@@ -27,17 +27,22 @@ release = __version__
 extensions = [
     "faculty_sphinx_theme",
     "sphinx.ext.autodoc",
-    "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "nbsphinx",
     "sphinx_copybutton",
     "sphinxcontrib.mermaid",
+    "myst_nb",
 ]
 
-mathjax_path = (
-    "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+# add in additional files
+source_suffix = {
+    ".ipynb": "myst-nb",
+    ".rst": "restructuredtext",
+    ".myst": "myst-nb",
+    ".md": "myst-nb",
+}
+
+myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
 
@@ -48,15 +53,6 @@ templates_path = ["_templates"]
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
-# nbsphinx configuration
-suppress_warnings = ["nbsphinx"]
-
-nbsphinx_execute_arguments = [
-    "--InlineBackend.figure_format='retina'",
-    # "--InlineBackend.figure_format={'svg', 'pdf'}",
-    "--InlineBackend.rc={'figure.dpi': 200}",
-]
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "faculty-sphinx-theme"
@@ -78,7 +74,6 @@ html_css_files = ["bullets.css"]
 # https://docs.readthedocs.io/en/stable/guides/adding-custom-css.html
 html_js_files = ["https://buttons.github.io/buttons.js"]
 
-
 # Mermaid configuration
 mermaid_output_format = "svg"
 
@@ -92,3 +87,8 @@ if os.getenv("CI"):
     # relative to docs/ directory!
     # (mmdc itself not in $PATH automatically, like local)
     mermaid_cmd = "../node_modules/.bin/mmdc"
+
+nb_execution_mode = "cache"
+nb_execution_timeout = -1
+nb_execution_excludepatterns = ["large-tutorials/*.md"]
+myst_heading_anchors = 3

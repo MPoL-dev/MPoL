@@ -1,3 +1,5 @@
+.. _gpu-reference-label:
+
 GPU Acceleration
 ----------------
 

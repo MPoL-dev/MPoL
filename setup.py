@@ -46,6 +46,8 @@ EXTRA_REQUIRES = {
         "sphinxcontrib-mermaid",
         "astropy",
         "tensorboard",
+        "myst-nb",
+        "jupyter-cache",
     ],
 }
 

@@ -1,6 +1,6 @@
 LARGE-NOTEBOOKS := HD143006_part_1.ipynb HD143006_part_2.ipynb
 
-%.ipynb: %.py
+%.ipynb: %.md
 	jupytext --to ipynb --execute $<
 
 

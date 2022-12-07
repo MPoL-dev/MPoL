@@ -35,10 +35,10 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    :maxdepth: 2
    :caption: User Guide
 
-   rml_intro.rst
-   installation.rst
-   units-and-conventions.rst
-   developer-documentation.rst
+   rml_intro.md
+   installation.md
+   units-and-conventions.md
+   developer-documentation.md
    api.rst
 
 .. toctree::
@@ -57,7 +57,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
 .. toctree::
    :hidden:
 
-   changelog.rst
+   changelog.md
 
 If you use MPoL in your research, please cite us! ::
 
