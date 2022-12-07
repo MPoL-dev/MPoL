@@ -7,16 +7,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: '3.8'
       - name: Install doc deps
         run: |
-          pip install .[docs]
+          pip install .'[docs]'
       - name: Install Pandoc dependency
         run: |
           sudo apt-get install pandoc
