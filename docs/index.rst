@@ -57,7 +57,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
 .. toctree::
    :hidden:
 
-   changelog.rst
+   changelog.md
 
 If you use MPoL in your research, please cite us! ::
 
