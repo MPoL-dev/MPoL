@@ -35,9 +35,9 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    :maxdepth: 2
    :caption: User Guide
 
-   rml_intro.rst
-   installation.rst
-   units-and-conventions.rst
+   rml_intro.md
+   installation.md
+   units-and-conventions.md
    developer-documentation.md
    api.rst
 
