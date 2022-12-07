@@ -90,5 +90,5 @@ if os.getenv("CI"):
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
-nb_execution_excludepatterns = ["large-tutorials/HD143006_part_1.md"]
+nb_execution_excludepatterns = ["large-tutorials/*.md"]
 myst_heading_anchors = 3
