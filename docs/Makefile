@@ -18,14 +18,14 @@ CI-NOTEBOOKS := ci-tutorials/PyTorch.ipynb ci-tutorials/gridder.ipynb ci-tutoria
 CHARTS := _static/mmd/build/SimpleNet.svg _static/mmd/build/ImageCube.svg _static/mmd/build/BaseCube.svg _static/mmd/build/SkyModel.svg
 clean:
 	rm -rf _build
-	rm -rf ${CI-NOTEBOOKS}
+	# rm -rf ${CI-NOTEBOOKS}
 	rm -rf ci-tutorials/.ipynb_checkpoints
 	rm -rf ci-tutorials/runs
 	rm -rf ${CHARTS}
 	rm -rf _static/baselines/build/baselines.csv
 
-ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
-	jupytext --to ipynb --execute $<
+# ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
+	# jupytext --to ipynb --execute $<
 
 # baseline table
 _static/baselines/build/baselines.csv: _static/baselines/src/print_conversions.py
@@ -42,5 +42,8 @@ _static/mmd/build/%.svg: _static/mmd/src/%.mmd
 	mkdir -p _static/mmd/build
 	${MERMAID_PATH}mmdc -i $^ -o $@
 
-html: ${CI-NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
+# html: ${CI-NOTEBOOKS} ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
+# 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
+
+html: ${CHARTS} _static/baselines/build/baselines.csv _static/fftshift/build/plot.png
 	python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build/html
