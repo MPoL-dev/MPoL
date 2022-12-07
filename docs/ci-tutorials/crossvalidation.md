@@ -110,7 +110,7 @@ When all loops are done, you can average the $K$ cross-validation scores togethe
 
 +++
 
-## Choosing the $K$-folds
+## Choosing the K-folds
 
 There are many ways to split a dataset into $K$ chunks, and, depending on your application, some schemes are better than others. For most interferometric datasets, visibility samples are clustered in Fourier space due to the limitations on the number and location of the antennas. One objective of cross validation might be figuring out how sparse $u$,$v$ coverage adversely affects our imaging process---ideally we'd like to tune the algorithm such that we would still recover a similar image even if our $u$,$v$ sampling were different. To explore slicing choices, here is the full $u$,$v$ coverage of our ALMA logo mock dataset (C43-7, 1 hour observation)
 
