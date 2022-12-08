@@ -8,8 +8,8 @@ from mpol import losses, precomposed
 from mpol.constants import *
 
 
-# configure a class to train with
 def test_init_train_class(coords, dataset):
+    # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
     rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
@@ -28,8 +28,8 @@ def test_init_train_class(coords, dataset):
 
 
 def test_train_loop(coords, dataset_cont, tmp_path):
-
     # set everything up to run on a single channel
+    # and run a few iterations
 
     nchan = 1
     rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
@@ -64,7 +64,8 @@ def test_train_loop(coords, dataset_cont, tmp_path):
 
 
 def test_tensorboard(coords, dataset_cont, tmp_path):
-    # set everything up to run on a single channel
+    # set everything up to run on a single channel and then
+    # test the writer function
 
     nchan = 1
     rml = precomposed.SimpleNet(coords=coords, nchan=nchan)

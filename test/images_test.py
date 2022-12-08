@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pytest
 import torch
-
 from astropy.io import fits
+
 from mpol import gridding, images, utils
 from mpol.constants import *
 
@@ -31,8 +31,6 @@ def test_single_chan():
 def test_basecube_grad():
     bcube = images.BaseCube(npix=800, cell_size=0.015)
     loss = torch.sum(bcube.forward())
-    # segfaults on 3.9
-    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
 
@@ -45,9 +43,8 @@ def test_imagecube_grad(coords):
     # send things through this layer
     loss = torch.sum(imagecube.forward(bcube.forward()))
 
-    # segfaults on 3.9
-    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
+
 
 # test for proper fits scale
 def test_imagecube_tofits(coords, tmp_path):
@@ -62,15 +59,20 @@ def test_imagecube_tofits(coords, tmp_path):
 
     # creating output fits file with name 'test_cube_fits_file39.fits'
     # file will be deleted after testing
-    imagecube.to_FITS(fname=tmp_path / 'test_cube_fits_file39.fits', overwrite=True)
+    imagecube.to_FITS(fname=tmp_path / "test_cube_fits_file39.fits", overwrite=True)
 
     # inputting the header from the previously created fits file
-    fits_header = fits.open(tmp_path / 'test_cube_fits_file39.fits')[0].header
-    assert (fits_header['CDELT1'] and fits_header['CDELT2']) == pytest.approx(coords.cell_size / 3600)
+    fits_header = fits.open(tmp_path / "test_cube_fits_file39.fits")[0].header
+    assert (fits_header["CDELT1"] and fits_header["CDELT2"]) == pytest.approx(
+        coords.cell_size / 3600
+    )
 
 
-# test image packing
 def test_fourier_layer(coords, tmp_path):
+    # test image packing
+    # test whether we get the same Fourier Transform using the FFT as we could
+    # calculate analytically
+
     kw = {
         "a": 1,
         "delta_x": 0.02,  # arcsec
@@ -133,6 +135,8 @@ def test_fourier_layer(coords, tmp_path):
 
 
 def test_fourier_grad(coords):
+    # Test that we can calculate a gradient on a loss function using the Fourier layer
+
     kw = {
         "a": 1,
         "delta_x": 0.02,  # arcsec
@@ -157,8 +161,6 @@ def test_fourier_grad(coords):
     output = flayer.forward(img_packed_tensor)
     loss = torch.sum(torch.abs(output))
 
-    # segfaults on 3.9
-    # https://github.com/pytorch/pytorch/issues/50014
     loss.backward()
 
 
@@ -217,6 +219,7 @@ def test_basecube_imagecube(coords, tmp_path):
 
 
 def test_base_cube_conv_cube(coords, tmp_path):
+    # test whether the HannConvCube functions appropriately
 
     # create a mock cube that includes negative values
     nchan = 1
@@ -227,13 +230,19 @@ def test_base_cube_conv_cube(coords, tmp_path):
         (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
     )
 
+    # The HannConvCube expects to function on a pre-packed ImageCube,
+    # so in order to get the plots looking correct on this test image,
+    # we need to faff around with packing
+
     # tensor
     test_cube = torch.normal(mean=mean, std=std)
+    test_cube_packed = utils.sky_cube_to_packed_cube(test_cube)
 
     # layer
     conv_layer = images.HannConvCube(nchan=nchan)
 
-    conv_output = conv_layer(test_cube)
+    conv_output_packed = conv_layer(test_cube_packed)
+    conv_output = utils.packed_cube_to_sky_cube(conv_output_packed)
 
     fig, ax = plt.subplots(ncols=2, nrows=1)
 
@@ -255,7 +264,9 @@ def test_base_cube_conv_cube(coords, tmp_path):
 
 
 def test_multi_chan_conv(coords, tmp_path):
-    # create a mock cube that includes negative values
+    # create a mock channel cube that includes negative values
+    # and make sure that the HannConvCube works across channels
+
     nchan = 10
     mean = torch.full(
         (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double

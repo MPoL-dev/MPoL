@@ -10,10 +10,11 @@ def index_vis(vis, griddedDataset):
     Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is "packed" just like the :class:`~mpol.datasets.GriddedDataset`
 
     Args:
-        vis (torch complex tensor): torch tensor ``(nchan, npix, npix)`` shape to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
 
-    Returns (torch complex tensor):  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
+    Returns:
+        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
     """
     assert (
         vis.size()[0] == griddedDataset.mask.size()[0]
@@ -51,7 +52,7 @@ class GriddedResidualConnector(nn.Module):
         self.griddedDataset = griddedDataset
         self.coords = fourierCube.coords
 
-        # take the mask
+        # take the mask from the gridded dataset
         self.mask = griddedDataset.mask
 
     def forward(self):
@@ -61,23 +62,26 @@ class GriddedResidualConnector(nn.Module):
 
             \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 
-        And store residual products as PyTorch tensor instance and property attributes. Real values of cube are stored after check that complex values are minimal.
+        and store residual products as PyTorch tensor instance and property attributes.
 
-        Returns (torch tensor complex): full packed cube (including imaginaries), mainly for debugging purposes.
+        Also take the iFFT of the gridded residuals and store this as an image. After the complex values of the image cube are checked to ensure that they are minimal, store only the real values as `self.cube`.
+
+        Returns:
+            torch tensor complex: The full packed image cube (including imaginaries). This can be useful for debugging purposes.
         """
         self.residuals = self.griddedDataset.vis_gridded - self.fourierCube.vis
 
         self.amp = torch.abs(self.residuals)
         self.phase = torch.angle(self.residuals)
 
-        # calculate the correpsonding residual dirty image (under uniform weighting).
+        # calculate the corresponding residual dirty image (under uniform weighting).
         # see units_and_conventions.rst for the calculation of the prefactors.
         # But essentially this calculation requires a prefactor of npix**2 * uv_cell_size**2
         # Assuming uv_cell_size would be measured in units of cycles/arcsec, then this prefactor is
         # equivalent to 1/cell_size**2, where cell_size is units of arcsec
         cube = (
             1
-            / (self.coords.cell_size ** 2)
+            / (self.coords.cell_size**2)
             * torch.fft.ifftn(self.residuals, dim=(1, 2))
         )  # Jy/arcsec^2
 
@@ -108,7 +112,6 @@ class GriddedResidualConnector(nn.Module):
 
         Returns:
             torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``
-
         """
         return utils.packed_cube_to_ground_cube(self.mask)
 

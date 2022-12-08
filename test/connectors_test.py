@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import connectors, coordinates, images
+from mpol import connectors, images
 from mpol.constants import *
 
 
-# test instantiate connector
-def test_instantiate_connector(coords, dataset):
+def test_index_vis(coords, dataset):
+    # test that we can index a dataset
 
     flayer = images.FourierCube(coords=coords)
 
@@ -32,11 +32,12 @@ def test_instantiate_connector(coords, dataset):
     # produce model visibilities
     vis = flayer.forward(imagecube.forward(basecube.forward()))
 
-    # take a basecube, imagecube, and dataset and predict
+    # take a basecube, imagecube, and GriddedDataset and predict corresponding visibilities.
     connectors.index_vis(vis, dataset)
 
 
 def test_connector_grad(coords, dataset):
+    # test that we can calculate the gradients through the loss
 
     flayer = images.FourierCube(coords=coords)
     nchan = dataset.nchan
@@ -58,6 +59,7 @@ def test_connector_grad(coords, dataset):
 
 
 def test_residual_connector(coords, dataset_cont, tmp_path):
+    # test that we can instantiate a residual connector and evaluate residual products
 
     flayer = images.FourierCube(coords=coords)
 
