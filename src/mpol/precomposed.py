@@ -1,6 +1,6 @@
 import torch
 
-from . import connectors, fourier, images
+from . import fourier, images
 from .coordinates import _setup_coords
 
 
