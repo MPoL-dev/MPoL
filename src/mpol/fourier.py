@@ -13,7 +13,7 @@ from .gridding import _setup_coords
 
 class FourierCube(nn.Module):
     r"""
-    A layer holding the cube corresponding to the FFT of ImageCube.
+    A layer to perform the FFT of an ImageCube and store the corresponding cube.
 
     Args:
         cell_size (float): the width of an image-plane pixel [arcseconds]
@@ -43,7 +43,7 @@ class FourierCube(nn.Module):
 
     def forward(self, cube):
         """
-        Perform the FFT of the image cube for each channel.
+        Perform the FFT of the image cube on each channel.
 
         Args:
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
@@ -58,7 +58,7 @@ class FourierCube(nn.Module):
         # the self.cell_size prefactor (in arcsec) is to obtain the correct output units
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
-        self.vis = self.coords.cell_size ** 2 * torch.fft.fftn(cube, dim=(1, 2))
+        self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
 
         return self.vis
 
@@ -208,7 +208,7 @@ class NuFFTNarrow(nn.Module):
         # now [1, nchan, npix, npix] shape
 
         # send this through the object
-        output = self.coords.cell_size ** 2 * self.nufft_ob(expanded, k_traj)
+        output = self.coords.cell_size**2 * self.nufft_ob(expanded, k_traj)
         # output is shape [1, nchan, ntraj]
 
         # remove the batch dimension
