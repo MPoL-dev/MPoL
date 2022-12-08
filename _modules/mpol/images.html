@@ -271,10 +271,22 @@
 
 <div class="viewcode-block" id="HannConvCube"><a class="viewcode-back" href="../../api.html#mpol.images.HannConvCube">[docs]</a><span class="k">class</span> <span class="nc">HannConvCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A convolution layer to effectively implement a Hann window in the Fourier domain by convolution in the image domain.</span>
+<span class="sd">    This convolutional layer convolves an input cube by a small 3x3 filter with shape</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \begin{bmatrix}</span>
+<span class="sd">        0.0625 &amp; 0.1250 &amp; 0.0625 \\</span>
+<span class="sd">        0.1250 &amp; 0.2500 &amp; 0.1250 \\</span>
+<span class="sd">        0.0625 &amp; 0.1250 &amp; 0.0625 \\</span>
+<span class="sd">        \end{bmatrix}</span>
+
+<span class="sd">    which is the 2D version of the discretely-sampled response function corresponding to a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a convolutional kernel in the image plane, and so effectively acts as apodization by a Hann window function in the Fourier domain. For more information, see the following Wikipedia articles on `Window Functions &lt;https://en.wikipedia.org/wiki/Window_function&gt;`_ in general and the `Hann Window &lt;https://en.wikipedia.org/wiki/Hann_function&gt;`_ specifically.</span>
+
+<span class="sd">    The idea is that this layer would help naturally attenuate high spatial frequency artifacts by baking in a natural apodization in the Fourier plane.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        nchan</span>
+<span class="sd">        nchan (int): number of channels</span>
 <span class="sd">        requires_grad (bool): keep kernel fixed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -295,7 +307,7 @@
         <span class="c1"># weights has size (nchan, 1, 3, 3)</span>
         <span class="c1"># bias has shape (nchan)</span>
 
-        <span class="c1"># build out the Hann kernel</span>
+        <span class="c1"># build out the discretely-sampled Hann kernel</span>
         <span class="n">spec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
         <span class="n">nugget</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>  <span class="c1"># shape (3,3) 2D Hann kernel</span>
         <span class="n">exp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">nugget</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># shape (1, 1, 3, 3)</span>
@@ -316,9 +328,9 @@
 <span class="sd">            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.</span>
+<span class="sd">            torch.complex tensor: the FFT of the image cube, in packed format and of shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.</span>
+        <span class="c1"># Conv2d is designed to work on batches, so some extra unsqueeze/squeezing action is required.</span>
         <span class="c1"># Additionally, the convolution must be done on the *sky-oriented* cube</span>
         <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
 
@@ -515,7 +527,7 @@
         <span class="c1"># the self.cell_size prefactor (in arcsec) is to obtain the correct output units</span>
         <span class="c1"># since it needs to correct for the spacing of the input grid.</span>
         <span class="c1"># See MPoL documentation and/or TMS Eqn A8.18 for more information.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis</span></div>
 
