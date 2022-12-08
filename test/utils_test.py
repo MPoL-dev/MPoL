@@ -49,6 +49,8 @@ def test_packed_gaussian(imagekw, tmp_path):
 
 
 def test_analytic_plot(tmp_path):
+    # plot the analytic Gaussian and its Fourier transform
+
     kw = {
         "a": 1,
         "delta_x": 0.02,  # arcsec
@@ -82,7 +84,7 @@ def test_analytic_plot(tmp_path):
     fig.savefig(tmp_path / "gaussian_packed.png", dpi=300)
 
     # calculated the packed FFT
-    fourier_packed_num = coords.cell_size ** 2 * np.fft.fft2(img_packed)
+    fourier_packed_num = coords.cell_size**2 * np.fft.fft2(img_packed)
 
     # calculate the analytical FFT
     fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
@@ -121,6 +123,7 @@ def test_analytic_plot(tmp_path):
 
 
 def test_loglinspace():
+    # test that our log linspace routine calculates the correct spacing
     array = utils.loglinspace(0, 10, 5, 3)
     print(array)
     print(np.diff(array))

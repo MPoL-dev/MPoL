@@ -29,7 +29,7 @@ def mock_visibility_data(mock_visibility_archive):
     weight = d["weight"]
     data = d["data"]
     data_re = np.real(data)
-    data_im = np.imag(data)  # CASA convention
+    data_im = np.imag(data)  # MPoL convention
 
     return uu, vv, weight, data_re, data_im
 
@@ -43,7 +43,7 @@ def mock_visibility_data_cont(mock_visibility_archive):
     weight = d["weight"][chan]
     data = d["data"][chan]
     data_re = np.real(data)
-    data_im = np.imag(data)  # CASA convention
+    data_im = np.imag(data)  # MPoL convention
 
     return uu, vv, weight, data_re, data_im
 
@@ -87,8 +87,8 @@ def dataset_cont(mock_visibility_data_cont, coords):
 
 @pytest.fixture
 def crossvalidation_products(mock_visibility_data):
-    # test the crossvalidation with a smaller set of coordinates than normal,
-    # better matched to the extremes of the mock dataset
+    # test the crossvalidation with a smaller set of image / Fourier coordinates than normal,
+    # which are better matched to the extremes of the mock dataset
     coords = coordinates.GridCoords(cell_size=0.04, npix=256)
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
