@@ -83,10 +83,22 @@ class BaseCube(nn.Module):
 
 class HannConvCube(nn.Module):
     r"""
-    A convolution layer to effectively implement a Hann window in the Fourier domain by convolution in the image domain.
+    This convolutional layer convolves an input cube by a small 3x3 filter with shape
+
+    .. math::
+
+        \begin{bmatrix}
+        0.0625 & 0.1250 & 0.0625 \\
+        0.1250 & 0.2500 & 0.1250 \\
+        0.0625 & 0.1250 & 0.0625 \\
+        \end{bmatrix}
+
+    which is the 2D version of the discretely-sampled response function corresponding to a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a convolutional kernel in the image plane, and so effectively acts as apodization by a Hann window function in the Fourier domain. For more information, see the following Wikipedia articles on `Window Functions <https://en.wikipedia.org/wiki/Window_function>`_ in general and the `Hann Window <https://en.wikipedia.org/wiki/Hann_function>`_ specifically.
+
+    The idea is that this layer would help naturally attenuate high spatial frequency artifacts by baking in a natural apodization in the Fourier plane.
 
     Args:
-        nchan
+        nchan (int): number of channels
         requires_grad (bool): keep kernel fixed
     """
 
@@ -107,7 +119,7 @@ class HannConvCube(nn.Module):
         # weights has size (nchan, 1, 3, 3)
         # bias has shape (nchan)
 
-        # build out the Hann kernel
+        # build out the discretely-sampled Hann kernel
         spec = torch.tensor([0.25, 0.5, 0.25], dtype=torch.double)
         nugget = torch.outer(spec, spec)  # shape (3,3) 2D Hann kernel
         exp = torch.unsqueeze(torch.unsqueeze(nugget, 0), 0)  # shape (1, 1, 3, 3)
@@ -128,9 +140,9 @@ class HannConvCube(nn.Module):
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
 
         Returns:
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in packed format.
+            torch.complex tensor: the FFT of the image cube, in packed format and of shape ``(nchan, npix, npix)``
         """
-        # Conv2d is designed to work on batchs, so some extra unsqueeze/squeezing action is required.
+        # Conv2d is designed to work on batches, so some extra unsqueeze/squeezing action is required.
         # Additionally, the convolution must be done on the *sky-oriented* cube
         sky_cube = utils.packed_cube_to_sky_cube(cube)
 

@@ -14,7 +14,7 @@ def test_mpol_fftshift(tmp_path):
     # initialize it as a torch matrix
     image_torch = torch.tensor(image_init)
 
-    # try fftshift to see if we got it
+    # try torch fftshift to see if we understand it correctly
     shifted_torch = torch.fft.fftshift(image_torch, dim=(1,))
     shifted_numpy = np.fft.fftshift(image_init, axes=1)
 

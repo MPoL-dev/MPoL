@@ -9,6 +9,8 @@ from mpol import connectors, datasets, fourier, utils
 
 
 def test_dataset_device(dataset):
+    # if we have a GPU available, test that we can send a dataset to it
+
     if torch.cuda.is_available():
         dataset = dataset.to("cuda")
         dataset = dataset.to("cpu")
@@ -45,10 +47,11 @@ def test_dartboard_histogram(crossvalidation_products, tmp_path):
 
     fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
 
-    cmap = copy.copy(matplotlib.cm.get_cmap("plasma"))
+    cmap = copy.copy(matplotlib.colormaps["plasma"])
     cmap.set_under("w")
     norm = matplotlib.colors.LogNorm(vmin=1)
 
+    ax.grid(False)
     im = ax.pcolormesh(
         dartboard.phi_edges,
         dartboard.q_edges,

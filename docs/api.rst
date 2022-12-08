@@ -36,11 +36,15 @@ Images
 .. automodule:: mpol.images
     :members:
 
-Connectors
-----------
 
-.. automodule:: mpol.connectors
+Precomposed Modules
+--------------------
+
+For convenience, we provide some "precomposed" `modules <https://pytorch.org/docs/stable/notes/modules.html>`_ which may be useful for simple imaging or modeling applications. In general, though, we encourage you to compose your own set of layers if your application requires it. The source code for a precomposed network can provide useful a starting point. We also recommend checking out the PyTorch documentation on `modules <https://pytorch.org/docs/stable/notes/modules.html>`_.
+
+.. automodule:: mpol.precomposed
     :members:
+
 
 Losses
 ------
@@ -49,10 +53,12 @@ Losses
     :members:
 
 
-Precomposed Modules
---------------------
+Connectors
+----------
 
-For convenience, we provide some "precomposed" `modules <https://pytorch.org/docs/stable/notes/modules.html>`_ which may be useful for simple imaging or modeling applications. In general, though, we encourage you to compose your own set of layers if your application requires it. The source code for a precomposed network can provide useful a starting point. We also recommend checking out the PyTorch documentation on `modules <https://pytorch.org/docs/stable/notes/modules.html>`_.
+The objects in the Images and Precomposed modules are focused on bringing some image-plane model to the space of the data, where the similarity of the model visibilities to the data visibilities will be evaluated by a negative log-likelihood loss. In some situations, though, it is useful to have access to the residual visibilities directly. For example, for visualization or debugging purposes.
 
-.. automodule:: mpol.precomposed
+Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
+
+.. automodule:: mpol.connectors
     :members:

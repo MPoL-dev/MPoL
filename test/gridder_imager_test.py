@@ -48,7 +48,7 @@ def test_beam_null(gridder, tmp_path):
     chan = 4
     fig, ax = plt.subplots(ncols=2)
 
-    cmap = copy.copy(matplotlib.cm.get_cmap("viridis"))
+    cmap = copy.copy(matplotlib.colormaps["viridis"])
     cmap.set_under("r")
     norm = matplotlib.colors.Normalize(vmin=0)
 
@@ -85,7 +85,7 @@ def test_beam_null_full(gridder, tmp_path):
     chan = 4
     fig, ax = plt.subplots(ncols=2)
 
-    cmap = copy.copy(matplotlib.cm.get_cmap("viridis"))
+    cmap = copy.copy(matplotlib.colormaps["viridis"])
     cmap.set_under("r")
     norm = matplotlib.colors.Normalize(vmin=0)
 
