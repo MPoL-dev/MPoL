@@ -5,7 +5,7 @@ from mpol import fourier, utils
 from mpol.constants import *
 
 
-def test_fourier_layer(coords, tmp_path):
+def test_fourier_cube(coords, tmp_path):
     # test image packing
     # test whether we get the same Fourier Transform using the FFT as we could
     # calculate analytically
@@ -71,7 +71,7 @@ def test_fourier_layer(coords, tmp_path):
     plt.close("all")
 
 
-def test_fourier_grad(coords):
+def test_fourier_cube_grad(coords):
     # Test that we can calculate a gradient on a loss function using the Fourier layer
 
     kw = {

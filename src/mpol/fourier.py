@@ -1,4 +1,4 @@
-r"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
+r"""The ``fourier`` module provides the core functionality of MPoL via :class:`mpol.fourier.FourierCube`."""
 
 import numpy as np
 import torch
@@ -13,12 +13,13 @@ from .gridding import _setup_coords
 
 class FourierCube(nn.Module):
     r"""
-    A layer to perform the FFT of an ImageCube and store the corresponding cube.
+    This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g., :class:`mpol.datasets.GriddedDataset`).
 
     Args:
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+
     """
 
     def __init__(self, cell_size=None, npix=None, coords=None):
@@ -94,18 +95,47 @@ class FourierCube(nn.Module):
         return torch.angle(self.ground_vis)
 
 
-class NuFFTNarrow(nn.Module):
+class NuFFT(nn.Module):
     r"""
-    A layer that translates an ImageCube to loose samples of the Fourier plane,
-    given :math:`u,v` locations.
+    This layer translates input from an :class:`mpol.images.ImageCube` directly to loose, ungridded samples of the Fourier plane, directly corresponding to the :math:`u,v` locations of the data. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or 'NuFFT' to interpolate directly to discrete :math:`u,v` locations that need not correspond to grid cell centers. This is implemented using the KbNufft routines of the `TorchKbNufft <https://torchkbnufft.readthedocs.io/en/stable/index.html>`_ package.
+
+    **Dimensionality**: One consideration when using this layer is the dimensionality of your image and your visibility samples. If your image has multiple channels (``nchan > 1``), there is the possibility that the :math:`u,v` sample locations corresponding to each channel may be different. In ALMA/VLA applications, this can arise when continuum observations are taken over significant bandwidth, since the spatial frequency sampled by any pair of antennas is wavelength-dependent
+
+    .. math::
+
+        u = \frac{D}{\lambda},
+
+    where :math:`D` is the projected baseline (measured in, say, meters) and :math:`\lambda` is the observing wavelength. In this application, the image-plane model could be the same for each channel, or it may vary with channel (necessary if the spectral slope of the source is significant).
+
+    On the other hand, with spectral line observations it will usually be the case that the total bandwidth of the observations is small enough such that the :math:`u,v` sample locations could be considered as the same for each channel. In spectral line applications, the image-plane model usually varies substantially with each channel.
+
+    This layer will determine whether the spatial frequencies are treated as constant based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
+
+    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel (and will invoke parallelization across the image cube ``nchan`` dimension using the 'coil' dimension of the TorchKbNufft package).
+    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used (and will invoke parallelization across the image cube ``nchan`` dimension using the 'batch' dimension of the TorchKbNufft package).
+
+    Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.
+
+    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft.
 
     Args:
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        uu (np.array): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]
+        vv (np.array): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]
+
     """
 
-    def __init__(self, cell_size=None, npix=None, coords=None, uu=None, vv=None):
+    def __init__(
+        self,
+        cell_size=None,
+        npix=None,
+        coords=None,
+        uu=None,
+        vv=None,
+        sparse_matrices=True,
+    ):
 
         super().__init__()
 
@@ -174,22 +204,14 @@ class NuFFTNarrow(nn.Module):
         return k_traj
 
     def forward(self, cube, uu=None, vv=None):
-        """
-        Perform the FFT of the image cube for each channel and interpolate to the uv points.
+        r"""
+        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization.
 
         Args:
-            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
-            uu (numpy array): u (East-West) spatial frequency coordinate [klambda]
-            vv (numpy array): v (North-South) spatial frequency coordinate [klambda]
+            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). A prepacked image cube, for example, from :meth:`mpol.images.ImageCube.forward`
 
         Returns:
-            (torch.complex tensor, of shape ``(nchan, nvis)``): the Fourier samples at the locations uu, vv.
-
-        ..note::
-
-            This routine assumes that uu and vv are *the same* for all channels. This is not strictly true.
-            For spectral line imaging, it might be true enough.
-
+            torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluate from the input image cube at the locations of the ``uu``, ``vv`` points set at layer initialization.
         """
 
         if (uu is not None) and (vv is not None):
@@ -213,17 +235,3 @@ class NuFFTNarrow(nn.Module):
 
         # remove the batch dimension
         return output[0]
-
-
-# class NuFFTWide(NuFFTNarrow):
-#     r"""
-#     A layer that translates an ImageCube to loose samples of the Fourier plane,
-#     given :math:`u,v` locations.
-
-#     Args:
-#         cell_size (float): the width of an image-plane pixel [arcseconds]
-#         npix (int): the number of pixels per image side
-#         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-#     """
-
-#     def __init__(self, cell_size=None, npix=None, coords=None, uu=None, vv=None):

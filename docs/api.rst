@@ -37,6 +37,13 @@ Images
     :members:
 
 
+Fourier
+-------
+
+.. automodule:: mpol.fourier
+    :members:
+
+
 Precomposed Modules
 --------------------
 
