@@ -122,6 +122,7 @@ class NuFFT(nn.Module):
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.
         uu (np.array): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]
         vv (np.array): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]
 
@@ -132,28 +133,14 @@ class NuFFT(nn.Module):
         cell_size=None,
         npix=None,
         coords=None,
+        nchan=None,
         uu=None,
         vv=None,
         sparse_matrices=True,
     ):
 
         super().__init__()
-
-        # we don't want to bother with the nchan argument here, so
-        # we don't use the convenience method _setup_coords
-        # and just do it manually
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
-
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+        _setup_coords(self, cell_size, npix, coords, nchan)
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
@@ -162,76 +149,126 @@ class NuFFT(nn.Module):
 
         if (uu is not None) and (vv is not None):
             self.k_traj = self._assemble_ktraj(uu, vv)
+        else:
+            raise ValueError("uu and vv are required arguments.")
+
+        self.sparse_matrices = sparse_matrices
+
+        if self.sparse_matrices:
+            # precompute the sparse interpolation matrices
+            self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
+                self.ktraj, im_size=(self.coords.npix, self.coords.npix)
+            )
 
     def _klambda_to_radpix(self, klambda):
-        """Convert a spatial frequency in units of klambda to radians/pixel.
+        """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
+
+        These concepts can be a little confusing because there are two angular measures at play.
+
+        1. The first is the normal angular sky coordinate, normally measured in arcseconds for typical sources observed by ALMA or the VLA. Arcseconds, being an angular coordinate, can equivalently be expressed in units of radians. To avoid confusion, we will call this angular measurement 'sky radians.' Alternatively, for a given image grid, this same sky coordinate could be expressed in units of sky pixels.
+        2. The second is the spatial frequency of some image-plane function, :math:`I_\nu(l,m)`, which we could quote in units of 'cycles per arcsecond' or 'cycles per sky pixel,' for example. With a radio interferometer, spatial frequencies are typically quoted in units of the observing wavelength, i.e., lambda or kilo-lambda. If the field of view of the image is small, thanks to the small-angle approximation, units of lambda are directly equivalent to 'cycles per sky radian.' The second angular measure comes about when converting the spatial frequency from a linear measure of frequency 'cycles per sky radian' to an angular measure of frequency 'radians per sky radian' or 'radians per sky pixel.'
+
+        The TorchKbNufft package expects k-trajectory vectors in units of 'radians per sky pixel.' This routine helps convert spatial frequencies from their default unit (kilolambda) into 'radians per sky pixel' using the pixel cell_size as provided by ``self.coords.dl``.
 
         Args:
             klambda (float): spatial frequency in units of kilolambda
-            cell_size (float): the size of a pixel in units of arcsec
+
+        Returns:
+            float: spatial frequency measured in units of radian per sky pixel
         """
 
-        # cycles per sky radian
+        # convert from kilolambda to cycles per sky radian
         u_lam = klambda * 1e3  # [lambda, or cycles/radian]
 
-        # radians per sky radian
+        # convert from 'cycles per sky radian' to 'radians per sky radian'
         u_rad_per_rad = u_lam * 2 * np.pi  # [radians / sky radian]
 
         # size of pixel in radians
         # self.coords.dl  # [sky radians/pixel]
 
-        # radians per pixel
+        # convert from 'radians per sky radian' to 'radians per sky pixel'
         u_rad_per_pix = u_rad_per_rad * self.coords.dl  # [radians / pixel]
 
         return u_rad_per_pix
 
     def _assemble_ktraj(self, uu, vv):
         r"""
-        Convert a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines.
+        This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.
+
+        * If ``uu`` and ``vv`` have a 1D shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This will result in a ``k_traj`` vector that has shape (``2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the 'coil' dimension of the TorchKbNufft package.
+        * If the ``uu`` and ``vv`` have a 2D shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used. This will result in a ``k_traj`` vector that has shape (``nchan, 2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the 'batch' dimension of the TorchKbNufft package.
 
         Args:
-            uu (numpy array): u (East-West) spatial frequency coordinate [klambda]
-            vv (numpy array): v (North-South) spatial frequency coordinate [klambda]
+            uu (1D or 2D numpy array): u (East-West) spatial frequency coordinate [klambda]
+            vv (1D or 2D numpy array): v (North-South) spatial frequency coordinate [klambda]
+
+        Returns:
+            k_traj (torch tensor): a k-trajectory vector with shape
         """
 
         uu_radpix = self._klambda_to_radpix(uu)
         vv_radpix = self._klambda_to_radpix(vv)
 
-        # k-trajectory needs to be packed the way the image is packed (y,x), so
-        # the trajectory needs to be packed (v, u)
-        k_traj = torch.tensor([vv_radpix, uu_radpix])
+        # if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.
+        # otherwise, we assume that we will paralellize across the batch dimension.
+        self.same_uv = len(uu.shape) == 1
+
+        if self.same_uv:
+            # k-trajectory needs to be packed the way the image is packed (y,x), so
+            # the trajectory needs to be packed (v, u)
+            # if TorchKbNufft receives a k-traj tensor of shape (2, nvis), it will parallelize across the coil dimension, assuming
+            # that the k-traj is the same for all coils/channels.
+            k_traj = torch.tensor([vv_radpix, uu_radpix])
+
+        else:
+            # in this case, we are given two tensors of shape (nchan, nvis)
+            # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
+            # then, concatenate the tensors along the axis=1 dimension.
+
+            uu_radpix_aug = torch.unsqueeze(uu_radpix, 1)
+            vv_radpix_aug = torch.unsqueeze(vv_radpix, 1)
+
+            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], axis=1)
+            # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
 
-    def forward(self, cube, uu=None, vv=None):
+    def forward(self, cube):
         r"""
-        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization.
+        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.
 
         Args:
-            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). A prepacked image cube, for example, from :meth:`mpol.images.ImageCube.forward`
+            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube should be a "prepacked" image cube, for example, from :meth:`mpol.images.ImageCube.forward`
 
         Returns:
-            torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluate from the input image cube at the locations of the ``uu``, ``vv`` points set at layer initialization.
+            torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.
         """
 
-        if (uu is not None) and (vv is not None):
-            k_traj = self._assemble_ktraj(uu, vv)
-        else:
-            k_traj = self.k_traj
-
         # "unpack" the cube, but leave it flipped
+        # NuFFT routine expects a "normal" cube, not an fftshifted one
         shifted = torch.fft.fftshift(cube, dim=(1, 2))
 
-        # convert the cube to an imaginary value
+        # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted.type(torch.complex128)
 
-        # expand the cube to include a batch dimension
-        expanded = complexed.unsqueeze(0)
-        # now [1, nchan, npix, npix] shape
+        # Consider how the similarity of the spatial frequency samples should be treated. We already took care of this on the k_traj side, since we set the shapes. But this also needs to be taken care of on the image side.
+        #   * If we plan to parallelize using the batch dimension, then we need an image with shape (nchan, 1, npix, npix).
+        #   * If we plan to parallelize with the coil dimension, then we need an image with shape (1, nchan, npix, npix).
+        if self.same_uv:
+            # expand the cube to include a batch dimension
+            expanded = complexed.unsqueeze(0)
+            # now [1, nchan, npix, npix] shape
+        else:
+            expanded = complexed.unsqueeze(1)
+            # now [nchan, 1, npix, npix] shape
 
-        # send this through the object
-        output = self.coords.cell_size**2 * self.nufft_ob(expanded, k_traj)
-        # output is shape [1, nchan, ntraj]
+        if self.sparse_matrices:
+            output = self.coords.cell_size**2 * self.nufft_ob(
+                expanded, self.k_traj, interp_mats=self.interp_mats
+            )
+        else:
+            output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)
 
-        # remove the batch dimension
-        return output[0]
+        # TODO: we will likely need to remove either the batch or coil dimension, depending on same_uv
+
+        return output
