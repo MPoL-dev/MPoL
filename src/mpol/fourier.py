@@ -157,7 +157,7 @@ class NuFFT(nn.Module):
         if self.sparse_matrices:
             # precompute the sparse interpolation matrices
             self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
-                self.ktraj, im_size=(self.coords.npix, self.coords.npix)
+                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
             )
 
     def _klambda_to_radpix(self, klambda):
@@ -218,17 +218,30 @@ class NuFFT(nn.Module):
             # the trajectory needs to be packed (v, u)
             # if TorchKbNufft receives a k-traj tensor of shape (2, nvis), it will parallelize across the coil dimension, assuming
             # that the k-traj is the same for all coils/channels.
-            k_traj = torch.tensor([vv_radpix, uu_radpix])
+            # interim convert to numpy array because of torch warning about speed
+            k_traj = torch.tensor(np.array([vv_radpix, uu_radpix]))
 
         else:
             # in this case, we are given two tensors of shape (nchan, nvis)
             # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
             # then, concatenate the tensors along the axis=1 dimension.
 
+            assert (
+                uu_radpix.shape[0] == self.nchan
+            ), "nchan of uu ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
+                uu_radpix.shape[0], self.nchan
+            )
+            assert (
+                vv_radpix.shape[0] == self.nchan
+            ), "nchan of vv ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
+                vv_radpix.shape[0], self.nchan
+            )
+
             uu_radpix_aug = torch.unsqueeze(uu_radpix, 1)
             vv_radpix_aug = torch.unsqueeze(vv_radpix, 1)
 
-            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], axis=1)
+            # interim convert to numpy array because of torch warning about speed
+            k_traj = torch.cat(np.array([vv_radpix_aug, uu_radpix_aug]), axis=1)
             # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
@@ -243,6 +256,13 @@ class NuFFT(nn.Module):
         Returns:
             torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.
         """
+
+        # make sure that the nchan assumptions for the ImageCube and the NuFFT setup are the same
+        assert (
+            cube.shape[0] == self.nchan
+        ), "nchan of ImageCube ({:}) is different than that used to initialize NuFFT layer ({:})".format(
+            cube.shape[0], self.nchan
+        )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
@@ -262,6 +282,7 @@ class NuFFT(nn.Module):
             expanded = complexed.unsqueeze(1)
             # now [nchan, 1, npix, npix] shape
 
+        # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         if self.sparse_matrices:
             output = self.coords.cell_size**2 * self.nufft_ob(
                 expanded, self.k_traj, interp_mats=self.interp_mats
@@ -269,6 +290,12 @@ class NuFFT(nn.Module):
         else:
             output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)
 
-        # TODO: we will likely need to remove either the batch or coil dimension, depending on same_uv
+        if self.same_uv:
+            # nchan took on the ncoil position, so remove the nbatch dimension
+            output = torch.squeeze(output, dim=0)
+
+        else:
+            # nchan took on the nbatch position, so remove the ncoil dimension
+            output = torch.squeeze(output, dim=1)
 
         return output

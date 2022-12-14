@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import torch
+from pytest import approx
 
-from mpol import fourier, utils
+from mpol import fourier, images, utils
 from mpol.constants import *
 
 
@@ -18,10 +19,6 @@ def test_fourier_cube(coords, tmp_path):
         "sigma_y": 0.01,
         "Omega": 20,  # degrees
     }
-
-    img = utils.sky_gaussian_arcsec(
-        coords.sky_x_centers_2D, coords.sky_y_centers_2D, **kw
-    )
 
     img_packed = utils.sky_gaussian_arcsec(
         coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
@@ -99,3 +96,65 @@ def test_fourier_cube_grad(coords):
     loss = torch.sum(torch.abs(output))
 
     loss.backward()
+
+
+def test_instantiate_nufft_single_chan(coords, mock_visibility_data_cont):
+
+    # load some data
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    # should assume everything is the same_uv
+    layer = fourier.NuFFT(coords=coords, nchan=1, uu=uu, vv=vv, sparse_matrices=False)
+    assert layer.same_uv
+
+    # should assume everything is the same_uv. Uses sparse_matrices as default
+    layer = fourier.NuFFT(coords=coords, nchan=1, uu=uu, vv=vv)
+    assert layer.same_uv
+
+
+def test_instantiate_nufft_multi_chan(coords, mock_visibility_data_cont):
+
+    # load some data
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    # should still assume that the uv is the same, since uu and vv are single-channel
+    layer = fourier.NuFFT(coords=coords, nchan=10, uu=uu, vv=vv, sparse_matrices=False)
+    assert layer.same_uv
+
+    # should still assume that the uv is the same, since uu and vv are single-channel
+    # should use sparse_matrices as default
+    layer = fourier.NuFFT(coords=coords, nchan=10, uu=uu, vv=vv)
+    assert layer.same_uv
+
+
+def test_predict_vis_nufft(coords, mock_visibility_data_cont):
+    # just see that we can load the layer and get something through
+
+    # load some data
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    nchan = 10
+
+    # instantiate an ImageCube layer filled with zeros
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
+
+    # we have a multi-channel cube, but only sent single-channel uu and vv
+    # coordinates. The expectation is that TorchKbNufft will parallelize these
+
+    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
+
+    # predict the values of the cube at the u,v locations
+    output = layer.forward(imagecube.forward())
+
+    # make sure we got back the number of visibilities we expected
+    assert output.shape == (nchan, len(uu))
+
+    # if the image cube was filled with zeros, then we should make sure this is true
+    assert output.detach().numpy() == approx(
+        np.zeros((nchan, len(uu)), dtype=np.complex128)
+    )
+
+
+# create an ImageCube using a function we know the true FT analytically
+# use NuFFT to FT and sample that image
+# assert that the NuFFT samples and the analytic FT samples are close
