@@ -37,6 +37,7 @@ EXTRA_REQUIRES = {
         "sphinx>=2.3.0",
         "numpy",
         "jupytext",
+        "ipython!=8.7.0", # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
         "nbsphinx",
         "faculty-sphinx-theme",
         "sphinx_copybutton",

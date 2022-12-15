@@ -16,7 +16,7 @@ import sphinx.util.osutil
 sphinx.util.osutil.ENOENT = errno.ENOENT
 
 project = "MPoL"
-copyright = "2019-21, Ian Czekala"
+copyright = "2019-22, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
@@ -75,20 +75,20 @@ html_css_files = ["bullets.css"]
 html_js_files = ["https://buttons.github.io/buttons.js"]
 
 # Mermaid configuration
-mermaid_output_format = "svg"
+# mermaid_output_format = "svg"
 
 # zero out any JS, since it doesn't work
-mermaid_init_js = ""
-mermaid_version = ""
+# mermaid_init_js = ""
+# mermaid_version = ""
 
-if os.getenv("CI"):
-    # if True, we're running on github actions and need
-    # to use the path of the installed mmdc
-    # relative to docs/ directory!
-    # (mmdc itself not in $PATH automatically, like local)
-    mermaid_cmd = "../node_modules/.bin/mmdc"
+# if os.getenv("CI"):
+#     # if True, we're running on github actions and need
+#     # to use the path of the installed mmdc
+#     # relative to docs/ directory!
+#     # (mmdc itself not in $PATH automatically, like local)
+#     mermaid_cmd = "../node_modules/.bin/mmdc"
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
-nb_execution_excludepatterns = ["large-tutorials/*.md"]
+nb_execution_excludepatterns = ["large-tutorials/*.md", '**.ipynb_checkpoints']
 myst_heading_anchors = 3
