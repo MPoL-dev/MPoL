@@ -86,8 +86,7 @@ MPoL provides "modules" to build and optimize complex imaging workflows, not dis
 
 This diagram shows how the primitive modules, like {class}`mpol.images.BaseCube`, {class}`mpol.images.ImageCube`, etc... are connected together to form {class}`mpol.precomposed.SimpleNet`. In this workflow, the pixel values of the {class}`mpol.images.BaseCube` are the core model parameters representing the image. More information about all of these components is available in the {ref}`API documentation <api-reference-label>`.
 
-```{code-cell}
-display(SVG(filename="../_static/mmd/build/SimpleNet.svg"))
+```{mermaid} ../_static/mmd/src/SimpleNet.mmd
 ```
 
 It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves following the SimpleNet source code as an example ({class}`mpol.precomposed.SimpleNet`) and swap in/out modules as we saw fit.

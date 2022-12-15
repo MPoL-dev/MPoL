@@ -44,6 +44,7 @@ from mpol import (
     datasets,
     gridding,
     images,
+    fourier,
     losses,
     precomposed,
 )
@@ -175,7 +176,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 ```
 
 ```{code-cell}
-flayer = images.FourierCube(coords=coords)
+flayer = fourier.FourierCube(coords=coords)
 flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
