@@ -128,7 +128,7 @@ def test_instantiate_nufft_multi_chan(coords, mock_visibility_data_cont):
 
 
 def test_predict_vis_nufft(coords, mock_visibility_data_cont):
-    # just see that we can load the layer and get something through
+    # just see that we can load the layer and get something through without error
 
     # load some data
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
