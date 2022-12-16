@@ -25,7 +25,6 @@ release = __version__
 
 # -- General configuration ---------------------------------------------------
 extensions = [
-    "faculty_sphinx_theme",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
@@ -55,8 +54,12 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = "faculty-sphinx-theme"
-html_theme_options = {"analytics_id": "UA-5472810-8"}
+html_theme = "sphinx_book_theme"
+html_theme_options = {
+    "analytics_id": "UA-5472810-8",
+    "repository_url": "https://github.com/MPoL-dev/MPoL",
+    "use_repository_button": True,
+}
 
 html_logo = "logo.png"
 html_favicon = "favicon.ico"
@@ -67,9 +70,6 @@ master_doc = "index"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-
-# https://github.com/readthedocs/sphinx_rtd_theme/issues/1145
-html_css_files = ["bullets.css"]
 
 # https://docs.readthedocs.io/en/stable/guides/adding-custom-css.html
 html_js_files = ["https://buttons.github.io/buttons.js"]
@@ -90,5 +90,5 @@ html_js_files = ["https://buttons.github.io/buttons.js"]
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
-nb_execution_excludepatterns = ["large-tutorials/*.md", '**.ipynb_checkpoints']
+nb_execution_excludepatterns = ["large-tutorials/*.md", "**.ipynb_checkpoints"]
 myst_heading_anchors = 3

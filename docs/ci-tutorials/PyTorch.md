@@ -14,7 +14,6 @@ kernelspec:
 
 ```{code-cell}
 :tags: [hide-cell]
-%matplotlib inline
 %run notebook_setup
 ```
 
@@ -113,7 +112,7 @@ def y(x):
 
 We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent.
 
-Note that Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional ``detach().numpy()`` or ``.item()`` calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively. When it comes time to use MPoL for RML imaging, or any large production run, we'll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.
+Note that the plotting library Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional ``detach().numpy()`` or ``.item()`` calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively, for plotting. When it comes time to use MPoL for RML imaging, or any large production run, we'll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.
 
 ```{code-cell}
 x = torch.linspace(-5, 5, 100)
@@ -141,16 +140,14 @@ plt.ylim(ymin=0, ymax=25)
 plt.show()
 ```
 
-We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:
+We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will be a vector pointing in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by:
 
 $x_\mathrm{new} = x_\mathrm{current} - \nabla y(x_\mathrm{current}) * (\mathrm{step\,size})$
 
 where:
 
 - $x_\mathrm{current}$ is our current x value
-
 - $\nabla y(x_\mathrm{current})$ is the gradient at our current point
-
 - $(\mathrm{step\,size})$ is a value we choose that scales our steps
 
 We will choose ``step_size = 0.1``:
@@ -204,7 +201,7 @@ plt.ylabel(r"$y$")
 plt.show()
 ```
 
-The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
+The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We'll continue this process of checking if the gradient is nearly zero, and take a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
 
 ```{code-cell}
 x = torch.linspace(-5, 5, 100)
@@ -286,7 +283,7 @@ y_large_coords.append(y_large_step_new.item())
 
 plt.scatter(x_large_coords, y_large_coords)  # plot points showing steps
 plt.scatter(x_large_coords[-1], y_large_coords[-1], c="C1")
-
+plt.text(9, 70, "step 1", va="center")
 
 plt.xlim(xmin=-20, xmax=20)
 plt.ylim(ymin=-1, ymax=260)
@@ -295,7 +292,7 @@ plt.ylabel(r"$y$")
 plt.show()
 ```
 
-*Note the change in scale.* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.
+*Note the change in scale!* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.
 
 To sum up, optimizing a function with gradient descent consists of
 
