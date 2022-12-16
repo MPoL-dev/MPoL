@@ -20,11 +20,11 @@ kernelspec:
 
 # Introduction to PyTorch: Tensors and Gradient Descent
 
-This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.
+This tutorial provides a gentle introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent outside of any specifics about radio interferometry or the MPoL package itself.
 
 ## Introduction to Tensors
 
-Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on PyTorch, and uses a form of gradient descent optimization to find the "best" image given a dataset and choice of regularizers.
+Tensors are multi-dimensional arrays, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on the [PyTorch](https://pytorch.org/) machine learning library, and uses a form of gradient descent optimization to find the "best" image given some dataset and loss function, which may include regularizers.
 
 We'll start this tutorial by importing the torch and numpy packages. Make sure you have [PyTorch installed](https://pytorch.org/get-started/locally/) before proceeding.
 
@@ -65,7 +65,7 @@ print(f"Torch tensor multiplication result: {prod_tensor}")
 
 +++
 
-PyTorch provides a key functionality---the ability to calculate the gradients on tensors. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``, we'll see why this is important in a moment.
+PyTorch allows us to calculate the gradients on tensors, which is a key functionality underlying MPoL. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``; we'll see why this is important in a moment.
 
 ```{code-cell}
 x = torch.tensor(3.0, requires_grad=True)
@@ -78,7 +78,7 @@ Let's define some variable $y$ in terms of $x$:
 y = x ** 2
 ```
 
- We see that the value of $y$ is as we expect---nothing too strange here.
+We see that the value of $y$ is as we expect---nothing too strange here.
 
 ```{code-cell}
 print(f"x: {x}")
@@ -87,26 +87,24 @@ print(f"y: {y}")
 
 But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx} = 2x$. The derivative evaluated at $x = 3$ is $6$.
 
-The magic is that can use PyTorch to get the same answer---no analytic derivative needed!
+We can use PyTorch to get the same answer---no analytic derivative needed!
 
 ```{code-cell}
 y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
 x.grad  # returns the grad attribute (the gradient) of y with respect to x
 ```
 
-PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
+PyTorch uses the concept of [automatic differentiation](https://arxiv.org/abs/1502.05767) to calculate the derivative. Instead of computing the derivative as we would by hand, the program uses a computational graph and the mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
 
 +++
 
 ## Optimizing a Function with Gradient Descent
 
-If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how would we do it?
+If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how might we do it?
 
-We wouldn't be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we'd know when to stop when the ground felt flat.
+We can't see all the way to the bottom of the valley, but we can feel which way is down based on the incline of where we are standing. We might take steps in the downward direction and we'd know when to stop when the ground finally felt flat. We would also need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.
 
-Before we leap, though, we need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.
-
-We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
+Now let's take a more quantitative look at the gradient descent using the function $y = x^2$:
 
 ```{code-cell}
 def y(x):
