@@ -116,7 +116,7 @@ class NuFFT(nn.Module):
 
     Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.
 
-    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft.
+    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the 'batch' dimension --- this will result in a warning.
 
     Args:
         cell_size (float): the width of an image-plane pixel [arcseconds]
@@ -155,10 +155,16 @@ class NuFFT(nn.Module):
         self.sparse_matrices = sparse_matrices
 
         if self.sparse_matrices:
-            # precompute the sparse interpolation matrices
-            self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
-                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
-            )
+            if self.same_uv:
+                # precompute the sparse interpolation matrices
+                self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
+                    self.k_traj, im_size=(self.coords.npix, self.coords.npix)
+                )
+            else:
+                import warnings
+                warnings.warn("Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).", category=RuntimeWarning)
+                self.interp_mats = None
+                self.sparse_matrices = False
 
     def _klambda_to_radpix(self, klambda):
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
@@ -237,11 +243,11 @@ class NuFFT(nn.Module):
                 vv_radpix.shape[0], self.nchan
             )
 
-            uu_radpix_aug = torch.unsqueeze(uu_radpix, 1)
-            vv_radpix_aug = torch.unsqueeze(vv_radpix, 1)
+            uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
+            vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
 
             # interim convert to numpy array because of torch warning about speed
-            k_traj = torch.cat(np.array([vv_radpix_aug, uu_radpix_aug]), axis=1)
+            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], axis=1)
             # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
