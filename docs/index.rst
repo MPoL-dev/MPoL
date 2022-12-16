@@ -48,6 +48,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    ci-tutorials/PyTorch
    ci-tutorials/gridder
    ci-tutorials/optimization
+   ci-tutorials/loose-visibilities
    ci-tutorials/crossvalidation
    ci-tutorials/gpu_setup.rst
    ci-tutorials/initializedirtyimage

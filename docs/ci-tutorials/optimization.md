@@ -14,16 +14,15 @@ kernelspec:
 
 ```{code-cell}
 :tags: [hide-cell]
-%matplotlib inline
 %run notebook_setup
 ```
 
-# Optimization Loop
+# Intro to MPoL Optimization
 
 In this tutorial, we'll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We'll continue with the dataset described in the [Gridding and Diagnostic Images](gridder.md) tutorial.
 
 ## Gridding recap
-Let's set up the gridder and coordinates as before
+Let's set up the {class}`~mpol.gridding.Gridder` and {class}`~mpol.coordinates.GridCoords` objects as before
 
 ```{code-cell}
 import matplotlib.pyplot as plt
@@ -73,7 +72,13 @@ gridder = gridding.Gridder(
 
 ## The PyTorch dataset
 
-Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The ``to_pytorch_dataset`` routine grids the visibilities with "uniform" weighting (in order to propagate the uncertainties needed for RML correctly) and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the `to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.md).
+```{margin} Cell-averaging
+The visibility averaging step performed by the gridder is a weighted average that is numerically equivalent to "uniform" weighting of the visibilities; this does not mean that MPoL or RML only produces images that have "uniform" weighting, however. The gridder also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL *forward-models* the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or [ungridded](loose-visibilities.md) visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.
+```
+
+Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The {meth}`mpol.gridding.Gridder.to_pytorch_dataset` routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the {meth}`~mpol.gridding.Gridder.to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.md).
+
+In the following [tutorial on the NuFFT](loose-visibilities.md), we'll explore an alternate MPoL layer that avoids gridding the visibilities all together. This approach may be more accurate for certain applications, but is usually slower to execute than the gridding approach described in this tutorial. For that reason, we recommend starting with the default gridding approach and only moving to the NuFFT layers once you are reasonably happy with the images you are getting.
 
 ```{code-cell}
 dset = gridder.to_pytorch_dataset()
@@ -115,7 +120,7 @@ The role of the optimizer is to advance the parameters (in this case, the pixel 
 
 
 ## Loss functions
-In the parlance of the machine learning community, one defines "loss" functions comparing models to data. For regularized maximum likelihood imaging, the most fundamental loss function we'll use is the {func}`mpol.losses.loss_fn` or the $\chi^2$ value comparing the model visibilities to the data visibilities. For this introductory tutorial, we'll use only the data likelihood loss function to start, but you should know that because imaging is an ill-defined inverse problem, this is not a sufficient constraint by itself. In later tutorials, we will apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The {mod}`mpol.losses` module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.
+In the parlance of the machine learning community, one defines "loss" functions comparing models to data. For regularized maximum likelihood imaging, the most fundamental loss function we'll use is the {func}`mpol.losses.loss_fn` or the $\chi^2$ value comparing the model visibilities to the data visibilities. For this introductory tutorial, we'll use only the data likelihood loss function to start, but you should know that because imaging is an ill-defined inverse problem, this is **not a sufficient constraint** by itself. In later tutorials, we will apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The {mod}`mpol.losses` module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.
 
 ## Gradient descent
 
@@ -150,6 +155,8 @@ im = ax.imshow(
     interpolation="none",
     extent=rml.icube.coords.img_ext,
 )
+plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(im)
 ```
 
@@ -196,6 +203,8 @@ im = ax.imshow(
     interpolation="none",
     extent=rml.icube.coords.img_ext,
 )
+plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(im)
 ```
 
@@ -221,6 +230,8 @@ im = ax.imshow(
     interpolation="none",
     extent=rml.icube.coords.img_ext,
 )
+plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(im)
 ```
 
@@ -277,6 +288,8 @@ im = ax.imshow(
     interpolation="none",
     extent=rml.icube.coords.img_ext,
 )
+plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(im)
 ```
 

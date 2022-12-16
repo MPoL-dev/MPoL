@@ -192,8 +192,8 @@ print(img.shape)
 
 And the image has 'units' of "Jy/beam". 
 
-```{margin}
-N.B. that the units of the dirty image are technically undefined. The fact that MPoL assigns units of "Jy/beam" here is truly a stop-gap measure meant to provide a rough diagnostic check that the data has been correctly imported and enable comparison to a CASA dirty image, for example. For more details on the ill-defined units of the dirty image (i.e., "Jy/dirty beam"), see footnote 4 of Chapter 3.2 of Daniel Briggs' [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) or the discussion in [Czekala et al. 2021b](https://ui.adsabs.harvard.edu/abs/2021ApJS..257....2C/abstract).
+```{margin} Dirty Image Units
+N.B. that the intensity units of the dirty image are technically undefined. The fact that MPoL assigns units of "Jy/beam" here is truly a stop-gap measure meant to provide a rough diagnostic check that the data has been correctly imported and to enable comparison to a CASA dirty image, for example. For more details on the ill-defined units of the dirty image (i.e., "Jy/dirty beam"), see footnote 4 of Chapter 3.2 of Daniel Briggs' [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) or the discussion in [Czekala et al. 2021b](https://ui.adsabs.harvard.edu/abs/2021ApJS..257....2C/abstract).
 ```
 
 ```{code-cell}
