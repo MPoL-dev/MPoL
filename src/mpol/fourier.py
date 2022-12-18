@@ -94,6 +94,91 @@ class FourierCube(nn.Module):
         """
         return torch.angle(self.ground_vis)
 
+def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
+    r"""
+    This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.
+
+    The antenna baselines *are* the same as a function of channel when they are measured in physical distance units, such as meters. However, when these baselines are converted to spatial frequency units, via
+
+    .. math::
+
+        u = \frac{D}{\lambda},
+
+    it's possible that the :math:`u` and :math:`v` values of each channel are significantly different if the :math:`\lambda` values of each channel are significantly different. This routine evaluates whether the maximum change in :math:`u` or :math:`v` across channels (when represented in kilolambda) is smaller than some threshold value, calculated as the fraction of a :math:`u,v` cell defined by ``coords``.
+
+    If this function returns ``True``, then it would be safe to proceed with parallelization in the :class:`mpol.fourier.NuFFT` layer via the coil dimension.
+
+    Args:
+        uu (1D np.array): a 1D array of length ``nvis`` array of the u (East-West) spatial frequency coordinate in units of [m]
+        vv (1D np.array): a 1D array of length ``nvis`` array of the v (North-South) spatial frequency coordinate in units of [m]
+        freqs (1D np.array): a 1D array of length ``nchan`` of the channel frequencies, in units of [Hz].
+        coords: a :class:`mpol.coordinates.GridCoords` object which represents the image and uv-grid dimensions.
+        uv_cell_frac (float): the maximum threshold for a change in :math:`u` or :math:`v` spatial frequency across channels, measured as a fraction of the :math:`u,v` cell defined by ``coords``.
+
+    Returns:
+        boolean: `True` if it is safe to assume that the baselines are constant with channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
+    """
+    
+    # broadcast and convert baselines to kilolambda across channel
+    uu, vv = utils.broadcast_and_convert_baselines(uu, vv, freqs)
+    # should be (nchan, nvis) arrays
+
+    # convert uv_cell_frac to a kilolambda threshold
+    delta_uv = uv_cell_frac * coords.du # [klambda]
+
+    # find maximum change in baseline across channel
+    # concatenate arrays to save steps
+    uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
+    
+    # find max - min along channel axis
+    uv_min = np.minimum(uv, axis=1)
+    uv_max = np.maximum(uv, axis=1)
+    uv_diff = uv_max - uv_min
+
+    # find maximum of that
+    max_diff = np.maximum(uv_diff)
+
+    # compare to uv_cell_frac
+    return max_diff < delta_uv
+    
+
+def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
+    r"""
+    This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.
+
+    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda. 
+    
+    If this routine returns True, then it should be safe for the user to either average the baselines across channel or simply choose a single, representative channel. This would enable parallelization in the {class}`mpol.fourier.NuFFT` via the coil dimension.
+
+    Args:
+        uu (1D np.array): a 1D array of length ``nvis`` array of the u (East-West) spatial frequency coordinate in units of [m]
+        vv (1D np.array): a 1D array of length ``nvis`` array of the v (North-South) spatial frequency coordinate in units of [m]
+        freqs (1D np.array): a 1D array of length ``nchan`` of the channel frequencies, in units of [Hz].
+        coords: a :class:`mpol.coordinates.GridCoords` object which represents the image and uv-grid dimensions.
+        uv_cell_frac (float): the maximum threshold for a change in :math:`u` or :math:`v` spatial frequency across channels, measured as a fraction of the :math:`u,v` cell defined by ``coords``.
+
+    Returns:
+        boolean: `True` if it is safe to assume that the baselines are constant with channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
+
+    """
+    # convert uv_cell_frac to a kilolambda threshold
+    delta_uv = uv_cell_frac * coords.du # [klambda]
+
+    # find maximum change in baseline across channel
+    # concatenate arrays to save steps
+    uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
+    
+    # find max - min along channel axis
+    uv_min = np.minimum(uv, axis=1)
+    uv_max = np.maximum(uv, axis=1)
+    uv_diff = uv_max - uv_min
+
+    # find maximum of that
+    max_diff = np.maximum(uv_diff)
+
+    # compare to uv_cell_frac
+    return max_diff < delta_uv
+    
 
 class NuFFT(nn.Module):
     r"""
@@ -216,7 +301,7 @@ class NuFFT(nn.Module):
         vv_radpix = self._klambda_to_radpix(vv)
 
         # if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.
-        # otherwise, we assume that we will paralellize across the batch dimension.
+        # otherwise, we assume that we will parallelize across the batch dimension.
         self.same_uv = len(uu.shape) == 1
 
         if self.same_uv:
