@@ -42,7 +42,7 @@ from astropy.utils.data import download_file
 and the relevant MPoL modules
 
 ```{code-cell}
-from mpol import coordinates, gridding, losses, precomposed, utils
+from mpol import coordinates, gridding, losses, precomposed, utils, images, fourier
 ```
 
 and loading the dataset
@@ -64,6 +64,7 @@ weight = d["weight"]
 data = d["data"]
 data_re = np.real(data)
 data_im = np.imag(data)
+nchan = len(uu)
 ```
 
 ```{code-cell}
@@ -73,7 +74,7 @@ coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
 This dataset has multiple channels to it, which we'll use to demonstrate some of the various features of the {class}`mpol.fourier.NuFFT` object.
 
-## The {class}`mpol.fourier.NuFFT` object.
+## The {class}`mpol.fourier.NuFFT` object
 
 The {class}`mpol.fourier.NuFFT` object relies upon the functionality provided by the [TorchKbNuFFT package](https://torchkbnufft.readthedocs.io/en/stable/). Before going further, we encourage you to read the API documentation of the {class}`mpol.fourier.NuFFT` object itself. There are two main modes of functionality to consider for this object, which depend on the dimensionality of your baseline arrays.
 
@@ -82,13 +83,31 @@ Paraphrasing from the {class}`mpol.fourier.NuFFT` API documentation,
 * If you provide baseline arrays ``uu`` and ``vv`` with a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This is likely a safe assumption for most spectral line datasets (but one you can check yourself using {func}`mpol.fourier.safe_baseline_constant_meters` or {func}`mpol.fourier.safe_baseline_constant_kilolambda`). 
 * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used.
 
+Let's use the {func}`mpol.fourier.safe_baseline_constant_kilolambda` routine to check the status of the arrays in this dataset.
 
+```{code-cell}
+fourier.safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05)
+```
 
+So, we would be safe to proceed with using the $u,v$ values from a single channel as representative. Let's proceed with this assumption
 
+```{code-cell}
+chan = 4
+uu_chan = uu[chan]
+vv_chan = vv[chan]
+```
 
-## Gridder
+and then use these values to initialize a {class}`mpol.fourier.NuFFT` object
 
-Send the visibilities to the normal gridder object
+```{code-cell}
+nufft = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
+```
+
+Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.Gridder` object and create an image for use in the forward model.
+
+## Compared to the Gridder object
+
+As before, we simply send the visibilities to the object and export a {class}`mpol.datasets.GriddedDataset`
 
 ```{code-cell}
 gridder = gridding.Gridder(
@@ -99,13 +118,123 @@ gridder = gridding.Gridder(
     data_re=data_re,
     data_im=data_im,
 )
+
+gridded_dset = gridder.to_pytorch_dataset()
 ```
 
-For both applications, 
+And we can initialize a :class:`mpol.fourier.FourierCube` 
 
-This tutorial explains how to use the non-uniform FFT to take an image plane model to the loose visibilities of the dataset.
+```{code-cell}
+flayer = fourier.FourierCube(coords=coords)
+```
 
-Different modes (parallelizing over channel with coil or with batch dimensionality).
+## Image-plane forward model
 
+RML is fundamentally a forward-modeling application. To test and compare both the NuFFT and gridded approaches, we'll use the same forward model.
+
+We could start from a blank image, but we'll make things slightly more interesting by setting the initial image to be a Gaussian in the image plane, constant across all channels
+
+```{code-cell}
+# Gaussian parameters
+kw = {
+    "a": 1,
+    "delta_x": 0.02,  # arcsec
+    "delta_y": -0.01,
+    "sigma_x": 0.02,
+    "sigma_y": 0.01,
+    "Omega": 20,  # degrees
+}
+
+# evaluate the Gaussian over the sky-plane, as np array
+img_packed = utils.sky_gaussian_arcsec(
+    coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+)
+
+# broadcast to (nchan, npix, npix)
+img_packed_cube = np.broadcast_to(img_packed, (nchan, coords.npix, coords.npix)).copy()
+# convert img_packed to pytorch tensor
+img_packed_tensor = torch.from_numpy(img_packed_cube)
+# insert into ImageCube layer
+icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
+```
+
+## Producing model visibilities
+
+The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.
+
+```{code-cell}
+vis_model_loose = nufft.forward(icube.forward())
+print("Loose model visibilities from the NuFFT have shape {:}".format(vis_model_loose.shape))
+print("The original loose data visibilities have shape {:}".format(data.shape))
+```
+
+By comparison, the {class}`~mpol.gridding.Gridder` object puts the visibilities onto a grid and exports a {class}`~mpol.datasets.GriddedDataset` object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the {class}`~mpol.fourier.FourierCube` layer
+
+```{code-cell}
+vis_model_gridded = flayer.forward(icube.forward())
+print("Gridded model visibilities from FourierCube have shape {:}".format(vis_model_gridded.shape))
+print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded.shape))
+```
+
+## Evaluating a likelihood function
+
+As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data $\mathbf{V}$ given a model $\mathcal{M}$ and its parameters $\mathbf{\theta}$. Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). The likelihood function is multi-dimensional Gaussian
+
+$$
+\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right ) 
+$$
+
+where $\mathbf{R} = \mathbf{V} - \mathcal{M}(\mathbf{\theta})$ is a vector of residual visibilities and $\mathbf{\Sigma}$ is the covariance matrix of the data. The logarithm of the likelihood function is
+
+$$
+\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \ln \det \mathbf{\Sigma} + \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right ).
+$$
+
+When considering independent data within the same channel, the covariance matrix is a diagonal matrix
+
+$$
+\mathbf{\Sigma} = \begin{bmatrix}
+\sigma_1^2 & 0 & \ldots & 0 \\
+0 & \sigma_2^2 & \ldots & 0 \\
+\vdots & \vdots & \ddots & 0 \\
+0 & 0 & 0 & \sigma_N^2
+\end{bmatrix}
+$$
+
+and the logarithm of the likelihood can be reduced to the following expression
+
+$$
+\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
+$$
+
+where the $\chi^2$ is evaluated with complex-valued data and model components as
+
+$$
+\chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}.
+$$
+
+If the same image-plane model values are the same, then the calculation of the likelihood function should also be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
+
+We'll test that here, using 
+
+log_likelihood_gridded
+
+log_likelihood
+
+
+
+## Normalized negative log likelihood loss function 
+
+Most of the time, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant. This means that we can further reduce the log likelihood function to 
+
+$$
+\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
+$$
+
+
+
+
+
+* Compute the loose visibilities via the NuFFT and calculate a negative log likelihood loss
 
 # timing tests -- possible with actual dataset

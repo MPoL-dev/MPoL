@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from .constants import arcsec, cc, deg, kB
+from .constants import arcsec, cc, c_ms, deg, kB
 
 def ground_cube_to_packed_cube(ground_cube):
     r"""
@@ -160,7 +160,7 @@ def convert_baselines(baselines, freq):
         (1D array nvis): baselines in [klambda]
     """
     # calculate wavelengths in meters
-    wavelengths = c.value / freq  # m
+    wavelengths = c_ms / freq  # m
 
     # calculate baselines in klambda
     return 1e-3 * baselines / wavelengths  # [klambda]
@@ -186,7 +186,7 @@ def broadcast_and_convert_baselines(u, v, chan_freq):
     vv = v * broadcast
 
     # calculate wavelengths in meters
-    wavelengths = c.value / chan_freq[:, np.newaxis]  # m
+    wavelengths = c_ms / chan_freq[:, np.newaxis]  # m
 
     # calculate baselines in klambda
     uu = 1e-3 * uu / wavelengths  # [klambda]

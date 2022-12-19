@@ -131,12 +131,12 @@ def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
     uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
     
     # find max - min along channel axis
-    uv_min = np.minimum(uv, axis=1)
-    uv_max = np.maximum(uv, axis=1)
+    uv_min = uv.min(axis=1)
+    uv_max = uv.max(axis=1)
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = np.maximum(uv_diff)
+    max_diff = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
@@ -169,12 +169,12 @@ def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
     uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
     
     # find max - min along channel axis
-    uv_min = np.minimum(uv, axis=1)
-    uv_max = np.maximum(uv, axis=1)
+    uv_min = uv.min(axis=1)
+    uv_max = uv.max(axis=1)
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = np.maximum(uv_diff)
+    max_diff = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
