@@ -27,7 +27,7 @@ def nll(model_vis, data_vis, weight):
 
     .. math::
 
-        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
+        L = \frac{1}{2 N_V}\left ( \sum_i^{N_V} w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i^{N_V} w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
 
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
@@ -63,7 +63,7 @@ def nll_gridded(vis, datasetGridded):
 
     .. math::
 
-        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
+        L = \frac{1}{2 N_V}\left ( \sum_i^{N_V} w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i^{N_V} w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
 
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
@@ -121,7 +121,7 @@ def TV_image(sky_cube, epsilon=1e-10):
     # diff the cube in mm and remove the last column
     diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
 
-    loss = torch.sum(torch.sqrt(diff_ll ** 2 + diff_mm ** 2 + epsilon))
+    loss = torch.sum(torch.sqrt(diff_ll**2 + diff_mm**2 + epsilon))
 
     return loss
 
@@ -144,7 +144,7 @@ def TV_channel(cube, epsilon=1e-10):
     """
     # calculate the difference between the n+1 cube and the n cube
     diff_vel = cube[1:] - cube[0:-1]
-    loss = torch.sum(torch.sqrt(diff_vel ** 2 + epsilon))
+    loss = torch.sum(torch.sqrt(diff_vel**2 + epsilon))
 
     return loss
 
@@ -166,7 +166,7 @@ def edge_clamp(cube):
     bt_edges = cube[:, (0, -1)]
     lr_edges = cube[:, :, (0, -1)]
 
-    loss = torch.sum(bt_edges ** 2) + torch.sum(lr_edges ** 2)
+    loss = torch.sum(bt_edges**2) + torch.sum(lr_edges**2)
 
     return loss
 
@@ -260,7 +260,7 @@ def PSD(qs, psd, l):
 
     # calculate the expected power spectral density
     expected_PSD = (
-        2 * np.pi * l_rad ** 2 * torch.exp(-2 * np.pi ** 2 * l_rad ** 2 * qs ** 2)
+        2 * np.pi * l_rad**2 * torch.exp(-2 * np.pi**2 * l_rad**2 * qs**2)
     )
 
     # evaluate the chi^2 for the PSD, making sure it broadcasts across all channels
@@ -291,6 +291,6 @@ def TSV(sky_cube):
     # diff the cube in mm and remove the last column
     diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
 
-    loss = torch.sum(diff_ll ** 2 + diff_mm ** 2)
+    loss = torch.sum(diff_ll**2 + diff_mm**2)
 
     return loss

@@ -28,7 +28,7 @@ For some applications, though, it may be desireable to keep the dataset as indiv
 
 In this tutorial, we will explore the {class}`mpol.fourier.NuFFT` object and how it may be used to compute individual visibilities.
 
-## Mock image  
+## Mock image
 
 We will use $u,v$ locations from the same mock-dataset as before. So we'll start by importing the relevant functions
 
@@ -56,7 +56,7 @@ fname = download_file(
     pkgname="mpol",
 )
 
-# this is a multi-channel dataset... 
+# this is a multi-channel dataset...
 d = np.load(fname)
 uu = d["uu"]
 vv = d["vv"]
@@ -78,9 +78,9 @@ This dataset has multiple channels to it, which we'll use to demonstrate some of
 
 The {class}`mpol.fourier.NuFFT` object relies upon the functionality provided by the [TorchKbNuFFT package](https://torchkbnufft.readthedocs.io/en/stable/). Before going further, we encourage you to read the API documentation of the {class}`mpol.fourier.NuFFT` object itself. There are two main modes of functionality to consider for this object, which depend on the dimensionality of your baseline arrays.
 
-Paraphrasing from the {class}`mpol.fourier.NuFFT` API documentation, 
+Paraphrasing from the {class}`mpol.fourier.NuFFT` API documentation,
 
-* If you provide baseline arrays ``uu`` and ``vv`` with a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This is likely a safe assumption for most spectral line datasets (but one you can check yourself using {func}`mpol.fourier.safe_baseline_constant_meters` or {func}`mpol.fourier.safe_baseline_constant_kilolambda`). 
+* If you provide baseline arrays ``uu`` and ``vv`` with a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This is likely a safe assumption for most spectral line datasets (but one you can check yourself using {func}`mpol.fourier.safe_baseline_constant_meters` or {func}`mpol.fourier.safe_baseline_constant_kilolambda`).
 * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used.
 
 Let's use the {func}`mpol.fourier.safe_baseline_constant_kilolambda` routine to check the status of the arrays in this dataset.
@@ -122,7 +122,7 @@ gridder = gridding.Gridder(
 gridded_dset = gridder.to_pytorch_dataset()
 ```
 
-And we can initialize a :class:`mpol.fourier.FourierCube` 
+And we can initialize a :class:`mpol.fourier.FourierCube`
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)
@@ -181,7 +181,7 @@ print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded
 As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data $\mathbf{V}$ given a model $\mathcal{M}$ and its parameters $\mathbf{\theta}$. Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). The likelihood function is multi-dimensional Gaussian
 
 $$
-\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right ) 
+\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right )
 $$
 
 where $\mathbf{R} = \mathbf{V} - \mathcal{M}(\mathbf{\theta})$ is a vector of residual visibilities and $\mathbf{\Sigma}$ is the covariance matrix of the data. The logarithm of the likelihood function is
@@ -215,7 +215,7 @@ $$
 
 If the same image-plane model values are the same, then the calculation of the likelihood function should also be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
 
-We'll test that here, using 
+We'll test that here, using
 
 log_likelihood_gridded
 
@@ -223,18 +223,27 @@ log_likelihood
 
 
 
-## Normalized negative log likelihood loss function 
+## Normalized negative log likelihood loss function
 
-Most of the time, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant. This means that we can further reduce the log likelihood function to 
+Most of the time, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant and we do not necessarily care about the absolute value of $\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta})$ but rather its relative value as a function of $\boldsymbol{\theta}$ (for example, as with posterior inference using MCMC). In these situations, we can further reduce the log likelihood function to a proportionality
 
 $$
-\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
+\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
 $$
 
+If we are simply optimizing a function, as with a simple parameter optimization, we only care about the value of $\boldsymbol{\theta}$ that maximizes the likelihood function---the constant of proportionality does not matter.
+
+In an RML workflow, rather than talk about maximizing likelihood functions, we usually talk about minimizing loss functions. As described in the [Introduction to RML Imaging](../rml_intro.md), we will usually compile a target loss function as the sum of several individual loss functions: a (negative) log-likelihood loss function and several regularizers. In this application, the relative proportionality (strength) of each loss function or regularizer is important. If we use the form of $\chi^2$ discussed so far, then its absolute value will change significantly when we use more or less data. This means that in order to give similar relative regularization, the pre-factors of the other loss terms will also need to be changed in response. That is why in these applications we recommend using a normalized negative log likelihood loss function of the form
+
+```{margin} Wrong for uncertainties
+N.B. that you do not use this normalized form of the likelihood function for any quantification of the uncertainty on your model parameters. Because it has the wrong proportionality, its relative dependence on $\boldsymbol{\theta}$ will be different and therefore yield incorrect parameter uncertainties.
+```
+
+$$
+L = \frac{1}{2 N_V} \sum_i^{N_V} \frac{|V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
+$$
+similar to "reduced $\chi^2$," but where the extra factor of 2 in the denominator comes about because the visibility data is complex-valued. More details are available in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`.
 
 
 
-
-* Compute the loose visibilities via the NuFFT and calculate a negative log likelihood loss
-
-# timing tests -- possible with actual dataset
+## timing tests -- possible with actual dataset
