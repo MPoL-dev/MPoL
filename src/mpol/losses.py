@@ -9,26 +9,81 @@ import torch
 from . import connectors
 from .constants import *
 
+def chi_squared(model_vis, data_vis, weight):
+    r"""
+    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model :math:`M_\mathcal{V}` visibilities using 
+
+    .. math::
+
+        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
+
+    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases.
+
+    Args:
+        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        data_vis (PyTorch complex): array of the data values representing :math:`M_\mathcal{V}`
+        weight (PyTorch real): array of weight values representing :math:`w_i`
+
+    Returns:
+        torch.double: the :math:`\chi^2` likelihood 
+    """
+    return torch.sum(weight * torch.abs(data_vis.real - model_vis.real) ** 2)
+    
+def log_likelihood(model_vis, data_vis, weight):
+    r"""
+    Comupte the log likelihood function :math:`\ln\mathcal{L}` between the complex data :math:`\boldsymbol{V}` and model :math:`M_\mathcal{V}` visibilities using 
+
+    .. math::
+
+        \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
+
+    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
+    
+    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases.
+
+    Args:
+        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        data_vis (PyTorch complex): array of the data values representing :math:`M_\mathcal{V}`
+        weight (PyTorch real): array of weight values representing :math:`w_i`
+
+    Returns:
+        torch.double: the :math:`\ln\mathcal{L}` log likelihood
+    """
+    
+    # If model and data are multidimensional, then flatten them to get full N
+    N = len(torch.ravel(data_vis))
+
+    sigma_term = torch.sum(1/weight)
+
+    return -0.5 * (N * np.log(2 * np.pi) + sigma_term + chi_squared(model_vis, data_vis, weight))
 
 def nll(model_vis, data_vis, weight):
     r"""
-    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all
-    quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
-    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real
-    and imaginaries in the :math:`\chi^2` sum.
+    Calculate a normalized "negative log likelihood" loss between the complex data :math:`\boldsymbol{V}` and model :math:`M_\mathcal{V}` visibilities using 
 
+    .. math::
+
+        L = \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \ln \mathcal{L}
+
+    Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
+    the prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum.
+
+
+    Note that this function should only be used in an optimization or point estimate situation. If it is used in any situation where uncertainties on parameter values are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. This is because the relative scaling of nll with respect to parameter value is incorrect.
+    
+    t will not be useful in 
+
+
+    
     Args:
-        model_vis (PyTorch complex): array tuple of the model
-        data_vis (PyTorch complex): array of the data values
-        weight (PyTorch real): array of weight values
+        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        data_vis (PyTorch complex): array of the data values representing :math:`M_\mathcal{V}`
+        weight (PyTorch real): array of weight values representing :math:`w_i`
 
     Returns:
         torch.double: the :math:`\chi^2` likelihood loss
 
-    .. math::
-
-        L = \frac{1}{2 N_V}\left ( \sum_i^{N_V} w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i^{N_V} w_i (D_{\Im, i} - M_{\Im, i})^2 \right)
-
+    
     where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.
 
     """
@@ -44,6 +99,15 @@ def nll(model_vis, data_vis, weight):
             + torch.sum(weight * (data_vis.imag - model_vis.imag) ** 2)
         )
     )
+
+
+def chi_squared_gridded():
+    pass
+
+def log_likelihood_gridded():
+    pass
+
+# Loss functions
 
 
 def nll_gridded(vis, datasetGridded):

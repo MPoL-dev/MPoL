@@ -17,7 +17,7 @@ kernelspec:
 %run notebook_setup
 ```
 
-# Using the NUFFT to predict individual visibilities
+# Likelihood functions and model visibilities
 
 Typical interferometric datasets from ALMA may contain over 100,000 individual visibility measurements. As you saw in the [MPoL optimization introduction](optimization.md), the basic MPoL workflow is to perform a weighted average of these individual visibilities to the $u,v$ Fourier grid defined by a {class}`mpol.coordinates.GridCoords` object and calculate equivalent weights for those grid cells. This means that any forward-modeling application of MPoL need only carry the image model to the gridded Fourier plane, since likelihood evaluations can be done on a cell-to-cell basis. Depending on the dimensions of the Fourier grid, this can dramatically reduce the effective size of the dataset and speed up the computational time.
 
@@ -178,16 +178,20 @@ print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded
 
 ## Evaluating a likelihood function
 
-As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data $\mathbf{V}$ given a model $\mathcal{M}$ and its parameters $\mathbf{\theta}$. Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). The likelihood function is multi-dimensional Gaussian
+As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data given a model and its parameters. 
+
+### Preamble for a completely real dataset 
+
+If we had a completely real dataset, for example, a bunch of values $\boldsymbol{Y}$ at various $\boldsymbol{X}$ locations and we wanted to fit a model of a line $M(x_i |\, \boldsymbol{\theta}) = m x_i + b$ with parameters $\boldsymbol{\theta} = \{m, b\}$, then the full likelihood is a multi-dimensional Gaussian
 
 $$
-\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right )
+\mathcal{L}(\boldsymbol{Y}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right )
 $$
 
-where $\mathbf{R} = \mathbf{V} - \mathcal{M}(\mathbf{\theta})$ is a vector of residual visibilities and $\mathbf{\Sigma}$ is the covariance matrix of the data. The logarithm of the likelihood function is
+where $\boldsymbol{R} = \boldsymbol{Y} - M(\boldsymbol{X} |\, \boldsymbol{\theta})$ is a vector of residual visibilities and $\mathbf{\Sigma}$ is the covariance matrix of the data. The logarithm of the likelihood function is
 
 $$
-\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \ln \det \mathbf{\Sigma} + \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right ).
+\ln \mathcal{L}(\boldsymbol{Y}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \ln \det \mathbf{\Sigma} + \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right ).
 $$
 
 When considering independent data within the same channel, the covariance matrix is a diagonal matrix
@@ -204,8 +208,24 @@ $$
 and the logarithm of the likelihood can be reduced to the following expression
 
 $$
-\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
+\ln \mathcal{L}(\boldsymbol{Y}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \chi^2(\boldsymbol{Y}|\,\boldsymbol{\theta}) \right )
 $$
+
+with 
+
+$$
+\chi^2(\boldsymbol{Y}|\,\boldsymbol{\theta}) = \sum_i^N \frac{(Y_i - M(x |\,\boldsymbol{\theta}))^2}{\sigma_i^2}.
+$$
+
+### Changes for complex-valued Fourier data
+
+Evaluating a likelihood function for complex-valued Fourier data essentially follows the same rules, but with a few modifications. The first comes about because a complex data point actually contains more information than a single real data point, there two numbers (real and imaginary) instead of just one.
+```{code-cell} More bits
+This is why numpy and pytorch have a `complex128` data type, compared to a `float64`.
+```
+
+Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). 
+
 
 where the $\chi^2$ is evaluated with complex-valued data and model components as
 
@@ -215,7 +235,16 @@ $$
 
 If the same image-plane model values are the same, then the calculation of the likelihood function should also be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
 
-We'll test that here, using
+We'll test that now.
+
+### "Loose" visibility log likelihood
+
+```{code-cell}
+ 
+```
+
+### Gridded visibility log likelihood 
+
 
 log_likelihood_gridded
 
