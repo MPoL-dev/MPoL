@@ -178,11 +178,11 @@ print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded
 
 ## Evaluating a likelihood function
 
-As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data given a model and its parameters. 
+As we discussed in the [Introduction to RML Imaging](../rml_intro.md) a likelihood function is used to to evaluate the probability of the data given a model and its parameters.
 
-### Preamble for a completely real dataset 
+### Preamble for a completely real dataset
 
-If we had a completely real dataset, for example, a bunch of values $\boldsymbol{Y}$ at various $\boldsymbol{X}$ locations and we wanted to fit a model of a line $M(x_i |\, \boldsymbol{\theta}) = m x_i + b$ with parameters $\boldsymbol{\theta} = \{m, b\}$, then the full likelihood is a multi-dimensional Gaussian
+If we had a dataset of only real values, for example, a bunch of values $\boldsymbol{Y}$ at various $\boldsymbol{X}$ locations, and we wanted to fit a model of a line $M(x_i |\, \boldsymbol{\theta}) = m x_i + b$ with parameters $\boldsymbol{\theta} = \{m, b\}$, then the full likelihood is a multi-dimensional Gaussian
 
 $$
 \mathcal{L}(\boldsymbol{Y}|\,\boldsymbol{\theta}) = \frac{1}{[(2 \pi)^N \det \mathbf{\Sigma}]^{1/2}} \exp \left (- \frac{1}{2} \mathbf{R}^\mathrm{T} \mathbf{\Sigma}^{-1} \mathbf{R} \right )
@@ -211,7 +211,7 @@ $$
 \ln \mathcal{L}(\boldsymbol{Y}|\,\boldsymbol{\theta}) = - \frac{1}{2} \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \chi^2(\boldsymbol{Y}|\,\boldsymbol{\theta}) \right )
 $$
 
-with 
+with
 
 $$
 \chi^2(\boldsymbol{Y}|\,\boldsymbol{\theta}) = \sum_i^N \frac{(Y_i - M(x |\,\boldsymbol{\theta}))^2}{\sigma_i^2}.
@@ -219,31 +219,59 @@ $$
 
 ### Changes for complex-valued Fourier data
 
-Evaluating a likelihood function for complex-valued Fourier data essentially follows the same rules, but with a few modifications. The first comes about because a complex data point actually contains more information than a single real data point, there two numbers (real and imaginary) instead of just one.
-```{code-cell} More bits
-This is why numpy and pytorch have a `complex128` data type, compared to a `float64`.
+```{margin} More bits
+This is why both numpy and pytorch have a `complex128` data type, which stores real and imaginary components as `float64` values.
 ```
+The likelihood function for complex-valued Fourier data with Gaussian uncertainties follows the same pattern, but with a few modifications. A complex data point actually contains more information than a single real data point, since there two numbers (real and imaginary) instead of just one.
 
-Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). 
-
-
-where the $\chi^2$ is evaluated with complex-valued data and model components as
+Thankfully, as we pointed out in the [Introduction to RML Imaging](../rml_intro.md), the measurements of the real and imaginary components are independent. This simplifies life tremendously and means that we can write the joint likelihood function of the full complex-valued visibility dataset as the product of the likelihood function for the real visibilities and the likelihood function for the imaginary visibilities
 
 $$
-\chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}.
+\mathcal{L}(\boldsymbol{V} |\,\boldsymbol{\theta} ) = \mathcal{L}(\boldsymbol{V}_\mathrm{Re} |\,\boldsymbol{\theta} ) \mathcal{L}(\boldsymbol{V}_\mathrm{Im} |\,\boldsymbol{\theta} ).
 $$
 
-If the same image-plane model values are the same, then the calculation of the likelihood function should also be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
+Within a given channel, Fourier data from sub-mm interferometric arrays like ALMA is well-characterized by independent Gaussian noise (the [cross-channel situation](https://github.com/MPoL-dev/MPoL/issues/18) is another story). Therefore, we can follow the same simplifications as before to arrive at an expression for the log likelihood function of complex visibility data
+
+```{margin} Full likelihood function
+Note that this full form of $\ln \mathcal{L}(\boldsymbol{V} |\,\boldsymbol{\theta} )$ is what you'll want to use in any situation where you are doing parameter inference, care about the uncertainties on your parameters (e.g., an MCMC fit), and may adjust $\sigma_i$ values.
+```
+$$
+\ln \mathcal{L}(\boldsymbol{V} |\,\boldsymbol{\theta} ) = - \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
+$$
+
+Note than an extra factor of 2 appears in some places compared to the fully-real example. In this situation, the $\chi^2$ is either directly evaluated with complex-valued data and model components as
+
+$$
+\chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
+$$
+
+or is split into separate $\chi^2$ sums for the real and imaginary data
+
+$$
+\chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{(V_{\mathrm{Re},i} - M_\mathrm{Re}(u_i, v_i |\,\boldsymbol{\theta}))^2}{\sigma_i^2} + \sum_i^N \frac{(V_{\mathrm{Im},i} - M_\mathrm{Im}(u_i, v_i |\,\boldsymbol{\theta}))^2}{\sigma_i^2}.
+$$
+
+```{margin} Simplified likelihood function
+You can use this form of $\ln \mathcal{L}(\boldsymbol{V} |\,\boldsymbol{\theta} )$ in any situation where you are doing parameter inference, care about the uncertainties on your parameters (e.g., an MCMC fit), but are keeping $\sigma_i$ values fixed.
+```
+Many times, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant and we do not care about the absolute value of $\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta})$ but only its relative value as a function of $\boldsymbol{\theta}$ (for example, as with posterior inference using MCMC). In these situations, we can further reduce the log likelihood function to a proportionality
+
+$$
+\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
+$$
+
+
+If the same image-plane model values are the same, then the value of the likelihood calculation should be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
 
 We'll test that now.
 
 ### "Loose" visibility log likelihood
 
 ```{code-cell}
- 
+
 ```
 
-### Gridded visibility log likelihood 
+### Gridded visibility log likelihood
 
 
 log_likelihood_gridded
@@ -254,25 +282,35 @@ log_likelihood
 
 ## Normalized negative log likelihood loss function
 
-Most of the time, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant and we do not necessarily care about the absolute value of $\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta})$ but rather its relative value as a function of $\boldsymbol{\theta}$ (for example, as with posterior inference using MCMC). In these situations, we can further reduce the log likelihood function to a proportionality
+In an RML workflow, rather than talk about maximizing likelihood functions, we usually talk about minimizing loss functions. As described in the [Introduction to RML Imaging](../rml_intro.md), we will usually compile a target loss function $L$ as the sum of several individual loss functions: a (negative) log-likelihood loss function and several regularizers. If we are just optimizing $L$, we only care about the value of $\hat{\boldsymbol{\theta}}$ that minimizes the function $L$. The constant of proportionality does not matter, we only care that $L(\hat{\boldsymbol{\theta}}) < L(\hat{\boldsymbol{\theta}} + \epsilon)$, not by how much.
 
-$$
-\ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
-$$
-
-If we are simply optimizing a function, as with a simple parameter optimization, we only care about the value of $\boldsymbol{\theta}$ that maximizes the likelihood function---the constant of proportionality does not matter.
-
-In an RML workflow, rather than talk about maximizing likelihood functions, we usually talk about minimizing loss functions. As described in the [Introduction to RML Imaging](../rml_intro.md), we will usually compile a target loss function as the sum of several individual loss functions: a (negative) log-likelihood loss function and several regularizers. In this application, the relative proportionality (strength) of each loss function or regularizer is important. If we use the form of $\chi^2$ discussed so far, then its absolute value will change significantly when we use more or less data. This means that in order to give similar relative regularization, the pre-factors of the other loss terms will also need to be changed in response. That is why in these applications we recommend using a normalized negative log likelihood loss function of the form
+In this application, the *relative proportionality* (strength) of each loss function or regularizer is important. If we use the log likelihood function discussed so far, then its absolute value will change significantly when we use more or less data. This means that in order to give similar relative regularization, the pre-factors of the other loss terms will also need to be changed in response. This makes it hard to translate ballpark regularizer strengths from one dataset to another.
 
 ```{margin} Wrong for uncertainties
 N.B. that you do not use this normalized form of the likelihood function for any quantification of the uncertainty on your model parameters. Because it has the wrong proportionality, its relative dependence on $\boldsymbol{\theta}$ will be different and therefore yield incorrect parameter uncertainties.
 ```
+In these applications we recommend using a normalized negative log likelihood loss function of the form
 
 $$
-L = \frac{1}{2 N_V} \sum_i^{N_V} \frac{|V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
+L_\mathrm{nll} = \frac{1}{2 N} \sum_i^{N} \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2} =  \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}).
 $$
-similar to "reduced $\chi^2$," but where the extra factor of 2 in the denominator comes about because the visibility data is complex-valued. More details are available in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`.
 
+This formulation works because a "well-fit" model will have
 
+$$
+V_i \approx M(u_i, v_i |\,\boldsymbol{\theta})
+$$
+
+but will be wrong on average by the amount of noise $\epsilon_i$ present in $V_i$. Thus,
+
+$$
+\langle |V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2 \rangle = \sigma_{\mathrm{Re},i}^2 + \sigma_{\mathrm{Im},i}^2 = 2 \sigma_i^2
+$$
+
+This is the same reasoning that gives rise to the statistical apothegm "a well-fit model has a reduced $\chi^2_R \approx 1$" (one that has many caveats). In this case the extra factor of 2 in the denominator comes about because the visibility data and its noise are complex-valued.
+
+The hope is that for many applications, the normalized negative log likelihood loss function will have a minimum value of $L(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the regularizer strengths *relative* to this value.
+
+This loss function is implemented in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`.
 
 ## timing tests -- possible with actual dataset
