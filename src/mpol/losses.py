@@ -18,7 +18,7 @@ def chi_squared(model_vis, data_vis, weight):
 
         \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
 
-    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases.
+    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases. We recommend not including the Hermitian conjugates.
 
     Args:
         model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
@@ -41,7 +41,7 @@ def log_likelihood(model_vis, data_vis, weight):
 
     where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
 
-    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases.
+    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases. We recommend not including the Hermitian conjugates.
 
     Args:
         model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
@@ -57,8 +57,10 @@ def log_likelihood(model_vis, data_vis, weight):
 
     sigma_term = torch.sum(1 / weight)
 
-    return -0.5 * (
-        N * np.log(2 * np.pi) + sigma_term + chi_squared(model_vis, data_vis, weight)
+    return (
+        N * np.log(2 * np.pi)
+        + sigma_term
+        + 0.5 * chi_squared(model_vis, data_vis, weight)
     )
 
 
@@ -83,25 +85,56 @@ def nll(model_vis, data_vis, weight):
     Returns:
         torch.double: the normalized negative log likelihood likelihood loss
     """
-    nvis = data_vis.size()[0]
 
-    # return 1 / (2 * nvis) * torch.sum(weight * torch.abs(data_vis - model_vis) ** 2)
+    # If model and data are multidimensional, then flatten them to get full N
+    N = len(torch.ravel(data_vis))
 
-    return (
-        1
-        / (2 * nvis)
-        * (
-            torch.sum(weight * (data_vis.real - model_vis.real) ** 2)
-            + torch.sum(weight * (data_vis.imag - model_vis.imag) ** 2)
+    return 1 / (2 * N) * chi_squared(model_vis, data_vis, weight)
+
+
+def chi_squared_gridded(vis, griddedDataset, HermitianPairs=True):
+    r"""
+    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) using gridded data and model visibilities.
+
+    Args:
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+        HermitianPairs (boolean): if `True`, Hermitian pairs are included in ``vis`` and ``griddedDataset``. The calculation will be adjusted so that the same result is returned as if :func:`~mpol.losses.chi_squared` were applied to visibilities without the Hermitian pairs.
+
+    Returns:
+        torch.double: the :math:`\chi^2` value
+
+    """
+
+    # use the index connector to get the model_visibilities from the dataset
+    # 1D torch tensor collapsed across cube dimensions, like
+    # griddedDataset.vis_indexed and griddedDataset.weight_indexed
+    model_vis = connectors.index_vis(vis, griddedDataset)
+
+    if HermitianPairs:
+        return 0.5 * chi_squared(
+            model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
         )
-    )
-
-
-def chi_squared_gridded():
-    pass
+    else:
+        # use the chi_squared function as normal.
+        return chi_squared(
+            model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
+        )
 
 
 def log_likelihood_gridded():
+    r"""
+    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.
+
+    Args:
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+
+    Returns:
+        torch.double: the :math:`\ln\mathcal{L}` value
+
+    """
+
     pass
 
 

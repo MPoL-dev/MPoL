@@ -268,16 +268,30 @@ We'll test that now.
 ### "Loose" visibility log likelihood
 
 ```{code-cell}
+# convert data and weight to pytorch tensors for use in the calls
+data_loose = torch.tensor(data)
+weight_loose = torch.tensor(weight)
 
+chisquare = losses.chi_squared(vis_model_loose, data_loose, weight_loose)
+loglike = losses.log_likelihood(vis_model_loose, data_loose, weight_loose)
+nll = losses.nll(vis_model_loose, data_loose, weight_loose)
+print("Chi squared", chisquare)
 ```
 
 ### Gridded visibility log likelihood
 
+```{code-cell}
+chisquare_gridded = losses.chi_squared_gridded(vis_model_gridded, gridded_dset)
+print("Chi squared gridded", chisquare_gridded)
+```
 
 log_likelihood_gridded
 
 log_likelihood
 
+My premise is that the Hermitian pairs aren't something we need to worry too much about. They are simply double-counted in the gridded/averaged version, compared to the loose version.
+
+I don't think we need to have a separate gridder for imaging and for evaluation.
 
 
 ## Normalized negative log likelihood loss function
