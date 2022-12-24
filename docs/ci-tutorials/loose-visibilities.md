@@ -254,16 +254,17 @@ $$
 ```{margin} Simplified likelihood function
 You can use this form of $\ln \mathcal{L}(\boldsymbol{V} |\,\boldsymbol{\theta} )$ in any situation where you are doing parameter inference, care about the uncertainties on your parameters (e.g., an MCMC fit), but are keeping $\sigma_i$ values fixed.
 ```
-Many times, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant and we do not care about the absolute value of $\mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta})$ but only its relative value as a function of $\boldsymbol{\theta}$ (for example, as with posterior inference using MCMC). In these situations, we can further reduce the log likelihood function to a proportionality
+Many times, we will be working in situations where the $\sigma_i$ values of the dataset are assumed to be constant. In these situations, we can further reduce the log likelihood function to a proportionality
 
 $$
 \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) \propto - \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) .
 $$
 
+Though it's common to talk about likelihood functions as "the probability of the data" given model parameters, especially in a Bayesian context, the overall normalization of the likelihood function on its own [is not defined](https://hea-www.harvard.edu/AstroStat/aas227_2016/lecture1_Robinson.pdf). This means that the value of the likelihood function (and component parts, like $\chi^2$) can and will be different if the dataset has been binned, even though we might be using exactly the same model. This isn't a problem, though, because the important thing is that, regardless of normalization, the likelihood function will convey the same information (mean and uncertainty) about the model parameters, because this depends on the shape of $\mathcal{L}$ as a function of $\boldsymbol{\theta}$.
 
-If the same image-plane model values are the same, then the value of the likelihood calculation should be the same whether we use the {class}`mpol.fourier.NuFFT` to produce loose visibilities or we use the {class}`mpol.fourier.FourierCube` to compute gridded visibilities.
+In a Bayesian context, the normalization of the posterior distribution is typically called the "Bayesian evidence." In evaluating this evidence, any normalization constant for the likelihood function would cancel out (e.g., see Equations 10 & 11 of [Hogg 2011](https://arxiv.org/abs/1205.4446)).
 
-We'll test that now.
+Now we'll evaluate the likelihood function using both the loose visibilities produced using the {class}`mpol.fourier.NuFFT` and the gridded visibilities produced using the {class}`mpol.fourier.FourierCube`.
 
 ### "Loose" visibility log likelihood
 
@@ -274,24 +275,20 @@ weight_loose = torch.tensor(weight)
 
 chisquare = losses.chi_squared(vis_model_loose, data_loose, weight_loose)
 loglike = losses.log_likelihood(vis_model_loose, data_loose, weight_loose)
-nll = losses.nll(vis_model_loose, data_loose, weight_loose)
 print("Chi squared", chisquare)
+print("Log likelihood", loglike)
 ```
 
 ### Gridded visibility log likelihood
 
 ```{code-cell}
 chisquare_gridded = losses.chi_squared_gridded(vis_model_gridded, gridded_dset)
+loglike_gridded = losses.log_likelihood_gridded(vis_model_gridded, gridded_dset)
 print("Chi squared gridded", chisquare_gridded)
+print("Log likelihood gridded", loglike_gridded)
 ```
 
-log_likelihood_gridded
-
-log_likelihood
-
-My premise is that the Hermitian pairs aren't something we need to worry too much about. They are simply double-counted in the gridded/averaged version, compared to the loose version.
-
-I don't think we need to have a separate gridder for imaging and for evaluation.
+As we just discussed, it's OK that these evaluations are different between the loose and the gridded visibilities, even though we are using the exact same image plane model.
 
 
 ## Normalized negative log likelihood loss function
@@ -306,10 +303,10 @@ N.B. that you do not use this normalized form of the likelihood function for any
 In these applications we recommend using a normalized negative log likelihood loss function of the form
 
 $$
-L_\mathrm{nll} = \frac{1}{2 N} \sum_i^{N} \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2} =  \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}).
+L_\mathrm{nll} = \frac{1}{2 N} \sum_i^{N} \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2} =  \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}),
 $$
 
-This formulation works because a "well-fit" model will have
+following [EHT-IV 2019](https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract). This formulation works because a "well-fit" model will have
 
 $$
 V_i \approx M(u_i, v_i |\,\boldsymbol{\theta})
@@ -321,10 +318,18 @@ $$
 \langle |V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2 \rangle = \sigma_{\mathrm{Re},i}^2 + \sigma_{\mathrm{Im},i}^2 = 2 \sigma_i^2
 $$
 
-This is the same reasoning that gives rise to the statistical apothegm "a well-fit model has a reduced $\chi^2_R \approx 1$" (one that has many caveats). In this case the extra factor of 2 in the denominator comes about because the visibility data and its noise are complex-valued.
+This is the same reasoning that gives rise to the statistical apothegm "a well-fit model has a reduced $\chi^2_R \approx 1$" (one that has [many caveats and pitfalls](https://arxiv.org/abs/1012.3754)). In this case the extra factor of 2 in the denominator comes about because the visibility data and its noise are complex-valued.
 
-The hope is that for many applications, the normalized negative log likelihood loss function will have a minimum value of $L(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the regularizer strengths *relative* to this value.
+The hope is that for many applications, the normalized negative log likelihood loss function will have a minimum value of $L(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the regularizer strengths *relative* to this value. Note that even this normalized loss won't be the same between an unbinned and binned dataset, though hopefully both will be on the order of $1$.
 
-This loss function is implemented in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`.
+This loss function is implemented in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`, and we can see the results here.
 
-## timing tests -- possible with actual dataset
+```{code-cell}
+nll = losses.nll(vis_model_loose, data_loose, weight_loose)
+print("Normalized log likelihood", nll)
+```
+
+```{code-cell}
+nll_gridded = losses.nll_gridded(vis_model_gridded, gridded_dset)
+print("Normalized log likelihood gridded", nll_gridded)
+```
