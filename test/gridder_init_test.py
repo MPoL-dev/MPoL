@@ -5,6 +5,9 @@ from mpol.constants import *
 
 
 def test_hermitian_pairs(mock_visibility_data):
+    # Test to see whether our routine checking whether Hermitian pairs
+    # exist in the dataset works correctly in the False and True cases
+
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     # should *NOT* contain Hermitian pairs

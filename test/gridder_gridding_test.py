@@ -94,7 +94,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     assert np.max(gridder.data_im_gridded) == pytest.approx(0)
 
 
-def test_weight_gridding(mock_visibility_data, tmp_path):
+def test_weight_gridding(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     # initialize random (positive) weight values
