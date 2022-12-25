@@ -1,210 +1,423 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>GPU Acceleration &mdash; MPoL 0.1.1 documentation</title>
-  
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  
+    <title>GPU Acceleration &#8212; MPoL 0.1.2.dev0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
-        <script src="https://buttons.github.io/buttons.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/bullets.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Initializing with the Dirty Image" href="initializedirtyimage.html" />
-    <link rel="prev" title="Cross validation" href="crossvalidation.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="prev" title="Cross validation" href="crossvalidation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-  
-    <a class="heading heading-extra-margin" href="../index.html">
-      <div class="logo-box logo-box-large">
-        <img class="logo" src="../_static/logo.png"/>
-      </div>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
       
-        <span class="icon icon-home"> MPoL</span>
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.2.dev0 documentation</h1>
       
     </a>
-  
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../rml_intro.html">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../developer-documentation.html">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gridder.html">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
 
-  
-    
-    
-      <div class="version">0.1.1</div>
-    
-  
-
-  
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">GPU Acceleration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installation-and-configuration">Installation and Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installing-cuda-toolkit">Installing CUDA Toolkit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#python-and-pytorch-gpu-configuration">Python and PyTorch GPU configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#why-use-the-gpu">Why use the GPU?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#using-the-gpu-as-part-of-pytorch-and-mpol">Using the GPU as part of PyTorch and MPoL</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-</ul>
 
-            
+
           
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
         
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">MPoL</a>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
         
-      </nav>
-
-
-      <div class="wy-nav-content">
-
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
   
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
   
-        
-        <div class="rst-content">
-        
-          
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
 
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
 
+</a>
 
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/ci-tutorials/gpu_setup.rst.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.rst</span>
+</a>
 
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-  <li class="breadcrumb"><a href="../index.html">MPoL</a> &raquo;</li>
-    
-  <li class="breadcrumb">GPU Acceleration</li>
-
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="../_sources/ci-tutorials/gpu_setup.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
   
-  <hr/>
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation-and-configuration">
+   Installation and Configuration
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-cuda-toolkit">
+     Installing CUDA Toolkit
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-and-pytorch-gpu-configuration">
+     Python and PyTorch GPU configuration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-use-the-gpu">
+   Why use the GPU?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-the-gpu-as-part-of-pytorch-and-mpol">
+   Using the GPU as part of PyTorch and MPoL
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>GPU Acceleration</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation-and-configuration">
+   Installation and Configuration
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-cuda-toolkit">
+     Installing CUDA Toolkit
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-and-pytorch-gpu-configuration">
+     Python and PyTorch GPU configuration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-use-the-gpu">
+   Why use the GPU?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-the-gpu-as-part-of-pytorch-and-mpol">
+   Using the GPU as part of PyTorch and MPoL
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
   <section id="gpu-acceleration">
-<span id="gpu-reference-label"></span><h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this heading">¶</a></h1>
+<span id="gpu-reference-label"></span><h1>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permalink to this headline">#</a></h1>
 <section id="installation-and-configuration">
-<h2>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this heading">¶</a></h2>
+<h2>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this headline">#</a></h2>
 <section id="installing-cuda-toolkit">
-<h3>Installing CUDA Toolkit<a class="headerlink" href="#installing-cuda-toolkit" title="Permalink to this heading">¶</a></h3>
+<h3>Installing CUDA Toolkit<a class="headerlink" href="#installing-cuda-toolkit" title="Permalink to this headline">#</a></h3>
 <p>The first step in utilizing the computational power of your Nvidia GPU
 is to install the CUDA toolkit. (If you’ve already configured your GPU for other software, you may skip this step.) To download the installer, visit <a class="reference external" href="https://developer.nvidia.com/cuda-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10&amp;target_type=exe_network">this
 link</a>
@@ -215,10 +428,10 @@ the toolkit has been installed, follow the instructions in the installer
 GUI. Once complete, restart your computer.</p>
 </section>
 <section id="python-and-pytorch-gpu-configuration">
-<h3>Python and PyTorch GPU configuration<a class="headerlink" href="#python-and-pytorch-gpu-configuration" title="Permalink to this heading">¶</a></h3>
+<h3>Python and PyTorch GPU configuration<a class="headerlink" href="#python-and-pytorch-gpu-configuration" title="Permalink to this headline">#</a></h3>
 <p>The next step is to check whether your Python and PyTorch installations are correctly configured to use your GPU. After installing MPoL, you can check whether everything installed correctly by opening up a Python interpreter, ard running</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import torch
-print(torch.cuda.is_available())
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>This command should return <code class="docutils literal notranslate"><span class="pre">True</span></code>. If not, then you may need to use a more specific installation process. Go to the <a class="reference external" href="https://pytorch.org/">PyTorch Official Site</a> and scroll down
@@ -231,39 +444,39 @@ while another Windows 10 system using a Nvidia GTX 1660Ti worked with the defaul
 </section>
 </section>
 <section id="why-use-the-gpu">
-<h2>Why use the GPU?<a class="headerlink" href="#why-use-the-gpu" title="Permalink to this heading">¶</a></h2>
+<h2>Why use the GPU?<a class="headerlink" href="#why-use-the-gpu" title="Permalink to this headline">#</a></h2>
 <p>Using a GPU can accelerate computing speeds up to 100x over CPUs, especially for operations on large images, like is common for MPoL. The following is a quick example showing the addition of two large vectors. Your exact timing may vary, but for our hardware this calculation took
 320 milliseconds seconds on the CPU, while it only took 3.1 milliseconds on the GPU.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import torch
-import time
-N = int(9.9e7)
-A = torch.ones(N)
-B = torch.ones(N)
-start = time.time()
-C = A + B
-print(time.time() - start)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">9.9e7</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">B</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>torch.cuda.empty_cache() # emptying the cache on the gpu just incase there was any memory left over from an old operation
-A = A.cuda()
-B = B.cuda()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span> <span class="c1"># emptying the cache on the gpu just incase there was any memory left over from an old operation</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>start = torch.cuda.Event(enable_timing=True)
-end = torch.cuda.Event(enable_timing=True)
-start.record()
-C = A + B
-end.record()
-torch.cuda.synchronize()
-print(start.elapsed_time(end))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">start</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">B</span>
+<span class="n">end</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">elapsed_time</span><span class="p">(</span><span class="n">end</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
 <section id="using-the-gpu-as-part-of-pytorch-and-mpol">
-<h2>Using the GPU as part of PyTorch and MPoL<a class="headerlink" href="#using-the-gpu-as-part-of-pytorch-and-mpol" title="Permalink to this heading">¶</a></h2>
+<h2>Using the GPU as part of PyTorch and MPoL<a class="headerlink" href="#using-the-gpu-as-part-of-pytorch-and-mpol" title="Permalink to this headline">#</a></h2>
 <p>Here is a short example demonstrating how to initialize an MPoL model and run it on the GPU. First we will set our device to the CUDA device.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>device = torch.device(&#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
-print(device)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cuda</span><span class="p">:</span><span class="mi">0</span>
@@ -278,25 +491,25 @@ will assume that <code class="docutils literal notranslate"><span class="pre">de
 </div>
 <p>Now that we have our device set, we’ll initialize the MPoL dataset as in previous tutorials. This example uses a multi-channel dataset, but for demonstration purposes we will only use the central
 channel (<code class="docutils literal notranslate"><span class="pre">central_chan=4</span></code>).</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from astropy.utils.data import download_file
-import numpy as np
-from mpol import gridding, coordinates
-fname = download_file(
-    &#39;https://zenodo.org/record/4498439/files/logo_cube.npz&#39;,
-    cache=True,
-    )
-d = np.load(fname)
-coords = coordinates.GridCoords(cell_size=0.03, npix=180)
-central_chan = 4
-gridder = gridding.Gridder(
-    coords=coords,
-    uu=d[&#39;uu&#39;][central_chan],
-    vv=d[&#39;vv&#39;][central_chan],
-    weight=d[&#39;weight&#39;][central_chan],
-    data_re=d[&#39;data_re&#39;][central_chan],
-    data_im=d[&#39;data_im&#39;][central_chan],
-)
-dataset = gridder.to_pytorch_dataset()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">coordinates</span>
+<span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
+    <span class="s1">&#39;https://zenodo.org/record/4498439/files/logo_cube.npz&#39;</span><span class="p">,</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
+<span class="n">central_chan</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+    <span class="n">uu</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;uu&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
+    <span class="n">vv</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;vv&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
+    <span class="n">weight</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
+    <span class="n">data_re</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;data_re&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
+    <span class="n">data_im</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;data_im&#39;</span><span class="p">][</span><span class="n">central_chan</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Next we’ll create a <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleNet</span></code></a> module to train to our
@@ -305,8 +518,8 @@ information, see the <a class="reference external" href="optimization.html">Opti
 Loop</a>
 tutorial or the MPoL SimpleNet <a class="reference external" href="https://mpol-dev.github.io/MPoL/_modules/mpol/precomposed.html#SimpleNet">Source
 Code</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol.precomposed import SimpleNet
-model = SimpleNet(coords=coords, nchan=dataset.nchan)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol.precomposed</span> <span class="kn">import</span> <span class="n">SimpleNet</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We are now ready to move our model and data to the GPU using the <code class="docutils literal notranslate"><span class="pre">tensor.to(device)</span></code>
@@ -317,40 +530,40 @@ device. Both of these methods return a <em>copy</em> of the object on the GPU.</
 Tutorial</a>, which basically contains a set of parameters that resulted in a strong cross validation score for this particular dataset. For more
 details on these variables, see the <a class="reference external" href="crossvalidation.html">Cross Validation
 Tutorial</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dset = dataset.to(device)
-model = model.cuda()
-config = {&#39;lr&#39;:0.5, &#39;lambda_sparsity&#39;:1e-4, &#39;lambda_TV&#39;:1e-4, &#39;epochs&#39;:600}
-optimizer = torch.optim.Adam(model.parameters(), lr=config[&#39;lr&#39;])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span><span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;lambda_sparsity&#39;</span><span class="p">:</span><span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;lambda_TV&#39;</span><span class="p">:</span><span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;epochs&#39;</span><span class="p">:</span><span class="mi">600</span><span class="p">}</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>We are now ready to train our network on the GPU. We will use a for-loop
 with 600 iterations (epochs) in which we will calculate the loss and
 step our optimizer.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol import losses
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">losses</span>
 
-# set the model to training mode
-model.train()
-for i in range(config[&#39;epochs&#39;]):
-    # set the model to zero grad
-    model.zero_grad()
+<span class="c1"># set the model to training mode</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]):</span>
+    <span class="c1"># set the model to zero grad</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-    # forward pass
-    vis = model.forward()
+    <span class="c1"># forward pass</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
 
-    # get skycube from our forward model
-    sky_cube = model.icube.sky_cube
+    <span class="c1"># get skycube from our forward model</span>
+    <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
 
-    # compute loss
-    loss = (
-        losses.nll_gridded(vis, dset)
-        + config[&#39;lambda_sparsity&#39;] * losses.sparsity(sky_cube)
-        + config[&#39;lambda_TV&#39;] * losses.TV_image(sky_cube))
+    <span class="c1"># compute loss</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;lambda_sparsity&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">losses</span><span class="o">.</span><span class="n">sparsity</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;lambda_TV&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">losses</span><span class="o">.</span><span class="n">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">))</span>
 
-    # perform a backward pass
-    loss.backward()
+    <span class="c1"># perform a backward pass</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
-    # update the weights
-    optimizer.step()
+    <span class="c1"># update the weights</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Congratulations! You have now trained a neural network on your GPU. In general, the process for running on the GPU is designed to be simple. Once your
@@ -359,66 +572,50 @@ CUDA device has been set-up, the main changes to a CPU-only run are the steps re
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="initializedirtyimage.html" class="btn btn-neutral float-right" title="Initializing with the Dirty Image" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="crossvalidation.html" class="btn btn-neutral float-left" title="Cross validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019-21, Ian Czekala
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="crossvalidation.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Cross validation</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="initializedirtyimage.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Initializing with the Dirty Image</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
 
 
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-    <!-- Theme Analytics -->
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-5472810-8', 'auto');
-    ga('send', 'pageview');
-    </script>
-
-    
-   
-
-</body>
+  </body>
 </html>

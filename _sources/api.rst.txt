@@ -22,19 +22,21 @@ Gridding
 --------
 
 .. automodule:: mpol.gridding
-    :members:
 
 Datasets and Cross-Validation
 -----------------------------
 
 .. automodule:: mpol.datasets
-    :members:
 
 Images
 ------
 
 .. automodule:: mpol.images
-    :members:
+
+Fourier
+-------
+
+.. automodule:: mpol.fourier
 
 
 Precomposed Modules
@@ -43,14 +45,11 @@ Precomposed Modules
 For convenience, we provide some "precomposed" `modules <https://pytorch.org/docs/stable/notes/modules.html>`_ which may be useful for simple imaging or modeling applications. In general, though, we encourage you to compose your own set of layers if your application requires it. The source code for a precomposed network can provide useful a starting point. We also recommend checking out the PyTorch documentation on `modules <https://pytorch.org/docs/stable/notes/modules.html>`_.
 
 .. automodule:: mpol.precomposed
-    :members:
-
 
 Losses
 ------
 
 .. automodule:: mpol.losses
-    :members:
 
 
 Connectors
@@ -61,4 +60,3 @@ The objects in the Images and Precomposed modules are focused on bringing some i
 Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
 
 .. automodule:: mpol.connectors
-    :members:

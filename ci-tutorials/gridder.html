@@ -1,202 +1,449 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Gridding and diagnostic images &mdash; MPoL 0.1.1 documentation</title>
-  
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  
+    <title>Gridding and diagnostic images &#8212; MPoL 0.1.2.dev0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
-        <script src="https://buttons.github.io/buttons.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/bullets.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/faculty.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Optimization Loop" href="optimization.html" />
-    <link rel="prev" title="Introduction to PyTorch: Tensors and Gradient Descent" href="PyTorch.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="next" title="Intro to MPoL Optimization" href="optimization.html" />
+    <link rel="prev" title="Introduction to PyTorch: Tensors and Gradient Descent" href="PyTorch.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-  
-    <a class="heading heading-extra-margin" href="../index.html">
-      <div class="logo-box logo-box-large">
-        <img class="logo" src="../_static/logo.png"/>
-      </div>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
       
-        <span class="icon icon-home"> MPoL</span>
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.2.dev0 documentation</h1>
       
     </a>
-  
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../rml_intro.html">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../developer-documentation.html">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gpu_setup.html">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
 
-  
-    
-    
-      <div class="version">0.1.1</div>
-    
-  
-
-  
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Gridding and diagnostic images</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#importing-data">Importing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-gridcoords-object">The GridCoords object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-gridder-object">The Gridder object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#visualizing-the-images">Visualizing the images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#checking-data-weights">Checking data weights</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-</ul>
 
-            
+
           
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
         
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">MPoL</a>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
         
-      </nav>
-
-
-      <div class="wy-nav-content">
-
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
   
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
   
-        
-        <div class="rst-content">
-        
-          
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
 
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
 
+</a>
 
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/ci-tutorials/gridder.md.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
 
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-  <li class="breadcrumb"><a href="../index.html">MPoL</a> &raquo;</li>
-    
-  <li class="breadcrumb">Gridding and diagnostic images</li>
-
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="../_sources/ci-tutorials/gridder.md.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
   
-  <hr/>
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-data">
+   Importing data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-the-data">
+   Plotting the data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-coordinates-gridcoords-object">
+   The
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.coordinates.GridCoords
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-gridding-gridder-object">
+   The
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.gridding.Gridder
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#making-a-diagnostic-dirty-image">
+   Making a diagnostic “dirty image”
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#checking-data-weights">
+   Checking data weights
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Gridding and diagnostic images</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-data">
+   Importing data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-the-data">
+   Plotting the data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-coordinates-gridcoords-object">
+   The
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.coordinates.GridCoords
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-gridding-gridder-object">
+   The
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.gridding.Gridder
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#making-a-diagnostic-dirty-image">
+   Making a diagnostic “dirty image”
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#checking-data-weights">
+   Checking data weights
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
   <div class="cell tag_hide-cell docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -204,76 +451,143 @@
 <span class="expanded">Hide code cell content</span>
 </summary>
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%matplotlib inline
-%run notebook_setup
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/MPoL/MPoL/docs/ci-tutorials/notebook_setup.py:7: DeprecationWarning: `magic(...)` is deprecated since IPython 0.13 (warning added in 8.1), use run_line_magic(magic_name, parameter_s).
-  get_ipython().magic(&#39;config InlineBackend.figure_format = &quot;retina&quot;&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">run</span> notebook_setup
 </pre></div>
 </div>
 </div>
 </details>
 </div>
 <section class="tex2jax_ignore mathjax_ignore" id="gridding-and-diagnostic-images">
-<h1>Gridding and diagnostic images<a class="headerlink" href="#gridding-and-diagnostic-images" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial covers how to read visibility data, average it to a “grid”, and make diagnostic images.</p>
+<h1>Gridding and diagnostic images<a class="headerlink" href="#gridding-and-diagnostic-images" title="Permalink to this headline">#</a></h1>
+<p>This tutorial provides a brief introduction to complex visibility data, shows how to average it to a “grid”, and how to make diagnostic images (e.g., the “dirty image”). The RML imaging workflow is demonstrated in later tutorials.</p>
 <section id="importing-data">
-<h2>Importing data<a class="headerlink" href="#importing-data" title="Permalink to this heading">¶</a></h2>
-<p>We’ll use a mock CASA measurement set that we produced as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets</a> package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a “monolithic” distribution with its own Python interpreter (which is difficult to install new packages into). Recently, <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/usingcasa/obtaining-and-installing">“modular” CASA</a> has made it possible to install the CASA routines into your own Python environment—however the package is only supported on Python 3.6 and RHEL 7 linux. To avoid propagating these restrictive installation requirements to MPoL, we assume that the user provides the arrays of complex visibilities directly. The data requirements of RML imaging are really that simple.</p>
-<p>In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA <code class="docutils literal notranslate"><span class="pre">table</span></code> and <code class="docutils literal notranslate"><span class="pre">ms</span></code> tools as described <a class="reference external" href="https://mpol-dev.github.io/visread/">here</a>. The user can use either “monolithic” or “modular” CASA to read the visibilities and save them to a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.9, MacOS) you can read these visibilities and pass them to the MPoL routines.</p>
+<h2>Importing data<a class="headerlink" href="#importing-data" title="Permalink to this headline">#</a></h2>
+<p>We’ll use a mock CASA measurement set that we produced as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets</a> package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a “monolithic” distribution with its own Python interpreter (which is difficult to install new packages into), but recently, <a class="reference external" href="https://casadocs.readthedocs.io/en/stable/notebooks/introduction.html#Modular-Packages">“modular” CASA</a> has made it possible to install the CASA routines into your own Python environment (with some restrictions on recent Python version). To avoid introducing a CASA dependence to MPoL, we assume that the user provides the arrays of complex visibilities directly as numpy arrays. The data requirements of RML imaging are really that simple.</p>
+<p>In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA <code class="docutils literal notranslate"><span class="pre">table</span></code> and <code class="docutils literal notranslate"><span class="pre">ms</span></code> tools as described <a class="reference external" href="https://mpol-dev.github.io/visread/">here</a>. The user can use either “monolithic” or “modular” CASA to read the visibilities and save them to a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.11) you can read these visibilities and pass them to the MPoL routines.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
 <p>It’s important to remember that MPoL follows the standard baseline convention as laid out in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract">Thompson, Moran, and Swenson</a> and other radio interferometry textbooks, while CASA follows a <a class="reference external" href="https://casa.nrao.edu/casadocs/casa-5.5.0/knowledgebase-and-memos/casa-memos/casa_memo2_coordconvention_rau.pdf/view">historically complicated convention</a> derived from AIPS. The difference between the two can be expressed as the complex conjugate of the visibilities. So, if you find that your image appears upside down and mirrored, you’ll want to take <code class="docutils literal notranslate"><span class="pre">np.conj</span></code> of your visibilities.</p>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
-import numpy as np
-from astropy.utils.data import download_file
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># load the mock dataset of the ALMA logo
-fname = download_file(
-    &quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;,
-    cache=True,
-    show_progress=True,
-    pkgname=&quot;mpol&quot;,
-)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
+<span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
+    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d = np.load(fname)
-uu = d[&quot;uu&quot;]
-vv = d[&quot;vv&quot;]
-weight = d[&quot;weight&quot;]
-data = d[&quot;data&quot;]
-data_re = np.real(data)
-data_im = np.imag(data)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="n">uu</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">]</span>
+<span class="n">vv</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">]</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<span class="n">data_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">data_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="the-gridcoords-object">
-<h2>The GridCoords object<a class="headerlink" href="#the-gridcoords-object" title="Permalink to this heading">¶</a></h2>
+<section id="plotting-the-data">
+<h2>Plotting the data<a class="headerlink" href="#plotting-the-data" title="Permalink to this headline">#</a></h2>
+<p>Following some of the exercises in the <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html">visread documentation</a>, let’s plot up the baseline distribution and get a rough look at the raw visibilities. For more information on these data types, we recommend you read the <a class="reference internal" href="../rml_intro.html"><span class="doc std std-doc">Introduction to RML Imaging</span></a>.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">uu</span></code>, <code class="docutils literal notranslate"><span class="pre">vv</span></code>, <code class="docutils literal notranslate"><span class="pre">weight</span></code>, <code class="docutils literal notranslate"><span class="pre">data_re</span></code>, and <code class="docutils literal notranslate"><span class="pre">data_im</span></code> arrays are all two-dimensional numpy arrays of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code>. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">nvis)</span></code>.</p>
+<p>For this particular dataset,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mpol import coordinates, gridding
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nchan</span><span class="p">,</span> <span class="n">nvis</span> <span class="o">=</span> <span class="n">uu</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset has </span><span class="si">{:}</span><span class="s2"> channels&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nchan</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset has </span><span class="si">{:}</span><span class="s2"> visibilities&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nvis</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset has 9 channels
+Dataset has 325080 visibilities
 </pre></div>
 </div>
 </div>
 </div>
-<p>The first MPoL object we’ll familiarize ourselves with is GridCoords. Two numbers, <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code>, uniquely define a grid in image space and Fourier space.</p>
+<p>Therefore, understand that the following baseline and visibility scatter plots are showing about a third of a million points.</p>
+<p>Here, we’ll plot the baselines corresponding to the first channel of the dataset by simply marking a point for every spatial frequency coordinate, <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>, in the dataset</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">uu</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$u$ [k$\lambda$]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$v$ [k$\lambda$]&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/a7e439acd106136d0d795fda928376e99aad9aeb096ab75fafaf0099d1ab476a.png" src="../_images/a7e439acd106136d0d795fda928376e99aad9aeb096ab75fafaf0099d1ab476a.png" />
+</div>
+</div>
+<p>The fact that visibility data has two spatial frequency coordinates sometimes makes plotting representations of the data values a little challenging. To simplify things, let’s define a 1D “radial” visibility coordinate as <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span>, and plot the real, imaginary, amplitude, and phase values of the visibilities against this.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span>
+
+<span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">pkw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span> <span class="s2">&quot;rasterized&quot;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span><span class="s2">&quot;k&quot;</span><span class="p">}</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">qq</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">chan</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="o">**</span><span class="n">pkw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Re(V) [Jy]&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">qq</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">chan</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="o">**</span><span class="n">pkw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Im(V) [Jy]&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">qq</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="n">amp</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">pkw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;amplitude [Jy]&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">qq</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="n">phase</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">pkw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;phase [radians]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$q$ [k$\lambda$]&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/da805dceaf129e873345b0618d4cfe52898294990696b10f5b1319b7eee0c919.png" src="../_images/da805dceaf129e873345b0618d4cfe52898294990696b10f5b1319b7eee0c919.png" />
+</div>
+</div>
+<p>There are nearly a third of a million points in each figure, and each is quite noisy, so we can’t learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms">plotms</a> tool.</p>
+</section>
+<section id="the-mpol-coordinates-gridcoords-object">
+<h2>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object<a class="headerlink" href="#the-mpol-coordinates-gridcoords-object" title="Permalink to this headline">#</a></h2>
+<p>Now, lets familiarize ourselves with MPoL’s <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Two numbers, <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code>, uniquely define a grid in image space and in Fourier space.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -281,7 +595,7 @@ data_im = np.imag(data)
 <p>The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>coords.img_ext  # [arcsec]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span>  <span class="c1"># [arcsec]</span>
 </pre></div>
 </div>
 </div>
@@ -293,50 +607,49 @@ data_im = np.imag(data)
 </div>
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
 </section>
-<section id="the-gridder-object">
-<h2>The Gridder object<a class="headerlink" href="#the-gridder-object" title="Permalink to this heading">¶</a></h2>
-<p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the GridCoords. We can instantiate a Gridder object by</p>
+<section id="the-mpol-gridding-gridder-object">
+<h2>The <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.Gridder</span></code></a> object<a class="headerlink" href="#the-mpol-gridding-gridder-object" title="Permalink to this headline">#</a></h2>
+<p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object. We can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object by</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>gridder = gridding.Gridder(
-    coords=coords,
-    uu=uu,
-    vv=vv,
-    weight=weight,
-    data_re=data_re,
-    data_im=data_im,
-)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
+    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
+    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+    <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span>
+    <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Note that the <code class="docutils literal notranslate"><span class="pre">uu</span></code>, <code class="docutils literal notranslate"><span class="pre">vv</span></code>, <code class="docutils literal notranslate"><span class="pre">weight</span></code>, <code class="docutils literal notranslate"><span class="pre">data_re</span></code>, and <code class="docutils literal notranslate"><span class="pre">data_im</span></code> arrays are all two-dimensional numpy arrays of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code>. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">nvis)</span></code>.
-Instantiating the <code class="docutils literal notranslate"><span class="pre">Gridder</span></code> object attaches the GridCoords object and the loose visibilities. There is also a convenience method to create the GridCoords and Gridder object in one shot by</p>
+<p>Instantiating the <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object attaches the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>  object and the loose visibilities. There is also a convenience method to create the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object in one shot by</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>gridder = gridding.Gridder(
-    cell_size=0.005,  # [arcsec]
-    npix=800,
-    uu=uu,
-    vv=vv,
-    weight=weight,
-    data_re=data_re,
-    data_im=data_im,
-)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+    <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>  <span class="c1"># [arcsec]</span>
+    <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
+    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
+    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+    <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span>
+    <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>if you don’t want to specify your GridCoords object separately.</p>
+<p>if you don’t want to specify your <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object separately.</p>
 </section>
-<section id="visualizing-the-images">
-<h2>Visualizing the images<a class="headerlink" href="#visualizing-the-images" title="Permalink to this heading">¶</a></h2>
-<p>To visualize the images, you can call <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.Gridder.get_dirty_image()</span></code></a>. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by GridCoords and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.
-There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis.</a>.
-We are usually interested in the diagnostic beam and image cubes that correspond to these gridded visibilities, frequently called the “dirty beam” and “dirty image” by radio astronomers. Those are accessible via the following routine</p>
+<section id="making-a-diagnostic-dirty-image">
+<h2>Making a diagnostic “dirty image”<a class="headerlink" href="#making-a-diagnostic-dirty-image" title="Permalink to this headline">#</a></h2>
+<p>As we saw, the raw visibility dataset is a set of complex-valued Fourier samples. Our objective is to make images of the sky-brightness distribution and do astrophysics. We’ll cover how to do this with MPoL and RML techniques in later tutorials, but it is possible to get a rough idea of the sky brightness by calculating the inverse Fourier transform of the visibility values.</p>
+<p>To do this, you can call the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.Gridder.get_dirty_image()</span></code></a> method on your <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.</p>
+<p>There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>img, beam = gridder.get_dirty_image(weighting=&quot;briggs&quot;, robust=0.0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -344,8 +657,8 @@ We are usually interested in the diagnostic beam and image cubes that correspond
 <p>Note that these are three dimensional image cubes with the same <code class="docutils literal notranslate"><span class="pre">nchan</span></code> as the input visibility data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(beam.shape)
-print(img.shape)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -356,38 +669,42 @@ print(img.shape)
 </div>
 </div>
 </div>
-<p>And the image has units of “Jy/beam”.</p>
+<p>And the image has ‘units’ of “Jy/beam”.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title">Dirty Image Units</p>
+<p>N.B. that the intensity units of the dirty image are technically undefined. The fact that MPoL assigns units of “Jy/beam” here is truly a stop-gap measure meant to provide a rough diagnostic check that the data has been correctly imported and to enable comparison to a CASA dirty image, for example. For more details on the ill-defined units of the dirty image (i.e., “Jy/dirty beam”), see footnote 4 of Chapter 3.2 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> or the discussion in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2021ApJS..257....2C/abstract">Czekala et al. 2021b</a>.</p>
+</aside>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>chan = 4
-kw = {&quot;origin&quot;: &quot;lower&quot;, &quot;interpolation&quot;: &quot;none&quot;, &quot;extent&quot;: gridder.coords.img_ext}
-fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
-ax[0].imshow(beam[chan], **kw)
-ax[0].set_title(&quot;beam&quot;)
-ax[1].imshow(img[chan], **kw)
-ax[1].set_title(&quot;image&quot;)
-for a in ax:
-    a.set_xlabel(r&quot;$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]&quot;)
-    a.set_ylabel(r&quot;$\Delta \delta$ [${}^{\prime\prime}$]&quot;)
-fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">beam</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;beam&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.14</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/0076641bb0c0232d45b85c87792155602f2d577d28042c3e218e42000da8214e.png" src="../_images/0076641bb0c0232d45b85c87792155602f2d577d28042c3e218e42000da8214e.png" />
+<img alt="../_images/c7dd57fe1a0a19c016f64e79c7af01a2776acf6ab9e2246b1d1c8f7b6e513fa5.png" src="../_images/c7dd57fe1a0a19c016f64e79c7af01a2776acf6ab9e2246b1d1c8f7b6e513fa5.png" />
 </div>
 </div>
-<p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by conjugating your visibilities.</p>
+<p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.</p>
 </section>
 <section id="checking-data-weights">
-<h2>Checking data weights<a class="headerlink" href="#checking-data-weights" title="Permalink to this heading">¶</a></h2>
-<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid—hence why these routines issue a warning.</p>
+<h2>Checking data weights<a class="headerlink" href="#checking-data-weights" title="Permalink to this headline">#</a></h2>
+<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid—hence why these routines issue a warning instead of an error.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
         <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span>
   <span class="p">)</span>
 </pre></div>
 </div>
-<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging, incorrectly scaled weights will raise a RuntimeError. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
+<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging, incorrectly scaled weights will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
 <p>The sensitivity of the export routines can be adjusted by changing the <code class="docutils literal notranslate"><span class="pre">max_scatter</span></code> keyword. Scatter checking can be disabled by setting <code class="docutils literal notranslate"><span class="pre">check_visibility_scatter=False</span></code>, but is not recommended unless you are trying to debug things.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">dset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">(</span><span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
 </pre></div>
@@ -396,66 +713,50 @@ fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="optimization.html" class="btn btn-neutral float-right" title="Optimization Loop" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="PyTorch.html" class="btn btn-neutral float-left" title="Introduction to PyTorch: Tensors and Gradient Descent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019-21, Ian Czekala
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="PyTorch.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Introduction to PyTorch: Tensors and Gradient Descent</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="optimization.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Intro to MPoL Optimization</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
 
 
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-    <!-- Theme Analytics -->
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-5472810-8', 'auto');
-    ga('send', 'pageview');
-    </script>
-
-    
-   
-
-</body>
+  </body>
 </html>

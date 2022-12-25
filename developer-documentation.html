@@ -1,240 +1,605 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Developer Documentation &mdash; MPoL 0.1.1 documentation</title>
-  
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  
+    <title>Developer Documentation &#8212; MPoL 0.1.2.dev0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script src="https://buttons.github.io/buttons.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
-  <link rel="stylesheet" href="_static/bullets.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="API" href="api.html" />
-    <link rel="prev" title="Units and Conventions" href="units-and-conventions.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="prev" title="Units and Conventions" href="units-and-conventions.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-  
-    <a class="heading heading-extra-margin" href="index.html">
-      <div class="logo-box logo-box-large">
-        <img class="logo" src="_static/logo.png"/>
-      </div>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
       
-        <span class="icon icon-home"> MPoL</span>
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.2.dev0 documentation</h1>
       
     </a>
-  
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="rml_intro.html">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/gridder.html">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/gpu_setup.html">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
 
-  
-    
-    
-      <div class="version">0.1.1</div>
-    
-  
-
-  
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#release-model">Release model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-development-environment">Setting up your development environment</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#forking-mpol-and-cloning-from-github">Forking MPoL and cloning from Github</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#python-virtual-environment">Python virtual environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installing-mpol-and-development-dependencies">Installing MPoL and development dependencies</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installing-dependencies">Installing dependencies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test-cache">Test cache</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#viewing-test-and-debug-plots">Viewing test and debug plots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test-coverage">Test coverage</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#building-the-documentation">Building the Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#contributing-code-and-tests">Contributing code and tests</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contributing-documentation">Contributing documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contributing-tutorials">Contributing tutorials</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#small-ish-tutorials-requiring-only-a-cpu">Small(ish) tutorials requiring only a CPU</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#larger-tutorials-requiring-substantial-computational-resources">Larger tutorials requiring substantial computational resources</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tutorial-best-practices">Tutorial best practices</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
 
-            
+
           
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
         
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">MPoL</a>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
         
-      </nav>
-
-
-      <div class="wy-nav-content">
-
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
   
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
   
-        
-        <div class="rst-content">
-        
-          
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
 
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
 
+</a>
 
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/developer-documentation.md.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
 
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
-    
-  <li class="breadcrumb">Developer Documentation</li>
-
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/developer-documentation.md.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
   
-  <hr/>
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#release-model">
+   Release model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setting-up-your-development-environment">
+   Setting up your development environment
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#forking-mpol-and-cloning-from-github">
+     Forking MPoL and cloning from Github
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-virtual-environment">
+     Python virtual environment
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-mpol-and-development-dependencies">
+     Installing MPoL and development dependencies
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#testing">
+   Testing
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-dependencies">
+     Installing dependencies
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#running-the-tests">
+     Running the tests
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#test-cache">
+     Test cache
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#viewing-test-and-debug-plots">
+     Viewing test and debug plots
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#test-coverage">
+     Test coverage
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#documentation">
+   Documentation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dependencies">
+     Dependencies
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#building-the-documentation">
+     Building the Documentation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#contributing">
+   Contributing
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-code-and-tests">
+     Contributing code and tests
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-documentation">
+     Contributing documentation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-tutorials">
+     Contributing tutorials
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#small-ish-tutorials-requiring-only-a-cpu">
+       Small(ish) tutorials requiring only a CPU
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#larger-tutorials-requiring-substantial-computational-resources">
+       Larger tutorials requiring substantial computational resources
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#tutorial-best-practices">
+       Tutorial best practices
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Developer Documentation</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#release-model">
+   Release model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setting-up-your-development-environment">
+   Setting up your development environment
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#forking-mpol-and-cloning-from-github">
+     Forking MPoL and cloning from Github
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-virtual-environment">
+     Python virtual environment
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-mpol-and-development-dependencies">
+     Installing MPoL and development dependencies
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#testing">
+   Testing
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installing-dependencies">
+     Installing dependencies
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#running-the-tests">
+     Running the tests
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#test-cache">
+     Test cache
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#viewing-test-and-debug-plots">
+     Viewing test and debug plots
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#test-coverage">
+     Test coverage
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#documentation">
+   Documentation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dependencies">
+     Dependencies
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#building-the-documentation">
+     Building the Documentation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#contributing">
+   Contributing
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-code-and-tests">
+     Contributing code and tests
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-documentation">
+     Contributing documentation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#contributing-tutorials">
+     Contributing tutorials
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#small-ish-tutorials-requiring-only-a-cpu">
+       Small(ish) tutorials requiring only a CPU
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#larger-tutorials-requiring-substantial-computational-resources">
+       Larger tutorials requiring substantial computational resources
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#tutorial-best-practices">
+       Tutorial best practices
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
   <section class="tex2jax_ignore mathjax_ignore" id="developer-documentation">
-<span id="developer-documentation-label"></span><h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this heading">¶</a></h1>
+<span id="developer-documentation-label"></span><h1>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">#</a></h1>
 <p>If you find an issue with the code, documentation, or would like to make a specific suggestion for an improvement, please raise an issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>. If you have a more general query or would just like to discuss a topic, please make a post on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
 <p>If you are new to contributing to an open source project, we recommend a quick read through the excellent contributing guides of the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> and <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy</a> packages. What follows in this guide draws upon many of the suggestions from those two resources. There are many ways to contribute to an open source project like MPoL, and all of them are valuable to us. No contribution is too small—even a typo fix is appreciated!</p>
 <section id="release-model">
-<h2>Release model<a class="headerlink" href="#release-model" title="Permalink to this heading">¶</a></h2>
+<h2>Release model<a class="headerlink" href="#release-model" title="Permalink to this headline">#</a></h2>
 <p>The MPoL project values stable software, and so we place a special emphasis on writing and running tests to ensure the code works reliably for as many users as possible. It is our intent that the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch of the github repository always reflects a stable version of the code that passes all tests. After significant new functionality has been introduced, a tagged release (e.g., <code class="docutils literal notranslate"><span class="pre">v0.1.1</span></code>) is generated from the main branch and pushed to PyPI.</p>
 </section>
 <section id="setting-up-your-development-environment">
-<h2>Setting up your development environment<a class="headerlink" href="#setting-up-your-development-environment" title="Permalink to this heading">¶</a></h2>
+<h2>Setting up your development environment<a class="headerlink" href="#setting-up-your-development-environment" title="Permalink to this headline">#</a></h2>
 <section id="forking-mpol-and-cloning-from-github">
-<h3>Forking MPoL and cloning from Github<a class="headerlink" href="#forking-mpol-and-cloning-from-github" title="Permalink to this heading">¶</a></h3>
+<h3>Forking MPoL and cloning from Github<a class="headerlink" href="#forking-mpol-and-cloning-from-github" title="Permalink to this headline">#</a></h3>
 <p>MPoL is developed using the git version control system. The source repository is hosted on <a class="reference external" href="https://github.com/MPoL-dev/MPoL">Github</a> as part of the <a class="reference external" href="https://github.com/MPoL-dev/">MPoL-dev</a> organization. If you are new to using git and Github, we recommend reviewing the git resources on the <a class="reference external" href="https://docs.astropy.org/en/stable/development/workflow/development_workflow.html">astropy contributing guide</a>.</p>
 <p>We use a “fork and pull request” model for collaborative development. If you are unfamiliar with this workflow, check out this short Github guide on <a class="reference external" href="https://guides.github.com/activities/forking/">forking projects</a>. For even more reference material, see the official Github documentation on <a class="reference external" href="https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests">collaborating with issues and pull requests</a>.</p>
 <p>After forking the MPoL repository to your own github account, clone the repository to your local machine.</p>
@@ -243,7 +608,7 @@
 </div>
 </section>
 <section id="python-virtual-environment">
-<h3>Python virtual environment<a class="headerlink" href="#python-virtual-environment" title="Permalink to this heading">¶</a></h3>
+<h3>Python virtual environment<a class="headerlink" href="#python-virtual-environment" title="Permalink to this headline">#</a></h3>
 <p>To keep things organized, we recommend creating a Python <a class="reference external" href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a> specifically for MPoL development (though this step isn’t strictly necessary). To do this,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd MPoL
 $ python3 -m venv venv
@@ -256,7 +621,7 @@ $ python3 -m venv venv
 <p>This gives you a clean Python environment in which to work without fear of conflicting package dependencies (e.g., perhaps you want to have two versions of MPoL installed on your system, one for production work and the other for development work. This is possible as long as you use two different virtual environments). You will need to remember to activate the corresponding virtual environment with each new shell session, however.</p>
 </section>
 <section id="installing-mpol-and-development-dependencies">
-<h3>Installing MPoL and development dependencies<a class="headerlink" href="#installing-mpol-and-development-dependencies" title="Permalink to this heading">¶</a></h3>
+<h3>Installing MPoL and development dependencies<a class="headerlink" href="#installing-mpol-and-development-dependencies" title="Permalink to this headline">#</a></h3>
 <p>Then, use pip to install the MPoL package. We recommend installing the package using</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(venv) $ pip install -e &quot;.[dev]&quot;
 </pre></div>
@@ -270,10 +635,10 @@ $ python3 -m venv venv
 </section>
 </section>
 <section id="testing">
-<span id="testing-reference-label"></span><h2>Testing<a class="headerlink" href="#testing" title="Permalink to this heading">¶</a></h2>
+<span id="testing-reference-label"></span><h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">#</a></h2>
 <p>MPoL includes a test suite written using <a class="reference external" href="https://docs.pytest.org/">pytest</a>. We aim for this test suite to be as comprehensive as possible, since this helps us achieve our goal of shipping stable software.</p>
 <section id="installing-dependencies">
-<h3>Installing dependencies<a class="headerlink" href="#installing-dependencies" title="Permalink to this heading">¶</a></h3>
+<h3>Installing dependencies<a class="headerlink" href="#installing-dependencies" title="Permalink to this headline">#</a></h3>
 <p>If you are only interested in running the tests, you can install the more limited set of testing package dependencies via</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;.[test]&quot;
 </pre></div>
@@ -281,7 +646,7 @@ $ python3 -m venv venv
 <p>after you’ve cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> list is a superset of the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> list.</p>
 </section>
 <section id="running-the-tests">
-<h3>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this heading">¶</a></h3>
+<h3>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">#</a></h3>
 <p>To run all of the tests, change to the root of the repository and invoke</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m pytest
 </pre></div>
@@ -289,11 +654,11 @@ $ python3 -m venv venv
 <p>If a test errors (especially on the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch), please report what went wrong as a bug report issue on the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">Github repository</a>.</p>
 </section>
 <section id="test-cache">
-<h3>Test cache<a class="headerlink" href="#test-cache" title="Permalink to this heading">¶</a></h3>
+<h3>Test cache<a class="headerlink" href="#test-cache" title="Permalink to this headline">#</a></h3>
 <p>Several of the tests require mock data that is not practical to package within the github repository itself, and so it is stored on Zenodo and downloaded using astropy caching functions. If you run into trouble with the test cache becoming stale, you can delete it by deleting the <code class="docutils literal notranslate"><span class="pre">.mpol/cache</span></code> folder in your home directory.</p>
 </section>
 <section id="viewing-test-and-debug-plots">
-<h3>Viewing test and debug plots<a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this heading">¶</a></h3>
+<h3>Viewing test and debug plots<a class="headerlink" href="#viewing-test-and-debug-plots" title="Permalink to this headline">#</a></h3>
 <p>Some tests produce temporary files, like plots, that could be useful to view for development or debugging. Normally these are saved to a temporary directory created by the system which will be cleaned up after the tests finish. To preserve them, first create a plot directory (e.g., <code class="docutils literal notranslate"><span class="pre">plotsdir</span></code>) and then run the tests with this <code class="docutils literal notranslate"><span class="pre">--basetemp</span></code> specified</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir plotsdir
 $ python -m pytest --basetemp=plotsdir
@@ -301,7 +666,7 @@ $ python -m pytest --basetemp=plotsdir
 </div>
 </section>
 <section id="test-coverage">
-<h3>Test coverage<a class="headerlink" href="#test-coverage" title="Permalink to this heading">¶</a></h3>
+<h3>Test coverage<a class="headerlink" href="#test-coverage" title="Permalink to this headline">#</a></h3>
 <p>To investigate how well the test suite covers the full range of program functionality, you can run <a class="reference external" href="https://coverage.readthedocs.io/en/coverage-5.5/">coverage.py</a> through pytest using <a class="reference external" href="https://pypi.org/project/pytest-cov/">pytest-cov</a>, which should already be installed as part of the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> dependencies</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --cov=mpol
 $ coverage html
@@ -312,21 +677,18 @@ $ coverage html
 </section>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">#</a></h2>
 <p>MPoL documentation is written as docstrings attached to MPoL classes and functions and as individual <code class="docutils literal notranslate"><span class="pre">.rst</span></code> or <code class="docutils literal notranslate"><span class="pre">.md</span></code> files located in the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder. The documentation is built using the <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> Python documentation generator, with the <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/index.html">MyST-NB</a> plugin.</p>
 <section id="dependencies">
-<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h3>
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">#</a></h3>
 <p>If you are only interested in building the documentation, you can install the more limited set of documentation package dependencies via</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;.[docs]&quot;
 </pre></div>
 </div>
 <p>after you’ve cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> list is a superset of the <code class="docutils literal notranslate"><span class="pre">[docs]</span></code> list.</p>
-<p>In addition to these Python packages, you will also need to install the <code class="docutils literal notranslate"><span class="pre">mmdc</span></code> tool and <code class="docutils literal notranslate"><span class="pre">pandoc</span></code>.</p>
-<p>The <a class="reference external" href="https://github.com/mermaid-js/mermaid-cli">mmdc</a> command line tool is used to render several <a class="reference external" href="https://mermaid-js.github.io/mermaid/#/">mermaid.js</a> charts used to explain MPoL functionality. After installation, make sure that you can successfully run the <code class="docutils literal notranslate"><span class="pre">mmdc</span></code> command line utility from the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder. Note that you will specifically want to install the <code class="docutils literal notranslate"><span class="pre">mermaid-cli</span></code> package (linked <a class="reference external" href="https://github.com/mermaid-js/mermaid-cli">here</a>). There are outdated versions of the package available under the name <code class="docutils literal notranslate"><span class="pre">mermaid.cli</span></code> which will not build the MPoL charts correctly.</p>
-<p>Installation instructions for <code class="docutils literal notranslate"><span class="pre">pandoc</span></code> can be found <a class="reference external" href="https://pandoc.org/installing.html">here</a>, if it isn’t already installed on your system.</p>
 </section>
 <section id="building-the-documentation">
-<h3>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">¶</a></h3>
+<h3>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">#</a></h3>
 <p>To build the documentation, change to the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder and run</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make html
 </pre></div>
@@ -340,7 +702,7 @@ $ coverage html
 </section>
 </section>
 <section id="contributing">
-<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h2>
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">#</a></h2>
 <p>The following subsections describe recommended workflows for contributing code, documentation, and tutorials to the MPoL package. They are written assuming that you are familiar with the preceding development guidelines in this document.</p>
 <p>In keeping with the <a class="reference external" href="https://guides.github.com/activities/forking/">fork and pull request model</a>, you carry out development on a forked version of the repository (i.e., <code class="docutils literal notranslate"><span class="pre">https://github.com/YOURUSERNAME/MPoL.git</span></code>) and, once you’re satisfied with your changes (and all code passes the tests), you initiate a pull request back to the central repository (<code class="docutils literal notranslate"><span class="pre">https://github.com/MPoL-dev/MPoL.git</span></code>).</p>
 <p>In general, we envision the contribution lifecycle following a pattern:</p>
@@ -356,12 +718,12 @@ $ coverage html
 <li><p>Someone will review your pull request and may suggest additional changes for improvements. If approved, your pull request will be merged into the MPoL-dev/MPoL repo. Thank you for your contribution!</p></li>
 </ol>
 <section id="contributing-code-and-tests">
-<h3>Contributing code and tests<a class="headerlink" href="#contributing-code-and-tests" title="Permalink to this heading">¶</a></h3>
+<h3>Contributing code and tests<a class="headerlink" href="#contributing-code-and-tests" title="Permalink to this headline">#</a></h3>
 <p>We strive to release a useable, stable software package. One way to help accomplish this is through writing rigorous and complete tests, especially after adding new functionality to the package. MPoL tests are located within the <code class="docutils literal notranslate"><span class="pre">test/</span></code> directory and follow <a class="reference external" href="https://docs.pytest.org/en/6.2.x/contents.html#toc">pytest</a> conventions. Please add your new tests to this directory—we love new and useful tests.</p>
 <p>If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for ‘tests’ to be one of the first suggestions on your pull request. Some helpful advice on <em>which</em> tests to write is <a class="reference external" href="https://docs.python-guide.org/writing/tests/">here</a>, <a class="reference external" href="https://realpython.com/pytest-python-testing/">here</a>, and <a class="reference external" href="https://www.nerdwallet.com/blog/engineering/5-pytest-best-practices/">here</a>.</p>
 </section>
 <section id="contributing-documentation">
-<h3>Contributing documentation<a class="headerlink" href="#contributing-documentation" title="Permalink to this heading">¶</a></h3>
+<h3>Contributing documentation<a class="headerlink" href="#contributing-documentation" title="Permalink to this headline">#</a></h3>
 <p>A general workflow for writing documentation might look like</p>
 <ol class="arabic simple">
 <li><p>run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> in the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder</p></li>
@@ -373,17 +735,17 @@ $ coverage html
 <p>The idea behind <a class="reference external" href="https://www.gnu.org/software/make/manual/make.html">GNU make</a> is that every invocation of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> will only rebuild the files whose dependencies have changed, saving lots of time.</p>
 </section>
 <section id="contributing-tutorials">
-<h3>Contributing tutorials<a class="headerlink" href="#contributing-tutorials" title="Permalink to this heading">¶</a></h3>
+<h3>Contributing tutorials<a class="headerlink" href="#contributing-tutorials" title="Permalink to this headline">#</a></h3>
 <p>If your tutorial is self-contained in scope and has limited computational needs (will complete on a single CPU in under 30 seconds), we recommend you provide the source file as a <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/authoring/basics.html#text-based-notebooks">MyST-NB <code class="docutils literal notranslate"><span class="pre">.md</span></code> file</a> so that we can build and test it as part of the continuous integration github workflow. If your tutorial requires more significant computational resources (e.g., a GPU, multiple CPS, or more than 30 seconds runtime), we suggest executing the notebook on your local computing resources and committing the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> (with output cells) directly to the repository. Both types of tutorial formats are described in more detail below.</p>
 <section id="small-ish-tutorials-requiring-only-a-cpu">
-<h4>Small(ish) tutorials requiring only a CPU<a class="headerlink" href="#small-ish-tutorials-requiring-only-a-cpu" title="Permalink to this heading">¶</a></h4>
+<h4>Small(ish) tutorials requiring only a CPU<a class="headerlink" href="#small-ish-tutorials-requiring-only-a-cpu" title="Permalink to this headline">#</a></h4>
 <p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, MPoL tutorials are written as <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/authoring/basics.html#text-based-notebooks">MyST-NB <code class="docutils literal notranslate"><span class="pre">.md</span></code> source files</a>. During the Sphinx build process, they are converted to Jupyter notebooks and executed using the MyST build process. For these smaller tutorials, the <code class="docutils literal notranslate"><span class="pre">.md</span></code> file you create is the only thing you need to commit to the github repo (don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.</p>
 <p>To write a tutorial, we suggest copying and rename one of the existing <code class="docutils literal notranslate"><span class="pre">.md</span></code> files in <code class="docutils literal notranslate"><span class="pre">docs/ci-tutorials/</span></code> to <code class="docutils literal notranslate"><span class="pre">docs/ci-tutorials/your-new-tutorial</span></code>, being sure to keep the header metadata. Then, you can write your tutorial using the <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/authoring/text-notebooks.html">MyST markdown syntax</a>.</p>
 <p>When done, add a reference to your tutorial in the table of contents in <code class="docutils literal notranslate"><span class="pre">docs/index.rst</span></code>. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder.md</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder.md</span></code> line. Then, you should be able to build the documentation as normal (i.e., <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>) and your tutorial will be included in the documentation. The MyST-NB plugin is doing the work behind the scenes.</p>
 <p>If your tutorial requires any extra build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES['docs']</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
 </section>
 <section id="larger-tutorials-requiring-substantial-computational-resources">
-<h4>Larger tutorials requiring substantial computational resources<a class="headerlink" href="#larger-tutorials-requiring-substantial-computational-resources" title="Permalink to this heading">¶</a></h4>
+<h4>Larger tutorials requiring substantial computational resources<a class="headerlink" href="#larger-tutorials-requiring-substantial-computational-resources" title="Permalink to this headline">#</a></h4>
 <p>Radio interferometric datasets are frequently large, and sometimes realistic tutorials with real data require substantial computational resources beyond those provided in github workflows. Though more burdensome to package, these “end-to-end” tutorials are often the most useful for users.</p>
 <p>Larger tutorials are not contributed in a continuously-integrated fashion, but instead are built and executed using local computational resources (these could be your laptop or a university research cluster). We still recommend that you write your tutorial as a <code class="docutils literal notranslate"><span class="pre">.md</span></code> file like the smaller tutorials, and update the <code class="docutils literal notranslate"><span class="pre">large-tutorials/Makefile</span></code> with your new filenames. The difference here is that you will build the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> version of your tutorial locally using <a class="reference external" href="https://jupytext.readthedocs.io/en/latest/">Jupytext</a> (you could use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> inside the <code class="docutils literal notranslate"><span class="pre">large-tutorials</span></code> directory, or just run <code class="docutils literal notranslate"><span class="pre">jupytext</span> <span class="pre">--to</span> <span class="pre">ipynb</span> <span class="pre">--execute</span> <span class="pre">my_tutorial.py</span></code>) you <em>will</em> want to commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file containing the cell output directly to the git repository.</p>
 <p>The expectation is that these tutorials will only be rerun when the tutorial is updated, so the git diff issue is not as large a concern as it was with the continuously-integrated smaller tutorials. Like before, the MyST-NB plugin will see a Jupyter notebook and incorporate it during the build process. Because the larger tutorials are not continuously integrated, however, there is some concern that the codebase could diverge from that used to generate the tutorial, rendering the tutorial stale. We believe this risk is acceptable given the benefit that these larger tutorials provide and we intend to check the tutorials for staleness with at least every minor release.</p>
@@ -397,7 +759,7 @@ $ coverage html
 <p>When done, add a reference to your tutorial in the documentation table of contents. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">large-tutorials/gpus.ipynb</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">large-tutorials/gpus.ipynb</span></code> line to the table of contents.</p>
 </section>
 <section id="tutorial-best-practices">
-<h4>Tutorial best practices<a class="headerlink" href="#tutorial-best-practices" title="Permalink to this heading">¶</a></h4>
+<h4>Tutorial best practices<a class="headerlink" href="#tutorial-best-practices" title="Permalink to this headline">#</a></h4>
 <p>Tutorials should be self-contained. If the tutorial requires a dataset, the dataset should be publicly available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo and/or as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets repository</a>). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.</p>
 <p>If you’re thinking about contributing a tutorial and would like guidance on form or scope, please raise an <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">issue</a> or <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">discussion</a> on the github repository.</p>
 </section>
@@ -406,66 +768,50 @@ $ coverage html
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="units-and-conventions.html" class="btn btn-neutral float-left" title="Units and Conventions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019-21, Ian Czekala
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="units-and-conventions.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Units and Conventions</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="api.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
 
 
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-    <!-- Theme Analytics -->
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-5472810-8', 'auto');
-    ga('send', 'pageview');
-    </script>
-
-    
-   
-
-</body>
+  </body>
 </html>

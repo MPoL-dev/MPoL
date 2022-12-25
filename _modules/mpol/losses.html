@@ -1,190 +1,287 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>mpol.losses &mdash; MPoL 0.1.1 documentation</title>
-  
 
-  
-  
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mpol.losses &#8212; MPoL 0.1.2.dev0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-        <script src="../../_static/clipboard.min.js"></script>
-        <script src="../../_static/copybutton.js"></script>
-        <script src="https://buttons.github.io/buttons.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/bullets.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/faculty.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-  
-    <a class="heading heading-extra-margin" href="../../index.html">
-      <div class="logo-box logo-box-large">
-        <img class="logo" src="../../_static/logo.png"/>
-      </div>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
       
-        <span class="icon icon-home"> MPoL</span>
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.2.dev0 documentation</h1>
       
     </a>
-  
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../rml_intro.html">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../developer-documentation.html">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/gridder.html">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/gpu_setup.html">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
 
-  
-    
-    
-      <div class="version">0.1.1</div>
-    
-  
-
-  
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../units-and-conventions.html">Units and Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developer-documentation.html">Developer Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">MPoL</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-
-  
-
-  
-        
-        <div class="rst-content">
-        
           
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
     
-  <li class="breadcrumb"><a href="../../index.html">MPoL</a> &raquo;</li>
-    
-      <li class="breadcrumb"><a href="../index.html">Module code</a> &raquo;</li>
-    
-  <li class="breadcrumb">mpol.losses</li>
-
-    
-      <li class="wy-breadcrumbs-aside">
+    <div class="header-article row sticky-top noprint">
         
-      </li>
-    
-  </ul>
 
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
   
-  <hr/>
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+    </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1></h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
   <h1>Source code for mpol.losses</h1><div class="highlight"><pre>
 <span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, including the regularization strength, which aspires to be similar across all terms, providing at least a starting point for tuning multiple loss functions.</span>
 
@@ -198,63 +295,149 @@
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="nll"><a class="viewcode-back" href="../../api.html#mpol.losses.nll">[docs]</a><span class="k">def</span> <span class="nf">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+<div class="viewcode-block" id="chi_squared"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared">[docs]</a><span class="k">def</span> <span class="nf">chi_squared</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the weighted :math:`\chi^2` loss between data and model visibilities. Visibilities may be any shape as long as all</span>
-<span class="sd">    quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
-<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real</span>
-<span class="sd">    and imaginaries in the :math:`\chi^2` sum.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        model_vis (PyTorch complex): array tuple of the model</span>
-<span class="sd">        data_vis (PyTorch complex): array of the data values</span>
-<span class="sd">        weight (PyTorch real): array of weight values</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        torch.double: the :math:`\chi^2` likelihood loss</span>
+<span class="sd">    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)</span>
+<span class="sd">        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}</span>
 
-<span class="sd">    where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.</span>
+<span class="sd">    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases. We recommend not including the Hermitian conjugates.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
+<span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: the :math:`\chi^2` likelihood</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">nvis</span> <span class="o">=</span> <span class="n">data_vis</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># print(&quot;inside chi_squared&quot;)</span>
+    <span class="c1"># print(&quot;model&quot;, model_vis.shape)</span>
+    <span class="c1"># print(&quot;data&quot;, data_vis.shape)</span>
+    <span class="c1"># print(&quot;weight&quot;, weight.shape)</span>
 
-    <span class="c1"># return 1 / (2 * nvis) * torch.sum(weight * torch.abs(data_vis - model_vis) ** 2)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data_vis</span> <span class="o">-</span> <span class="n">model_vis</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="log_likelihood"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = - \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )</span>
+
+<span class="sd">    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.</span>
+
+<span class="sd">    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the normalization of the answer returned will be different between the two cases. Inference of the parameter values should be unaffected. We recommend not including the Hermitian conjugates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
+<span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: the :math:`\ln\mathcal{L}` log likelihood</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If model and data are multidimensional, then flatten them to get full N</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">data_vis</span><span class="p">))</span>
+
+    <span class="n">sigma_term</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">weight</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="mi">1</span>
-        <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nvis</span><span class="p">)</span>
-        <span class="o">*</span> <span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="n">data_vis</span><span class="o">.</span><span class="n">real</span> <span class="o">-</span> <span class="n">model_vis</span><span class="o">.</span><span class="n">real</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="n">data_vis</span><span class="o">.</span><span class="n">imag</span> <span class="o">-</span> <span class="n">model_vis</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">N</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">sigma_term</span>
+        <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">chi_squared</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="nll"><a class="viewcode-back" href="../../api.html#mpol.losses.nll">[docs]</a><span class="k">def</span> <span class="nf">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; loss between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        L_\mathrm{nll} = \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta})</span>
+
+<span class="sd">    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`. Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
+<span class="sd">    a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum. This means that this normalized negative log likelihood loss function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the prefactor strengths of other regularizers *relative* to this value.</span>
+
+<span class="sd">    Note that this function should only be used in an optimization or point estimate situation. If it is used in any situation where uncertainties on parameter values are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to parameter value is incorrect.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
+<span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: the normalized negative log likelihood likelihood loss</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If model and data are multidimensional, then flatten them to get full N</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">data_vis</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">chi_squared</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="chi_squared_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared_gridded">[docs]</a><span class="k">def</span> <span class="nf">chi_squared_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) using gridded data and model visibilities.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: the :math:`\chi^2` value</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
+    <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
+    <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">chi_squared</span><span class="p">(</span>
+        <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="log_likelihood_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood_gridded">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.double: the :math:`\ln\mathcal{L}` value</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
+    <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
+    <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span>
+        <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the weighted :math:`\chi^2` loss between gridded data and model visibilities. Visibilities may be any shape as long as all</span>
-<span class="sd">    quantities have the *same* shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
-<span class="sd">    the prefactor :math:`1/(2 N_V)`, where :math:`N_V` is the number of visibilities. The factor of 2 comes in because we must count real</span>
-<span class="sd">    and imaginaries in the :math:`\chi^2` sum.</span>
+<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; (corresponding to :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will return the same value regardless of whether Hermitian pairs are included.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model_vis (PyTorch complex): array tuple of the model</span>
-<span class="sd">        data_vis (PyTorch complex): array of the data values</span>
-<span class="sd">        weight (PyTorch real): array of weight values</span>
+<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.double: the :math:`\chi^2` likelihood loss</span>
-
-<span class="sd">    .. math::</span>
-
-<span class="sd">        L = \frac{1}{2 N_V}\left ( \sum_i w_i (D_{\Re, i} - M_{\Re, i})^2 + \sum_i w_i (D_{\Im, i} - M_{\Im, i})^2 \right)</span>
-
-<span class="sd">    where :math:`w` are the visibility weights, :math:`D_\Re` and :math:`D_\Im` are the real and imaginary components of the data visibilities, respectively, and :math:`M_\Re` and :math:`M_\Im` are the real and imaginary components of the model visibilities, respectively.</span>
-
+<span class="sd">        torch.double: the normalized negative log likelihood likelihood loss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">)</span>
 
@@ -309,7 +492,7 @@
     <span class="c1"># diff the cube in mm and remove the last column</span>
     <span class="n">diff_mm</span> <span class="o">=</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_ll</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">diff_mm</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_ll</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">diff_mm</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 
@@ -332,7 +515,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># calculate the difference between the n+1 cube and the n cube</span>
     <span class="n">diff_vel</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cube</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_vel</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_vel</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 
@@ -354,7 +537,7 @@
     <span class="n">bt_edges</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[:,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
     <span class="n">lr_edges</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
 
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">bt_edges</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lr_edges</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">bt_edges</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lr_edges</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 
@@ -448,7 +631,7 @@
 
     <span class="c1"># calculate the expected power spectral density</span>
     <span class="n">expected_PSD</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">l_rad</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l_rad</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">qs</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">l_rad</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">l_rad</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">qs</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="p">)</span>
 
     <span class="c1"># evaluate the chi^2 for the PSD, making sure it broadcasts across all channels</span>
@@ -479,62 +662,41 @@
     <span class="c1"># diff the cube in mm and remove the last column</span>
     <span class="n">diff_mm</span> <span class="o">=</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">sky_cube</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">diff_ll</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">diff_mm</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">diff_ll</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">diff_mm</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 </pre></div>
 
-           </div>
-           
-          </div>
-          <footer>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019-21, Ian Czekala
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
         </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
 
 
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-    <!-- Theme Analytics -->
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-5472810-8', 'auto');
-    ga('send', 'pageview');
-    </script>
-
-    
-   
-
-</body>
+  </body>
 </html>

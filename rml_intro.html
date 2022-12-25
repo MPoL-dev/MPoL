@@ -1,209 +1,420 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Introduction to Regularized Maximum Likelihood Imaging &mdash; MPoL 0.1.1 documentation</title>
-  
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  
+    <title>Introduction to Regularized Maximum Likelihood Imaging &#8212; MPoL 0.1.2.dev0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="https://buttons.github.io/buttons.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
-  <link rel="stylesheet" href="_static/bullets.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/faculty.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="MPoL Installation" href="installation.html" />
-    <link rel="prev" title="Million Points of Light (MPoL)" href="index.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
+    <link rel="prev" title="Million Points of Light (MPoL)" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-  
-    <a class="heading heading-extra-margin" href="index.html">
-      <div class="logo-box logo-box-large">
-        <img class="logo" src="_static/logo.png"/>
-      </div>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
       
-        <span class="icon icon-home"> MPoL</span>
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.2.dev0 documentation</h1>
       
     </a>
-  
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="developer-documentation.html">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/gridder.html">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/gpu_setup.html">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
 
-  
-    
-    
-      <div class="version">0.1.1</div>
-    
-  
-
-  
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to Regularized Maximum Likelihood Imaging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction-to-likelihood-functions">Introduction to Likelihood functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-in-the-fourier-domain">Data in the Fourier domain</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#likelihood-functions-for-fourier-data">Likelihood functions for Fourier data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#rml-images-as-non-parametric-models">RML images as non-parametric models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-mpol-package-for-regularized-maximum-likelihood-imaging">The MPoL package for Regularized Maximum Likelihood imaging</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Optimization Loop</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
 
-            
+
           
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
         
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">MPoL</a>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
         
-      </nav>
-
-
-      <div class="wy-nav-content">
-
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
   
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
   
-        
-        <div class="rst-content">
-        
-          
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
 
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
 
+</a>
 
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/rml_intro.md.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
 
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
 
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-  <li class="breadcrumb"><a href="index.html">MPoL</a> &raquo;</li>
-    
-  <li class="breadcrumb">Introduction to Regularized Maximum Likelihood Imaging</li>
-
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/rml_intro.md.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
   
-  <hr/>
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#introduction-to-likelihood-functions">
+   Introduction to Likelihood functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-in-the-fourier-domain">
+   Data in the Fourier domain
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#likelihood-functions-for-fourier-data">
+   Likelihood functions for Fourier data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rml-images-as-non-parametric-models">
+   RML images as non-parametric models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-package-for-regularized-maximum-likelihood-imaging">
+   The MPoL package for Regularized Maximum Likelihood imaging
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Introduction to Regularized Maximum Likelihood Imaging</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#introduction-to-likelihood-functions">
+   Introduction to Likelihood functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-in-the-fourier-domain">
+   Data in the Fourier domain
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#likelihood-functions-for-fourier-data">
+   Likelihood functions for Fourier data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rml-images-as-non-parametric-models">
+   RML images as non-parametric models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-mpol-package-for-regularized-maximum-likelihood-imaging">
+   The MPoL package for Regularized Maximum Likelihood imaging
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
   <section class="tex2jax_ignore mathjax_ignore" id="introduction-to-regularized-maximum-likelihood-imaging">
-<span id="rml-intro-label"></span><h1>Introduction to Regularized Maximum Likelihood Imaging<a class="headerlink" href="#introduction-to-regularized-maximum-likelihood-imaging" title="Permalink to this heading">¶</a></h1>
+<span id="rml-intro-label"></span><h1>Introduction to Regularized Maximum Likelihood Imaging<a class="headerlink" href="#introduction-to-regularized-maximum-likelihood-imaging" title="Permalink to this headline">#</a></h1>
 <p>This document is an attempt to provide a whirlwind introduction to what Regularized Maximum Likelihood (RML) imaging is, and why you might want to use this MPoL package to perform it with your interferometric dataset. Of course, the field is rich, varied, and this short introduction couldn’t possibly do justice to cover the topic in depth. We recommend that you check out many of the links and suggestions in this document for further reading and understanding.</p>
 <section id="introduction-to-likelihood-functions">
-<h2>Introduction to Likelihood functions<a class="headerlink" href="#introduction-to-likelihood-functions" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction to Likelihood functions<a class="headerlink" href="#introduction-to-likelihood-functions" title="Permalink to this headline">#</a></h2>
 <p>Typically, when astronomers fit a model to some dataset, such as a line <span class="math notranslate nohighlight">\(y = m x + b\)</span> to a collection of <span class="math notranslate nohighlight">\(\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}\)</span> points, we require a likelihood function. Simply put, the likelihood function specifies the probability of the data, given a model, and encapsulates our assumptions about the data and noise generating processes.</p>
 <p>For most real-world datasets, we don’t measure the “true” <span class="math notranslate nohighlight">\(y\)</span> value of the line (i.e., <span class="math notranslate nohighlight">\(mx + b\)</span>), but rather make a measurement which has been partially corrupted by some “noise.” In that case, we say that each <span class="math notranslate nohighlight">\(y_i\)</span> data point is actually generated by</p>
 <div class="math notranslate nohighlight">
@@ -235,7 +446,7 @@ y_i = m x_i + b + \epsilon
 \[
 \ln \mathcal{L}(\boldsymbol{Y} |\,\boldsymbol{\theta}) = - \frac{1}{2} \chi^2 (\boldsymbol{Y} |\,\boldsymbol{\theta}) + C
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(C\)</span> is a constant with respect to the model parameters. It is common to use shorthand to say that “the likelihood function is <span class="math notranslate nohighlight">\(\chi^2\)</span>” to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values <span class="math notranslate nohighlight">\(\boldsymbol{\theta}_\mathrm{MLE}\)</span> which maximize the likelihood function. Unsurprisingly, these parameters are called the <em>maximum likelihood estimate</em> (or MLE), and usually they represent something like a “best-fit” model. <a class="footnote-reference brackets" href="#mle-solution" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+<p>where <span class="math notranslate nohighlight">\(C\)</span> is a constant with respect to the model parameters. It is common to use shorthand to say that “the likelihood function is <span class="math notranslate nohighlight">\(\chi^2\)</span>” to indicate situations where the data uncertainties are Gaussian. Very often, we (or others) are interested in the parameter values <span class="math notranslate nohighlight">\(\boldsymbol{\theta}_\mathrm{MLE}\)</span> which maximize the likelihood function. Unsurprisingly, these parameters are called the <em>maximum likelihood estimate</em> (or MLE), and usually they represent something like a “best-fit” model. <a class="footnote-reference brackets" href="#mle-solution" id="id1">1</a></p>
 <p>When it comes time to do parameter inference, however, it’s important to keep in mind</p>
 <ol class="arabic simple">
 <li><p>the simplifying assumptions we made about the noise uncertainties being constant with respect to the model parameters. If we were to “fit for the noise” in a hierarchical model, for example, we would need to use the full form of the log-likelihood function, including the <span class="math notranslate nohighlight">\(-N \ln \left (\sqrt{2 \pi} \sigma \right)\)</span> term.</p></li>
@@ -264,7 +475,7 @@ p(\boldsymbol{\theta}|\,\boldsymbol{Y}) \propto p(\boldsymbol{Y}|\,\boldsymbol{\
 </div>
 </section>
 <section id="data-in-the-fourier-domain">
-<h2>Data in the Fourier domain<a class="headerlink" href="#data-in-the-fourier-domain" title="Permalink to this heading">¶</a></h2>
+<h2>Data in the Fourier domain<a class="headerlink" href="#data-in-the-fourier-domain" title="Permalink to this headline">#</a></h2>
 <p>MPoL is a package to make images from interferometric data. Currently, we are most focused on modeling datasets from radio interferometers like the <a class="reference external" href="https://almascience.nrao.edu/">Atacama Large Millimeter Array</a> (ALMA), so the following introduction will have a radio astronomy flavor to it. But the concept of forward modeling interferometric data is quite general, and with a few additions the MPoL package could be applied to imaging problems involving Fourier data from optical and infrared telescopes (if this describes your dataset, please get in touch).</p>
 <p>As astronomers, we are most often interested in characterizing what an astrophysical source looks like. In other words, how its surface brightness <span class="math notranslate nohighlight">\(I\)</span> changes as a function of sky position. However, intereferometers acquire samples of data in the Fourier domain, also called the visibility domain. The visibility domain is the Fourier transform of the image sky brightness</p>
 <div class="math notranslate nohighlight">
@@ -311,7 +522,7 @@ w_i = \frac{1}{\sigma_i^2}
 </div>
 </section>
 <section id="likelihood-functions-for-fourier-data">
-<h2>Likelihood functions for Fourier data<a class="headerlink" href="#likelihood-functions-for-fourier-data" title="Permalink to this heading">¶</a></h2>
+<h2>Likelihood functions for Fourier data<a class="headerlink" href="#likelihood-functions-for-fourier-data" title="Permalink to this headline">#</a></h2>
 <p>Now that we’ve introduced likelihood functions in general and the specifics of Fourier data, let’s talk about likelihood functions for inference with Fourier data. As before, our statement about the data generating process</p>
 <div class="math notranslate nohighlight">
 \[
@@ -346,7 +557,7 @@ V_i = \mathcal{V}(u_i, v_i) + \epsilon
 </div>
 </section>
 <section id="rml-images-as-non-parametric-models">
-<h2>RML images as non-parametric models<a class="headerlink" href="#rml-images-as-non-parametric-models" title="Permalink to this heading">¶</a></h2>
+<h2>RML images as non-parametric models<a class="headerlink" href="#rml-images-as-non-parametric-models" title="Permalink to this headline">#</a></h2>
 <p>Now that we’ve introduced what it means to forward-model a dataset and how to calculate a likelihood function, let’s talk about non-parametric models.</p>
 <p>Say that our <span class="math notranslate nohighlight">\(\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}\)</span> dataset looked a bit more structured than a simple <span class="math notranslate nohighlight">\(y = mx + b\)</span> relationship. We could expand the model by adding more parameters, for example, by adding quadratic and cubic terms, e.g., <span class="math notranslate nohighlight">\(y = a_0 + a_1 x + a_2 x^2 + a_3 x^3\)</span>. This would be a reasonable approach, especially if the parameters <span class="math notranslate nohighlight">\(a_2\)</span>, <span class="math notranslate nohighlight">\(a_3\)</span>, etc… had physical meaning. But if all that we’re interested in is modeling the relationship between <span class="math notranslate nohighlight">\(y = f(x)\)</span> in order to make predictions, we could just as easily use a <a class="reference external" href="https://www.section.io/engineering-education/parametric-vs-nonparametric/">non-parametric model</a>, like a <a class="reference external" href="https://en.wikipedia.org/wiki/Spline_(mathematics)">spline</a> or a <a class="reference external" href="https://distill.pub/2019/visual-exploration-gaussian-processes/">Gaussian process</a>.</p>
 <p>With RML imaging, we’re trying to come up with a model that will fit the dataset. But rather than using a parametric model like a protoplanetary disk structure model or a series of Gaussian rings, we’re using a non-parametric model of <em>the image itself</em>. This could be as simple as parameterizing the image using the intensity values of the pixels themselves, i.e.,</p>
@@ -397,7 +608,7 @@ L_\mathrm{sparsity}(\boldsymbol{\theta}) = \sum_i |I_i|
 \[
 L(\boldsymbol{\theta}) = L_\mathrm{nll}(\boldsymbol{\theta}) + \lambda_\mathrm{sparsity} L_\mathrm{sparsity}(\boldsymbol{\theta})
 \]</div>
-<p>Where we control the relative “strength” of the regularization via the scalar prefactor <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span>. If <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity} = 0\)</span>, no sparsity regularization is applied. Non-zero values of <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span> will add in regularization that penalizes non-sparse <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> values. How strong this penalization is depends on the strength relative to the other terms in the loss calculation. <a class="footnote-reference brackets" href="#relative-strength" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+<p>Where we control the relative “strength” of the regularization via the scalar prefactor <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span>. If <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity} = 0\)</span>, no sparsity regularization is applied. Non-zero values of <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span> will add in regularization that penalizes non-sparse <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> values. How strong this penalization is depends on the strength relative to the other terms in the loss calculation. <a class="footnote-reference brackets" href="#relative-strength" id="id2">2</a></p>
 <p>We can equivalently specify this using Bayesian terminology, such that</p>
 <div class="math notranslate nohighlight">
 \[
@@ -420,7 +631,7 @@ p(\boldsymbol{\theta}) = C \exp \left (-\lambda_\mathrm{sparsity} \sum_i | I_i| 
 </div>
 </section>
 <section id="the-mpol-package-for-regularized-maximum-likelihood-imaging">
-<h2>The MPoL package for Regularized Maximum Likelihood imaging<a class="headerlink" href="#the-mpol-package-for-regularized-maximum-likelihood-imaging" title="Permalink to this heading">¶</a></h2>
+<h2>The MPoL package for Regularized Maximum Likelihood imaging<a class="headerlink" href="#the-mpol-package-for-regularized-maximum-likelihood-imaging" title="Permalink to this headline">#</a></h2>
 <p><em>Million Points of Light</em> or “MPoL” is a Python package that is used to perform regularized maximum likelihood imaging. By that we mean that the package provides the building blocks to create flexible image models and optimize them to fit interferometric datasets. The package is developed completely in the open on <a class="reference external" href="https://github.com/MPoL-dev/MPoL">Github</a>.</p>
 <p>We strive to</p>
 <ul class="simple">
@@ -448,80 +659,62 @@ p(\boldsymbol{\theta}) = C \exp \left (-\lambda_\mathrm{sparsity} \sum_i | I_i| 
 <p>To get started with MPoL, we recommend <a class="reference internal" href="installation.html"><span class="doc std std-doc">installing the package</span></a> and reading through the tutorial series. If you have any questions about the package, we invite you to join us on our <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">Github discussions page</a>.</p>
 <p class="rubric">Footnotes</p>
 <hr class="footnotes docutils" />
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="mle-solution" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>There’s actually a lot to unpack here. When your model has many parameters (i.e., the posterior distribution is high dimensional), the MLE (or MAP) solution is unlikely to represent a <em>typical</em> realization of your model parameters. This is a quirk of the geometry of high dimensional spaces. For more information, we recommend checking out Chapter 1 of <a class="reference external" href="https://arxiv.org/abs/1701.02434">Betancourt 2017</a>. Still, the MLE solution is often a useful quantity to communicate, summarizing the mode of the probability distribution.</p>
-</aside>
-<aside class="footnote brackets" id="relative-strength" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p>This is where the factor of <span class="math notranslate nohighlight">\(1/2\)</span> in front of <span class="math notranslate nohighlight">\(\chi^2\)</span> becomes important. You could use something like <span class="math notranslate nohighlight">\(L_\mathrm{nll}(\boldsymbol{\theta}) = \chi^2(\boldsymbol{\theta})\)</span>, but then you’d need to change the value of <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span> to achieve the same relative regularization.</p>
-</aside>
-</aside>
+<dl class="footnote brackets">
+<dt class="label" id="mle-solution"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>There’s actually a lot to unpack here. When your model has many parameters (i.e., the posterior distribution is high dimensional), the MLE (or MAP) solution is unlikely to represent a <em>typical</em> realization of your model parameters. This is a quirk of the geometry of high dimensional spaces. For more information, we recommend checking out Chapter 1 of <a class="reference external" href="https://arxiv.org/abs/1701.02434">Betancourt 2017</a>. Still, the MLE solution is often a useful quantity to communicate, summarizing the mode of the probability distribution.</p>
+</dd>
+<dt class="label" id="relative-strength"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>This is where the factor of <span class="math notranslate nohighlight">\(1/2\)</span> in front of <span class="math notranslate nohighlight">\(\chi^2\)</span> becomes important. You could use something like <span class="math notranslate nohighlight">\(L_\mathrm{nll}(\boldsymbol{\theta}) = \chi^2(\boldsymbol{\theta})\)</span>, but then you’d need to change the value of <span class="math notranslate nohighlight">\(\lambda_\mathrm{sparsity}\)</span> to achieve the same relative regularization.</p>
+</dd>
+</dl>
 </section>
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="installation.html" class="btn btn-neutral float-right" title="MPoL Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Million Points of Light (MPoL)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019-21, Ian Czekala
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Million Points of Light (MPoL)</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="installation.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MPoL Installation</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
 
 
       </div>
-
-    </section>
-
-  </div>
+    </div>
   
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-    <!-- Theme Analytics -->
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-5472810-8', 'auto');
-    ga('send', 'pageview');
-    </script>
-
-    
-   
-
-</body>
+  </body>
 </html>

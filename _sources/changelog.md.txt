@@ -5,6 +5,8 @@
 ## v0.1.2
 
 - Switched documentation backend to [MyST-NB](https://myst-nb.readthedocs.io/en/latest/index.html).
+- Switched documentation theme to [Sphinx Book Theme](https://sphinx-book-theme.readthedocs.io/en/latest/index.html).
+- Added {class}`~mpol.fourier.NuFFT` layer, allowing the direct forward modeling of un-gridded :math:`u,v` data. Closes GitHub issue [#17](https://github.com/MPoL-dev/MPoL/issues/17).
 
 ## v0.1.1
 
