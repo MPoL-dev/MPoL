@@ -21,16 +21,38 @@ kernelspec:
 This is most useful if you already have a real dataset, with real baseline distributions and noise weights. Alternatively, you could acquire some baseline distribution and noise distribution, possibly using CASA's simobserve.
 
 
-
 For this, you would take a realistic, known, sky-brightness distribution and then propagate this to the visibilities. For example, you could use an image from a simulation, a parametric model, or even an image from the Internet.
 
 ```{code-cell}
-url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/The_final_ALMA_antenna.jpg/2560px-The_final_ALMA_antenna.jpg"
+# use python to download an image
+import requests
+
+image_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/The_final_ALMA_antenna.jpg/2560px-The_final_ALMA_antenna.jpg"
+
+img_data = requests.get(image_url).content
+with open('alma.jpg', 'wb') as handler:
+    handler.write(img_data)
+```
+
+```{code-cell} ipython3
+---
+mystnb:
+  image:
+    width: 600px
+    alt: ALMA
+    classes: shadow bg-primary
+  figure:
+    caption: |
+      The ALMA antennas.
+    name: alma-ref
+---
+from IPython.display import Image
+Image("alma.jpg")
 ```
 
 How many pixels does it have?
 
-The routine just takes an Image cube, u,v, weights and produces visibilites with noise.
+The routine just takes an Image cube, u,v, weights and produces visibilities with noise.
 
 But there's another concern about how to put the image cube in, right? I guess that's just a matter of matching the image cube to the size. You may want to pad the image, though. You probably also want to convolve it.
 
