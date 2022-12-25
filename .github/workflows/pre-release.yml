@@ -18,7 +18,7 @@ jobs:
         run: |
           pip install .[dev]
       - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-mpol-dls
         with:
@@ -62,7 +62,7 @@ jobs:
         run: |
           pip install .[test]
       - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-mpol-dls
         with:
