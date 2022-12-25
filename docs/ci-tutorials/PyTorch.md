@@ -14,17 +14,16 @@ kernelspec:
 
 ```{code-cell}
 :tags: [hide-cell]
-%matplotlib inline
 %run notebook_setup
 ```
 
 # Introduction to PyTorch: Tensors and Gradient Descent
 
-This tutorial provides an introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent.
+This tutorial provides a gentle introduction to PyTorch tensors, automatic differentiation, and optimization with gradient descent outside of any specifics about radio interferometry or the MPoL package itself.
 
 ## Introduction to Tensors
 
-Tensors are matrices, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on PyTorch, and uses a form of gradient descent optimization to find the "best" image given a dataset and choice of regularizers.
+Tensors are multi-dimensional arrays, similar to numpy arrays, with the added benefit that they can be used to calculate gradients (more on that later). MPoL is built on the [PyTorch](https://pytorch.org/) machine learning library, and uses a form of gradient descent optimization to find the "best" image given some dataset and loss function, which may include regularizers.
 
 We'll start this tutorial by importing the torch and numpy packages. Make sure you have [PyTorch installed](https://pytorch.org/get-started/locally/) before proceeding.
 
@@ -65,7 +64,7 @@ print(f"Torch tensor multiplication result: {prod_tensor}")
 
 +++
 
-PyTorch provides a key functionality---the ability to calculate the gradients on tensors. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``, we'll see why this is important in a moment.
+PyTorch allows us to calculate the gradients on tensors, which is a key functionality underlying MPoL. Let's start by creating a tensor with a single value. Here we are setting ``requires_grad = True``; we'll see why this is important in a moment.
 
 ```{code-cell}
 x = torch.tensor(3.0, requires_grad=True)
@@ -78,7 +77,7 @@ Let's define some variable $y$ in terms of $x$:
 y = x ** 2
 ```
 
- We see that the value of $y$ is as we expect---nothing too strange here.
+We see that the value of $y$ is as we expect---nothing too strange here.
 
 ```{code-cell}
 print(f"x: {x}")
@@ -87,26 +86,24 @@ print(f"y: {y}")
 
 But what if we wanted to calculate the gradient of $y$ with respect to $x$? Using calculus, we find that the answer is $\frac{dy}{dx} = 2x$. The derivative evaluated at $x = 3$ is $6$.
 
-The magic is that can use PyTorch to get the same answer---no analytic derivative needed!
+We can use PyTorch to get the same answer---no analytic derivative needed!
 
 ```{code-cell}
 y.backward()  # populates gradient (.grad) attributes of y with respect to all of its independent variables
 x.grad  # returns the grad attribute (the gradient) of y with respect to x
 ```
 
-PyTorch uses the concept of automatic differentiation to calculate the derivative. Instead of computing the derivative as we would by hand, the program is using a computational graph and mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
+PyTorch uses the concept of [automatic differentiation](https://arxiv.org/abs/1502.05767) to calculate the derivative. Instead of computing the derivative as we would by hand, the program uses a computational graph and the mechanistic application of the chain rule. For example, a computational graph with several operations on $x$ resulting in a final output $y$ will use the chain rule to compute the differential associated with each operation and multiply these differentials together to get the derivative of $y$ with respect to $x$.
 
 +++
 
 ## Optimizing a Function with Gradient Descent
 
-If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how would we do it?
+If we were on the side of a hill in the dark and we wanted to get down to the bottom of a valley, how might we do it?
 
-We wouldn't be able to see all the way to the bottom of the valley, but we could feel which way is down based on the incline of where we are standing. We would take steps in the downward direction and we'd know when to stop when the ground felt flat.
+We can't see all the way to the bottom of the valley, but we can feel which way is down based on the incline of where we are standing. We might take steps in the downward direction and we'd know when to stop when the ground finally felt flat. We would also need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.
 
-Before we leap, though, we need to consider how large our steps should be. If we take very small steps, it will take us a longer time than if we take larger steps. However, if we take large leaps, we might completely miss the flat part of the valley, and jump straight across to the other side of the valley.
-
-We can look at the gradient descent from a more mathematical lense by looking at the graph $y = x^2$:
+Now let's take a more quantitative look at the gradient descent using the function $y = x^2$:
 
 ```{code-cell}
 def y(x):
@@ -115,7 +112,7 @@ def y(x):
 
 We will choose some arbitrary place to start on the left side of the hill and use PyTorch to calculate the tangent.
 
-Note that Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional ``detach().numpy()`` or ``.item()`` calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively. When it comes time to use MPoL for RML imaging, or any large production run, we'll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.
+Note that the plotting library Matplotlib requires numpy arrays instead of PyTorch tensors, so in the following code you might see the occasional ``detach().numpy()`` or ``.item()`` calls, which are used to convert PyTorch tensors to numpy arrays and scalar values, respectively, for plotting. When it comes time to use MPoL for RML imaging, or any large production run, we'll try to keep the calculations native to PyTorch tensors as long as possible, to avoid the overhead of converting types.
 
 ```{code-cell}
 x = torch.linspace(-5, 5, 100)
@@ -143,16 +140,14 @@ plt.ylim(ymin=0, ymax=25)
 plt.show()
 ```
 
-We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will point in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by this equation:
+We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will be a vector pointing in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by:
 
 $x_\mathrm{new} = x_\mathrm{current} - \nabla y(x_\mathrm{current}) * (\mathrm{step\,size})$
 
 where:
 
 - $x_\mathrm{current}$ is our current x value
-
 - $\nabla y(x_\mathrm{current})$ is the gradient at our current point
-
 - $(\mathrm{step\,size})$ is a value we choose that scales our steps
 
 We will choose ``step_size = 0.1``:
@@ -206,7 +201,7 @@ plt.ylabel(r"$y$")
 plt.show()
 ```
 
-The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We continue this process of checking if the gradient is nearly zero, and taking a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
+The gradient at our new point (shown in orange) is still not close to zero, meaning we haven't reached the minimum. We'll continue this process of checking if the gradient is nearly zero, and take a step in the direction of steepest descent until we reach the bottom of the valley. We'll say we've reached the bottom of the valley when the absolute value of the gradient is $<0.1$:
 
 ```{code-cell}
 x = torch.linspace(-5, 5, 100)
@@ -288,7 +283,7 @@ y_large_coords.append(y_large_step_new.item())
 
 plt.scatter(x_large_coords, y_large_coords)  # plot points showing steps
 plt.scatter(x_large_coords[-1], y_large_coords[-1], c="C1")
-
+plt.text(9, 70, "step 1", va="center")
 
 plt.xlim(xmin=-20, xmax=20)
 plt.ylim(ymin=-1, ymax=260)
@@ -297,7 +292,7 @@ plt.ylabel(r"$y$")
 plt.show()
 ```
 
-*Note the change in scale.* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.
+*Note the change in scale!* With only one step, we already see that we stepped *right over* the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we'd find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be ``step size = 0.6``, which would have reached pretty close to the minimum after only 3 steps.
 
 To sum up, optimizing a function with gradient descent consists of
 

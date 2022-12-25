@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import connectors, images
+from mpol import connectors, coordinates, fourier, images
 from mpol.constants import *
 
 
 def test_index_vis(coords, dataset):
     # test that we can index a dataset
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
 
     # create a mock cube that includes negative values
     nchan = dataset.nchan
@@ -39,7 +39,7 @@ def test_index_vis(coords, dataset):
 def test_connector_grad(coords, dataset):
     # test that we can calculate the gradients through the loss
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
@@ -61,7 +61,7 @@ def test_connector_grad(coords, dataset):
 def test_residual_connector(coords, dataset_cont, tmp_path):
     # test that we can instantiate a residual connector and evaluate residual products
 
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
 
     # create a mock cube that includes negative values
     nchan = dataset_cont.nchan

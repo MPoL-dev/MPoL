@@ -10,6 +10,8 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
     """
     Check that all data inputs are the same shape, the weights are positive, and the data_re and data_im are floats.
 
+    Make a reasonable effort to ensure that Hermitian pairs are *not* included.
+
     If the user supplied 1d vectors of shape ``(nvis,)``, make them all 2d with one channel, ``(1,nvis)``.
 
     """
@@ -33,6 +35,9 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_im.dtype == np.double
     ), "data_im should be type single or double"
 
+    # check to see that uu, vv and data do not contain Hermitian pairs
+    assert not contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
+
     if uu.ndim == 1:
         uu = np.atleast_2d(uu)
         vv = np.atleast_2d(vv)
@@ -45,15 +50,99 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
     # expand to 2d with complex conjugates
 
 
+def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
+    r"""
+    Check that the dataset does not contain Hermitian pairs. Because the sky brightness :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian, meaning that
+
+    .. math::
+
+        \mathcal{V}(u, v) = \mathcal{V}^*(-u, -v).
+
+    Most datasets (e.g., those extracted from CASA) will only record one visibility measurement per baseline and not include the duplicate Hermitian pair (to save storage space). This routine attempts to determine if the dataset contains Hermitian pairs or not by choosing one data point at a time and then searching the dataset to see if its Hermitian pair exists. The routine will declare that a dataset contains Hermitian pairs or not after it has searched ``test_vis`` number of data points. If 0 Hermitian pairs have been found for all ``test_vis`` points, then the dataset will be declared to have no Hermitian pairs. If ``test_vis`` Hermitian pairs were found for ``test_vis`` points searched, then the dataset will be declared to have Hermitian pairs. If more than 0 but fewer than ``test_vis`` Hermitian pairs were found for ``test_vis`` points, an error will be raised.
+
+    Gridding objects like :class:`mpol.gridding.Gridder` will naturally augment an input dataset to include the Hermitian pairs, so that images of :math:`I_\nu` produced with the inverse Fourier transform turn out to be real.
+
+    Args:
+        uu (numpy array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        data (numpy complex): array of data values
+        test_vis (int): the number of data points to search for Hermitian 'matches'
+        test_channel (int): the index of the channel to perform the check
+
+    Returns:
+        boolean : ``True`` if dataset does contain Hermitian pairs, ``False`` if not.
+    """
+
+    # make sure everything is in (nchan, nvis) format, to make our lives easier
+    if uu.ndim == 1:
+        uu = np.atleast_2d(uu)
+        vv = np.atleast_2d(vv)
+        data = np.atleast_2d(data)
+
+    # but only test a single-channel
+    uu = uu[test_channel]
+    vv = vv[test_channel]
+    data = data[test_channel]
+
+    # if the dataset contains Hermitian pairs, then there will be a large number of visibilities that have matching
+    # (uu, vv) and conjugate data values
+
+    # We don't know what order uu or vv might have been augmented in, or sorted after the fact, so we can't
+    # rely on quick differencing operations
+
+    num_pairs = 0
+
+    # make uv array same shape as data (nvis, 2)
+    uu_vv = np.array([uu, vv]).T  # (nvis, 2)
+
+    for i in range(test_vis):
+        # we will approach this as a sort operation.
+
+        # choose a u,v point
+        uv_point = uu_vv[i]
+
+        # see if its conjugate exists in the full array
+        # nonzero returns a tuple of (2, found_vis)
+        # we only need the first dimension, not the u_v dimension
+        ind = np.nonzero(uu_vv == -uv_point)[0]
+
+        # if we found something, then take the first result
+        if ind.size > 0:
+            ind = ind[0]
+
+            # test to see whether the data is a conjugate
+            if data[i] == np.conj(data[ind]):
+                num_pairs += 1
+
+    if num_pairs == 0:
+        return False
+    elif num_pairs == test_vis:
+        return True
+    else:
+        raise RuntimeError(
+            "{:} Hermitian pairs were found out of {:} visibilities tested, dataset is inconsistent.".format(
+                num_pairs, test_vis
+            )
+        )
+
+    # choose a uu, vv point, then see if the opposite value exists in the dataset
+    # if it does, then check that its visibility value is the complex conjugate
+
+    # we could have a max threshold, i.e., like at least 5 need to exist to say the dataset has pairs
+
+    # Subtract
+    return False
+
+
 class Gridder:
     r"""
     The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates. The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.' The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
     If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
 
-    If you just want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
+    If you want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
@@ -201,7 +290,7 @@ class Gridder:
 
         Args:
             weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
-            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approxmately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approximately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
             taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
         """
 
@@ -242,7 +331,7 @@ class Gridder:
 
             # calculate the robust parameter f^2 for each channel
             f_sq = ((5 * 10 ** (-robust)) ** 2) / (
-                np.sum(cell_weight ** 2, axis=(1, 2)) / np.sum(self.weight, axis=1)
+                np.sum(cell_weight**2, axis=(1, 2)) / np.sum(self.weight, axis=1)
             )
 
             # the robust weight corresponding to the cell
@@ -422,7 +511,7 @@ class Gridder:
 
         beam = self._fliplr_cube(
             np.fft.fftshift(
-                self.coords.npix ** 2
+                self.coords.npix**2
                 * np.fft.ifft2(
                     C[:, np.newaxis, np.newaxis] * re_gridded_beam,
                 ),
@@ -470,7 +559,7 @@ class Gridder:
 
         # calculate a meshgrid (same for all channels)
         ll, mm = np.meshgrid(self.coords.l_centers, self.coords.m_centers)
-        rr = np.sqrt(ll ** 2 + mm ** 2)
+        rr = np.sqrt(ll**2 + mm**2)
         theta = np.arctan2(mm, ll) + np.pi  # radians in range [0, 2pi]
 
         nulled_beam = self.beam.copy()
@@ -518,7 +607,7 @@ class Gridder:
         nulled = self._null_dirty_beam(
             ntheta=ntheta, single_channel_estimate=single_channel_estimate
         )
-        return self.coords.cell_size ** 2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
+        return self.coords.cell_size**2 * np.sum(nulled, axis=(1, 2))  # arcsec^2
 
     def get_dirty_image(
         self,
@@ -530,7 +619,7 @@ class Gridder:
         max_scatter=1.2,
         **beam_kwargs
     ):
-        """
+        r"""
         Calculate the dirty image.
 
         Args:
@@ -572,7 +661,7 @@ class Gridder:
 
         img = self._fliplr_cube(
             np.fft.fftshift(
-                self.coords.npix ** 2
+                self.coords.npix**2
                 * np.fft.ifft2(self.C[:, np.newaxis, np.newaxis] * self.vis_gridded),
                 axes=(1, 2),
             )
@@ -601,7 +690,7 @@ class Gridder:
         return img.real, beam
 
     def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
-        """
+        r"""
         Export gridded visibilities to a PyTorch dataset object.
 
         Args:
@@ -625,11 +714,6 @@ class Gridder:
         # grid visibilites (uniform weighting necessary here) and weights
         self._grid_visibilities(weighting="uniform")
         self._grid_weights()
-
-        # This should be an obsolete check now but I'll leave it here for now
-        assert (
-            self.weight_gridded is not None
-        ), "To export with uncertainties, first grid visibilities with weighting='uniform', no tapering function, and robust=None. Otherwise, data weights are not defined."
 
         return GriddedDataset(
             coords=self.coords,

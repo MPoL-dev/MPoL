@@ -1,8 +1,7 @@
 import numpy as np
 import torch
 
-from .constants import arcsec, cc, deg, kB
-
+from .constants import arcsec, cc, c_ms, deg, kB
 
 def ground_cube_to_packed_cube(ground_cube):
     r"""
@@ -151,9 +150,54 @@ def fftspace(width, N):
     return xx
 
 
+def convert_baselines(baselines, freq):
+    r"""
+    Convert baselines in meters to kilolambda.
+    Args:
+        baselines (float or np.array): baselines in [m].
+        freq (float or np.array): frequencies in [Hz]. If either ``baselines`` or ``freq`` are numpy arrays, their shapes must be broadcast-able.
+    Returns:
+        (1D array nvis): baselines in [klambda]
+    """
+    # calculate wavelengths in meters
+    wavelengths = c_ms / freq  # m
+
+    # calculate baselines in klambda
+    return 1e-3 * baselines / wavelengths  # [klambda]
+
+
+def broadcast_and_convert_baselines(u, v, chan_freq):
+    r"""
+    Convert baselines to kilolambda and broadcast to match shape of channel frequencies.
+    Args:
+        u (1D array nvis): baseline [m]
+        v (1D array nvis): baseline [m]
+        chan_freq (1D array nchan): frequencies [Hz]
+    Returns:
+        (u, v) each of which are (nchan, nvis) arrays of baselines in [klambda]
+    """
+
+    nchan = len(chan_freq)
+
+    # broadcast to the same shape as the data
+    # stub to broadcast u, v to all channels
+    broadcast = np.ones((nchan, 1))
+    uu = u * broadcast
+    vv = v * broadcast
+
+    # calculate wavelengths in meters
+    wavelengths = c_ms / chan_freq[:, np.newaxis]  # m
+
+    # calculate baselines in klambda
+    uu = 1e-3 * uu / wavelengths  # [klambda]
+    vv = 1e-3 * vv / wavelengths  # [klambda]
+
+    return (uu, vv)
+
+
 def get_max_spatial_freq(cell_size, npix):
     r"""
-    Calculate the maximum spatial frequency contained in the image.
+    Calculate the maximum spatial frequency that the image can represent and still satisfy the Nyquist Sampling theorem.
 
     Args:
         cell_size (float): the pixel size in arcseconds
@@ -172,12 +216,13 @@ def get_max_spatial_freq(cell_size, npix):
 
 def get_maximum_cell_size(uu_vv_point):
     r"""
-    Calculate the maximum possible cell_size that will Nyquist sample the uu or vv point. Note: not q point.
+    Calculate the maximum possible cell_size that will still Nyquist sample the uu or vv point. Note: not q point.
 
     Args:
         uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].
 
-    Returns: cell_size (in arcsec)
+    Returns: 
+        cell_size (in arcsec)
     """
 
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec

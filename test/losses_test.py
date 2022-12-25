@@ -1,7 +1,158 @@
+import numpy as np
 import pytest
 import torch
 
-from mpol import losses
+from mpol import fourier, images, losses, utils
+
+
+# create a fixture that has an image and produces loose and gridded model visibilities
+@pytest.fixture
+def image_cube(mock_visibility_data, coords):
+    # Gaussian parameters
+    kw = {
+        "a": 1,
+        "delta_x": 0.02,  # arcsec
+        "delta_y": -0.01,
+        "sigma_x": 0.02,
+        "sigma_y": 0.01,
+        "Omega": 20,  # degrees
+    }
+
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    nchan = len(uu)
+
+    # evaluate the Gaussian over the sky-plane, as np array
+    img_packed = utils.sky_gaussian_arcsec(
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+    )
+
+    # broadcast to (nchan, npix, npix)
+    img_packed_cube = np.broadcast_to(
+        img_packed, (nchan, coords.npix, coords.npix)
+    ).copy()
+    # convert img_packed to pytorch tensor
+    img_packed_tensor = torch.from_numpy(img_packed_cube)
+    # insert into ImageCube layer
+
+    return images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
+
+
+@pytest.fixture
+def loose_visibilities(mock_visibility_data, image_cube):
+    # use the NuFFT to produce model visibilities
+
+    nchan = image_cube.nchan
+
+    # use the coil broadcasting ability
+    chan = 4
+
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu_chan = uu[chan]
+    vv_chan = vv[chan]
+
+    nufft = fourier.NuFFT(coords=image_cube.coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
+    return nufft.forward(image_cube.forward())
+
+
+@pytest.fixture
+def gridded_visibilities(image_cube):
+
+    # use the FourierCube to produce model visibilities
+    flayer = fourier.FourierCube(coords=image_cube.coords)
+    return flayer.forward(image_cube.forward())
+
+
+def test_chi_squared_evaluation(
+    loose_visibilities, mock_visibility_data, gridded_visibilities, dataset
+):
+    # because of the way likelihood functions are defined, we would not expect
+    # the loose chi_squared or log_likelihood function to give the same answers as
+    # the gridded chi_squared or log_likelihood functions. This is because the normalization
+    # of likelihood functions are somewhat ill-defined, since the value of the likelihood
+    # function can change based on whether you bin your data.  The normalization only really makes
+    # sense in a full Bayesian setting where the evidence is computed and the normalization cancels out anyway.
+    # The important thing is that the *shape* of the likelihood function is the same as parameters
+    # are varied.
+    # more info
+    # https://stats.stackexchange.com/questions/97515/what-does-likelihood-is-only-defined-up-to-a-multiplicative-constant-of-proport?noredirect=1&lq=1
+
+    # calculate the ungridded chi^2
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    data = torch.tensor(data_re + 1.0j * data_im)
+    weight = torch.tensor(weight)
+
+    chi_squared = losses.chi_squared(loose_visibilities, data, weight)
+    print("loose chi_squared", chi_squared)
+
+    # calculate the gridded chi^2
+    chi_squared_gridded = losses.chi_squared_gridded(gridded_visibilities, dataset)
+    print("gridded chi_squared", chi_squared_gridded)
+
+    # it's OK that the values are different
+
+
+def test_log_likelihood_evaluation(
+    loose_visibilities, mock_visibility_data, gridded_visibilities, dataset
+):
+    # see comments under test_chi_squared_evaluation for why we don't necessarily expect these
+    # to be the same between gridded and ungridded
+
+    # calculate the ungridded log likelihood
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    data = torch.tensor(data_re + 1.0j * data_im)
+    weight = torch.tensor(weight)
+
+    log_like = losses.log_likelihood(loose_visibilities, data, weight)
+    print("loose log_likelihood", log_like)
+
+    # calculate the gridded log likelihood
+    log_like_gridded = losses.log_likelihood_gridded(gridded_visibilities, dataset)
+    print("gridded log likelihood", log_like_gridded)
+
+
+def test_nll_hermitian_pairs(loose_visibilities, mock_visibility_data):
+    # calculate the ungridded log likelihood
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    data = torch.tensor(data_re + 1.0j * data_im)
+    weight = torch.tensor(weight)
+
+    log_like = losses.nll(loose_visibilities, data, weight)
+    print("loose nll", log_like)
+
+    # calculate it with Hermitian pairs
+
+    # expand the vectors to include complex conjugates
+    uu = np.concatenate([uu, -uu], axis=1)
+    vv = np.concatenate([vv, -vv], axis=1)
+    loose_visibilities = torch.cat(
+        [loose_visibilities, torch.conj(loose_visibilities)], axis=1
+    )
+    data = torch.cat([data, torch.conj(data)], axis=1)
+    weight = torch.cat([weight, weight], axis=1)
+
+    log_like = losses.nll(loose_visibilities, data, weight)
+    print("loose nll w/ Hermitian", log_like)
+
+
+def test_nll_evaluation(
+    loose_visibilities, mock_visibility_data, gridded_visibilities, dataset
+):
+    # We would have expected the ungridded and gridded values to be closer than they are
+    # but I suppose this comes down to how the noise is averaged within each visibility cell.
+    # and the definition of degrees of freedom
+    # https://arxiv.org/abs/1012.3754
+
+    # calculate the ungridded log likelihood
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+    data = torch.tensor(data_re + 1.0j * data_im)
+    weight = torch.tensor(weight)
+
+    log_like = losses.nll(loose_visibilities, data, weight)
+    print("loose nll", log_like)
+
+    # calculate the gridded log likelihood
+    log_like_gridded = losses.nll_gridded(gridded_visibilities, dataset)
+    print("gridded nll", log_like_gridded)
 
 
 def test_nll_1D_zero():

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import connectors, datasets, images, utils
+from mpol import connectors, datasets, fourier, utils
 
 
 def test_dataset_device(dataset):
@@ -255,7 +255,7 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
 
     # visualize dirty images
     # create mock fourier layer
-    flayer = images.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords)
     flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
     fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))

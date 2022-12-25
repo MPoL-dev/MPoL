@@ -1,6 +1,6 @@
 import torch
 
-from . import connectors, images
+from . import fourier, images
 from .coordinates import _setup_coords
 
 
@@ -19,7 +19,7 @@ class SimpleNet(torch.nn.Module):
 
     :ivar bcube: the :class:`~mpol.images.BaseCube` instance
     :ivar icube: the :class:`~mpol.images.ImageCube` instance
-    :ivar fcube: the :class:`~mpol.images.FourierCube` instance
+    :ivar fcube: the :class:`~mpol.fourier.FourierCube` instance
 
     For example, you'll likely want to access the ``self.icube.sky_model`` at some point.
 
@@ -50,11 +50,11 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
-        self.fcube = images.FourierCube(coords=self.coords)
+        self.fcube = fourier.FourierCube(coords=self.coords)
 
     def forward(self):
         r"""
-        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.images.FourierCube` to produce the visibility cube.
+        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.fourier.FourierCube` to produce the visibility cube.
 
         Returns: 1D complex torch tensor of model visibilities.
         """

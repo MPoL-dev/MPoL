@@ -16,7 +16,7 @@ import sphinx.util.osutil
 sphinx.util.osutil.ENOENT = errno.ENOENT
 
 project = "MPoL"
-copyright = "2019-21, Ian Czekala"
+copyright = "2019-22, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
@@ -25,7 +25,6 @@ release = __version__
 
 # -- General configuration ---------------------------------------------------
 extensions = [
-    "faculty_sphinx_theme",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
@@ -45,6 +44,8 @@ source_suffix = {
 myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
+autodoc_member_order = "bysource" 
+autodoc_default_options = {"members": None}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -55,8 +56,12 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = "faculty-sphinx-theme"
-html_theme_options = {"analytics_id": "UA-5472810-8"}
+html_theme = "sphinx_book_theme"
+html_theme_options = {
+    "analytics_id": "UA-5472810-8",
+    "repository_url": "https://github.com/MPoL-dev/MPoL",
+    "use_repository_button": True,
+}
 
 html_logo = "logo.png"
 html_favicon = "favicon.ico"
@@ -68,27 +73,26 @@ master_doc = "index"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-# https://github.com/readthedocs/sphinx_rtd_theme/issues/1145
-html_css_files = ["bullets.css"]
-
 # https://docs.readthedocs.io/en/stable/guides/adding-custom-css.html
 html_js_files = ["https://buttons.github.io/buttons.js"]
 
 # Mermaid configuration
-mermaid_output_format = "svg"
+# mermaid_output_format = "svg"
 
 # zero out any JS, since it doesn't work
-mermaid_init_js = ""
-mermaid_version = ""
+# mermaid_init_js = ""
+# mermaid_version = ""
 
-if os.getenv("CI"):
-    # if True, we're running on github actions and need
-    # to use the path of the installed mmdc
-    # relative to docs/ directory!
-    # (mmdc itself not in $PATH automatically, like local)
-    mermaid_cmd = "../node_modules/.bin/mmdc"
+# if os.getenv("CI"):
+#     # if True, we're running on github actions and need
+#     # to use the path of the installed mmdc
+#     # relative to docs/ directory!
+#     # (mmdc itself not in $PATH automatically, like local)
+#     mermaid_cmd = "../node_modules/.bin/mmdc"
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
-nb_execution_excludepatterns = ["large-tutorials/*.md"]
+# .ipynb are produced using Makefile on own terms,
+# # both .md and executed .ipynb are kept in git repo
+nb_execution_excludepatterns = ["large-tutorials/*.md", "**.ipynb_checkpoints"]
 myst_heading_anchors = 3

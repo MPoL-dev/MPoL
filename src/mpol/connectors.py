@@ -37,7 +37,7 @@ class GriddedResidualConnector(nn.Module):
     Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.
 
     Args:
-        fourierCube: instantiated :class:`~mpol.images.FourierCube` object
+        fourierCube: instantiated :class:`~mpol.fourier.FourierCube` object
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
     """
 

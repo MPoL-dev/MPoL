@@ -9,6 +9,9 @@ from mpol.constants import *
 
 
 def test_grid_cont(mock_visibility_data_cont):
+    """
+    Test that the gridding operation doesn't error.
+    """
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
     gridder = gridding.Gridder(
@@ -29,6 +32,11 @@ def test_grid_cont(mock_visibility_data_cont):
 
 # test that we're getting the right numbers back for some well defined operations
 def test_uniform_ones(mock_visibility_data, tmp_path):
+    """
+    Test that we can grid average a set of visibilities that are just 1.
+    We should get back entirely 1s.
+    """
+
     coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
@@ -72,16 +80,25 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
     plt.close("all")
 
-    assert np.min(gridder.data_re_gridded) == pytest.approx(0)
+    # if the gridding worked, we should have real values approximately 1
     assert np.max(gridder.data_re_gridded) == pytest.approx(1)
+    # except in the cells with no data
+    assert np.min(gridder.data_re_gridded) == pytest.approx(0)
 
+    # make sure all average values are set to 1
+    diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
+    assert np.all(diff_real < 1e-10)
+
+    # and imaginary values approximately 0 everywhere
     assert np.min(gridder.data_im_gridded) == pytest.approx(0)
     assert np.max(gridder.data_im_gridded) == pytest.approx(0)
 
 
-def test_weight_gridding(mock_visibility_data, tmp_path):
+def test_weight_gridding(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
-    weight = np.ones_like(uu)
+
+    # initialize random (positive) weight values
+    weight = np.random.uniform(low=0.01, high=0.1, size=uu.shape)
     data_re = np.ones_like(uu)
     data_im = np.ones_like(uu)
 
@@ -95,24 +112,16 @@ def test_weight_gridding(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    gridder._grid_visibilities(weighting="uniform")
     gridder._grid_weights()
 
-    # make sure all average values are set to 1
-    diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
-    print(diff_real)
-    print(np.max(diff_real))
-    assert np.all(diff_real < 1e-10)
+    print("sum of ungridded weights", np.sum(weight))
 
-    # can't do this with imaginaries and fake data.
-    # diff_imag = np.abs(1 - gridder.vis_gridded[gridder.mask].imag)
-    # print(diff_imag)
-    # print(np.max(diff_imag))
-    # assert np.all(diff_imag < 1e-10)
+    # test that the weights all sum to the same value, modulo Hermitian aspects
+    # should be twice that of the ungridded weights, since Hermitian weights have
+    # been double-counted
+    print("sum of gridded weights", np.sum(gridder.weight_gridded))
 
-    # figure out where non-1 averaged imaginaries are coming through.
-    # IDK, it's kind of a weird thing because we're complex-conjugating the visibilites. Maybe this is right?
-    # seems kind of dumb though. I think to just say imaginaries should be 1 and then mirror, you get into inconsistencies
+    assert np.sum(weight) == pytest.approx(0.5 * np.sum(gridder.weight_gridded))
 
 
 # test the standard deviation estimation routines
