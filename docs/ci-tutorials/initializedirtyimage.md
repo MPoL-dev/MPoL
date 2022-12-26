@@ -81,7 +81,7 @@ Now let's calculate the dirty image. Here we're using Briggs weighting with a ro
 
 ```{code-cell}
 # Calculate the dirty image
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/beam")
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
 ```
 
 Let's visualize this dirty image. Here we're using an aggressive colormap to highlight the many negative flux pixels contained in this image.

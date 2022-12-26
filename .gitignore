@@ -120,6 +120,10 @@ venv/
 # notebooks produced from jupytext
 docs/ci-tutorials/*.ipynb
 
+docs/ci-tutorials/alma.jpg
+docs/ci-tutorials/mock_data.npz
+
+
 # tensorboard outputs
 docs/ci-tutorials/runs
 docs/large-tutorials/runs
@@ -134,3 +138,6 @@ dirty_image_model.pt
 
 # setup file
 project_setup.sh
+
+plotsdir
+runs

@@ -13,7 +13,6 @@ kernelspec:
 
 ```{code-cell}
 :tags: [hide-cell]
-%matplotlib inline
 %run notebook_setup
 ```
 

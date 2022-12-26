@@ -35,9 +35,6 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_im.dtype == np.double
     ), "data_im should be type single or double"
 
-    # check to see that uu, vv and data do not contain Hermitian pairs
-    assert not contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
-
     if uu.ndim == 1:
         uu = np.atleast_2d(uu)
         vv = np.atleast_2d(vv)
@@ -45,9 +42,10 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_re = np.atleast_2d(data_re)
         data_im = np.atleast_2d(data_im)
 
-    return uu, vv, weight, data_re, data_im
+    # check to see that uu, vv and data do not contain Hermitian pairs
+    assert not contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
-    # expand to 2d with complex conjugates
+    return uu, vv, weight, data_re, data_im
 
 
 def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
@@ -148,11 +146,11 @@ class Gridder:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        uu (numpy array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-        vv (numpy array): (nchan, nvis) length array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-        weight (2d numpy array): (nchan, nvis) length array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
-        data_re (2d numpy array): (nchan, nvis) length array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
-        data_im (2d numpy array): (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
+        data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
 
     """
 
