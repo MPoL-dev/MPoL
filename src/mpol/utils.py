@@ -1,17 +1,19 @@
 import numpy as np
 import torch
 
-from .constants import arcsec, cc, c_ms, deg, kB
+from . import fourier
+from .constants import arcsec, c_ms, cc, deg, kB
+
 
 def ground_cube_to_packed_cube(ground_cube):
     r"""
     Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.
-    
+
     Args:
         ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
 
     Returns:
-        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Packed Visibility Cube. 
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Packed Visibility Cube.
     """
     shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
     return shifted
@@ -20,7 +22,7 @@ def ground_cube_to_packed_cube(ground_cube):
 def packed_cube_to_ground_cube(packed_cube):
     r"""
     Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.
-    
+
     Args:
         packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
 
@@ -35,7 +37,7 @@ def packed_cube_to_ground_cube(packed_cube):
 def sky_cube_to_packed_cube(sky_cube):
     r"""
     Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.
-    
+
     Args:
         sky_cube: a previously initialized Sky Cube object with RA increasing to the *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
 
@@ -50,7 +52,7 @@ def sky_cube_to_packed_cube(sky_cube):
 def packed_cube_to_sky_cube(packed_cube):
     r"""
     Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.
-    
+
     Args:
         packed_cube: a previously initialized Packed Image Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
 
@@ -77,13 +79,13 @@ def get_Jy_arcsec2(T_b, nu=230e9):
     """
     # brightness temperature assuming RJ limit
     # units of ergs/s/cm^2/Hz/ster
-    I_nu = T_b * 2 * nu ** 2 * kB / cc ** 2
+    I_nu = T_b * 2 * nu**2 * kB / cc**2
 
     # convert to Jy/ster
     Jy_ster = I_nu * 1e23
 
     # convert to Jy/arcsec^2
-    Jy_arcsec2 = Jy_ster * arcsec ** 2
+    Jy_arcsec2 = Jy_ster * arcsec**2
 
     return Jy_arcsec2
 
@@ -221,7 +223,7 @@ def get_maximum_cell_size(uu_vv_point):
     Args:
         uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].
 
-    Returns: 
+    Returns:
         cell_size (in arcsec)
     """
 
@@ -433,7 +435,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
         * 2
         * np.pi
         * np.exp(
-            -2 * np.pi ** 2 * (sigma_l ** 2 * up ** 2 + sigma_m ** 2 * vp ** 2)
+            -2 * np.pi**2 * (sigma_l**2 * up**2 + sigma_m**2 * vp**2)
             - 2.0j * np.pi * (delta_l * u + delta_m * v)
         )
     )
@@ -461,10 +463,41 @@ def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y,
     return fourier_gaussian_lambda_radians(
         1e3 * u,
         1e3 * v,
-        a / arcsec ** 2,
+        a / arcsec**2,
         delta_x * arcsec,
         delta_y * arcsec,
         sigma_x * arcsec,
         sigma_y * arcsec,
         Omega,
     )
+
+
+def make_fake_dataset(imageCube, uu, vv, weight):
+    r"""
+    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
+
+    The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``.
+
+    Args:
+        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a fake dataset
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) length array of thermal weights :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+
+    Returns:
+        (2-tuple): a two tuple of the fake data. The first array is the mock dataset including noise, the second array is the mock dataset without noise.
+    """
+
+    # make into a multi-channel dataset, even if only a single-channel provided
+    if uu.ndim == 1:
+        uu = np.atleast_2d(uu)
+        vv = np.atleast_2d(vv)
+        weight = np.atleast_2d(weight)
+
+    # instantiate a NuFFT object based on the ImageCube
+    nufft = fourier.NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
+
+    # carry it forward to the visibilities
+    vis = nufft.forward(imageCube.forward())
+
+    return weight
