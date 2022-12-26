@@ -16,14 +16,11 @@ help:
 CI-NOTEBOOKS := ci-tutorials/PyTorch.ipynb ci-tutorials/gridder.ipynb ci-tutorials/optimization.ipynb ci-tutorials/crossvalidation.ipynb ci-tutorials/initializedirtyimage.ipynb
 clean:
 	rm -rf _build
-	# rm -rf ${CI-NOTEBOOKS}
 	rm -rf ci-tutorials/.ipynb_checkpoints
 	rm -rf ci-tutorials/runs
-	rm -rf ${CHARTS}
+	rm -rf ci-tutorials/alma.jpg
+	rm -rf ci-tutorials/mock_data.npz
 	rm -rf _static/baselines/build/baselines.csv
-
-# ci-tutorials/%.ipynb: ci-tutorials/%.py ${CHARTS}
-	# jupytext --to ipynb --execute $<
 
 # baseline table
 _static/baselines/build/baselines.csv: _static/baselines/src/print_conversions.py
