@@ -94,6 +94,7 @@ class FourierCube(nn.Module):
         """
         return torch.angle(self.ground_vis)
 
+
 def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.
@@ -118,18 +119,18 @@ def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
     Returns:
         boolean: `True` if it is safe to assume that the baselines are constant with channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
     """
-    
+
     # broadcast and convert baselines to kilolambda across channel
     uu, vv = utils.broadcast_and_convert_baselines(uu, vv, freqs)
     # should be (nchan, nvis) arrays
 
     # convert uv_cell_frac to a kilolambda threshold
-    delta_uv = uv_cell_frac * coords.du # [klambda]
+    delta_uv = uv_cell_frac * coords.du  # [klambda]
 
     # find maximum change in baseline across channel
     # concatenate arrays to save steps
-    uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
-    
+    uv = np.array([uu, vv])  # (2, nchan, nvis) arrays
+
     # find max - min along channel axis
     uv_min = uv.min(axis=1)
     uv_max = uv.max(axis=1)
@@ -140,14 +141,14 @@ def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
-    
+
 
 def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.
 
-    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda. 
-    
+    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda.
+
     If this routine returns True, then it should be safe for the user to either average the baselines across channel or simply choose a single, representative channel. This would enable parallelization in the {class}`mpol.fourier.NuFFT` via the coil dimension.
 
     Args:
@@ -162,12 +163,12 @@ def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
 
     """
     # convert uv_cell_frac to a kilolambda threshold
-    delta_uv = uv_cell_frac * coords.du # [klambda]
+    delta_uv = uv_cell_frac * coords.du  # [klambda]
 
     # find maximum change in baseline across channel
     # concatenate arrays to save steps
-    uv = np.array([uu, vv]) # (2, nchan, nvis) arrays
-    
+    uv = np.array([uu, vv])  # (2, nchan, nvis) arrays
+
     # find max - min along channel axis
     uv_min = uv.min(axis=1)
     uv_max = uv.max(axis=1)
@@ -178,7 +179,7 @@ def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
-    
+
 
 class NuFFT(nn.Module):
     r"""
@@ -247,7 +248,11 @@ class NuFFT(nn.Module):
                 )
             else:
                 import warnings
-                warnings.warn("Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).", category=RuntimeWarning)
+
+                warnings.warn(
+                    "Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).",
+                    category=RuntimeWarning,
+                )
                 self.interp_mats = None
                 self.sparse_matrices = False
 
@@ -390,3 +395,43 @@ class NuFFT(nn.Module):
             output = torch.squeeze(output, dim=1)
 
         return output
+
+
+def make_fake_dataset(imageCube, uu, vv, weight):
+    r"""
+    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
+
+    The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``.
+
+    Args:
+        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a fake dataset
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) length array of thermal weights :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+
+    Returns:
+        (2-tuple): a two tuple of the fake data. The first array is the mock dataset including noise, the second array is the mock dataset without noise.
+    """
+
+    # make into a multi-channel dataset, even if only a single-channel provided
+    if uu.ndim == 1:
+        uu = np.atleast_2d(uu)
+        vv = np.atleast_2d(vv)
+        weight = np.atleast_2d(weight)
+
+    # instantiate a NuFFT object based on the ImageCube
+    nufft = fourier.NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
+
+    # carry it forward to the visibilities
+    vis_noiseless = nufft.forward(imageCube.forward())
+
+    # generate complex noise
+    sigma = 1 / np.sqrt(weight)
+    noise = np.random.normal(
+        loc=0, scale=sigma, size=uu.shape
+    ) + 1.0j * np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    # add to data
+    vis_noise = vis_noiseless + noise
+
+    return vis_noise, vis_noiseless

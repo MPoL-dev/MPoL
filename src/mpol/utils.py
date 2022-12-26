@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 
-from . import fourier
 from .constants import arcsec, c_ms, cc, deg, kB
 
 
@@ -470,43 +469,3 @@ def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y,
         sigma_y * arcsec,
         Omega,
     )
-
-
-def make_fake_dataset(imageCube, uu, vv, weight):
-    r"""
-    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
-
-    The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``.
-
-    Args:
-        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a fake dataset
-        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        weight (2d numpy array): (nchan, nvis) length array of thermal weights :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
-
-    Returns:
-        (2-tuple): a two tuple of the fake data. The first array is the mock dataset including noise, the second array is the mock dataset without noise.
-    """
-
-    # make into a multi-channel dataset, even if only a single-channel provided
-    if uu.ndim == 1:
-        uu = np.atleast_2d(uu)
-        vv = np.atleast_2d(vv)
-        weight = np.atleast_2d(weight)
-
-    # instantiate a NuFFT object based on the ImageCube
-    nufft = fourier.NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
-
-    # carry it forward to the visibilities
-    vis_noiseless = nufft.forward(imageCube.forward())
-
-    # generate complex noise
-    sigma = 1 / np.sqrt(weight)
-    noise = np.random.normal(
-        loc=0, scale=sigma, size=uu.shape
-    ) + 1.0j * np.random.normal(loc=0, scale=sigma, size=uu.shape)
-
-    # add to data
-    vis_noise = vis_noiseless + noise
-
-    return vis_noise, vis_noiseless
