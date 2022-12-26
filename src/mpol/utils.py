@@ -498,6 +498,15 @@ def make_fake_dataset(imageCube, uu, vv, weight):
     nufft = fourier.NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
 
     # carry it forward to the visibilities
-    vis = nufft.forward(imageCube.forward())
+    vis_noiseless = nufft.forward(imageCube.forward())
 
-    return weight
+    # generate complex noise
+    sigma = 1 / np.sqrt(weight)
+    noise = np.random.normal(
+        loc=0, scale=sigma, size=uu.shape
+    ) + 1.0j * np.random.normal(loc=0, scale=sigma, size=uu.shape)
+
+    # add to data
+    vis_noise = vis_noiseless + noise
+
+    return vis_noise, vis_noiseless
