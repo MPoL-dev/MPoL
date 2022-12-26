@@ -37,7 +37,7 @@ EXTRA_REQUIRES = {
         "sphinx>=2.3.0",
         "numpy",
         "jupytext",
-        "ipython!=8.7.0", # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
+        "ipython!=8.7.0",  # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
         "nbsphinx",
         "sphinx_book_theme",
         "sphinx_copybutton",
@@ -49,6 +49,7 @@ EXTRA_REQUIRES = {
         "tensorboard",
         "myst-nb",
         "jupyter-cache",
+        "Pillow",
     ],
 }
 
@@ -66,7 +67,15 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/iancze/MPoL",
-    install_requires=["numpy", "scipy", "torch>=1.8.0", "torchvision", "torchaudio", "torchkbnufft", "astropy"],
+    install_requires=[
+        "numpy",
+        "scipy",
+        "torch>=1.8.0",
+        "torchvision",
+        "torchaudio",
+        "torchkbnufft",
+        "astropy",
+    ],
     extras_require=EXTRA_REQUIRES,
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
