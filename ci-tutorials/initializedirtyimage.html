@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Initializing with the Dirty Image &#8212; MPoL 0.1.3.dev0 documentation</title>
+    <title>Initializing with the Dirty Image &#8212; MPoL 0.1.13 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -86,7 +86,7 @@
       <img src="../_static/logo.png" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">MPoL 0.1.3.dev0 documentation</h1>
+      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
@@ -175,6 +175,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../large-tutorials/HD143006_part_2.html">
    HD143006 Tutorial Part 2
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fakedata.html">
+   Making a Mock Dataset
   </a>
  </li>
 </ul>
@@ -508,7 +513,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the dirty image</span>
-<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/beam&quot;</span><span class="p">)</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -530,13 +535,13 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f6f327f3f40&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fd114f56d00&gt;
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1920x1440 with 0 Axes&gt;
 </pre></div>
 </div>
-<img alt="../_images/eadd9b40361407f502a56de298d6d43b2fc4a35524a8a498c9a763239fc37533.png" src="../_images/eadd9b40361407f502a56de298d6d43b2fc4a35524a8a498c9a763239fc37533.png" />
+<img alt="../_images/75fc575557eb4f6c2867d649bfd70335d1ea84bbf4379518b0d46c76747e7328.png" src="../_images/75fc575557eb4f6c2867d649bfd70335d1ea84bbf4379518b0d46c76747e7328.png" />
 </div>
 </div>
 <p>We can see that there are a number of pixels with negative flux values</p>
@@ -613,7 +618,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;loss&#39;)
 </pre></div>
 </div>
-<img alt="../_images/528b4cb97eeb55e0270de80d6be84fe53291a8b80f702120a4cfbb2daa85edca.png" src="../_images/528b4cb97eeb55e0270de80d6be84fe53291a8b80f702120a4cfbb2daa85edca.png" />
+<img alt="../_images/d15de9b152d98db0669227ad8f24f4db78767767ed4a13e2bf2e18469d6ac13a.png" src="../_images/d15de9b152d98db0669227ad8f24f4db78767767ed4a13e2bf2e18469d6ac13a.png" />
 </div>
 </div>
 <p>Let’s visualize the resulting image cube representation.</p>
@@ -629,10 +634,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f6f300621f0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fd114263700&gt;
 </pre></div>
 </div>
-<img alt="../_images/bc8acccbac9b5ae07c62fbee47858f6b961eb527d69439965eb36ecf0b2ca7cf.png" src="../_images/bc8acccbac9b5ae07c62fbee47858f6b961eb527d69439965eb36ecf0b2ca7cf.png" />
+<img alt="../_images/634397b9c3416eb94bc73ca5230868e8800e306416a3828f4cf52002377d46c6.png" src="../_images/634397b9c3416eb94bc73ca5230868e8800e306416a3828f4cf52002377d46c6.png" />
 </div>
 </div>
 <p>We see that the cube resembles the dirty image, but it contains no pixels with negative flux values.</p>
@@ -664,10 +669,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f6f28fa2dc0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fd1141b1be0&gt;
 </pre></div>
 </div>
-<img alt="../_images/775132c865b4a787bd8a4141d006d04e9b6e1a49b64c2f3c005cb1800be7168c.png" src="../_images/775132c865b4a787bd8a4141d006d04e9b6e1a49b64c2f3c005cb1800be7168c.png" />
+<img alt="../_images/dabdaac3622b846b7191bb192f0b9946006f9b09298118638d8912615c69760d.png" src="../_images/dabdaac3622b846b7191bb192f0b9946006f9b09298118638d8912615c69760d.png" />
 </div>
 </div>
 </section>
@@ -722,13 +727,13 @@ title="Print to PDF"
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OrderedDict([(&#39;bcube.base_cube&#39;,
-              tensor([[[-5.0804, -4.8556, -5.1265,  ..., -5.4252, -5.4998, -5.3646],
-                       [-5.4508, -5.2860, -5.4591,  ..., -5.6400, -5.7612, -5.6770],
-                       [-5.6921, -5.5713, -5.6573,  ..., -5.8351, -5.9434, -5.8712],
+              tensor([[[ -2.4145,  -1.2679,  -2.4439,  ...,  -3.9169,  -4.3179,  -3.9517],
+                       [ -4.0859,  -2.1172,  -4.1596,  ...,  -4.8748,  -5.2527,  -5.0201],
+                       [ -5.0305,  -4.4869,  -4.9043,  ...,  -5.5131,  -5.7732,  -5.5880],
                        ...,
-                       [-4.1607, -3.8701, -3.9250,  ..., -4.8574, -4.7145, -4.4097],
-                       [-4.3247, -3.9789, -4.1579,  ..., -4.9576, -4.8731, -4.6139],
-                       [-4.6532, -4.3457, -4.6481,  ..., -5.1825, -5.1763, -4.9727]]],
+                       [-14.7604, -20.9380, -14.0989,  ...,  -2.0000,  -1.7609,  -7.0087],
+                       [ -6.7399, -11.0350,  -6.4670,  ...,  -1.5676,  -2.0277,  -0.2905],
+                       [ -0.7768,  -1.9421,   1.6008,  ...,  -2.2245,  -2.7876,  -2.2624]]],
                      dtype=torch.float64)),
              (&#39;conv_layer.m.weight&#39;,
               tensor([[[[0.0625, 0.1250, 0.0625],

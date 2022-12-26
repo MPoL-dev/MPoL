@@ -54,6 +54,7 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    ci-tutorials/initializedirtyimage
    large-tutorials/HD143006_part_1
    large-tutorials/HD143006_part_2
+   ci-tutorials/fakedata
 
 .. toctree::
    :hidden:

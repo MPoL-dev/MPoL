@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.fourier &#8212; MPoL 0.1.3.dev0 documentation</title>
+    <title>mpol.fourier &#8212; MPoL 0.1.13 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -83,7 +83,7 @@
       <img src="../../_static/logo.png" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">MPoL 0.1.3.dev0 documentation</h1>
+      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -172,6 +172,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../../large-tutorials/HD143006_part_2.html">
    HD143006 Tutorial Part 2
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../ci-tutorials/fakedata.html">
+   Making a Mock Dataset
   </a>
  </li>
 </ul>
@@ -379,6 +384,7 @@ title="Source repository"
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ground_vis</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="safe_baseline_constant_meters"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_meters">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_meters</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.</span>
@@ -403,18 +409,18 @@ title="Source repository"
 <span class="sd">    Returns:</span>
 <span class="sd">        boolean: `True` if it is safe to assume that the baselines are constant with channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="c1"># broadcast and convert baselines to kilolambda across channel</span>
     <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">broadcast_and_convert_baselines</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">freqs</span><span class="p">)</span>
     <span class="c1"># should be (nchan, nvis) arrays</span>
 
     <span class="c1"># convert uv_cell_frac to a kilolambda threshold</span>
-    <span class="n">delta_uv</span> <span class="o">=</span> <span class="n">uv_cell_frac</span> <span class="o">*</span> <span class="n">coords</span><span class="o">.</span><span class="n">du</span> <span class="c1"># [klambda]</span>
+    <span class="n">delta_uv</span> <span class="o">=</span> <span class="n">uv_cell_frac</span> <span class="o">*</span> <span class="n">coords</span><span class="o">.</span><span class="n">du</span>  <span class="c1"># [klambda]</span>
 
     <span class="c1"># find maximum change in baseline across channel</span>
     <span class="c1"># concatenate arrays to save steps</span>
-    <span class="n">uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">])</span> <span class="c1"># (2, nchan, nvis) arrays</span>
-    
+    <span class="n">uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">])</span>  <span class="c1"># (2, nchan, nvis) arrays</span>
+
     <span class="c1"># find max - min along channel axis</span>
     <span class="n">uv_min</span> <span class="o">=</span> <span class="n">uv</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">uv_max</span> <span class="o">=</span> <span class="n">uv</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -425,14 +431,14 @@ title="Source repository"
 
     <span class="c1"># compare to uv_cell_frac</span>
     <span class="k">return</span> <span class="n">max_diff</span> <span class="o">&lt;</span> <span class="n">delta_uv</span></div>
-    
+
 
 <div class="viewcode-block" id="safe_baseline_constant_kilolambda"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_kilolambda">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_kilolambda</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.</span>
 
-<span class="sd">    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda. </span>
-<span class="sd">    </span>
+<span class="sd">    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda.</span>
+
 <span class="sd">    If this routine returns True, then it should be safe for the user to either average the baselines across channel or simply choose a single, representative channel. This would enable parallelization in the {class}`mpol.fourier.NuFFT` via the coil dimension.</span>
 
 <span class="sd">    Args:</span>
@@ -447,12 +453,12 @@ title="Source repository"
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># convert uv_cell_frac to a kilolambda threshold</span>
-    <span class="n">delta_uv</span> <span class="o">=</span> <span class="n">uv_cell_frac</span> <span class="o">*</span> <span class="n">coords</span><span class="o">.</span><span class="n">du</span> <span class="c1"># [klambda]</span>
+    <span class="n">delta_uv</span> <span class="o">=</span> <span class="n">uv_cell_frac</span> <span class="o">*</span> <span class="n">coords</span><span class="o">.</span><span class="n">du</span>  <span class="c1"># [klambda]</span>
 
     <span class="c1"># find maximum change in baseline across channel</span>
     <span class="c1"># concatenate arrays to save steps</span>
-    <span class="n">uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">])</span> <span class="c1"># (2, nchan, nvis) arrays</span>
-    
+    <span class="n">uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">])</span>  <span class="c1"># (2, nchan, nvis) arrays</span>
+
     <span class="c1"># find max - min along channel axis</span>
     <span class="n">uv_min</span> <span class="o">=</span> <span class="n">uv</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">uv_max</span> <span class="o">=</span> <span class="n">uv</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -463,7 +469,7 @@ title="Source repository"
 
     <span class="c1"># compare to uv_cell_frac</span>
     <span class="k">return</span> <span class="n">max_diff</span> <span class="o">&lt;</span> <span class="n">delta_uv</span></div>
-    
+
 
 <div class="viewcode-block" id="NuFFT"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT">[docs]</a><span class="k">class</span> <span class="nc">NuFFT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -532,7 +538,11 @@ title="Source repository"
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">warnings</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the &#39;batch&#39; dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the &#39;batch&#39; dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).&quot;</span><span class="p">,</span>
+                    <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">interp_mats</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -675,6 +685,47 @@ title="Source repository"
             <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output</span></div></div>
+
+
+<div class="viewcode-block" id="make_fake_data"><a class="viewcode-back" href="../../api.html#mpol.fourier.make_fake_data">[docs]</a><span class="k">def</span> <span class="nf">make_fake_data</span><span class="p">(</span><span class="n">imageCube</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.</span>
+
+<span class="sd">    The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a fake dataset</span>
+<span class="sd">        uu (numpy array): array of u spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">        vv (numpy array): array of v spatial frequency coordinates, not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">        weight (2d numpy array): length array of thermal weights :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (2-tuple): a two tuple of the fake data. The first array is the mock dataset including noise, the second array is the mock dataset without added noise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># instantiate a NuFFT object based on the ImageCube</span>
+    <span class="c1"># OK if uu shape (nvis,)</span>
+    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">imageCube</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">imageCube</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
+
+    <span class="c1"># make into a multi-channel dataset, even if only a single-channel provided</span>
+    <span class="k">if</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">uu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+        <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+
+    <span class="c1"># carry it forward to the visibilities, which will be (nchan, nvis)</span>
+    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">imageCube</span><span class="o">.</span><span class="n">forward</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="c1"># generate complex noise</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+        <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">uu</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">uu</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># add to data</span>
+    <span class="n">vis_noise</span> <span class="o">=</span> <span class="n">vis_noiseless</span> <span class="o">+</span> <span class="n">noise</span>
+
+    <span class="k">return</span> <span class="n">vis_noise</span><span class="p">,</span> <span class="n">vis_noiseless</span></div>
 </pre></div>
 
               </div>

@@ -109,6 +109,7 @@ $$
 
 For more information on this procedure as implmented in MPoL, see the {class}`~mpol.gridding.Gridder` class and the source code of its {func}`~mpol.gridding.Gridder.get_dirty_image` method. When the grid of ${\cal V}_{u,v}$ values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) of Daniel Briggs.
 
+(cube-orientation-label)=
 ### Image Cube Packing for FFTs
 
 Numerical FFT routines expect that the first element of an input array (i.e., `array[i,0,0]`) corresponds to the zeroth spatial ($l,m$) or frequency ($u,v$) coordinate. This convention is quite different than the way we normally look at images. As described above, MPoL deals with three dimensional image cubes of shape `(nchan, npix, npix)`, where the "rows" of the image cube (axis=1) correspond to the $m$ or Dec axis, and the "columns" of the image cube (axis=2) correspond to the $l$ or R.A. axis. Normally, the zeroth spatial component $(l,m) = (0,0)$ is in the *center* of the array (at position `array[i,M/2,L/2]`), so that when an array is visualized (say with `matplotlib.pyplot.imshow`, `origin="lower"`), the center of the array appears in the center of the image.

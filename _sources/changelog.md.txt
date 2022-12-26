@@ -2,11 +2,16 @@
 
 # Changelog
 
+## v0.1.3
+
+- Added the {func}`mpol.fourier.make_fake_data` routine and the [Mock Data tutorial](ci-tutorials/fakedata.md).
+- Fixed a bug in the [Dirty Image Initialization](ci-tutorials/initializedirtyimage.md) tutorial so that the dirty image is delivered in units of Jy/arcsec^2.
+
 ## v0.1.2
 
 - Switched documentation backend to [MyST-NB](https://myst-nb.readthedocs.io/en/latest/index.html).
 - Switched documentation theme to [Sphinx Book Theme](https://sphinx-book-theme.readthedocs.io/en/latest/index.html).
-- Added {class}`~mpol.fourier.NuFFT` layer, allowing the direct forward modeling of un-gridded :math:`u,v` data. Closes GitHub issue [#17](https://github.com/MPoL-dev/MPoL/issues/17).
+- Added {class}`~mpol.fourier.NuFFT` layer, allowing the direct forward modeling of un-gridded $u,v$ data. Closes GitHub issue [#17](https://github.com/MPoL-dev/MPoL/issues/17).
 
 ## v0.1.1
 

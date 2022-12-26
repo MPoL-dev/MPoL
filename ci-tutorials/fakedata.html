@@ -1,0 +1,1060 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Making a Mock Dataset &#8212; MPoL 0.1.13 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="prev" title="HD143006 Tutorial Part 2" href="../large-tutorials/HD143006_part_2.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../rml_intro.html">
+   Introduction to Regularized Maximum Likelihood Imaging
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../installation.html">
+   MPoL Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../units-and-conventions.html">
+   Units and Conventions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../developer-documentation.html">
+   Developer Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../api.html">
+   API
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tutorials
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="PyTorch.html">
+   Introduction to PyTorch: Tensors and Gradient Descent
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gridder.html">
+   Gridding and diagnostic images
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="optimization.html">
+   Intro to MPoL Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="loose-visibilities.html">
+   Likelihood functions and model visibilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="crossvalidation.html">
+   Cross validation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gpu_setup.html">
+   GPU Acceleration
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="initializedirtyimage.html">
+   Initializing with the Dirty Image
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_1.html">
+   HD143006 Tutorial Part 1
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/HD143006_part_2.html">
+   HD143006 Tutorial Part 2
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Making a Mock Dataset
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../changelog.html">
+   Changelog
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/MPoL-dev/MPoL"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/ci-tutorials/fakedata.md.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choosing-a-mock-sky-brightness-distribution">
+   Choosing a mock sky brightness distribution
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-pillow-to-greyscale-apodize-pad-and-resize">
+   Using Pillow to greyscale, apodize, pad, and resize
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exporting-to-a-numpy-array-and-setting-flux-scale">
+   Exporting to a Numpy array and setting flux scale
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#initializing-imagecube">
+   Initializing
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     ImageCube
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#obtaining-u-v-baseline-and-weight-distributions">
+   Obtaining
+   <span class="math notranslate nohighlight">
+    \(u,v\)
+   </span>
+   baseline and weight distributions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#making-the-mock-dataset">
+   Making the mock dataset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#verifying-the-mock-dataset">
+   Verifying the mock dataset
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Making a Mock Dataset</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choosing-a-mock-sky-brightness-distribution">
+   Choosing a mock sky brightness distribution
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-pillow-to-greyscale-apodize-pad-and-resize">
+   Using Pillow to greyscale, apodize, pad, and resize
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exporting-to-a-numpy-array-and-setting-flux-scale">
+   Exporting to a Numpy array and setting flux scale
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#initializing-imagecube">
+   Initializing
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     ImageCube
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#obtaining-u-v-baseline-and-weight-distributions">
+   Obtaining
+   <span class="math notranslate nohighlight">
+    \(u,v\)
+   </span>
+   baseline and weight distributions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#making-the-mock-dataset">
+   Making the mock dataset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#verifying-the-mock-dataset">
+   Verifying the mock dataset
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">run</span> notebook_setup
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="making-a-mock-dataset">
+<span id="mock-dataset-label"></span><h1>Making a Mock Dataset<a class="headerlink" href="#making-a-mock-dataset" title="Permalink to this headline">#</a></h1>
+<p>In this tutorial, we’ll explore how you might construct a mock dataset from a known sky brightness distribution. In many ways, this problem is already solved in a realistic manner by CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/latest/api/tt/casatasks.simulation.simobserve.html">simobserve</a> task. However, by replicating the key parts of this process with MPoL framework, we can easily make direct comparisons to images produced using RML techniques.</p>
+<p>In a nutshell, this process is works by</p>
+<ol class="arabic simple">
+<li><p>taking a known sky brightness distribution (i.e., a mock “true” image)</p></li>
+<li><p>inserting it into an <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a></p></li>
+<li><p>using the <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> to predict visibilities at provided <span class="math notranslate nohighlight">\(u,v\)</span> locations</p></li>
+<li><p>adding noise</p></li>
+</ol>
+<p>The final two steps are relatively straightforward. The first two steps are conceptually simple but there are several technical caveats one should be aware of, which we’ll cover now.</p>
+<section id="choosing-a-mock-sky-brightness-distribution">
+<h2>Choosing a mock sky brightness distribution<a class="headerlink" href="#choosing-a-mock-sky-brightness-distribution" title="Permalink to this headline">#</a></h2>
+<p>You can choose a mock sky brightness distribution from a simulation, a parametric model, or even an image from the Internet. For this tutorial, we’ll use a JPEG image from the internet, since it will highlight many of the problems one might run into. First, we’ll download the image and display it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use python to download an image</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">image_url</span><span class="o">=</span><span class="s2">&quot;https://cdn.eso.org/images/screen/alma-eight_close.jpg&quot;</span>
+
+<span class="n">img_data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;alma.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handler</span><span class="p">:</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;alma.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<figure class="align-default" id="alma-ref">
+<a class="shadow bg-primary reference internal image-reference" href="../_images/53d7471cb69e46243cfe347294cdd0a3e788bfb13302c454350db1f8aee84c93.jpg"><img alt="ALMA" class="shadow bg-primary" src="../_images/53d7471cb69e46243cfe347294cdd0a3e788bfb13302c454350db1f8aee84c93.jpg" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-text">The ALMA antennas. Credit: ALMA (ESO/NAOJ/NRAO)</span><a class="headerlink" href="#alma-ref" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+<p>There are several operations we will need to perform on this image before it is suitable to insert into an <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>.</p>
+<ol class="arabic simple">
+<li><p>convert the JPEG image to greyscale <code class="docutils literal notranslate"><span class="pre">float64</span></code> values</p></li>
+<li><p>make the image square (if necessary)</p></li>
+<li><p>choose a target <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> size via <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and <code class="docutils literal notranslate"><span class="pre">npix</span></code>. The range of acceptable image dimensions depends on the range <span class="math notranslate nohighlight">\(u,v\)</span> coordinates</p></li>
+<li><p>if the raw image size is larger than the target size of the <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a>, smooth and downsample the image</p></li>
+<li><p>scale flux units to be Jy/arcsec^2</p></li>
+</ol>
+<p>To perform image manipulations, we’ll use the <a class="reference external" href="https://pillow.readthedocs.io/en/stable/index.html">Pillow</a> library.</p>
+</section>
+<section id="using-pillow-to-greyscale-apodize-pad-and-resize">
+<h2>Using Pillow to greyscale, apodize, pad, and resize<a class="headerlink" href="#using-pillow-to-greyscale-apodize-pad-and-resize" title="Permalink to this headline">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageOps</span><span class="p">,</span> <span class="n">ImageMath</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">im_raw</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;alma.jpg&quot;</span><span class="p">)</span>
+
+<span class="c1"># convert to greyscale</span>
+<span class="n">im_grey</span> <span class="o">=</span> <span class="n">ImageOps</span><span class="o">.</span><span class="n">grayscale</span><span class="p">(</span><span class="n">im_raw</span><span class="p">)</span>
+
+<span class="c1"># get image dimensions</span>
+<span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span> <span class="o">=</span> <span class="n">im_grey</span><span class="o">.</span><span class="n">size</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">im_grey</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L
+</pre></div>
+</div>
+</div>
+</div>
+<p>In converting the JPEG image to greyscale (mode “L” or “luminance”), the Pillow library has reduced the color channel to a single axis with an 8-bit unsigned integer, which can take on the values from 0 to 255. More info on the modes is available <a class="reference external" href="https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-modes">here</a>. We can see the greyscale image</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_grey</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4d710611cefc33e5f2ea39a98f8665ab808c204250eb8beb18f2d65581098bf6.png" src="../_images/4d710611cefc33e5f2ea39a98f8665ab808c204250eb8beb18f2d65581098bf6.png" />
+</div>
+</div>
+<p>Now let’s think about how to make the image square. Depending on the image, we can either crop the longer dimension or pad the larger dimension. Before we do that, though, we also need to think about the image edges.</p>
+<p>Because the discrete Fourier transform is used to take an image to the visibility plane, we make the assumption that the image is infinite and periodic in space beyond the field of view. i.e., it tiles to infinity. Therefore, to avoid introducing spurious spatial frequencies from discontinous edges, it is a good idea to make sure that the edges of the image all have the same value. The simplest thing to do here is to taper the image edges such that they all go to 0. We can do this by multiplying by the image by an apodization function, like the Hann window. We’ll multiply two 1D Hann windows to create a 2D apodization window.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xhann</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">xsize</span><span class="p">)</span>
+<span class="n">yhann</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">ysize</span><span class="p">)</span>
+<span class="c1"># each is already normalized to a max of 1</span>
+<span class="c1"># so hann is also normed to a max of 1</span>
+<span class="c1"># broadcast to 2D</span>
+<span class="n">hann</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">yhann</span><span class="p">,</span> <span class="n">xhann</span><span class="p">)</span>
+
+<span class="c1"># now convert the numpy array to a Pillow object</span>
+<span class="c1"># scale to 0 - 255 and then convert to uint8</span>
+<span class="n">hann8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">hann</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+<span class="n">im_apod</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">hann8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can visualize the 2D Hann apodization window</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_apod</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/52133f6c14b96f46a6131e6634f2191978274952e44cdd0685472719283dda8e.png" src="../_images/52133f6c14b96f46a6131e6634f2191978274952e44cdd0685472719283dda8e.png" />
+</div>
+</div>
+<p>And then use image math to multiply the apodization window against the greyscaled image</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_res</span> <span class="o">=</span> <span class="n">ImageMath</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;a * b&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">im_grey</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">im_apod</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To give an image with a vignette-like appearance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_res</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8f3ffcffd63694125267c4f3f6494ae934b5dc14a4a8136874793feeb40a3b8f.png" src="../_images/8f3ffcffd63694125267c4f3f6494ae934b5dc14a4a8136874793feeb40a3b8f.png" />
+</div>
+</div>
+<p>Now, let’s pad the image to be square</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">)</span>
+<span class="n">im_pad</span> <span class="o">=</span> <span class="n">ImageOps</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">im_res</span><span class="p">,</span> <span class="p">(</span><span class="n">max_dim</span><span class="p">,</span> <span class="n">max_dim</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_pad</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c7c38d411191ee89743265c59d35bff5520ee39f844484b8e46bb5197a11518e.png" src="../_images/c7c38d411191ee89743265c59d35bff5520ee39f844484b8e46bb5197a11518e.png" />
+</div>
+</div>
+<p>Great, we now have a square, apodized image.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title">Simulations</p>
+<p>We should note that all of these pre-processing steps were only necessary because we pulled a non-square JPEG image from the internet. If we were starting from an image produced from a radiative transfer situation (for example, a solitary protoplanetary disk in the center of a field), we could skip most of these previous steps.</p>
+</aside>
+<p>The next thing we should fix is that a 1280 x 1280 image is still a bit too many pixels for most ALMA observations. I.e., the spatial resolution or “beam size” of most ALMA observations is such that for any single-pointing observation, we wouldn’t need this many pixels to represent the full information content of the image. Therefore, let’s resize the image to be a bit smaller.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">npix</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">im_small</span> <span class="o">=</span> <span class="n">im_pad</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">npix</span><span class="p">,</span><span class="n">npix</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_small</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7817aacfa469a5f75abd2a57c7c166a78d3d8094e56e4f4f9aeda12165ccdae6.png" src="../_images/7817aacfa469a5f75abd2a57c7c166a78d3d8094e56e4f4f9aeda12165ccdae6.png" />
+</div>
+</div>
+</section>
+<section id="exporting-to-a-numpy-array-and-setting-flux-scale">
+<h2>Exporting to a Numpy array and setting flux scale<a class="headerlink" href="#exporting-to-a-numpy-array-and-setting-flux-scale" title="Permalink to this headline">#</a></h2>
+<p>Now that we have done the necessary image preparation, we’re ready to leave the Pillow library and work with numpy arrays and pytorch tensors. First we convert from a Pillow object to a numpy array</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">im_small</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can see that this array is now a 32-bit integer array (it was promoted from an 8-bit integer array during the ImageMath operation to save precision).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       ...,
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0]], dtype=int32)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We will convert this array to a <code class="docutils literal notranslate"><span class="pre">float64</span></code> type and normalize its max value to 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">/</span><span class="n">b</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we can plot this array using matplotlib’s <code class="docutils literal notranslate"><span class="pre">imshow</span></code> and using the <code class="docutils literal notranslate"><span class="pre">origin=&quot;lower&quot;</span></code> argument as we might normally do with arrays of data from MPoL.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title">MPoL Image Orientations</p>
+<p>Now might be a good time to familiarize yourself with the <a class="reference internal" href="../units-and-conventions.html#cube-orientation-label"><span class="std std-ref">Image Cube Packing for FFTs</span></a>, if you aren’t already familiar.</p>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7f54702274f0&gt;
+</pre></div>
+</div>
+<img alt="../_images/01b18b961c7508bbbf0f9ad728071c961d1b48ca70b3acfca318ca735fcc6ee9.png" src="../_images/01b18b961c7508bbbf0f9ad728071c961d1b48ca70b3acfca318ca735fcc6ee9.png" />
+</div>
+</div>
+<p>In doing so, we’ve uncovered an additional problem that the image is upside down! We can fix this using</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7f5470143fd0&gt;
+</pre></div>
+</div>
+<img alt="../_images/152a0ee3f00180cb833f22cf9cf14fcac23d1b8b29f841ef4bc8ece80e4c3ee5.png" src="../_images/152a0ee3f00180cb833f22cf9cf14fcac23d1b8b29f841ef4bc8ece80e4c3ee5.png" />
+</div>
+</div>
+<p>In this example, we’re only working with a single-channel mock sky brightness distribution, so we only need to add an extra channel dimension to make an image cube. If we were working with a multi-channel sky brightness distribution, we could repeat the above transformations for each channel of the image cube.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now let’s choose how big we want our mock sky brightness to be on the sky. Adjusting the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> changes the maximum spatial frequency that can be represented in the image. I.e., a smaller pixel <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> will enable an image to carry higher spatial frequencies. Changing the number of pixels in the image via <code class="docutils literal notranslate"><span class="pre">npix</span></code> will change the number of <span class="math notranslate nohighlight">\(u,v\)</span> cells between 0 and the max spatial frequency. We effectively chose the <code class="docutils literal notranslate"><span class="pre">npix</span></code> when we performed the resize operation, so all that’s left is to choose the <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cell_size</span> <span class="o">=</span> <span class="mf">0.03</span> <span class="c1"># arcsec</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The final task is to scale the amplitude of the image to the desired level. The <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> object will expect the input tensor to be in units of Jy/arcsec^2.</p>
+<p>Let’s assume that we would like the total flux of our mock image to be 30 Jy, which a very bright source for ALMA band 6. Then again, the noise levels in the mock baseline distribution we plan to use are relatively high, the baseline distribution lacks short spacings, and we want to make sure our source shines through.</p>
+<p>So, if we have assigned each pixel to be 0.03 arcseconds on each side, then each pixel has an area of</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pixel_area</span> <span class="o">=</span> <span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># arcsec</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pixel_area</span><span class="p">,</span> <span class="s2">&quot;arcsec^2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0009 arcsec^2
+</pre></div>
+</div>
+</div>
+</div>
+<p>What is the current flux of the image?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if the raw image is supposed to be in Jy/arcsec^2, then to calculate</span>
+<span class="c1"># total flux, we would convert to Jy/pixel by multiplying area / pixel</span>
+<span class="c1"># and then summing all values</span>
+<span class="n">old_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">pixel_area</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">old_flux</span><span class="p">,</span> <span class="s2">&quot;Jy&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>17.617448544297993 Jy
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, if we want the image to have a total flux of 30 Jy, we need to multiply by a factor of</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flux_scaled</span> <span class="o">=</span> <span class="mi">30</span><span class="o">/</span><span class="n">old_flux</span> <span class="o">*</span> <span class="n">d</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total flux of image is now </span><span class="si">{:.1f}</span><span class="s2"> Jy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flux_scaled</span> <span class="o">*</span> <span class="n">pixel_area</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total flux of image is now 30.0 Jy
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="initializing-imagecube">
+<h2>Initializing <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a><a class="headerlink" href="#initializing-imagecube" title="Permalink to this headline">#</a></h2>
+<p>Now, we’ll convert the numpy array to a PyTorch tensor</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="n">img_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">flux_scaled</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And finally, we’ll shift the tensor from a “Sky Cube” to a “Packed Cube” as the <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a> expects</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="n">img_tensor_packed</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">img_tensor</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol.images</span> <span class="kn">import</span> <span class="n">ImageCube</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">ImageCube</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="n">img_tensor_packed</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you want to double-check that the image was correctly inserted, you can do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># double check it went in correctly</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">forward</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to see that it’s upright and not flipped.</p>
+</section>
+<section id="obtaining-u-v-baseline-and-weight-distributions">
+<h2>Obtaining <span class="math notranslate nohighlight">\(u,v\)</span> baseline and weight distributions<a class="headerlink" href="#obtaining-u-v-baseline-and-weight-distributions" title="Permalink to this headline">#</a></h2>
+<p>One of the key use cases for producing a mock dataset from a known sky brightness is to test the ability of an RML algorithm to recover the “true” image. <span class="math notranslate nohighlight">\(u,v\)</span> baseline distributions from real interferometric arrays like ALMA, VLA, and others are highly structured sampling distributions that are difficult to accurately replicate using distributions available to random number generators.</p>
+<p>Therefore, we always recommend generating fake data using <span class="math notranslate nohighlight">\(u,v\)</span> distributions from real datasets, or use those produced using realistic simulators like CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/latest/api/tt/casatasks.simulation.simobserve.html">simobserve</a> task. In this example, we’ll just use the baseline distribution from the mock dataset we’ve used in many of the tutorials. You can see a plot of it in the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Gridding and Diagnostic Images</span></a> tutorial. We’ll only need the <span class="math notranslate nohighlight">\(u,v\)</span> and weight arrays.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+
+<span class="c1"># load the mock dataset of the ALMA logo</span>
+<span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
+    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># select the components for a single channel</span>
+<span class="n">chan</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="n">uu</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;uu&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
+<span class="n">vv</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>MPoL has a helper routine to calculate the maximum <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> that can still Nyquist sample the highest spatial frequency in the baseline distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span><span class="n">vv</span><span class="p">]))</span>
+<span class="n">max_cell_size</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">max_uv</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The maximum cell_size that will still Nyquist sample the spatial frequency represented by the maximum u,v value is </span><span class="si">{:.2f}</span><span class="s2"> arcseconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_cell_size</span><span class="p">))</span>
+<span class="k">assert</span> <span class="n">cell_size</span> <span class="o">&lt;</span> <span class="n">max_cell_size</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The maximum cell_size that will still Nyquist sample the spatial frequency represented by the maximum u,v value is 0.09 arcseconds
+</pre></div>
+</div>
+</div>
+</div>
+<p>Thankfully, we see that we already chose a sufficiently small <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>.</p>
+</section>
+<section id="making-the-mock-dataset">
+<h2>Making the mock dataset<a class="headerlink" href="#making-the-mock-dataset" title="Permalink to this headline">#</a></h2>
+<p>With the <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a>, <span class="math notranslate nohighlight">\(u,v\)</span> and weight distributions now in hand, generating the mock visibilities is relatively straightforward using the <a class="reference internal" href="../api.html#mpol.fourier.make_fake_data" title="mpol.fourier.make_fake_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.fourier.make_fake_data()</span></code></a> routine. This routine uses the <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFT</span></code></a> to produce loose visibilities at the <span class="math notranslate nohighlight">\(u,v\)</span> locations and then adds random Gaussian noise to the visibilities, drawn from a probability distribution set by the value of the weights.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">fourier</span>
+<span class="c1"># will have the same shape as the uu, vv, and weight inputs</span>
+<span class="n">data_noise</span><span class="p">,</span> <span class="n">data_noiseless</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">make_fake_data</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">data_noise</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_noiseless</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_noise</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1, 325080)
+(1, 325080)
+[[ 1.38333786-0.28341353j  9.54298928+4.15422164j  1.74624089+2.33877236j
+  ...  0.59281735-0.5747789j   0.90838752+0.10924159j
+  -1.33784434-0.44108567j]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now you could save this to disk. Since this is continuum dataset, we’ll remove the channel dimension from the mock visibilities</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">data_noise</span><span class="p">)</span>
+<span class="c1"># data = np.squeeze(data_noiseless)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="s2">&quot;mock_data.npz&quot;</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And now you could use this dataset just like any other when doing RML inference, and now you will have a reference image to compare “ground truth” to.</p>
+</section>
+<section id="verifying-the-mock-dataset">
+<h2>Verifying the mock dataset<a class="headerlink" href="#verifying-the-mock-dataset" title="Permalink to this headline">#</a></h2>
+<p>To make sure the whole process worked OK, we’ll load the visibilities and then make a dirty image. We’ll set the coordinates of the gridder and dirty image to be exactly those as our input image, so that we can make a pixel-to-pixel comparison. Note that this isn’t strictly necessary, though. We could make a range of images with different <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>s and <code class="docutils literal notranslate"><span class="pre">npix</span></code>s.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
+
+<span class="c1"># well set the</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
+
+<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
+    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
+    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+    <span class="n">data_re</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+    <span class="n">data_im</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+<span class="n">noise_estimate</span> <span class="o">=</span> <span class="n">C</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weight</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">noise_estimate</span><span class="p">,</span> <span class="s2">&quot;Jy / dirty beam&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0025689290972358914 Jy / dirty beam
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">beam</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;beam&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.14</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/3a18583e74c7bc9176605243692145ef7d838f3e72278054fc5e4d5a2d8ffa1a.png" src="../_images/3a18583e74c7bc9176605243692145ef7d838f3e72278054fc5e4d5a2d8ffa1a.png" />
+</div>
+</div>
+<p>We can even subtract this on a pixel-by-pixel basis and compare to the original image.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">flux_scaled</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;dirty image&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">flux_scaled</span><span class="p">[</span><span class="n">chan</span><span class="p">]</span> <span class="o">-</span> <span class="n">img</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;difference&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([])</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([])</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.14</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/61019d19cce63552f65a866a261a9f6d4ae3fb6a19c276590f20062ab37569c5.png" src="../_images/61019d19cce63552f65a866a261a9f6d4ae3fb6a19c276590f20062ab37569c5.png" />
+</div>
+</div>
+<p>The subtraction revears some interesting artefacts.</p>
+<ol class="arabic simple">
+<li><p>the dirty image and difference image have substantial emission in regions away from the true locations of flux. This is because the dirty beam sidelobes spread flux from the center of the image to other regions. CLEAN or RML would remove most of these features.</p></li>
+<li><p>the difference image has fine-featured residuals in the center, corresponding to the edges of the antenna dishes and support structures. This is because the dirty beam has some Briggs weighting applied to it, and is closer to natural weighting than uniform weighting. This means that the spatial resolution of the dirty image is not as high as the original image, and thus high spatial frequency features, like the edges of the antennae, are not reproduced in the dirty image. Pushing the beam closer to uniform weighting would capture some of these finer structured features, but at the expense of higher thermal noise in the image.</p></li>
+<li><p>the faint “halo” surrounding the antennas in the original image (the smooth blue sky and brown ground, in the actual JPEG) has been spatially filtered out of the dirty image. This is because this mock baseline distribution was generated for a more extended ALMA configuration without a sufficient number of short baselines.</p></li>
+</ol>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../large-tutorials/HD143006_part_2.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">HD143006 Tutorial Part 2</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../changelog.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Changelog</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Ian Czekala<br/>
+  
+      &copy; Copyright 2019-22, Ian Czekala.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

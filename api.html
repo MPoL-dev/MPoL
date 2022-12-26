@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>API &#8212; MPoL 0.1.3.dev0 documentation</title>
+    <title>API &#8212; MPoL 0.1.13 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -88,7 +88,7 @@
       <img src="_static/logo.png" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">MPoL 0.1.3.dev0 documentation</h1>
+      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -177,6 +177,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="large-tutorials/HD143006_part_2.html">
    HD143006 Tutorial Part 2
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ci-tutorials/fakedata.html">
+   Making a Mock Dataset
   </a>
  </li>
 </ul>
@@ -916,11 +921,11 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>cell_size</strong> (<em>float</em>) – width of a single square pixel in [arcsec]</p></li>
 <li><p><strong>npix</strong> (<em>int</em>) – number of pixels in the width of the image</p></li>
 <li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
-<li><p><strong>uu</strong> (<em>numpy array</em>) – array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
-<li><p><strong>vv</strong> (<em>numpy array</em>) – (nchan, nvis) length array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
-<li><p><strong>weight</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of thermal weights. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
-<li><p><strong>data_re</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the real part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
-<li><p><strong>data_im</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+<li><p><strong>uu</strong> (<em>numpy array</em>) – (nchan, nvis) array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<em>numpy array</em>) – (nchan, nvis) array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>weight</strong> (<em>2d numpy array</em>) – (nchan, nvis) array of thermal weights. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
+<li><p><strong>data_re</strong> (<em>2d numpy array</em>) – (nchan, nvis) array of the real part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
+<li><p><strong>data_im</strong> (<em>2d numpy array</em>) – (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
 </ul>
 </dd>
 </dl>
@@ -1202,7 +1207,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
 <li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the base cube. Default = 1.</p></li>
 <li><p><strong>pixel_mapping</strong> (<em>torch.nn</em>) – a PyTorch function mapping the base pixel representation to the cube representation. If <cite>None</cite>, defaults to <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus">torch.nn.Softplus()</a>. Output of the function should be in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>].</p></li>
-<li><p><strong>base_cube</strong> (<em>torch.double tensor</em><em>, </em><em>optional</em>) – a pre-packed base cube to initialize the model with. If None, assumes <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
+<li><p><strong>base_cube</strong> (<em>torch.double tensor</em><em>, </em><em>optional</em>) – a pre-packed base cube to initialize the model with. If None, assumes <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>. See <a class="reference internal" href="units-and-conventions.html#cube-orientation-label"><span class="std std-ref">Image Cube Packing for FFTs</span></a> for more information on the expectations of the orientation of the input image.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1268,7 +1273,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
 <li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the image</p></li>
 <li><p><strong>passthrough</strong> (<em>bool</em>) – if passthrough, assume ImageCube is just a layer as opposed to parameter base.</p></li>
-<li><p><strong>cube</strong> (torch.double tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – (optional) a prepacked image cube to initialize the model with in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>]. If None, assumes starting <code class="docutils literal notranslate"><span class="pre">cube</span></code> is <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>.</p></li>
+<li><p><strong>cube</strong> (torch.double tensor, of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – (optional) a prepacked image cube to initialize the model with in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\,\mathrm{arcsec}^{-2}\)</span>]. If None, assumes starting <code class="docutils literal notranslate"><span class="pre">cube</span></code> is <code class="docutils literal notranslate"><span class="pre">torch.zeros</span></code>. See <a class="reference internal" href="units-and-conventions.html#cube-orientation-label"><span class="std std-ref">Image Cube Packing for FFTs</span></a> for more information on the expectations of the orientation of the input image.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1495,6 +1500,29 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.fourier.make_fake_data">
+<span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">make_fake_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imageCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/fourier.html#make_fake_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.make_fake_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a fake dataset from a supplied <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>. See <a class="reference internal" href="ci-tutorials/fakedata.html#mock-dataset-label"><span class="std std-ref">Making a Mock Dataset</span></a> for more details on how to prepare a generic image for use in an <a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a>.</p>
+<p>The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">nvis)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imageCube</strong> (<a class="reference internal" href="#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageCube</span></code></a>) – the image layer to put into a fake dataset</p></li>
+<li><p><strong>uu</strong> (<em>numpy array</em>) – array of u spatial frequency coordinates, not including Hermitian pairs. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<em>numpy array</em>) – array of v spatial frequency coordinates, not including Hermitian pairs. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
+<li><p><strong>weight</strong> (<em>2d numpy array</em>) – length array of thermal weights <span class="math notranslate nohighlight">\(w_i = 1/\sigma_i^2\)</span>. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a two tuple of the fake data. The first array is the mock dataset including noise, the second array is the mock dataset without added noise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(2-tuple)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
