@@ -138,7 +138,11 @@ im_pad = ImageOps.pad(im_res, (max_dim, max_dim))
 im_pad
 ```
 
-Great, we now have a square, apodized image. The only thing is that a 1280 x 1280 image is still a bit too many pixels for most ALMA observations. I.e., the spatial resolution or "beam size" of most ALMA observations is such that for any single-pointing observation, we wouldn't need this many pixels to represent the full information content of the image. Therefore, let's resize the image to be a bit smaller.
+Great, we now have a square, apodized image.
+```{margin} Simulations
+We should note that all of these pre-processing steps were only necessary because we pulled a non-square JPEG image from the internet. If we were starting from an image produced from a radiative transfer situation (for example, a solitary protoplanetary disk in the center of a field), we could skip most of these previous steps.
+```
+The next thing we should fix is that a 1280 x 1280 image is still a bit too many pixels for most ALMA observations. I.e., the spatial resolution or "beam size" of most ALMA observations is such that for any single-pointing observation, we wouldn't need this many pixels to represent the full information content of the image. Therefore, let's resize the image to be a bit smaller.
 
 ```{code-cell} ipython3
 npix = 500
@@ -149,7 +153,7 @@ im_small = im_pad.resize((npix,npix))
 im_small
 ```
 
-## Exporting to a PyTorch tensor
+## Exporting to a Numpy array and setting flux scale
 
 Now that we have done the necessary image preparation, we're ready to leave the Pillow library and work with numpy arrays and pytorch tensors. First we convert from a Pillow object to a numpy array
 
@@ -194,11 +198,50 @@ In this example, we're only working with a single-channel mock sky brightness di
 d = np.expand_dims(c, axis=0)
 ```
 
+Now let's choose how big we want our mock sky brightness to be on the sky. Adjusting the `cell_size` changes the maximum spatial frequency that can be represented in the image. I.e., a smaller pixel `cell_size` will enable an image to carry higher spatial frequencies. Changing the number of pixels in the image via `npix` will change the number of $u,v$ cells between 0 and the max spatial frequency. We effectively chose the `npix` when we performed the resize operation, so all that's left is to choose the `cell_size`.
+
+```{code-cell} ipython3
+cell_size = 0.03 # arcsec
+```
+
+The final task is to scale the amplitude of the image to the desired level. The {class}`~mpol.images.ImageCube` object will expect the input tensor to be in units of Jy/arcsec^2.
+
+Let's assume that we would like the total flux of our mock image to be 30 Jy, which a very bright source for ALMA band 6. Then again, the noise levels in the mock baseline distribution we plan to use are relatively high, the baseline distribution lacks short spacings, and we want to make sure our source shines through.
+
+So, if we have assigned each pixel to be 0.03 arcseconds on each side, then each pixel has an area of
+
+```{code-cell} ipython3
+pixel_area = cell_size**2 # arcsec
+print(pixel_area, "arcsec^2")
+```
+
+What is the current flux of the image?
+
+```{code-cell} ipython3
+# if the raw image is supposed to be in Jy/arcsec^2, then to calculate
+# total flux, we would convert to Jy/pixel by multiplying area / pixel
+# and then summing all values
+old_flux = np.sum(d * pixel_area)
+print(old_flux, "Jy")
+```
+
+So, if we want the image to have a total flux of 30 Jy, we need to multiply by a factor of
+
+```{code-cell} ipython3
+flux_scaled = 30/old_flux * d
+```
+
+```{code-cell} ipython3
+print("Total flux of image is now {:.1f} Jy".format(np.sum(flux_scaled * pixel_area)))
+```
+
+## Initializing {class}`~mpol.images.ImageCube`
+
 Now, we'll convert the numpy array to a PyTorch tensor
 
 ```{code-cell} ipython3
 import torch
-img_tensor = torch.tensor(d.copy())
+img_tensor = torch.tensor(flux_scaled.copy())
 ```
 
 And finally, we'll shift the tensor from a "Sky Cube" to a "Packed Cube" as the {class}`~mpol.images.ImageCube` expects
@@ -208,35 +251,23 @@ from mpol import utils
 img_tensor_packed = utils.sky_cube_to_packed_cube(img_tensor)
 ```
 
-## Initializing {class}`~mpol.images.ImageCube`
-
-Now let's settle on how big
-
-Here is where it would be helpful to have a note about how changing pixel size and image dimensions affects the uv coverage. There needs to be some match up between the image and the uv size.
-
-Adjusting the `cell_size` changes the maximum spatial frequency that can be represented in the image. I.e., a smaller pixel cell size will enable an image to carry higher spatial frequencies.
-
-Changing the number of pixels via `npix` will change the number of $u,v$ cells between 0 and the max spatial frequency.
-
-We already defined `npix` when we performed the resize operation.
-
 ```{code-cell} ipython3
-cell_size = 0.03 # arcsec
-
 from mpol.images import ImageCube
 image = ImageCube(cell_size=cell_size, npix=npix, nchan=1, cube=img_tensor_packed)
 ```
 
-```{code-cell} ipython3
-# double check it went in correctly
-# plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image.forward()).detach().numpy()), origin="lower")
+If you want to double-check that the image was correctly inserted, you can do
 ```
+# double check it went in correctly
+plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image.forward()).detach().numpy()), origin="lower")
+```
+to see that it's upright and not flipped.
 
-## Getting baseline distributions
+## Obtaining $u,v$ baseline and weight distributions
 
-This is most useful if you already have a real dataset, with real baseline distributions and noise weights. Alternatively, you could acquire some baseline distribution and noise distribution, possibly using CASA's simobserve.
+One of the key use cases for producing a mock dataset from a known sky brightness is to test the ability of an RML algorithm to recover the "true" image. $u,v$ baseline distributions from real interferometric arrays like ALMA, VLA, and others are highly structured sampling distributions that are difficult to accurately replicate using distributions available to random number generators.
 
-In this example, we'll just use the baseline distribution from the mock dataset we've used in many of the tutorials. You can see a plot of it in the [Gridding and Diagnostic Images](gridder.md) tutorial. We'll only need the $u,v$ and weight arrays.
+Therefore, we always recommend generating fake data using $u,v$ distributions from real datasets, or use those produced using realistic simulators like CASA's [simobserve](https://casadocs.readthedocs.io/en/latest/api/tt/casatasks.simulation.simobserve.html) task. In this example, we'll just use the baseline distribution from the mock dataset we've used in many of the tutorials. You can see a plot of it in the [Gridding and Diagnostic Images](gridder.md) tutorial. We'll only need the $u,v$ and weight arrays.
 
 ```{code-cell} ipython3
 from astropy.utils.data import download_file
@@ -249,45 +280,122 @@ fname = download_file(
     pkgname="mpol",
 )
 
+# select the components for a single channel
+chan = 4
 d = np.load(fname)
-uu = d["uu"]
-vv = d["vv"]
-weight = d["weight"]
+uu = d["uu"][chan]
+vv = d["vv"][chan]
+weight = d["weight"][chan]
 ```
+
+MPoL has a helper routine to calculate the maximum `cell_size` that can still Nyquist sample the highest spatial frequency in the baseline distribution.
 
 ```{code-cell} ipython3
 max_uv = np.max(np.array([uu,vv]))
 max_cell_size = utils.get_maximum_cell_size(max_uv)
 print("The maximum cell_size that will still Nyquist sample the spatial frequency represented by the maximum u,v value is {:.2f} arcseconds".format(max_cell_size))
+assert cell_size < max_cell_size
 ```
 
-```{code-cell} ipython3
-# will have the same shape as the uu, vv, and weight inputs
-data_noise, data_noiseless = make_fake_data(image, u, v, weight)
-```
-
-How many pixels does it have?
-
-The routine just takes an Image cube, u,v, weights and produces visibilities with noise.
-
-
-
-Now, let's put this into a pytorch tensor, flip the directions, and insert it into an ImageCube.
-
-```{code-cell} ipython3
-
-```
-
-We'll use the same u,v distribution and noise distribution from the mock dataset. The max baseline
-
+Thankfully, we see that we already chose a sufficiently small `cell_size`.
 
 ## Making the mock dataset
 
+With the {class}`~mpol.images.ImageCube`, $u,v$ and weight distributions now in hand, generating the mock visibilities is relatively straightforward using the {func}`mpol.fourier.make_fake_data` routine. This routine uses the {class}`~mpol.fourier.NuFFT` to produce loose visibilities at the $u,v$ locations and then adds random Gaussian noise to the visibilities, drawn from a probability distribution set by the value of the weights.
 
-Now you could save this to disk, for example
+```{code-cell} ipython3
+from mpol import fourier
+# will have the same shape as the uu, vv, and weight inputs
+data_noise, data_noiseless = fourier.make_fake_data(image, uu, vv, weight)
 
+print(data_noise.shape)
+print(data_noiseless.shape)
+print(data_noise)
+```
 
+Now you could save this to disk. Since this is continuum dataset, we'll remove the channel dimension from the mock visibilities
+
+```{code-cell} ipython3
+data = np.squeeze(data_noise)
+# data = np.squeeze(data_noiseless)
+np.savez("mock_data.npz", uu=uu, vv=vv, weight=weight, data=data)
+```
+
+And now you could use this dataset just like any other when doing RML inference, and now you will have a reference image to compare "ground truth" to.
+
++++
 
 ## Verifying the mock dataset
 
-To make sure the whole process worked OK, we'll load the visibilities and then make a dirty image.
+To make sure the whole process worked OK, we'll load the visibilities and then make a dirty image. We'll set the coordinates of the gridder and dirty image to be exactly those as our input image, so that we can make a pixel-to-pixel comparison. Note that this isn't strictly necessary, though. We could make a range of images with different `cell_size`s and `npix`s.
+
+```{code-cell} ipython3
+from mpol import coordinates, gridding
+
+# well set the
+coords = coordinates.GridCoords(cell_size=cell_size, npix=npix)
+
+gridder = gridding.Gridder(
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=np.squeeze(np.real(data)),
+    data_im=np.squeeze(np.imag(data)),
+)
+```
+
+```{code-cell} ipython3
+C = 1 / np.sum(weight)
+noise_estimate = C * np.sqrt(np.sum(weight))
+print(noise_estimate, "Jy / dirty beam")
+```
+
+```{code-cell} ipython3
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+```
+
+```{code-cell} ipython3
+chan = 0
+kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
+ax[0].imshow(beam[chan], **kw)
+ax[0].set_title("beam")
+ax[1].imshow(img[chan], **kw)
+ax[1].set_title("image")
+for a in ax:
+    a.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+    a.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
+```
+
+We can even subtract this on a pixel-by-pixel basis and compare to the original image.
+
+```{code-cell} ipython3
+chan = 0
+kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+fig, ax = plt.subplots(ncols=3, figsize=(6.0, 3))
+
+ax[0].imshow(flux_scaled[chan], **kw)
+ax[0].set_title("original")
+
+ax[1].imshow(img[chan], **kw)
+ax[1].set_title("dirty image")
+
+ax[2].imshow(flux_scaled[chan] - img[chan], **kw)
+ax[2].set_title("difference")
+
+ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+
+for a in ax[1:]:
+    a.xaxis.set_ticklabels([])
+    a.yaxis.set_ticklabels([])
+
+fig.subplots_adjust(left=0.14, right=0.90, wspace=0.2, bottom=0.15, top=0.9)
+```
+
+The subtraction revears some interesting artefacts.
+1. the dirty image and difference image have substantial emission in regions away from the true locations of flux. This is because the dirty beam sidelobes spread flux from the center of the image to other regions. CLEAN or RML would remove most of these features.
+2. the difference image has fine-featured residuals in the center, corresponding to the edges of the antenna dishes and support structures. This is because the dirty beam has some Briggs weighting applied to it, and is closer to natural weighting than uniform weighting. This means that the spatial resolution of the dirty image is not as high as the original image, and thus high spatial frequency features, like the edges of the antennae, are not reproduced in the dirty image. Pushing the beam closer to uniform weighting would capture some of these finer structured features, but at the expense of higher thermal noise in the image.
+3. the faint "halo" surrounding the antennas in the original image (the smooth blue sky and brown ground, in the actual JPEG) has been spatially filtered out of the dirty image. This is because this mock baseline distribution was generated for a more extended ALMA configuration without a sufficient number of short baselines.
