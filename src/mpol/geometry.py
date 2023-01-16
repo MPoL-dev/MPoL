@@ -33,8 +33,8 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
 
     # 1) rotate about the z0 axis by omega
     if omega is not None:
-        cos_omega = torch.cos(omega)
-        sin_omega = torch.sin(omega)
+        cos_omega = torch.cos(torch.as_tensor(omega))
+        sin_omega = torch.sin(torch.as_tensor(omega))
 
         x1 = cos_omega * x - sin_omega * y 
         y1 = sin_omega * x + cos_omega * y
@@ -46,7 +46,7 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
     x2 = x1
     
     if incl is not None:
-        y2 = torch.cos(incl) * y1
+        y2 = torch.cos(torch.as_tensor(incl)) * y1
         # z3 = z2, subsequent rotation by Omega doesn't affect it
         # Z = -torch.sin(incl) * y1
     else:
@@ -55,8 +55,8 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
 
     # 3) rotate about z2 axis by Omega
     if Omega is not None:
-        cos_Omega = torch.cos(Omega)
-        sin_Omega = torch.sin(Omega)
+        cos_Omega = torch.cos(torch.as_tensor(Omega))
+        sin_Omega = torch.sin(torch.as_tensor(Omega))
 
         X = cos_Omega * x2 - sin_Omega * y2
         Y = sin_Omega * x2 + cos_Omega * y2
@@ -96,8 +96,8 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
 
     # 1) inverse rotation about Z axis by Omega -> x2, y2, z2
     if Omega is not None:
-        cos_Omega = torch.cos(Omega)
-        sin_Omega = torch.sin(Omega)
+        cos_Omega = torch.cos(torch.as_tensor(Omega))
+        sin_Omega = torch.sin(torch.as_tensor(Omega))
 
         x2 = cos_Omega * X + sin_Omega * Y
         y2 = -sin_Omega * X + cos_Omega * Y
@@ -111,14 +111,14 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
     # we don't know Z, but we can solve some equations to find that 
     # y = Y / cos(i), as expected by intuition
     if incl is not None:
-        y1 = y2 / torch.cos(incl)
+        y1 = y2 / torch.cos(torch.as_tensor(incl))
     else:
         y1 = y2 
     
     # 3) inverse rotation about the z1 axis by an amount of omega
     if omega is not None:
-        cos_omega = torch.cos(omega)
-        sin_omega = torch.sin(omega)
+        cos_omega = torch.cos(torch.as_tensor(omega))
+        sin_omega = torch.sin(torch.as_tensor(omega))
 
         x = x1 * cos_omega + y1 * sin_omega 
         y = -x1 * sin_omega + y1 * cos_omega

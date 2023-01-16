@@ -25,6 +25,10 @@ class GridCoords:
     :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]
     :ivar dm: image-plane cell spacing in DEC direction [radians]
     :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [arcsec]
+    :ivar packed_x_centers_2D: ll increasing + fftshifted centers [arcseconds]. Useful for directly evaluating a packed cube.
+    :ivar packed_y_centers_2D: mm increasing + fftshifted centers [arcseconds]. Useful for directly evaluating a packed cube.
+    :ivar sky_x_centers_2D: for evaluating a sky image [arcseconds].
+    :ivar sky_y_centers_2D: for evaluating a sky image [arcseconds].
     :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]
     :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]
     :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].
