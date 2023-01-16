@@ -10,13 +10,17 @@ Utilities
 ---------
 
 .. automodule:: mpol.utils
-    :members:
+
 
 Coordinates
 -----------
 
 .. automodule:: mpol.coordinates
-    :members:
+
+Geometry
+--------
+
+.. automodule:: mpol.geometry
 
 Gridding
 --------
