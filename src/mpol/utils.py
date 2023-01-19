@@ -151,20 +151,27 @@ def fftspace(width, N):
     return xx
 
 
-def convert_baselines(baselines, freq):
+def convert_baselines(baselines, freq=None, wle=None):
     r"""
     Convert baselines in meters to kilolambda.
     Args:
         baselines (float or np.array): baselines in [m].
-        freq (float or np.array): frequencies in [Hz]. If either ``baselines`` or ``freq`` are numpy arrays, their shapes must be broadcast-able.
+        freq (float or np.array), optional: frequencies in [Hz]. 
+        wle (float or np.array), optional: wavelengths in [m].
     Returns:
         (1D array nvis): baselines in [klambda]
+    Notes: 
+        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be broadcast-able.
     """
-    # calculate wavelengths in meters
-    wavelengths = c_ms / freq  # m
+    if (freq is None and wle is None) or (wle and freq):
+        raise AttributeError("Exactly one of 'freq' or 'wle' must be supplied.")
+
+    if wle is None:
+        # calculate wavelengths in meters
+        wle = c_ms / freq  # m
 
     # calculate baselines in klambda
-    return 1e-3 * baselines / wavelengths  # [klambda]
+    return 1e-3 * baselines / wle  # [klambda]
 
 
 def broadcast_and_convert_baselines(u, v, chan_freq):
