@@ -361,7 +361,7 @@ class KFoldCrossValidatorGridded:
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
         npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
-        verbose (int), default=0: level of verbosity of log messages
+        device (torch.device) : the desired device of the output. If ``None``, defalts to current device.
 
     Once initialized, iterate through the datasets like
 
@@ -381,14 +381,16 @@ class KFoldCrossValidatorGridded:
         q_edges=None,
         phi_edges=None,
         npseed=None,
-        verbose=0
+        device=None
     ):
 
-        # for ease of interface with numpy, enforce that griddedDataset tensors be on the CPU  
+        self.device = device
+        self.use_gpu = False
+
+        # for ease of interface with numpy, temporarily move griddedDataset tensors on the GPU to the CPU  
         if griddedDataset.vis_gridded.is_cuda:
+            self.use_gpu = True
             griddedDataset = griddedDataset.to('cpu')
-            if verbose > 0:
-                print('KFoldCrossValidatorGridded: moving griddedDataset to CPU')
 
         self.griddedDataset = griddedDataset
 
@@ -450,6 +452,13 @@ class KFoldCrossValidatorGridded:
             test.add_mask(test_mask)
 
             self.n += 1
-            return train, test
+
+            # if the supplied griddedDataset was initially on the GPU, 
+            # enforce that we move it back from our temporary storage on the CPU
+            # (to prevent silently returning its instance on the CPU)
+            if self.use_gpu and not self.griddedDataset.vis_gridded.is_cuda and self.device is None:
+                return train.cuda(), test.cuda()
+            return train.to(self.device), test.to(self.device)
+
         else:
             raise StopIteration
