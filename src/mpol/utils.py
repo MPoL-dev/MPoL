@@ -237,31 +237,27 @@ def get_maximum_cell_size(uu_vv_point):
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
 
 
-def get_optimal_image_properties(image_width, q, percentile=None, 
-                                target_baseline=None):
+def get_optimal_image_properties(image_width, q, percentile=100):
     r"""
     For an image of desired width, determine the maximum pixel size that 
-    ensures Nyquist sampling of the provided baseline distribution out to a 
-    chosen percentile (or specific baseline), and the number of pixels 
+    ensures Nyquist sampling of the provided baseline (or baseline 
+    distribution) out to a chosen percentile, and the number of pixels 
     (given this pixel size) to obtain the desired image width.
 
     N.B.: No assumption or correction is made concerning whether the baseline 
-    distribution is projected or deprojected.
+    (distribution) is projected or deprojected.
 
     Parameters
     ----------
     image_width : float, unit = arcsec
         Desired width of the image (i.e., image will be a 
         image_width :math:`\times` image_width square).
-    q : array, unit = :math:`k\lambda`
-        Baseline distribution (all values must be non-negative).
-    percentile : int, default = None
+    q : float or array, unit = :math:`k\lambda`
+        Baseline distribution (all values must be non-negative). If a single 
+        value, 'percentile' has no effect.
+    percentile : int, default = 100
         Percentile of the baseline distribution (between 0 - 100) out to which 
         the desired image will Nyquist sample. 
-    target_baseline : float, optional, default = None, unit = :math:`k\lambda`
-        Specific baseline out to which the desired image will Nyquist sample 
-        (as an alternative to 'percentile'). One of 'percentile' and 
-        'target_baseline' must be None. 
 
     Returns
     -------
@@ -273,15 +269,8 @@ def get_optimal_image_properties(image_width, q, percentile=None,
     """
 
     assert np.all(q >= 0), "All baselines should be >=0." 
-    if percentile and target_baseline:
-        raise ValueError("One of 'percentile' and 'target_baseline' must be " 
-                        "None.")
 
-    if percentile:
-        q_optimal = np.percentile(q, percentile)
-    else:
-        q_optimal = target_baseline
-
+    q_optimal = np.percentile(q, percentile)
     cell_size = get_maximum_cell_size(q_optimal)
 
     # round the desired number of pixels up to the nearest integer
