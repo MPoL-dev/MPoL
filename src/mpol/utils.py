@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import torch
 
 from .constants import arcsec, c_ms, cc, deg, kB
@@ -234,6 +235,81 @@ def get_maximum_cell_size(uu_vv_point):
     """
 
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
+
+
+def get_optimal_image_properties(image_width, q, percentile=100):
+    r"""
+    For an image of desired width, determine the maximum pixel size that 
+    ensures Nyquist sampling of the provided baseline distribution out to a 
+    chosen percentile, and the number of pixels (given this pixel size) to 
+    obtain the desired image width.
+
+    N.B.: No assumption or correction is made concerning whether the baseline 
+    distribution is projected or deprojected.
+
+    Parameters
+    ----------
+    image_width : float, unit = arcsec
+        Desired width of the image (i.e., image will be a 
+        image_width :math:`\times` image_width square).
+    q : array, unit = :math:`k\lambda`
+        Baseline distribution (all values must be non-negative).
+    percentile : int, default = 100
+        Percentile of the baseline distribution out to which the desired image 
+        will Nyquist sample. 
+
+    Returns
+    -------
+    cell_size : float, unit = arcsec
+        Image pixel size required to Nyquist sample.
+    npix : int
+        Number of pixels of cell_size to equal (or slightly exceed) the image 
+        width (npix will be rounded up and enforced as even).
+    """
+
+    assert np.all(q >= 0), "All baselines should be >=0." 
+    
+    q_optimal = np.percentile(q, percentile)
+    cell_size = get_maximum_cell_size(q_optimal)
+
+    # round the desired number of pixels up to the nearest integer
+    npix = math.ceil(image_width / cell_size)
+    # enforce that npix be even
+    if npix % 2 == 1:
+        npix += 1
+
+    return cell_size, npix
+
+
+def get_optimal_npixel(q, npixels, percentile=100):
+    r"""
+    For a desired image, determine the maximum pixel size that ensures Nyquist 
+    sampling of the provided baseline distribution out to its chosen 
+    percentile.
+
+    N.B.: No assumption or correction is made concerning whether the baseline 
+    distribution is projected or deprojected.
+
+    Parameters
+    ----------
+    q : array, unit = :math:`k\lambda`
+        Baseline distribution (all values must be non-negative).
+    percentile : int, default = 100
+        Percentile of the baseline distribution out to which the desired image 
+        will Nyquist sample. 
+
+    Returns
+    -------
+    cell_size : float, unit = arcsec
+        Image pixel size required to Nyquist sample.
+    """
+
+    assert np.all(q >= 0), "All baselines should be >=0." 
+        
+    q_optimal = np.percentile(q, percentile)
+    cell_size = get_maximum_cell_size(q_optimal)
+
+    return cell_size
 
 
 def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
