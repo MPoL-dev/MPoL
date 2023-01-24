@@ -179,10 +179,10 @@ def check_baselines(q):
                 "[\lambda].".format(max(q), max_feasible_q)) 
 
     if min(q) > min_feasible_q * 1e3:
-        raise Warning("Minimum baseline of {:.1e} is large for units of "
-                    "[\klambda]. Baselines must be in units of "
+        raise Warning("Minimum baseline of {:.1e} is large for expected "
+                    "minimum value of {:.1e}. Baselines must be in units of "
                     "[k\lambda], but it looks like they're in "
-                    "[\lambda].".format(min(q), min_feasible_q)) 
+                    "[\lambda].".format(min(q), min_feasible_q * 1e3)) 
 
 
 def convert_baselines(baselines, freq=None, wle=None):
