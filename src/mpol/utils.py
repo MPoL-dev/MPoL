@@ -281,7 +281,7 @@ def get_optimal_image_properties(image_width, q, percentile=None,
         q_optimal = np.percentile(q, percentile)
     else:
         q_optimal = target_baseline
-        
+
     cell_size = get_maximum_cell_size(q_optimal)
 
     # round the desired number of pixels up to the nearest integer
@@ -291,37 +291,6 @@ def get_optimal_image_properties(image_width, q, percentile=None,
         npix += 1
 
     return cell_size, npix
-
-
-def get_optimal_npixel(q, npixels, percentile=100):
-    r"""
-    For a desired image, determine the maximum pixel size that ensures Nyquist 
-    sampling of the provided baseline distribution out to its chosen 
-    percentile.
-
-    N.B.: No assumption or correction is made concerning whether the baseline 
-    distribution is projected or deprojected.
-
-    Parameters
-    ----------
-    q : array, unit = :math:`k\lambda`
-        Baseline distribution (all values must be non-negative).
-    percentile : int, default = 100
-        Percentile of the baseline distribution out to which the desired image 
-        will Nyquist sample. 
-
-    Returns
-    -------
-    cell_size : float, unit = arcsec
-        Image pixel size required to Nyquist sample.
-    """
-
-    assert np.all(q >= 0), "All baselines should be >=0." 
-        
-    q_optimal = np.percentile(q, percentile)
-    cell_size = get_maximum_cell_size(q_optimal)
-
-    return cell_size
 
 
 def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
