@@ -273,7 +273,7 @@ def get_optimal_image_properties(image_width, q, percentile=None,
     """
 
     assert np.all(q >= 0), "All baselines should be >=0." 
-    if percentile is not None and target_baseline is not None:
+    if percentile and target_baseline:
         raise ValueError("One of 'percentile' and 'target_baseline' must be " 
                         "None.")
 
