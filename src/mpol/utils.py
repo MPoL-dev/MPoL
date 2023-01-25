@@ -151,7 +151,7 @@ def fftspace(width, N):
     return xx
 
 
-def check_baselines(q):
+def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
     """
     Check if baseline lengths are sensible for expected code unit of 
     [k\lambda], or if instead they're being supplied in [\lambda].
@@ -160,17 +160,17 @@ def check_baselines(q):
     ----------
      q : array, unit = :math:`k\lambda`
         Baseline distribution (all values must be non-negative). 
+    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0
+        Minimum baseline in code units expected for a dataset. The default 
+        value of 1e0 is a conservative value for ALMA, assuming a minimum
+        antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.
+    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5
+        Maximum baseline in code units expected for a dataset. The default 
+        value of 1e5 is a conservative value for ALMA, assuming a maximum 
+        antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.
     """
     
     assert np.all(q >= 0), "All baselines should be >=0."
-
-    # conservative estimate based on ALMA minimum antenna separation (~12 m) 
-    # and maximum observing wavelength (3.6 mm)
-    min_feasible_q = 1e0
-
-    # conservative estimate based on ALMA maximum antenna separation (~16 km) 
-    # and minimum observing wavelength (0.3 mm)
-    max_feasible_q = 1e5
     
     if max(q) > max_feasible_q:
         raise Warning("Maximum baseline of {:.1e} is > maximum expected "
