@@ -6,7 +6,7 @@ from mpol import fourier, images, utils
 from mpol.constants import *
 
 
-def test_fourier_cube(coords, tmp_path):
+def test_fourier_cube(coords, tmp_path, device=None):
     # test image packing
     # test whether we get the same Fourier Transform using the FFT as we could
     # calculate analytically
@@ -25,10 +25,10 @@ def test_fourier_cube(coords, tmp_path):
     )
 
     # calculated the packed FFT using the FourierLayer
-    flayer = fourier.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords, device=device)
     # convert img_packed to pytorch tensor
     img_packed_tensor = torch.from_numpy(img_packed[np.newaxis, :, :])
-    fourier_packed_num = np.squeeze(flayer.forward(img_packed_tensor).numpy())
+    fourier_packed_num = np.squeeze(flayer.forward(img_packed_tensor).cpu().numpy())
 
     # calculate the analytical FFT
     fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
@@ -96,6 +96,13 @@ def test_fourier_cube_grad(coords):
     loss = torch.sum(torch.abs(output))
 
     loss.backward()
+
+
+def test_fourier_cube_gpu(coords, tmp_path):
+    if torch.cuda.is_available():
+        device = torch.device('cuda:0')
+    
+    test_fourier_cube(coords, tmp_path, device)
 
 
 def test_instantiate_nufft_single_chan(coords, mock_visibility_data_cont):
