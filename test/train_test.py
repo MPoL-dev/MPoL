@@ -8,11 +8,11 @@ from mpol import losses, precomposed
 from mpol.constants import *
 
 
-def test_init_train_class(coords, dataset):
+def test_init_train_class(coords, dataset, device=None):
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
 
     vis = rml.forward()
 
@@ -27,12 +27,12 @@ def test_init_train_class(coords, dataset):
     print(rml.bcube.base_cube.grad)
 
 
-def test_train_loop(coords, dataset_cont, tmp_path):
+def test_train_loop(coords, dataset_cont, tmp_path, device=None):
     # set everything up to run on a single channel
     # and run a few iterations
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
@@ -63,12 +63,12 @@ def test_train_loop(coords, dataset_cont, tmp_path):
     plt.close("all")
 
 
-def test_tensorboard(coords, dataset_cont, tmp_path):
+def test_tensorboard(coords, dataset_cont, tmp_path, device=None):
     # set everything up to run on a single channel and then
     # test the writer function
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
@@ -90,3 +90,18 @@ def test_tensorboard(coords, dataset_cont, tmp_path):
 
         # update the model parameters
         optimizer.step()
+
+
+def test_train_workflow_gpu(coords, dataset, dataset_cont, tmp_path):
+    if torch.cuda.is_available():
+        device = torch.device('cuda:0')
+    
+        dataset = dataset.to(device)
+        dataset_cont = dataset_cont.to(device)
+        
+        test_init_train_class(coords, dataset, device)
+        test_train_loop(coords, dataset_cont, tmp_path, device)
+        test_tensorboard(coords, dataset_cont, tmp_path, device)
+
+    else:
+        pass
