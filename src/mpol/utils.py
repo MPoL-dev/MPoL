@@ -241,11 +241,8 @@ def get_optimal_image_properties(image_width, q, percentile=100):
     r"""
     For an image of desired width, determine the maximum pixel size that 
     ensures Nyquist sampling of the provided baseline (or baseline 
-    distribution) out to a chosen percentile, and the number of pixels 
+    distribution, out to a chosen percentile), and the number of pixels 
     (given this pixel size) to obtain the desired image width.
-
-    N.B.: No assumption or correction is made concerning whether the baseline 
-    (distribution) is projected or deprojected.
 
     Parameters
     ----------
@@ -266,6 +263,14 @@ def get_optimal_image_properties(image_width, q, percentile=100):
     npix : int
         Number of pixels of cell_size to equal (or slightly exceed) the image 
         width (npix will be rounded up and enforced as even).
+
+    Notes
+    -----
+    To obtain the image properties for a single baseline distance, pass 'q' as 
+    a float. In this case, 'percentile' has no effect.
+
+    No assumption or correction is made concerning whether the baseline 
+    (distribution) is projected or deprojected.
     """
 
     assert np.all(q >= 0), "All baselines should be >=0." 
