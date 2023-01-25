@@ -383,13 +383,12 @@ class KFoldCrossValidatorGridded:
         npseed=None,
         device=None
     ):
-
-        self.device = device
-        self.use_gpu = False
-
-        # for ease of interface with numpy, temporarily move griddedDataset tensors on the GPU to the CPU  
+        
+        self.device = device 
+        
+        # for ease of interface with numpy, temporarily move griddedDataset 
+        # tensors on the GPU to the CPU  
         if griddedDataset.vis_gridded.is_cuda:
-            self.use_gpu = True
             griddedDataset = griddedDataset.to('cpu')
 
         self.griddedDataset = griddedDataset
@@ -455,9 +454,6 @@ class KFoldCrossValidatorGridded:
 
             # if the supplied griddedDataset was initially on the GPU, 
             # enforce that we move it back from our temporary storage on the CPU
-            # (to prevent silently returning its instance on the CPU)
-            if self.use_gpu and not self.griddedDataset.vis_gridded.is_cuda and self.device is None:
-                return train.cuda(), test.cuda()
             return train.to(self.device), test.to(self.device)
 
         else:
