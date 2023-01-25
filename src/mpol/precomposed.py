@@ -36,6 +36,7 @@ class SimpleNet(torch.nn.Module):
         coords=None,
         nchan=None,
         base_cube=None,
+        device=None
     ):
         super().__init__()
 
@@ -50,7 +51,7 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
-        self.fcube = fourier.FourierCube(coords=self.coords)
+        self.fcube = fourier.FourierCube(coords=self.coords, device=device)
 
     def forward(self):
         r"""
