@@ -39,7 +39,7 @@ EXTRA_REQUIRES = {
         "jupytext",
         "ipython!=8.7.0",  # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
         "nbsphinx",
-        "sphinx_book_theme==0.3.3",
+        "sphinx_book_theme>=0.3.3",
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",
