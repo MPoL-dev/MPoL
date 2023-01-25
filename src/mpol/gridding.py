@@ -687,7 +687,7 @@ class Gridder:
 
         return img.real, beam
 
-    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
+    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2, device=None):
         r"""
         Export gridded visibilities to a PyTorch dataset object.
 
@@ -719,6 +719,7 @@ class Gridder:
             vis_gridded=self.vis_gridded,
             weight_gridded=self.weight_gridded,
             mask=self.mask,
+            device=device
         )
 
     @property
