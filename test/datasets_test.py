@@ -203,19 +203,21 @@ def test_hermitian_mask_k(crossvalidation_products, tmp_path):
     fig.savefig(tmp_path / "hermitian.png", dpi=300)
 
 
-def test_crossvalidator_init(crossvalidation_products):
+def test_crossvalidator_init(crossvalidation_products, device=None):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
 
     # create cross validator through passing dartboard
-    datasets.KFoldCrossValidatorGridded(dataset, 5, dartboard=dartboard)
+    datasets.KFoldCrossValidatorGridded(dataset, 5, dartboard=dartboard, 
+                                        device=device)
 
     # create cross validator through implicit creation of dartboard
-    datasets.KFoldCrossValidatorGridded(dataset, 5)
+    datasets.KFoldCrossValidatorGridded(dataset, 5, device=device)
 
 
-def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
+def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path, 
+                                        device=None):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
@@ -223,18 +225,19 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
     # create cross validator through passing dartboard
     k = 5
     chan = 4
-    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard)
+    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, 
+                                                device=device)
 
     fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(6, 12))
 
     for k, (train, test) in enumerate(cv):
 
         ax[k, 0].imshow(
-            np.fft.fftshift(train.mask[chan].detach().numpy()),
+            np.fft.fftshift(train.mask[chan].detach().cpu().numpy()),
             interpolation="none",
         )
         ax[k, 1].imshow(
-            np.fft.fftshift(test.mask[chan].detach().numpy()),
+            np.fft.fftshift(test.mask[chan].detach().cpu().numpy()),
             interpolation="none",
         )
 
@@ -243,7 +246,8 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
     fig.savefig(tmp_path / "masks", dpi=300)
 
 
-def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
+def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path, 
+                                        device=None):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
@@ -251,11 +255,12 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
     # create cross validator through passing dartboard
     k = 5
     chan = 4
-    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard)
+    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard,
+                                            device=device)
 
     # visualize dirty images
     # create mock fourier layer
-    flayer = fourier.FourierCube(coords=coords)
+    flayer = fourier.FourierCube(coords=coords, device=device)
     flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
     fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))
@@ -269,25 +274,39 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
         test_chan = utils.packed_cube_to_sky_cube(rtest.forward())[chan]
 
         im = ax[k, 0].imshow(
-            train_chan.real.detach().numpy(), interpolation="none", origin="lower"
+            train_chan.real.detach().cpu().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 0])
 
         im = ax[k, 1].imshow(
-            train_chan.imag.detach().numpy(), interpolation="none", origin="lower"
+            train_chan.imag.detach().cpu().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 1])
 
         im = ax[k, 2].imshow(
-            test_chan.real.detach().numpy(), interpolation="none", origin="lower"
+            test_chan.real.detach().cpu().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 2])
 
         im = ax[k, 3].imshow(
-            test_chan.imag.detach().numpy(), interpolation="none", origin="lower"
+            test_chan.imag.detach().cpu().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 3])
 
     ax[0, 0].set_title("train")
     ax[0, 2].set_title("test")
     fig.savefig(tmp_path / "images", dpi=300)
+
+
+def test_crossvalidator_workflow_gpu(crossvalidation_products, tmp_path):
+    if torch.cuda.is_available():
+        device = torch.device('cuda:0')
+
+        test_crossvalidator_init(crossvalidation_products, device)
+        test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path, 
+                                            device)
+        test_crossvalidator_iterate_images(crossvalidation_products, tmp_path, 
+                                            device)
+    
+    else:
+        pass
