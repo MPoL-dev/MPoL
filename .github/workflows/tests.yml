@@ -11,9 +11,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Install package deps
+
+      - name: Install dependencies needed to download files
         run: |
-          pip install .[dl_files]
+          pip install astropy
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:

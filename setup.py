@@ -25,9 +25,6 @@ version = get_version("src/mpol/__init__.py")
 
 
 EXTRA_REQUIRES = {
-    "dl_files": [
-        "astropy"
-    ],
     "test": [
         "pytest",
         "pytest-cov",
