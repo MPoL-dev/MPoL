@@ -62,9 +62,9 @@ jobs:
       - name: Install vanilla package
         run: |
           pip install .
-      - name: Install test deps
+      - name: Install all dev dependencies
         run: |
-          pip install .[test]
+          pip install .[dev]
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:
