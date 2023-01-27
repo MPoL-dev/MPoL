@@ -1,4 +1,4 @@
-name: package test and docs test
+name: package test
 
 on: push
 
