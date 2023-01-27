@@ -11,9 +11,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-          cache: 'pip'
-          cache-dependency-path: setup.py
-
       - name: Install dependencies needed to download files
         run: |
           pip install astropy
@@ -43,6 +40,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip' # caching pip dependencies
+          cache-dependency-path: setup.py
       - name: Lint with flake8
         run: |
           pip install flake8
