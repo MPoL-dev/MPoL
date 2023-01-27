@@ -185,11 +185,11 @@ The following plots visualize how we've split up the data. For each $K$-fold, we
 ```{code-cell}
 fig, ax = plt.subplots(nrows=k, ncols=3, figsize=(6, 10))
 
-for i, (train, test) in enumerate(k_fold_datasets):
+for i, (train_subset, test_subset) in enumerate(k_fold_datasets):
 
-    rtrain = connectors.GriddedResidualConnector(flayer, train)
+    rtrain = connectors.GriddedResidualConnector(flayer, train_subset)
     rtrain.forward()
-    rtest = connectors.GriddedResidualConnector(flayer, test)
+    rtest = connectors.GriddedResidualConnector(flayer, test_subset)
     rtest.forward()
 
     vis_ext = rtrain.coords.vis_ext
