@@ -42,7 +42,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       # cache the Python environment, including installed dependencies
       # (unique to each python-version; speeds up tests more than caching pip cache)
-      - uses: actions/cache@v3
+      - name: Cache/Restore the Python env
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-python${{ matrix.python-version }}-env
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
