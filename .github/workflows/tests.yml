@@ -1,6 +1,6 @@
 name: package test and docs test
 
-on: [push, pull_request]
+on: push
 
 jobs:
   dl_files:
