@@ -1,0 +1,43 @@
+name: docs test
+
+# Run this workflow when a review is requested on a PR that targets the main
+# branch, or the PR is closed
+on:
+  pull_request:
+    types: [review_requested, closed]
+    branches: [main]
+
+# Prevent multiple PRs from building/deploying the docs at the same time
+concurrency:
+  group: ${{ github.workflow }}
+
+# test that the docs build
+# (but don't deploy to gh-pages)
+jobs:
+  docs:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install doc deps
+        run: |
+          pip install .[docs]
+      - name: Install Pandoc dependency
+        run: |
+          sudo apt-get install pandoc
+      - name: Cache/Restore the .mpol folder cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-mpol-dls
+        with:
+          # files are stored in .mpol
+          path: ~/.mpol
+          # the "key" is the hash of the download script
+          key: ${{ hashFiles('docs/download_external_files.py') }}
+      - name: Build the docs
+        run: |
+          make -C docs clean
+          make -C docs html
