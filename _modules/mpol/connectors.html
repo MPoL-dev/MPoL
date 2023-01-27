@@ -296,7 +296,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="index_vis"><a class="viewcode-back" href="../../api.html#mpol.connectors.index_vis">[docs]</a><span class="k">def</span> <span class="nf">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is &quot;packed&quot; just like the :class:`~mpol.datasets.GriddedDataset`</span>
 
 <span class="sd">    Args:</span>
@@ -323,7 +323,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="GriddedResidualConnector"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector">[docs]</a><span class="k">class</span> <span class="nc">GriddedResidualConnector</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Connect a FourierCube to the gridded dataset and calculate residual products useful for visualization and debugging in both the Fourier plane and image plane. The products are available as property attributes after the ``forward`` call.</span>
 
 <span class="sd">    Args:</span>
@@ -346,7 +346,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span>
 
 <div class="viewcode-block" id="GriddedResidualConnector.forward"><a class="viewcode-back" href="../../api.html#mpol.connectors.GriddedResidualConnector.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the residuals as</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the residuals as</span>
 
 <span class="sd">        .. math::</span>
 
@@ -386,7 +386,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The image cube arranged as it would appear on the sky. Array dimensions for plotting given by ``self.coords.img_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -397,7 +397,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The boolean mask, arranged in ground format.</span>
 
 <span class="sd">        Returns:</span>
@@ -407,7 +407,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The amplitude of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -417,7 +417,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase of the residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -427,7 +427,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The complex residuals, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>

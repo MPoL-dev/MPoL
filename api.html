@@ -598,12 +598,14 @@ title="Print to PDF"
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.convert_baselines">
-<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">convert_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baselines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#convert_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.convert_baselines" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">convert_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baselines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#convert_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.convert_baselines" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert baselines in meters to kilolambda.
 :param baselines: baselines in [m].
 :type baselines: float or np.array
-:param freq: frequencies in [Hz]. If either <code class="docutils literal notranslate"><span class="pre">baselines</span></code> or <code class="docutils literal notranslate"><span class="pre">freq</span></code> are numpy arrays, their shapes must be broadcast-able.
-:type freq: float or np.array</p>
+:param freq: frequencies in [Hz].
+:type freq: float or np.array
+:param wle: wavelengths in [m].
+:type wle: float or np.array</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>baselines in [klambda]</p>
@@ -612,6 +614,8 @@ title="Print to PDF"
 <dd class="field-even"><p>(1D array nvis)</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">baselines</span></code>, <code class="docutils literal notranslate"><span class="pre">freq</span></code> or <code class="docutils literal notranslate"><span class="pre">wle</span></code> are numpy arrays, their shapes must be broadcast-able.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -663,6 +667,40 @@ title="Print to PDF"
 <dd class="field-even"><p>cell_size (in arcsec)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.get_optimal_image_properties">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_optimal_image_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_optimal_image_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_optimal_image_properties" title="Permalink to this definition">#</a></dt>
+<dd><p>For an image of desired width, determine the maximum pixel size that
+ensures Nyquist sampling of the provided baseline (or baseline
+distribution, out to a chosen percentile), and the number of pixels
+(given this pixel size) to obtain the desired image width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_width</strong> (<em>float</em><em>, </em><em>unit = arcsec</em>) – Desired width of the image (i.e., image will be a
+image_width <span class="math notranslate nohighlight">\(\times\)</span> image_width square).</p></li>
+<li><p><strong>q</strong> (float or array, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>) – Baseline distribution (all values must be non-negative). If a single
+value, ‘percentile’ has no effect.</p></li>
+<li><p><strong>percentile</strong> (<em>int</em><em>, </em><em>default = 100</em>) – Percentile of the baseline distribution (between 0 - 100) out to which
+the desired image will Nyquist sample.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float, unit = arcsec</em>) – Image pixel size required to Nyquist sample.</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – Number of pixels of cell_size to equal (or slightly exceed) the image
+width (npix will be rounded up and enforced as even).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To obtain the image properties for a single baseline distance, pass ‘q’ as
+a float. In this case, ‘percentile’ has no effect.</p>
+<p>No assumption or correction is made concerning whether the baseline
+(distribution) is projected or deprojected.</p>
 </dd></dl>
 
 <dl class="py function">

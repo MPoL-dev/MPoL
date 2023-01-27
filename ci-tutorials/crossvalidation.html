@@ -511,7 +511,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-<img alt="../_images/d360bcd89dfc6d7d99c5ff20cf1d66f69aee459be59f7c5c40640490e109f075.png" src="../_images/d360bcd89dfc6d7d99c5ff20cf1d66f69aee459be59f7c5c40640490e109f075.png" />
+<img alt="../_images/a6e6aa022586a381297e854dd8ce83182fe367bf6aa11fc58491055436c28527.png" src="../_images/a6e6aa022586a381297e854dd8ce83182fe367bf6aa11fc58491055436c28527.png" />
 </div>
 </div>
 </section>
@@ -548,7 +548,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7bebfe1e97996297198d013de75f75c055928c44367b8faa6ee0641424957f85.png" src="../_images/7bebfe1e97996297198d013de75f75c055928c44367b8faa6ee0641424957f85.png" />
+<img alt="../_images/e301ae5b31ac871e846efddd11006c702ba835cd5191a7882f5b8436a75048a6.png" src="../_images/e301ae5b31ac871e846efddd11006c702ba835cd5191a7882f5b8436a75048a6.png" />
 </div>
 </div>
 <p>As you can see, the <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> space is sampled in a very structured way:</p>
@@ -584,7 +584,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/0578120abf214c415fb27e715c27660a69e8b7d36b42bd55cc7b7fea5f43f750.png" src="../_images/0578120abf214c415fb27e715c27660a69e8b7d36b42bd55cc7b7fea5f43f750.png" />
+<img alt="../_images/7759c956594bfa3e122faf5e0457fe98a520f3f8c35a06c40ecbe928e43fd683.png" src="../_images/7759c956594bfa3e122faf5e0457fe98a520f3f8c35a06c40ecbe928e43fd683.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -631,11 +631,11 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">k_fold_datasets</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">train_subset</span><span class="p">,</span> <span class="n">test_subset</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">k_fold_datasets</span><span class="p">):</span>
 
-    <span class="n">rtrain</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">GriddedResidualConnector</span><span class="p">(</span><span class="n">flayer</span><span class="p">,</span> <span class="n">train</span><span class="p">)</span>
+    <span class="n">rtrain</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">GriddedResidualConnector</span><span class="p">(</span><span class="n">flayer</span><span class="p">,</span> <span class="n">train_subset</span><span class="p">)</span>
     <span class="n">rtrain</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
-    <span class="n">rtest</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">GriddedResidualConnector</span><span class="p">(</span><span class="n">flayer</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+    <span class="n">rtest</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">GriddedResidualConnector</span><span class="p">(</span><span class="n">flayer</span><span class="p">,</span> <span class="n">test_subset</span><span class="p">)</span>
     <span class="n">rtest</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
 
     <span class="n">vis_ext</span> <span class="o">=</span> <span class="n">rtrain</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">vis_ext</span>
@@ -676,7 +676,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/21906eebf6579fce43b6eb8cb097b60145883030fb5f2e57ccfafee5937b1c48.png" src="../_images/21906eebf6579fce43b6eb8cb097b60145883030fb5f2e57ccfafee5937b1c48.png" />
+<img alt="../_images/1a7d7c27d41fecf1717c624e027cad2db3f07d6d6b26cba998f3555cb5042e68.png" src="../_images/1a7d7c27d41fecf1717c624e027cad2db3f07d6d6b26cba998f3555cb5042e68.png" />
 </div>
 </div>
 </section>
@@ -744,7 +744,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cross_validate</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    config is a dictionary that should contain ``lr``, ``lambda_sparsity``, ``lambda_TV``, ``epochs``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">test_scores</span> <span class="o">=</span> <span class="p">[]</span>
@@ -808,7 +808,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/a53e6ab5e0874fb4df6541b53e10a7c0361d08280e662811ddc513ed08dcd6be.png" src="../_images/a53e6ab5e0874fb4df6541b53e10a7c0361d08280e662811ddc513ed08dcd6be.png" />
+<img alt="../_images/3d9e4617b9f041d0aa1f132f05cfbd3670fe1a8695d79367eb6d0cb9604058ef.png" src="../_images/3d9e4617b9f041d0aa1f132f05cfbd3670fe1a8695d79367eb6d0cb9604058ef.png" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -827,7 +827,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/fe9f174d13f8e46c734d11a65e8bbe75760c57b32dcc9b0394dd3e70b654fdb5.png" src="../_images/fe9f174d13f8e46c734d11a65e8bbe75760c57b32dcc9b0394dd3e70b654fdb5.png" />
+<img alt="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" src="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -846,7 +846,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/aeea6392ebf679e96e3fa32cc7e9b1bf12602afd450407fd2608cc631b8d5ee2.png" src="../_images/aeea6392ebf679e96e3fa32cc7e9b1bf12602afd450407fd2608cc631b8d5ee2.png" />
+<img alt="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" src="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
@@ -907,7 +907,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-<img alt="../_images/ff78459c3d1969991bf22a31db9e5e7838503941382c9ecbe0fc4868467d6b0e.png" src="../_images/ff78459c3d1969991bf22a31db9e5e7838503941382c9ecbe0fc4868467d6b0e.png" />
+<img alt="../_images/711e6724d3df319c5d80a37fb537064bbb6bfc6641f7e9c6ea2eebe5ae037468.png" src="../_images/711e6724d3df319c5d80a37fb537064bbb6bfc6641f7e9c6ea2eebe5ae037468.png" />
 </div>
 </div>
 </section>

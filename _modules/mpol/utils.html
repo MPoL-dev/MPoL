@@ -289,13 +289,14 @@ title="Source repository"
                 
   <h1>Source code for mpol.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">c_ms</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">kB</span>
 
 
 <div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
@@ -309,7 +310,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
@@ -324,7 +325,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="sky_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
@@ -339,7 +340,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="packed_cube_to_sky_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_sky_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
@@ -356,7 +357,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="get_Jy_arcsec2"><a class="viewcode-back" href="../../api.html#mpol.utils.get_Jy_arcsec2">[docs]</a><span class="k">def</span> <span class="nf">get_Jy_arcsec2</span><span class="p">(</span><span class="n">T_b</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">230e9</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.</span>
 
 <span class="sd">    Args:</span>
@@ -380,7 +381,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="log_stretch"><a class="viewcode-back" href="../../api.html#mpol.utils.log_stretch">[docs]</a><span class="k">def</span> <span class="nf">log_stretch</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a log stretch to the tensor.</span>
 
 <span class="sd">    Args:</span>
@@ -393,7 +394,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="loglinspace"><a class="viewcode-back" href="../../api.html#mpol.utils.loglinspace">[docs]</a><span class="k">def</span> <span class="nf">loglinspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">N_log</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``.</span>
 
 <span class="sd">    Args:</span>
@@ -421,7 +422,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="fftspace"><a class="viewcode-back" href="../../api.html#mpol.utils.fftspace">[docs]</a><span class="k">def</span> <span class="nf">fftspace</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        width (float): the width of the array</span>
@@ -441,24 +442,31 @@ title="Source repository"
     <span class="k">return</span> <span class="n">xx</span></div>
 
 
-<div class="viewcode-block" id="convert_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.convert_baselines">[docs]</a><span class="k">def</span> <span class="nf">convert_baselines</span><span class="p">(</span><span class="n">baselines</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="convert_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.convert_baselines">[docs]</a><span class="k">def</span> <span class="nf">convert_baselines</span><span class="p">(</span><span class="n">baselines</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert baselines in meters to kilolambda.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        baselines (float or np.array): baselines in [m].</span>
-<span class="sd">        freq (float or np.array): frequencies in [Hz]. If either ``baselines`` or ``freq`` are numpy arrays, their shapes must be broadcast-able.</span>
+<span class="sd">        freq (float or np.array), optional: frequencies in [Hz]. </span>
+<span class="sd">        wle (float or np.array), optional: wavelengths in [m].</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        (1D array nvis): baselines in [klambda]</span>
+<span class="sd">    Notes: </span>
+<span class="sd">        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be broadcast-able.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># calculate wavelengths in meters</span>
-    <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">c_ms</span> <span class="o">/</span> <span class="n">freq</span>  <span class="c1"># m</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">wle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">wle</span> <span class="ow">and</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Exactly one of &#39;freq&#39; or &#39;wle&#39; must be supplied.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">wle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate wavelengths in meters</span>
+        <span class="n">wle</span> <span class="o">=</span> <span class="n">c_ms</span> <span class="o">/</span> <span class="n">freq</span>  <span class="c1"># m</span>
 
     <span class="c1"># calculate baselines in klambda</span>
-    <span class="k">return</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">baselines</span> <span class="o">/</span> <span class="n">wavelengths</span>  <span class="c1"># [klambda]</span></div>
+    <span class="k">return</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">baselines</span> <span class="o">/</span> <span class="n">wle</span>  <span class="c1"># [klambda]</span></div>
 
 
 <div class="viewcode-block" id="broadcast_and_convert_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.broadcast_and_convert_baselines">[docs]</a><span class="k">def</span> <span class="nf">broadcast_and_convert_baselines</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">chan_freq</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert baselines to kilolambda and broadcast to match shape of channel frequencies.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        u (1D array nvis): baseline [m]</span>
@@ -487,7 +495,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="get_max_spatial_freq"><a class="viewcode-back" href="../../api.html#mpol.utils.get_max_spatial_freq">[docs]</a><span class="k">def</span> <span class="nf">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the maximum spatial frequency that the image can represent and still satisfy the Nyquist Sampling theorem.</span>
 
 <span class="sd">    Args:</span>
@@ -506,7 +514,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="get_maximum_cell_size"><a class="viewcode-back" href="../../api.html#mpol.utils.get_maximum_cell_size">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_cell_size</span><span class="p">(</span><span class="n">uu_vv_point</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the maximum possible cell_size that will still Nyquist sample the uu or vv point. Note: not q point.</span>
 
 <span class="sd">    Args:</span>
@@ -519,8 +527,58 @@ title="Source repository"
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">uu_vv_point</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="n">arcsec</span></div>
 
 
+<div class="viewcode-block" id="get_optimal_image_properties"><a class="viewcode-back" href="../../api.html#mpol.utils.get_optimal_image_properties">[docs]</a><span class="k">def</span> <span class="nf">get_optimal_image_properties</span><span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an image of desired width, determine the maximum pixel size that </span>
+<span class="sd">    ensures Nyquist sampling of the provided baseline (or baseline </span>
+<span class="sd">    distribution, out to a chosen percentile), and the number of pixels </span>
+<span class="sd">    (given this pixel size) to obtain the desired image width.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image_width : float, unit = arcsec</span>
+<span class="sd">        Desired width of the image (i.e., image will be a </span>
+<span class="sd">        image_width :math:`\times` image_width square).</span>
+<span class="sd">    q : float or array, unit = :math:`k\lambda`</span>
+<span class="sd">        Baseline distribution (all values must be non-negative). If a single </span>
+<span class="sd">        value, &#39;percentile&#39; has no effect.</span>
+<span class="sd">    percentile : int, default = 100</span>
+<span class="sd">        Percentile of the baseline distribution (between 0 - 100) out to which </span>
+<span class="sd">        the desired image will Nyquist sample. </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cell_size : float, unit = arcsec</span>
+<span class="sd">        Image pixel size required to Nyquist sample.</span>
+<span class="sd">    npix : int</span>
+<span class="sd">        Number of pixels of cell_size to equal (or slightly exceed) the image </span>
+<span class="sd">        width (npix will be rounded up and enforced as even).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    To obtain the image properties for a single baseline distance, pass &#39;q&#39; as </span>
+<span class="sd">    a float. In this case, &#39;percentile&#39; has no effect.</span>
+
+<span class="sd">    No assumption or correction is made concerning whether the baseline </span>
+<span class="sd">    (distribution) is projected or deprojected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span> 
+
+    <span class="n">q_optimal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="p">)</span>
+    <span class="n">cell_size</span> <span class="o">=</span> <span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">q_optimal</span><span class="p">)</span>
+
+    <span class="c1"># round the desired number of pixels up to the nearest integer</span>
+    <span class="n">npix</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">image_width</span> <span class="o">/</span> <span class="n">cell_size</span><span class="p">)</span>
+    <span class="c1"># enforce that npix be even</span>
+    <span class="k">if</span> <span class="n">npix</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">npix</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span></div>
+
+
 <div class="viewcode-block" id="sky_gaussian_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_radians">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_radians</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is rotated ``Omega`` degrees East of North.</span>
 
 <span class="sd">    To evaluate the Gaussian, internally first we translate to center</span>
@@ -569,7 +627,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="sky_gaussian_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_arcsec">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_arcsec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts from arcsec to radians.</span>
 
 <span class="sd">    Args:</span>
@@ -599,7 +657,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="fourier_gaussian_lambda_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_lambda_radians">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_lambda_radians</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.</span>
 
 <span class="sd">    Args:</span>
@@ -731,7 +789,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="fourier_gaussian_klambda_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_klambda_arcsec">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_klambda_arcsec</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.</span>
 
 <span class="sd">    Args:</span>

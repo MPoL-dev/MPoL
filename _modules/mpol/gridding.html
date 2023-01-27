@@ -297,7 +297,7 @@ title="Source repository"
 
 
 <span class="k">def</span> <span class="nf">_check_data_inputs_2d</span><span class="p">(</span><span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check that all data inputs are the same shape, the weights are positive, and the data_re and data_im are floats.</span>
 
 <span class="sd">    Make a reasonable effort to ensure that Hermitian pairs are *not* included.</span>
@@ -339,7 +339,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="contains_hermitian_pairs"><a class="viewcode-back" href="../../api.html#mpol.gridding.contains_hermitian_pairs">[docs]</a><span class="k">def</span> <span class="nf">contains_hermitian_pairs</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">test_vis</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">test_channel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check that the dataset does not contain Hermitian pairs. Because the sky brightness :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian, meaning that</span>
 
 <span class="sd">    .. math::</span>
@@ -423,7 +423,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="Gridder"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder">[docs]</a><span class="k">class</span> <span class="nc">Gridder</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.</span>
 
 <span class="sd">    The :class:`.Gridder` object accepts &quot;loose&quot; *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates, i.e. the &#39;Hermitian pairs.&#39; The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel &#39;continuum&#39; visibilities, they will just have nchan = 1 in the first dimension of most products.</span>
@@ -490,7 +490,7 @@ title="Source repository"
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_sum_cell_values_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a list of loose visibility points :math:`(u,v)` and their corresponding values :math:`x`,</span>
 <span class="sd">        partition the points up into 2D :math:`u-v` cells defined by the ``coords`` object attached to</span>
 <span class="sd">        the gridder, such that ``cell[i,j]`` has bounds between ``coords.u_edges[j, j+1]`` and ``coords.v_edges[i, i+1]``.</span>
@@ -523,7 +523,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_sum_cell_values_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the :func:`~mpol.gridding.Gridder.sum_cell_values_channel` routine over all channels of the</span>
 <span class="sd">        input visibilities.</span>
 
@@ -550,7 +550,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">cube</span>
 
     <span class="k">def</span> <span class="nf">_extract_gridded_values_to_loose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridded_quantity</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the gridded cell quantity corresponding to each of the loose visibilities.</span>
 
 <span class="sd">        Args:</span>
@@ -573,7 +573,7 @@ title="Source repository"
         <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">taper_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Grid the loose data visibilities to the Fourier grid in preparation for imaging.</span>
 
 <span class="sd">        Args:</span>
@@ -667,7 +667,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">re_gridded_beam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">re_gridded_beam</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_grid_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that</span>
 <span class="sd">        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities</span>
 <span class="sd">        within that cell.</span>
@@ -682,7 +682,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cell_weight</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_estimate_cell_standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate the `standard deviation &lt;https://en.wikipedia.org/wiki/Standard_deviation&gt;`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.</span>
 
 <span class="sd">        1. Calculate the mean real :math:`\mu_\Re` and imaginary :math:`\mu_\Im` values within each cell using a weighted mean, assuming that the visibility function is constant across the cell.</span>
@@ -755,7 +755,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">s_re</span><span class="p">,</span> <span class="n">s_im</span>
 
     <span class="k">def</span> <span class="nf">_check_scatter_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks/compares visibility scatter to a given threshold value ``max_scatter`` and raises an AssertionError if the median scatter across all cells exceeds ``max_scatter``.</span>
 
 <span class="sd">        Args:</span>
@@ -782,7 +782,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">cube</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">re_gridded_beam</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the dirty beam corresponding to the gridded visibilities.</span>
 
 <span class="sd">        Args:</span>
@@ -816,7 +816,7 @@ title="Source repository"
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam</span>
 
     <span class="k">def</span> <span class="nf">_null_dirty_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Zero out (null) all pixels in the dirty beam exterior to the first null, for each channel.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.</span>
@@ -882,7 +882,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">nulled_beam</span>
 
 <div class="viewcode-block" id="Gridder.get_dirty_beam_area"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.get_dirty_beam_area">[docs]</a>    <span class="k">def</span> <span class="nf">get_dirty_beam_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">single_channel_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the effective area of the dirty beam for each channel. Assumes that the beam has already been generated by running :func:`~mpol.gridding.Gridder.get_dirty_image`. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.</span>
 
 <span class="sd">        Args:</span>
@@ -907,7 +907,7 @@ title="Source repository"
         <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
         <span class="o">**</span><span class="n">beam_kwargs</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the dirty image.</span>
 
 <span class="sd">        Args:</span>
@@ -978,7 +978,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">beam</span></div>
 
 <div class="viewcode-block" id="Gridder.to_pytorch_dataset"><a class="viewcode-back" href="../../api.html#mpol.gridding.Gridder.to_pytorch_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_pytorch_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export gridded visibilities to a PyTorch dataset object.</span>
 
 <span class="sd">        Args:</span>
@@ -1013,7 +1013,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The visibility FFT cube fftshifted for plotting with ``imshow``.</span>
 
 <span class="sd">        Returns:</span>

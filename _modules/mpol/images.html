@@ -301,7 +301,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="BaseCube"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube">[docs]</a><span class="k">class</span> <span class="nc">BaseCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube domain.</span>
 
 <span class="sd">    .. math::</span>
@@ -358,7 +358,7 @@ title="Source repository"
             <span class="bp">self</span><span class="o">.</span><span class="n">pixel_mapping</span> <span class="o">=</span> <span class="n">pixel_mapping</span>
 
 <div class="viewcode-block" id="BaseCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the image representation from the ``base_cube`` using the pixel mapping</span>
 
 <span class="sd">        .. math::</span>
@@ -372,7 +372,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="HannConvCube"><a class="viewcode-back" href="../../api.html#mpol.images.HannConvCube">[docs]</a><span class="k">class</span> <span class="nc">HannConvCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This convolutional layer convolves an input cube by a small 3x3 filter with shape</span>
 
 <span class="sd">    .. math::</span>
@@ -426,7 +426,7 @@ title="Source repository"
         <span class="p">)</span>
 
 <div class="viewcode-block" id="HannConvCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.HannConvCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Args:</span>
 <span class="sd">            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()</span>
 
 <span class="sd">        Returns:</span>
@@ -452,7 +452,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="ImageCube"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube">[docs]</a><span class="k">class</span> <span class="nc">ImageCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
 
 <span class="sd">    All keyword arguments are required unless noted. The passthrough argument is essential for specifying whether the ImageCube object is the set of root parameters (``passthrough==False``) or if its simply a passthrough layer (``pasthrough==True``). In either case, ImageCube is essentially an identity layer, since no transformations are applied to the ``cube`` tensor. The main purpose of the ImageCube layer is to provide useful functionality around the ``cube`` tensor, such as returning a sky_cube representation and providing FITS writing functionility. In the case of ``passthrough==False``, the ImageCube layer also acts as a container for the trainable parameters.</span>
@@ -505,7 +505,7 @@ title="Source repository"
             <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ImageCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the ImageCube object was initialized with ``passthrough=True``, the ``cube`` argument is required. ``forward`` essentially just passes this on as an identity operation.</span>
 
 <span class="sd">        If the ImageCube object was initialized with ``passthrough=False``, the ``cube`` argument is not permitted, and ``forward`` passes on the stored ``nn.Parameter`` cube as an identity operation.</span>
@@ -529,7 +529,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The image cube arranged as it would appear on the sky.</span>
 
 <span class="sd">        Returns:</span>
@@ -539,7 +539,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ImageCube.to_FITS"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.to_FITS">[docs]</a>    <span class="k">def</span> <span class="nf">to_FITS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;cube.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export the image cube to a FITS file.</span>
 
 <span class="sd">        Args:</span>

@@ -296,7 +296,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="GridCoords"><a class="viewcode-back" href="../../api.html#mpol.coordinates.GridCoords">[docs]</a><span class="k">class</span> <span class="nc">GridCoords</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid.</span>
 
 <span class="sd">    Args:</span>
@@ -429,7 +429,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">sky_x_centers_2D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">x_centers_2D</span><span class="p">)</span>  <span class="c1"># [arcsec]</span>
 
 <div class="viewcode-block" id="GridCoords.check_data_fit"><a class="viewcode-back" href="../../api.html#mpol.coordinates.GridCoords.check_data_fit">[docs]</a>    <span class="k">def</span> <span class="nf">check_data_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.</span>
 
 <span class="sd">        Args:</span>
@@ -470,7 +470,7 @@ title="Source repository"
 
 
 <span class="k">def</span> <span class="nf">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convenience helper to setup coordinate objects inside BaseCube and ImageCube classes. This is meant to be called inside ``__init__``, and will create the instance attributes on ``self``.</span>
 
 <span class="sd">    Args:</span>

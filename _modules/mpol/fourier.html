@@ -302,7 +302,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="FourierCube"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube">[docs]</a><span class="k">class</span> <span class="nc">FourierCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g., :class:`mpol.datasets.GriddedDataset`).</span>
 
 <span class="sd">    Args:</span>
@@ -333,7 +333,7 @@ title="Source repository"
             <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FourierCube.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the FFT of the image cube on each channel.</span>
 
 <span class="sd">        Args:</span>
@@ -355,7 +355,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The visibility cube in ground format cube fftshifted for plotting with ``imshow``.</span>
 
 <span class="sd">        Returns:</span>
@@ -366,7 +366,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -376,7 +376,7 @@ title="Source repository"
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
 <span class="sd">        Returns:</span>
@@ -386,7 +386,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="safe_baseline_constant_meters"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_meters">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_meters</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.</span>
 
 <span class="sd">    The antenna baselines *are* the same as a function of channel when they are measured in physical distance units, such as meters. However, when these baselines are converted to spatial frequency units, via</span>
@@ -434,7 +434,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="safe_baseline_constant_kilolambda"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_kilolambda">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_kilolambda</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.</span>
 
 <span class="sd">    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and have units of kilolambda.</span>
@@ -472,7 +472,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="NuFFT"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT">[docs]</a><span class="k">class</span> <span class="nc">NuFFT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This layer translates input from an :class:`mpol.images.ImageCube` directly to loose, ungridded samples of the Fourier plane, directly corresponding to the :math:`u,v` locations of the data. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or &#39;NuFFT&#39; to interpolate directly to discrete :math:`u,v` locations that need not correspond to grid cell centers. This is implemented using the KbNufft routines of the `TorchKbNufft &lt;https://torchkbnufft.readthedocs.io/en/stable/index.html&gt;`_ package.</span>
 
 <span class="sd">    **Dimensionality**: One consideration when using this layer is the dimensionality of your image and your visibility samples. If your image has multiple channels (``nchan &gt; 1``), there is the possibility that the :math:`u,v` sample locations corresponding to each channel may be different. In ALMA/VLA applications, this can arise when continuum observations are taken over significant bandwidth, since the spatial frequency sampled by any pair of antennas is wavelength-dependent</span>
@@ -547,7 +547,7 @@ title="Source repository"
                 <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
 
 <span class="sd">        These concepts can be a little confusing because there are two angular measures at play.</span>
 
@@ -578,7 +578,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">u_rad_per_pix</span>
 
     <span class="k">def</span> <span class="nf">_assemble_ktraj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.</span>
 
 <span class="sd">        * If ``uu`` and ``vv`` have a 1D shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This will result in a ``k_traj`` vector that has shape (``2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the &#39;coil&#39; dimension of the TorchKbNufft package.</span>
@@ -633,7 +633,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">k_traj</span>
 
 <div class="viewcode-block" id="NuFFT.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.</span>
 
 <span class="sd">        Args:</span>
@@ -688,7 +688,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="make_fake_data"><a class="viewcode-back" href="../../api.html#mpol.fourier.make_fake_data">[docs]</a><span class="k">def</span> <span class="nf">make_fake_data</span><span class="p">(</span><span class="n">imageCube</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.</span>
 
 <span class="sd">    The provided visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``.</span>
