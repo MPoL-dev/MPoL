@@ -42,6 +42,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip' # caching pip dependencies
           cache-dependency-path: setup.py
+      - name: Install pip
+        run: |
+          pip install --upgrade pip
       - name: Lint with flake8
         run: |
           pip install flake8
