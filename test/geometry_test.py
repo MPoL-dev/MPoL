@@ -34,7 +34,9 @@ def test_rotate_coords(coords):
     incl = 30. * np.pi/180
     Omega = 210. * np.pi/180
 
-    x, y = geometry.flat_to_observer(coords.sky_x_centers_2D, coords.sky_y_centers_2D, omega=omega, incl=incl, Omega=Omega)
+    x, y = geometry.observer_to_flat(coords.sky_x_centers_2D, coords.sky_y_centers_2D, omega=omega, incl=incl, Omega=Omega)
     
     print(x, y)
+
+    
     
