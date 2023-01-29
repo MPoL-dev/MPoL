@@ -155,6 +155,40 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
         np.zeros((nchan, len(uu)), dtype=np.complex128)
     )
 
+def test_nufft_predict_GPU(coords, mock_visibility_data_cont):
+
+    if not torch.cuda.is_available():
+        pass 
+    else:
+        device = torch.device("cuda:0")
+    
+        # just see that we can load the layer and get something through without error
+        # for a very simple blank function
+
+        # load some data
+        uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+        nchan = 10
+
+        # instantiate an ImageCube layer filled with zeros and send to GPU
+        imagecube = images.ImageCube(coords=coords, nchan=nchan).to(device=device)
+
+        # we have a multi-channel cube, but only sent single-channel uu and vv
+        # coordinates. The expectation is that TorchKbNufft will parallelize these
+
+        layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv).to(device=device)
+
+        # predict the values of the cube at the u,v locations
+        output = layer.forward(imagecube.forward())
+
+        # make sure we got back the number of visibilities we expected
+        assert output.shape == (nchan, len(uu))
+
+        # if the image cube was filled with zeros, then we should make sure this is true
+        assert output.cpu().detach().numpy() == approx(
+            np.zeros((nchan, len(uu)), dtype=np.complex128)
+        )
+
 def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
 
     # create a single-channel ImageCube using a function we know the true FT analytically
