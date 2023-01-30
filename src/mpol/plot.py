@@ -5,8 +5,46 @@ import matplotlib.colors as mco
 from mpol.utils import loglinspace
 
 def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None, 
-    q_edges1d=None, cmap=None, norm=None, show_datapoints=False, 
-    save_prefix=None):
+    q_edges1d=None, show_datapoints=False, savename=None):
+    r"""
+    Generate a figure with 1d and 2d histograms of (u,v)-plane coverage. 
+    Histograms can give raw counts or weighted counts using the dataset weights.
+
+    Parameters
+    ----------
+    dataset : `mpol.datasets.GriddedDataset` object
+    show_weights : bool, default=False
+        Whether to weight histogram bin counts by the data weight (inherited 
+        from `dataset` normalized to the mean data weight across all points in
+        full dataset)
+    q_edges : array, optional (default=None), unit=:math:[`k\lambda`] 
+        Radial bin edges for the 1d and 2d histogram. If `None`, defaults to 
+        12 log-linearly radial bins over [0, 1.1 * maximum baseline in 
+        `dataset`].
+    phi_edges : array, optional (default=None), unit=[rad] 
+        Azimuthal bin edges for the 2d histogram. If `None`, defaults to 
+        16 bins over [-\pi, \pi]
+    q_edges1d : array, optional (default=None), unit=:math:[`k\lambda`]
+        Radial bin edges for a second 1d histogram. If `None`, defaults to 
+        50 bins equispaced over [0, 1.1 * maximum baseline in `dataset`].
+    show_datapoints : bool, default = False 
+        Whether to overplot the raw visibilities in `dataset` on the 2d 
+        histogram.
+    savename : string, default = None
+        If provided, the generated figure will be saved to `savename`.
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+
+    Notes
+    -----
+    No assumption or correction is made concerning whether the (u,v) distances 
+    are projected or deprojected.
+    """
 
     # 2D mask for any UV cells that contain visibilities
     # in *any* channel
@@ -68,13 +106,12 @@ def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None,
     # 2d polar histogram
     ax2 = fig.add_subplot(122, polar=True)
 
-    if cmap is None:
-        # discrete colormap
-        cmap = plt.cm.get_cmap("plasma")
-        discrete_colors = cmap(np.linspace(0, 1, 10))
-        cmap = mco.LinearSegmentedColormap.from_list(None, discrete_colors, 10)
-    if norm is None:
-        norm = mco.LogNorm(vmin=1)
+    # discrete colormap
+    cmap = plt.cm.get_cmap("plasma")
+    discrete_colors = cmap(np.linspace(0, 1, 10))
+    cmap = mco.LinearSegmentedColormap.from_list(None, discrete_colors, 10)
+
+    norm = mco.LogNorm(vmin=1)
 
     im = ax2.pcolormesh(
         phi_edges, 
