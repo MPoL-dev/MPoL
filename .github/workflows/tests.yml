@@ -1,6 +1,6 @@
-name: package test and docs test
+name: package test
 
-on: [push, pull_request]
+on: push
 
 jobs:
   dl_files:
@@ -11,9 +11,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Install package deps
+      - name: Install dependencies needed to download files
         run: |
-          pip install .[dev]
+          pip install astropy
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:
@@ -40,7 +40,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      # cache the Python environment, including installed dependencies
+      # (unique to each python-version; speeds up tests more than caching pip cache)
+      - name: Cache/Restore the Python env
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-python${{ matrix.python-version }}-env
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
+      - name: Install pip
         run: |
           pip install --upgrade pip
       - name: Lint with flake8
@@ -53,7 +62,7 @@ jobs:
       - name: Install vanilla package
         run: |
           pip install .
-      - name: Install test deps
+      - name: Install test dependencies
         run: |
           pip install .[test]
       - name: Cache/Restore the .mpol folder cache
@@ -68,35 +77,3 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
-
-  # if all tests succeed, then
-  # make sure the docs build OK
-  # (but don't deploy to gh-pages)
-  docs:
-    needs: tests # don't bother running if a test failed
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Install doc deps
-        run: |
-          pip install .[docs]
-      - name: Install Pandoc dependency
-        run: |
-          sudo apt-get install pandoc
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
-      - name: Build the docs
-        run: |
-          make -C docs clean
-          make -C docs html
