@@ -97,7 +97,7 @@ def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None,
         ax2.scatter(phis, qs, s=1.5, rasterized=True, linewidths=0.0, c="k", 
                     alpha=0.3)
 
-    if save_prefix:
-        fig.savefig(save_prefix + '_vis_histogram.png', dpi=300)
+    if savename:
+        fig.savefig(savename, dpi=300)
 
     return fig, (ax0, ax1, ax2)
