@@ -380,3 +380,24 @@ def TSV(sky_cube):
     loss = torch.sum(diff_ll**2 + diff_mm**2)
 
     return loss
+
+
+def check_convergence(loss_new, loss_old, tol):
+    r"""
+    Determine whether the loss function has converged.
+    
+    Parameters
+    ----------
+    loss_new : float
+        Current value of loss function 
+    loss_old : float
+        Previous value of loss function
+    tol : float > 0, default = 1e-3
+        Tolerence for convergence
+
+    Returns
+    -------
+    `True` if the convergence criterion is met, else `False`.
+    """
+    
+    return np.all(np.abs(loss_new - loss_old) <= tol * loss_new)
