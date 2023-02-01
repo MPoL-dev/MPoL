@@ -25,3 +25,25 @@ class TrainTest:
         self._optimizer = optimizer
         self._config = config
         self._verbose = verbose
+
+
+    def check_convergence(self, loss_new, loss_old, tol):
+        r"""
+        Determine whether the loss function has converged.
+        
+        Parameters
+        ----------
+        loss_new : float
+            Current value of loss function 
+        loss_old : float
+            Previous value of loss function
+        tol : float > 0, default = 1e-3
+            Tolerence for convergence
+
+        Returns
+        -------
+        `True` if the convergence criterion is met, else `False`.
+        """
+        
+        return np.all(np.abs(loss_new - loss_old) <= tol * loss_new)
+
