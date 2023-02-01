@@ -1,0 +1,43 @@
+{
+  "input_output" : {
+    "vis_filename"              : "",
+    "save_dir"                  : ""
+  },
+
+  "hardware" : {
+    "use_gpu"                   : false
+  },
+
+  "modify_data" : {
+    "norm_wle"                  : null
+  },
+
+  "image_grid" : {
+    "npix"                      : null,
+    "cell_size"                 : null,
+    "autoset_image_dim"         : true
+  },
+
+  "neural_net" : {
+    "learn_rate"                : 0.5,
+    "epochs"                    : 1000,
+    "convergence_tol"           : 1e-3, 
+    "learn_diag_step"           : 50,
+    "lambda_guess_regularizers" : null,
+    "lambda_entropy"            : null,
+    "entropy_prior_intensity"   : 1e-10,
+    "lambda_sparsity"           : null,
+    "lambda_TV"                 : null,
+    "TV_epsilon"                : 1e-10,
+    "lambda_TSV"                : null
+  },
+
+  "cross_val" : {
+    "kfolds"                    : 5,
+    "seed"                      : null
+  },
+
+  "plotting" : {
+    "diag_fig_train"            : false
+  }
+}
