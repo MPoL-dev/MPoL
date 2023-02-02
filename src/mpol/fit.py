@@ -128,3 +128,27 @@ def modify_data(config): # TODO
 def train_test_crossval(): # TODO 
 
 def output_results(config): # TODO
+
+def main(*args):
+    """Run the full MPoL pipeline to fit a dataset
+
+    Parameters
+    ----------
+    *args : strings
+        Simulates the command line arguments
+    """
+
+    config, param_path = parse_parameters(*args)
+
+    # TODO: add pipeline 
+
+    logging.info('  Updating {} with final parameters used'
+                    ''.format(param_path))
+    with open(param_path, 'w') as f:
+        json.dump(config, f, indent=4)
+
+    logging.info("MPoL MCoMplete!\n")
+
+
+if __name__ == "__main__":
+    main()
