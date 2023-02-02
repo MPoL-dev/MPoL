@@ -3,10 +3,10 @@
 
 import os
 import json
+import argparse
+import logging
 
 import numpy as np
-
-# import logging # TODO: use?
 
 import mpol
 # from mpol import # TODO
@@ -119,3 +119,12 @@ def parse_parameters(*args):
         json.dump(config, f, indent=4)
 
     return config, param_path
+
+
+def load_data(config): # TODO
+
+def modify_data(config): # TODO
+
+def train_test_crossval(): # TODO 
+
+def output_results(config): # TODO
