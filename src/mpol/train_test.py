@@ -28,23 +28,32 @@ class TrainTest:
         self._verbose = verbose
 
 
-    def check_convergence(self, loss_new, loss_old, tol):
+    def loss_convergence(self, loss, tol=1e-2):
         r"""
-        Determine whether the loss function has converged.
+        Estimate whether the loss function has converged by assessing its 
+        relative change over recent iterations.
         
         Parameters
         ----------
-        loss_new : float
-            Current value of loss function 
-        loss_old : float
-            Previous value of loss function
-        tol : float > 0, default = 1e-3
+        loss : array
+            Values of loss function over iterations (epochs). 
+            If len(loss) < 11, `False` will be returned, as convergence 
+            cannot be adequately assessed.
+        tol : float > 0, default=1e-2
             Tolerence for convergence
 
         Returns
         -------
         `True` if the convergence criterion is met, else `False`.
         """
+        min_len = 11 
+        if len(loss) < min_len:
+            return False
+        
+        ratios = np.abs(loss[-1] / loss[-min_len:-1]) 
+
+        return np.all(1 - tol <= ratios) and np.all(ratios <= 1 + tol)
+
         
         return np.all(np.abs(loss_new - loss_old) <= tol * loss_new)
 
