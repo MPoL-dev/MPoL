@@ -15,16 +15,16 @@ class TrainTest:
         Instance of the `mpol.gridding.Gridder` class.
     optimizer : `torch.optim` object
         PyTorch optimizer class for the training loop.
-
+    # TODO
     verbose : bool, default=True
         Whether to print notification messages. 
     """
 
-    def __init__(self, gridder, optimizer, epochs, convergence_tol, 
-                lambda_guess_regularizers, lambda_entropy, 
-                entropy_prior_intensity, lambda_sparsity, lambda_TV, 
-                TV_epsilon, lambda_TSV, 
-                train_diag_step, diag_fig_train, verbose=True):
+    def __init__(self, gridder, optimizer, epochs=500, convergence_tol=1e-2, 
+                lambda_guess_regularizers=[""], lambda_entropy=None, 
+                entropy_prior_intensity=None, lambda_sparsity=None, lambda_TV=None, 
+                TV_epsilon=None, lambda_TSV=None, 
+                train_diag_step=None, diag_fig_train=False, verbose=True):
         self._gridder = gridder
         self._optimizer = optimizer
         self._epochs = epochs
