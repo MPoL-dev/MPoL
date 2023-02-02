@@ -1,6 +1,6 @@
 {
     "input_output" : {
-      "vis_filename"              : "Data file (.txt, .npy, .npz) with visibilities to be modeled. Text file should have columns (u [k\\lambda], v [k\\lambda], Re(V) + 1j*Im(V) [Jy], weights [Jy^-2])", 
+      "data_filename"             : "Data file (.txt, .npy, .npz) with visibilities to be modeled. Text file should have columns (u [k\\lambda], v [k\\lambda], Re(V) + 1j*Im(V) [Jy], weights [Jy^-2])", 
       "save_dir"                  : "Directory in which output datafiles and figures are saved",
     },
   
