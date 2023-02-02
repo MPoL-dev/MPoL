@@ -131,3 +131,72 @@ class TrainTest:
         return loss 
 
 
+    def train(self, model, dataset):
+        r"""
+        Trains a neural network, forward modeling a visibility dataset and 
+        evaluating the corresponding model image against the data, using 
+        PyTorch with gradient descent.
+        
+        Parameters
+        ----------
+        model : `torch.nn.Module` object
+            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        dataset : PyTorch dataset object
+            Instance of the `mpol.datasets.GriddedDataset` class.
+
+        Returns
+        -------
+        loss.item() : float
+            Loss value 
+        """
+        # set model to training mode
+        model.train()
+        
+        # track model residuals
+        residuals = GriddedResidualConnector(model.fcube, dataset)
+
+        count = 0
+        # track loss value over epochs
+        losses = []
+        
+        while (not self.loss_convergence(np.array(losses),
+                                        self._config["convergence_tol"])
+                and count <= self._config["epochs"]):
+
+            if self._verbose:
+                print('\r  epoch {} of {}'.format(count, 
+                                                 self._config["epochs"]), 
+                        end='', flush=True)
+            
+            self._optimizer.zero_grad()
+
+            # calculate model visibility cube (corresponding to current pixel 
+            # values of mpol.images.BaseCube)
+            vis = model.forward() 
+
+            # get predicted sky cube corresponding to model visibilities
+            sky_cube = model.icube.sky_cube
+
+            # calculate loss between model visibilities and data
+            loss = self.loss_eval(vis, dataset, sky_cube)
+            losses.append(loss.item())
+
+            # generate optional fit diagnostics
+            if (count % self._config["learn_diag_step"] == 0 or
+                count == self._config["epochs"] - 1) :
+
+                if self._config["diag_fig_train"]:
+                    train_diagnostics(model, residuals, losses, count)
+
+            # calculate gradients of loss function w.r.t. model parameters
+            loss.backward() 
+
+            # update model parameters via gradient descent
+            self._optimizer.step()  
+
+            count += 1
+
+        # return loss value    
+        return loss.item(), losses
+
+
