@@ -188,7 +188,7 @@ class TrainTest:
 
             # TODO
             # generate optional fit diagnostics
-            # if (count % self._config["learn_diag_step"] == 0 or
+            # if (count % self._config["train_diag_step"] == 0 or
             #     count == self._config["epochs"] - 1) :
                 # if self._config["diag_fig_train"]:
                 #     train_diagnostics(model, residuals, losses, count)
