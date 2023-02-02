@@ -190,8 +190,9 @@ class TrainTest:
             if (count % self._config["learn_diag_step"] == 0 or
                 count == self._config["epochs"] - 1) :
 
-                if self._config["diag_fig_train"]:
-                    train_diagnostics(model, residuals, losses, count)
+                # TODO
+                # if self._config["diag_fig_train"]:
+                #     train_diagnostics(model, residuals, losses, count)
 
             # calculate gradients of loss function w.r.t. model parameters
             loss.backward() 
