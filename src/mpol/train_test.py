@@ -200,3 +200,30 @@ class TrainTest:
         return loss.item(), losses
 
 
+    def test(self, model, dataset):
+        r"""
+        Test a model visibility cube against withheld data.
+        
+        Parameters
+        ----------
+        model : `torch.nn.Module` object
+            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        dataset : PyTorch dataset object
+            Instance of the `mpol.datasets.GriddedDataset` class.
+
+        Returns
+        -------
+        loss.item() : float
+            Loss value 
+        """
+        # evaluate trained model against a set of withheld (test) visibilities
+        model.eval()
+
+        # calculate model visibility cube
+        vis = model.forward()
+
+        # calculate loss used for a cross-validation score
+        loss = self.loss_eval(vis, dataset)
+
+        # return loss value
+        return loss.item()
