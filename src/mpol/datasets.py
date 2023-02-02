@@ -361,7 +361,6 @@ class KFoldCrossValidatorGridded:
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
         npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
-        device (torch.device) : the desired device of the output. If ``None``, defalts to current device.
 
     Once initialized, iterate through the datasets like
 
@@ -380,11 +379,8 @@ class KFoldCrossValidatorGridded:
         dartboard=None,
         q_edges=None,
         phi_edges=None,
-        npseed=None,
-        device=None
+        npseed=None
     ):
-        
-        self.device = device 
         
         # for ease of interface with numpy, temporarily move griddedDataset 
         # tensors on the GPU to the CPU  
@@ -454,7 +450,7 @@ class KFoldCrossValidatorGridded:
 
             # if the supplied griddedDataset was initially on the GPU, 
             # enforce that we move it back from our temporary storage on the CPU
-            return train.to(self.device), test.to(self.device)
+            return train, test
 
         else:
             raise StopIteration
