@@ -9,10 +9,28 @@ class CrossValidate:
     r"""
     # TODO
     """
-    def __init__(self, coords, gridder, config, verbose=True):
+    def __init__(self, coords, kfolds, seed, learn_rate, gridder, epochs, 
+                convergence_tol, 
+                lambda_guess_regularizers, lambda_entropy, 
+                entropy_prior_intensity, lambda_sparsity, lambda_TV, 
+                TV_epsilon, lambda_TSV, 
+                train_diag_step, diag_fig_train, verbose=True):
         self._coords = coords
+        self._kfolds = kfolds
+        self._seed = seed
+        self._learn_rate = learn_rate
         self._gridder = gridder
-        self._config = config
+        self._epochs = epochs
+        self._convergence_tol = convergence_tol
+        self._lambda_guess_regularizers = lambda_guess_regularizers
+        self._lambda_entropy = lambda_entropy
+        self._entropy_prior_intensity = entropy_prior_intensity
+        self._lambda_sparsity = lambda_sparsity
+        self._lambda_TV = lambda_TV
+        self._TV_epsilon = TV_epsilon
+        self._lambda_TSV = lambda_TSV
+        self._train_diag_step = train_diag_step
+        self._diag_fig_train = diag_fig_train
         self._verbose = verbose
 
 
@@ -49,9 +67,20 @@ class CrossValidate:
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
             # if use_gpu: # TODO
                 # model = model.cuda()
-            optimizer = torch.optim.Adam(model.parameters(), lr=self._config["learn_rate"])
+            optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
 
-            trainer = TrainTest(self._gridder, optimizer, self._config)
+            trainer = TrainTest(self._gridder, optimizer, self._epochs, 
+                                self._convergence_tol, 
+                                self._lambda_guess_regularizers, 
+                                self._lambda_entropy,
+                                self._entropy_prior_intensity,
+                                self._lambda_sparsity,
+                                self._lambda_TV, self._TV_epsilon,
+                                self._lambda_TSV,
+                                self._train_diag_step, self._diag_fig_train,
+                                self._verbose
+            )
+
             _, loss_history = trainer.train(model, train_subset)
             loss_histories.append(loss_history)
             all_scores.append(trainer.test(model, test_subset))
