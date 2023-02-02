@@ -381,11 +381,6 @@ class KFoldCrossValidatorGridded:
         phi_edges=None,
         npseed=None
     ):
-        
-        # for ease of interface with numpy, temporarily move griddedDataset 
-        # tensors on the GPU to the CPU  
-        if griddedDataset.vis_gridded.is_cuda:
-            griddedDataset = griddedDataset.to('cpu')
 
         self.griddedDataset = griddedDataset
 
@@ -404,7 +399,7 @@ class KFoldCrossValidatorGridded:
 
         # 2D mask for any UV cells that contain visibilities
         # in *any* channel
-        stacked_mask = np.any(self.griddedDataset.mask.detach().numpy(), axis=0)
+        stacked_mask = torch.any(self.griddedDataset.mask, axis=0)
 
         # get qs, phis from dataset and turn into 1D lists
         qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
