@@ -42,7 +42,7 @@ class FourierCube(nn.Module):
             self.coords = GridCoords(cell_size=cell_size, npix=npix)
 
         self.register_buffer("vis", None)
-        
+
 
     def forward(self, cube):
         """
@@ -62,9 +62,6 @@ class FourierCube(nn.Module):
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
         self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
-
-        self.register_buffer("vis", 
-                            self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2)))
         
         return self.vis
 
