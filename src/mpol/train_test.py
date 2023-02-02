@@ -1,17 +1,19 @@
 import numpy as np
 import torch
 
+from mpol.connectors import GriddedResidualConnector
+from mpol.losses import nll_gridded, entropy, sparsity, TV_image, TSV
+# from mpol.plot import train_diagnostics # TODO
+
 class TrainTest:
     r"""
     Utilities training and testing an MPoL neural network.
 
     Parameters
     ----------
-    model : `torch.nn.Module` class 
-        A neural network. Instance of the `mpol.precomposed.SimpleNet` class.
-    dataset : PyTorch dataset object
-        Instance of the `mpol.datasets.GriddedDataset` class.
-    optimizer : `torch.optim` class
+    gridder : `mpol.gridding.Gridder` object
+        Instance of the `mpol.gridding.Gridder` class.
+    optimizer : `torch.optim` object
         PyTorch optimizer class for the training loop.
     config : dict
         Dictionary containing training parameters. 
@@ -19,9 +21,8 @@ class TrainTest:
         Whether to print notification messages. 
     """
 
-    def __init__(self, model, dataset, optimizer, config, verbose=True):
-        self._model = model
-        self._dataset = dataset
+    def __init__(self, gridder, optimizer, config, verbose=True):
+        self._gridder = gridder
         self._optimizer = optimizer
         self._config = config
         self._verbose = verbose
