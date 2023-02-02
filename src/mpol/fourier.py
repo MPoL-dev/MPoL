@@ -42,6 +42,7 @@ class FourierCube(nn.Module):
             self.coords = GridCoords(cell_size=cell_size, npix=npix)
 
         self.register_buffer("vis", None)
+        
 
     def forward(self, cube):
         """
