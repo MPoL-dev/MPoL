@@ -54,7 +54,7 @@ class TrainTest:
 
         return np.all(1 - tol <= ratios) and np.all(ratios <= 1 + tol)
 
-        
+
     def loss_lambda_guess(self):
         r"""
         Set an initial guess for regularizer strengths :math:`\lambda_{x}` by 
@@ -104,8 +104,7 @@ class TrainTest:
         Returns
         -------
         loss : torch.double
-            Loss value
-
+            Value of loss function
         """
         # negative log-likelihood loss function
         loss = nll_gridded(vis, dataset)
@@ -147,7 +146,9 @@ class TrainTest:
         Returns
         -------
         loss.item() : float
-            Loss value 
+            Value of loss function at end of optimization loop
+        losses : list
+            Loss value at each iteration (epoch) in the loop
         """
         # set model to training mode
         model.train()
@@ -214,7 +215,7 @@ class TrainTest:
         Returns
         -------
         loss.item() : float
-            Loss value 
+            Value of loss function 
         """
         # evaluate trained model against a set of withheld (test) visibilities
         model.eval()
