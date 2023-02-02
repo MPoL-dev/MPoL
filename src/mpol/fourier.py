@@ -19,11 +19,9 @@ class FourierCube(nn.Module):
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        device (torch.device) : the desired device of the image cube. If ``None``, defalts to current device.
-
     """
 
-    def __init__(self, cell_size=None, npix=None, coords=None, device=None):
+    def __init__(self, cell_size=None, npix=None, coords=None):
 
         super().__init__()
 
@@ -42,8 +40,8 @@ class FourierCube(nn.Module):
             ), "GridCoords must be empty if npix and cell_size are supplied."
 
             self.coords = GridCoords(cell_size=cell_size, npix=npix)
-        
-        self.device = device
+
+        self.register_buffer("vis", None)
 
     def forward(self, cube):
         """
@@ -64,7 +62,8 @@ class FourierCube(nn.Module):
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
         self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
 
-        self.vis = self.vis.to(self.device)
+        self.register_buffer("vis", 
+                            self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2)))
         
         return self.vis
 
