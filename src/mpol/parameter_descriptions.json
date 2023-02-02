@@ -1,6 +1,6 @@
 {
     "input_output" : {
-      "vis_filename"              : "Datafile with visibilities to be modeled",
+      "vis_filename"              : "Data file with visibilities to be modeled",
       "save_dir"                  : "Directory in which output datafiles and figures are saved",
     },
   
