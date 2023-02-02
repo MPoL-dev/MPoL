@@ -68,25 +68,29 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        if "entropy" in config["lambda_guess_regularizers"]:
-            loss_e1 = entropy(img1_nn, config["entropy_prior_intensity"])
-            loss_e2 = entropy(img2_nn, config["entropy_prior_intensity"])
+        if "entropy" in self._config["lambda_guess_regularizers"]:
+            # force negative pixel values to small positive value
+            img1_nn = torch.where(img1 < 0, 1e-10, img1)
+            img2_nn = torch.where(img2 < 0, 1e-10, img2)
+
+            loss_e1 = entropy(img1_nn, self._config["entropy_prior_intensity"])
+            loss_e2 = entropy(img2_nn, self._config["entropy_prior_intensity"])
             # update config value
             self._config["lambda_entropy"] = 1 / (loss_e2 - loss_e1)
 
-        if "sparsity" in config["lambda_guess_regularizers"]:
-            loss_s1 = sparsity(img1_nn)
-            loss_s2 = sparsity(img2_nn)
+        if "sparsity" in self._config["lambda_guess_regularizers"]:
+            loss_s1 = sparsity(img1)
+            loss_s2 = sparsity(img2)
             self._config["lambda_sparsity"] = 1 / (loss_s2 - loss_s1)
 
-        if "TV" in config["lambda_guess_regularizers"]:
-            loss_TV1 = TV_image(img1_nn, config["TV_epsilon"])
-            loss_TV2 = TV_image(img2_nn, config["TV_epsilon"])
+        if "TV" in self._config["lambda_guess_regularizers"]:
+            loss_TV1 = TV_image(img1, self._config["TV_epsilon"])
+            loss_TV2 = TV_image(img2, self._config["TV_epsilon"])
             self._config["lambda_TV"] = 1 / (loss_TV2 - loss_TV1)
 
-        if "TSV" in config["lambda_guess_regularizers"]:
-            loss_TSV1 = TSV(img1_nn)
-            loss_TSV2 = TSV(img2_nn)
+        if "TSV" in self._config["lambda_guess_regularizers"]:
+            loss_TSV1 = TSV(img1)
+            loss_TSV2 = TSV(img2)
             self._config["lambda_TSV"] = 1 / (loss_TSV2 - loss_TSV1)
 
 
