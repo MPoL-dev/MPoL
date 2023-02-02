@@ -106,6 +106,7 @@ class TrainTest:
             loss_TSV2 = TSV(img2)
             self._lambda_TSV = 1 / (loss_TSV2 - loss_TSV1)
 
+        # TODO: pass stored values to update used_pars
 
     def loss_eval(self, vis, dataset, sky_cube=None):
         r"""
