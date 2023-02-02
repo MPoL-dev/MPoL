@@ -54,6 +54,22 @@ def coords():
 
 
 @pytest.fixture
+def gridder(mock_visibility_data, coords):
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    return gridder
+    
+
+@pytest.fixture
 def dataset(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
