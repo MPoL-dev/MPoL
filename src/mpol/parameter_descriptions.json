@@ -1,0 +1,43 @@
+{
+    "input_output" : {
+      "vis_filename"              : "Datafile with visibilities to be modeled",
+      "save_dir"                  : "Directory in which output datafiles and figures are saved",
+    },
+  
+    "hardware" : {
+      "use_gpu"                   : "Whether to accelerate the modeling pipeline using 1+ compatible CUDA GPUs"
+    },
+  
+    "modify_data" : {
+      "norm_wle"                  : "Observing wavelength (unit=[m]) by which to normalize the (u, v) points (i.e., convert from [m] to [rad]). Not needed if the (u, v) points are already in units of [k\\lambda]"
+    },
+  
+    "image_grid" : {
+      "npix"                      : "Number of pixels along one axis in the model image",
+      "cell_size"                 : "Image pixel size (unit=[arcsec])",
+      "autoset_image_dim"         : "Whether to autonomously determine optimal values for `npix` and `cell_size` using data's uv-distribution"
+    },
+  
+    "neural_net" : {
+      "learn_rate"                : "Neural network learning rate",
+      "epochs"                    : "Number of training iterations",
+      "convergence_tol"           : "Tolerance for training iteration stopping criterion as assessed by loss function (suggested <= 1e-2)", 
+      "train_diag_step"           : "Interval at which optional training diagnostics are output",
+      "lambda_guess_regularizers" : "List of regularizers for which to guess an initial value in training loop",
+      "lambda_entropy"            : "Relative strength for entropy regularizer (scaling factor \\lambda that multiplies entropy loss function)",
+      "entropy_prior_intensity"   : "Prior value :math:`p` to calculate entropy against (suggested <<1; see `mpol.losses.entropy`)",
+      "lambda_sparsity"           : "Relative strength for sparsity regularizer (scaling factor \\lambda that multiplies sparsity loss function)",
+      "lambda_TV"                 : "Relative strength for total variation (TV) regularizer (scaling factor \\lambda that multiplies TV loss function)",
+      "TV_epsilon"                : "Softening parameter for total variation (TV) regularizer (suggested <<1; see `mpol.losses.TV_image`)",
+      "lambda_TSV"                : "Relative strength for total squared variation (TSV) regularizer (scaling factor \\lambda that multiplies TSV loss function)",
+    },
+  
+    "cross_val" : {
+      "kfolds"                    : "Number of k-folds to use in k-fold cross-validation",
+      "seed"                      : "Random seed for cross-validation train/test dataset splitting"
+    },
+  
+    "plotting" : {
+      "diag_fig_train"            : "Whether to generate a diagnostic figure during training (`neural_net:train_diag_step` must also be nonzero)"
+    }
+  }
