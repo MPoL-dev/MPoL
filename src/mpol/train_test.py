@@ -90,4 +90,44 @@ class TrainTest:
             self._config["lambda_TSV"] = 1 / (loss_TSV2 - loss_TSV1)
 
 
+    def loss_eval(self, vis, dataset, sky_cube=None):
+        r"""
+        Parameters
+        ----------
+        vis : torch.complex tensor
+            Model visibility cube (see `mpol.fourier.FourierCube.forward`)
+        dataset : PyTorch dataset object
+            Instance of the `mpol.datasets.GriddedDataset` class.
+        sky_cube : torch.double
+            MPoL Ground Cube (see `mpol.utils.packed_cube_to_ground_cube`)
+
+        Returns
+        -------
+        loss : torch.double
+            Loss value
+
+        """
+        # negative log-likelihood loss function
+        loss = nll_gridded(vis, dataset)
+
+        # regularizers
+        if sky_cube is not None:
+            # optionally guess regularizer strengths
+            if self._config["lambda_guess_regularizers"] is not None:
+                self.loss_lambda_guess()
+
+            # apply regularizers
+            if self._config["lambda_entropy"] is not None:
+                loss += self._config["lambda_entropy"] * entropy(sky_cube, 
+                                                                self._config["entropy_prior_intensity"])
+            if self._config["lambda_sparsity"] is not None:
+                loss += self._config["lambda_sparsity"] * sparsity(sky_cube)
+            if self._config["lambda_TV"] is not None:
+                loss += self._config["lambda_TV"] * TV_image(sky_cube, 
+                                                            self._config["TV_epsilon"])
+            if self._config["lambda_TSV"] is not None:
+                loss += self._config["lambda_TSV"] * TSV(sky_cube)
+
+        return loss 
+
 
