@@ -34,3 +34,31 @@ class CrossValidate:
 
         return test_train_datasets
 
+
+    def run_crossval(self, test_train_datasets):
+        r"""
+        # TODO
+        """
+        loss_histories = []
+        all_scores = []
+
+        for kfold, (train_subset, test_subset) in enumerate(test_train_datasets):
+            print('\nk_fold {} of {}'.format(kfold, np.shape(test_train_datasets)[0] - 1))
+
+            # create a new model and optimizer for this k_fold
+            model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
+            # if use_gpu: # TODO
+                # model = model.cuda()
+            optimizer = torch.optim.Adam(model.parameters(), lr=self._config["learn_rate"])
+
+            trainer = TrainTest(self._gridder, optimizer, self._config)
+            _, loss_history = trainer.train(model, train_subset)
+            loss_histories.append(loss_history)
+            all_scores.append(trainer.test(model, test_subset))
+
+        # average individual test scores as a cross-val metric for chosen 
+        # hyperparameters
+        cv_score = np.mean(all_scores)
+
+        return cv_score, all_scores, loss_histories
+    
