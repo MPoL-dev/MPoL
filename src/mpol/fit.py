@@ -125,7 +125,7 @@ def load_data(config): # TODO
 
 def modify_data(config): # TODO
 
-def train_test_crossval(): # TODO 
+def train_test_crossval(config): # TODO 
 
 def output_results(config): # TODO
 
