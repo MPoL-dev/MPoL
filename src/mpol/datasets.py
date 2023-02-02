@@ -443,8 +443,6 @@ class KFoldCrossValidatorGridded:
 
             self.n += 1
 
-            # if the supplied griddedDataset was initially on the GPU, 
-            # enforce that we move it back from our temporary storage on the CPU
             return train, test
 
         else:
