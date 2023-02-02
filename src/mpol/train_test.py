@@ -200,7 +200,7 @@ class TrainTest:
             losses.append(loss.item())
 
             # generate optional fit diagnostics
-            if (count % self._train_diag_step == 0 or
+            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
                 count == self._epochs - 1) :
                     pass # TODO
                 # if self._diag_fig_train:
