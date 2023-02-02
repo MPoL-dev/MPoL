@@ -9,12 +9,12 @@ class CrossValidate:
     r"""
     # TODO
     """
-    def __init__(self, coords, kfolds, seed, learn_rate, gridder, epochs, 
-                convergence_tol, 
-                lambda_guess_regularizers, lambda_entropy, 
-                entropy_prior_intensity, lambda_sparsity, lambda_TV, 
-                TV_epsilon, lambda_TSV, 
-                train_diag_step, diag_fig_train, verbose=True):
+    def __init__(self, coords, gridder, kfolds=5, seed=None, learn_rate=0.5, 
+                epochs=500, convergence_tol=1e-2, 
+                lambda_guess_regularizers="", lambda_entropy=None, 
+                entropy_prior_intensity=None, lambda_sparsity=None, lambda_TV=None, 
+                TV_epsilon=None, lambda_TSV=None, 
+                train_diag_step=None, diag_fig_train=False, verbose=True):
         self._coords = coords
         self._kfolds = kfolds
         self._seed = seed
