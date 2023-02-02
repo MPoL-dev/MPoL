@@ -55,5 +55,39 @@ class TrainTest:
         return np.all(1 - tol <= ratios) and np.all(ratios <= 1 + tol)
 
         
-        return np.all(np.abs(loss_new - loss_old) <= tol * loss_new)
+    def loss_lambda_guess(self):
+        r"""
+        Set an initial guess for regularizer strengths :math:`\lambda_{x}` by 
+        comparing images generated with different visibility weighting. 
+        
+        The guesses update \lambda values in the `self._config` dictionary.
+        """
+        # generate images of the data using two briggs robust values
+        img1, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.0)
+        img2, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.5)
+        img1 = torch.from_numpy(img1.copy())
+        img2 = torch.from_numpy(img2.copy())
+
+        if "entropy" in config["lambda_guess_regularizers"]:
+            loss_e1 = entropy(img1_nn, config["entropy_prior_intensity"])
+            loss_e2 = entropy(img2_nn, config["entropy_prior_intensity"])
+            # update config value
+            self._config["lambda_entropy"] = 1 / (loss_e2 - loss_e1)
+
+        if "sparsity" in config["lambda_guess_regularizers"]:
+            loss_s1 = sparsity(img1_nn)
+            loss_s2 = sparsity(img2_nn)
+            self._config["lambda_sparsity"] = 1 / (loss_s2 - loss_s1)
+
+        if "TV" in config["lambda_guess_regularizers"]:
+            loss_TV1 = TV_image(img1_nn, config["TV_epsilon"])
+            loss_TV2 = TV_image(img2_nn, config["TV_epsilon"])
+            self._config["lambda_TV"] = 1 / (loss_TV2 - loss_TV1)
+
+        if "TSV" in config["lambda_guess_regularizers"]:
+            loss_TSV1 = TSV(img1_nn)
+            loss_TSV2 = TSV(img2_nn)
+            self._config["lambda_TSV"] = 1 / (loss_TSV2 - loss_TSV1)
+
+
 
