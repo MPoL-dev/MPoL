@@ -23,7 +23,7 @@ class TrainTest:
     def __init__(self, gridder, optimizer, epochs=500, convergence_tol=1e-2, 
                 lambda_guess_regularizers=[""], lambda_entropy=None, 
                 entropy_prior_intensity=None, lambda_sparsity=None, lambda_TV=None, 
-                TV_epsilon=None, lambda_TSV=None, 
+                TV_epsilon=1e-10, lambda_TSV=None, 
                 train_diag_step=None, diag_fig_train=False, verbose=True):
         self._gridder = gridder
         self._optimizer = optimizer
@@ -135,12 +135,12 @@ class TrainTest:
             # apply regularizers
             if self._lambda_entropy is not None:
                 loss += self._lambda_entropy * entropy(sky_cube, 
-                                                                self._entropy_prior_intensity)
+                                                        self._entropy_prior_intensity)
             if self._lambda_sparsity is not None:
                 loss += self._lambda_sparsity * sparsity(sky_cube)
             if self._lambda_TV is not None:
                 loss += self._lambda_TV * TV_image(sky_cube, 
-                                                            self._TV_epsilon)
+                                                    self._TV_epsilon)
             if self._lambda_TSV is not None:
                 loss += self._lambda_TSV * TSV(sky_cube)
 
