@@ -15,16 +15,29 @@ class TrainTest:
         Instance of the `mpol.gridding.Gridder` class.
     optimizer : `torch.optim` object
         PyTorch optimizer class for the training loop.
-    config : dict
-        Dictionary containing training parameters. 
+
     verbose : bool, default=True
         Whether to print notification messages. 
     """
 
-    def __init__(self, gridder, optimizer, config, verbose=True):
+    def __init__(self, gridder, optimizer, epochs, convergence_tol, 
+                lambda_guess_regularizers, lambda_entropy, 
+                entropy_prior_intensity, lambda_sparsity, lambda_TV, 
+                TV_epsilon, lambda_TSV, 
+                train_diag_step, diag_fig_train, verbose=True):
         self._gridder = gridder
         self._optimizer = optimizer
-        self._config = config
+        self._epochs = epochs
+        self._convergence_tol = convergence_tol
+        self._lambda_guess_regularizers = lambda_guess_regularizers
+        self._lambda_entropy = lambda_entropy
+        self._entropy_prior_intensity = entropy_prior_intensity
+        self._lambda_sparsity = lambda_sparsity
+        self._lambda_TV = lambda_TV
+        self._TV_epsilon = TV_epsilon
+        self._lambda_TSV = lambda_TSV
+        self._train_diag_step = train_diag_step
+        self._diag_fig_train = diag_fig_train
         self._verbose = verbose
 
 
@@ -60,7 +73,7 @@ class TrainTest:
         Set an initial guess for regularizer strengths :math:`\lambda_{x}` by 
         comparing images generated with different visibility weighting. 
         
-        The guesses update \lambda values in the `self._config` dictionary.
+        The guesses update \lambda values in `self`.
         """
         # generate images of the data using two briggs robust values
         img1, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.0)
@@ -68,30 +81,30 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        if "entropy" in self._config["lambda_guess_regularizers"]:
+        if "entropy" in self._lambda_guess_regularizers:
             # force negative pixel values to small positive value
             img1_nn = torch.where(img1 < 0, 1e-10, img1)
             img2_nn = torch.where(img2 < 0, 1e-10, img2)
 
-            loss_e1 = entropy(img1_nn, self._config["entropy_prior_intensity"])
-            loss_e2 = entropy(img2_nn, self._config["entropy_prior_intensity"])
-            # update config value
-            self._config["lambda_entropy"] = 1 / (loss_e2 - loss_e1)
+            loss_e1 = entropy(img1_nn, self._entropy_prior_intensity)
+            loss_e2 = entropy(img2_nn, self._entropy_prior_intensity)
+            # update stored value
+            self._lambda_entropy = 1 / (loss_e2 - loss_e1)
 
-        if "sparsity" in self._config["lambda_guess_regularizers"]:
+        if "sparsity" in self._lambda_guess_regularizers:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
-            self._config["lambda_sparsity"] = 1 / (loss_s2 - loss_s1)
+            self._lambda_sparsity = 1 / (loss_s2 - loss_s1)
 
-        if "TV" in self._config["lambda_guess_regularizers"]:
-            loss_TV1 = TV_image(img1, self._config["TV_epsilon"])
-            loss_TV2 = TV_image(img2, self._config["TV_epsilon"])
-            self._config["lambda_TV"] = 1 / (loss_TV2 - loss_TV1)
+        if "TV" in self._lambda_guess_regularizers:
+            loss_TV1 = TV_image(img1, self._TV_epsilon)
+            loss_TV2 = TV_image(img2, self._TV_epsilon)
+            self._lambda_TV = 1 / (loss_TV2 - loss_TV1)
 
-        if "TSV" in self._config["lambda_guess_regularizers"]:
+        if "TSV" in self._lambda_guess_regularizers:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
-            self._config["lambda_TSV"] = 1 / (loss_TSV2 - loss_TSV1)
+            self._lambda_TSV = 1 / (loss_TSV2 - loss_TSV1)
 
 
     def loss_eval(self, vis, dataset, sky_cube=None):
@@ -116,20 +129,20 @@ class TrainTest:
         # regularizers
         if sky_cube is not None:
             # optionally guess regularizer strengths
-            if self._config["lambda_guess_regularizers"] is not None:
+            if self._lambda_guess_regularizers is not None:
                 self.loss_lambda_guess()
 
             # apply regularizers
-            if self._config["lambda_entropy"] is not None:
-                loss += self._config["lambda_entropy"] * entropy(sky_cube, 
-                                                                self._config["entropy_prior_intensity"])
-            if self._config["lambda_sparsity"] is not None:
-                loss += self._config["lambda_sparsity"] * sparsity(sky_cube)
-            if self._config["lambda_TV"] is not None:
-                loss += self._config["lambda_TV"] * TV_image(sky_cube, 
-                                                            self._config["TV_epsilon"])
-            if self._config["lambda_TSV"] is not None:
-                loss += self._config["lambda_TSV"] * TSV(sky_cube)
+            if self._lambda_entropy is not None:
+                loss += self._lambda_entropy * entropy(sky_cube, 
+                                                                self._entropy_prior_intensity)
+            if self._lambda_sparsity is not None:
+                loss += self._lambda_sparsity * sparsity(sky_cube)
+            if self._lambda_TV is not None:
+                loss += self._lambda_TV * TV_image(sky_cube, 
+                                                            self._TV_epsilon)
+            if self._lambda_TSV is not None:
+                loss += self._lambda_TSV * TSV(sky_cube)
 
         return loss 
 
@@ -165,12 +178,12 @@ class TrainTest:
         losses = []
         
         while (not self.loss_convergence(np.array(losses),
-                                        self._config["convergence_tol"])
-                and count <= self._config["epochs"]):
+                                        self._convergence_tol)
+                and count <= self._epochs):
 
             if self._verbose:
                 print('\r  epoch {} of {}'.format(count, 
-                                                 self._config["epochs"]), 
+                                                 self._epochs), 
                         end='', flush=True)
             
             self._optimizer.zero_grad()
@@ -186,11 +199,11 @@ class TrainTest:
             loss = self.loss_eval(vis, dataset, sky_cube)
             losses.append(loss.item())
 
-            # TODO
             # generate optional fit diagnostics
-            # if (count % self._config["train_diag_step"] == 0 or
-            #     count == self._config["epochs"] - 1) :
-                # if self._config["diag_fig_train"]:
+            if (count % self._train_diag_step == 0 or
+                count == self._epochs - 1) :
+                    pass # TODO
+                # if self._diag_fig_train:
                 #     train_diagnostics(model, residuals, losses, count)
 
             # calculate gradients of loss function w.r.t. model parameters
