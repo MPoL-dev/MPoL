@@ -22,7 +22,7 @@
     "learn_rate"                : 0.5,
     "epochs"                    : 1000,
     "convergence_tol"           : 1e-3, 
-    "learn_diag_step"           : 50,
+    "train_diag_step"           : 50,
     "lambda_guess_regularizers" : null,
     "lambda_entropy"            : null,
     "entropy_prior_intensity"   : 1e-10,
