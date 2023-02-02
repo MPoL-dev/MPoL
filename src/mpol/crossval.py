@@ -34,7 +34,7 @@ class CrossValidate:
         self._verbose = verbose
 
 
-    def split_dataset(self, dataset):
+    def split_dataset(self, dataset, kfolds, seed):
         r"""
         # TODO
         """
@@ -42,9 +42,9 @@ class CrossValidate:
         dartboard = Dartboard(coords=self._coords)
 
         # use 'dartboard' to split full dataset into train/test subsets
-        subsets = KFoldCrossValidatorGridded(dataset, self._config["kfolds"],
+        subsets = KFoldCrossValidatorGridded(dataset, kfolds,
                                         dartboard=dartboard,
-                                        npseed=self._config["seed"])#, device=device) # TODO
+                                        npseed=seed)#, device=device) # TODO
 
         # store the individual train/test subsets
         test_train_datasets = [(train_pair, test_pair) for (train_pair, test_pair) in subsets]
