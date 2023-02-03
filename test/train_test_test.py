@@ -5,7 +5,25 @@ import torch.optim
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
+from mpol.train_test import TrainTest
 from mpol.constants import *
+
+
+def test_traintestclass_training(coords, gridder, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"]
+    # reset a key to bypass TrainTest.loss_lambda_guess
+    train_pars["lambda_guess"] = None
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
 
 
 def test_standalone_init_train(coords, dataset):
