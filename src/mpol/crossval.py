@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 import torch
 
 from mpol.precomposed import SimpleNet
@@ -131,7 +132,8 @@ class CrossValidate:
         all_scores = []
 
         for kfold, (train_subset, test_subset) in enumerate(test_train_datasets):
-            print('\nk_fold {} of {}'.format(kfold, np.shape(test_train_datasets)[0] - 1))
+            if self._verbose:
+                logging.info("\nCross-validation: K-fold {} of {}".format(kfold, np.shape(test_train_datasets)[0] - 1))
 
             # create a new model and optimizer for this k_fold
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
