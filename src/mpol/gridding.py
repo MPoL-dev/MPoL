@@ -718,7 +718,7 @@ class Gridder:
             nchan=self.nchan,
             vis_gridded=self.vis_gridded,
             weight_gridded=self.weight_gridded,
-            mask=self.mask,
+            mask=self.mask
         )
 
     @property
