@@ -10,3 +10,11 @@ def test_crossvalclass_split(coords, gridder, dataset, generic_parameters):
     test_train_datasets = cross_validator.split_dataset(dataset)
 
 
+def test_crossvalclass_kfold(coords, gridder, dataset, generic_parameters):
+    # using the CrossValidate class, perform k-fold cross-validation
+
+    crossval_pars = generic_parameters["crossval_pars"]
+
+    cross_validator = CrossValidate(coords, gridder, **crossval_pars)
+    test_train_datasets = cross_validator.split_dataset(dataset)
+    cv_score, all_scores, loss_histories = cross_validator.run_crossval(test_train_datasets)
