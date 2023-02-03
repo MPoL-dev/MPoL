@@ -107,9 +107,10 @@ class CrossValidate:
                                         dartboard=dartboard,
                                         npseed=self._seed)
 
-        # store the individual train/test subsets
-        test_train_datasets = [(train_pair, test_pair) for (train_pair, test_pair) in subsets]
-        # test_train_datasets = [(train.to('cuda'), test.to('cuda')) for (train, test) in subsets] # TODO: once GPU syntax decided on
+        if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+            test_train_datasets = [(train.to(self._device), test.to(self._device)) for (train, test) in subsets]
+        else:
+            test_train_datasets = [(train_pair, test_pair) for (train_pair, test_pair) in subsets]
 
         return test_train_datasets
 
@@ -142,8 +143,9 @@ class CrossValidate:
 
             # create a new model and optimizer for this k_fold
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
-            # if use_gpu: # TODO: once GPU syntax decided on
-                # model = model.cuda()
+            if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                model = model.to(self._device)
+                
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
 
             trainer = TrainTest(gridder=self._gridder, 
