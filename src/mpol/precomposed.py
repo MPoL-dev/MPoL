@@ -35,7 +35,7 @@ class SimpleNet(torch.nn.Module):
         npix=None,
         coords=None,
         nchan=None,
-        base_cube=None,
+        base_cube=None
     ):
         super().__init__()
 

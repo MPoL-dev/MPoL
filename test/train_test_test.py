@@ -5,7 +5,7 @@ import torch.optim
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
-from mpol.train_test import TrainTest
+from mpol.training import TrainTest
 from mpol.constants import *
 
 

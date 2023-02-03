@@ -379,7 +379,7 @@ class KFoldCrossValidatorGridded:
         dartboard=None,
         q_edges=None,
         phi_edges=None,
-        npseed=None,
+        npseed=None
     ):
 
         self.griddedDataset = griddedDataset
@@ -399,7 +399,7 @@ class KFoldCrossValidatorGridded:
 
         # 2D mask for any UV cells that contain visibilities
         # in *any* channel
-        stacked_mask = np.any(self.griddedDataset.mask.detach().numpy(), axis=0)
+        stacked_mask = torch.any(self.griddedDataset.mask, axis=0)
 
         # get qs, phis from dataset and turn into 1D lists
         qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
@@ -442,6 +442,8 @@ class KFoldCrossValidatorGridded:
             test.add_mask(test_mask)
 
             self.n += 1
+
             return train, test
+
         else:
             raise StopIteration
