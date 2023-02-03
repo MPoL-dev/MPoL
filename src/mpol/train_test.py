@@ -81,7 +81,7 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        if "entropy" in self._lambda_guess_regularizers:
+        if "entropy" in self._lambda_guess:
             # force negative pixel values to small positive value
             img1_nn = torch.where(img1 < 0, 1e-10, img1)
             img2_nn = torch.where(img2 < 0, 1e-10, img2)
@@ -91,22 +91,21 @@ class TrainTest:
             # update stored value
             self._lambda_entropy = 1 / (loss_e2 - loss_e1)
 
-        if "sparsity" in self._lambda_guess_regularizers:
+        if "sparsity" in self._lambda_guess:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
             self._lambda_sparsity = 1 / (loss_s2 - loss_s1)
 
-        if "TV" in self._lambda_guess_regularizers:
+        if "TV" in self._lambda_guess:
             loss_TV1 = TV_image(img1, self._TV_epsilon)
             loss_TV2 = TV_image(img2, self._TV_epsilon)
             self._lambda_TV = 1 / (loss_TV2 - loss_TV1)
 
-        if "TSV" in self._lambda_guess_regularizers:
+        if "TSV" in self._lambda_guess:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
             self._lambda_TSV = 1 / (loss_TSV2 - loss_TSV1)
 
-        # TODO: pass stored values to update used_pars
 
     def loss_eval(self, vis, dataset, sky_cube=None):
         r"""
