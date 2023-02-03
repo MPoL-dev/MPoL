@@ -110,7 +110,22 @@ class CrossValidate:
 
     def run_crossval(self, test_train_datasets):
         r"""
-        # TODO
+        Run a cross-validation loop for a model obtained with a given set of 
+        hyperparameters.
+
+        Parameters
+        ----------
+        test_train_datasets : list of `mpol.datasets.GriddedDataset` objects
+            Training and test subsets pre-split from the true dataset
+
+        Returns
+        -------
+        cv_score : float 
+            Mean cross-validation score across all k-folds
+        all_scores : list of float
+            Individual cross-validation scores for each k-fold 
+        loss_histories : list of float 
+            Loss function values for each training loop
         """
         loss_histories = []
         all_scores = []
