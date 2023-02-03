@@ -23,6 +23,9 @@ class TrainTest:
         loss function (suggested <= 1e-2)
     lambda_guess : list of str, default=None
         List of regularizers for which to guess an initial value 
+    lambda_guess_briggs : list of float, default=[0.0, 0.5]
+        Briggs robust values for two images used to guess initial regularizer 
+        values (if lambda_guess is not None)
     lambda_entropy : float
         Relative strength for entropy regularizer
     entropy_prior_intensity : float, default=1e-10
@@ -45,15 +48,17 @@ class TrainTest:
     """
 
     def __init__(self, gridder, optimizer, epochs=500, convergence_tol=1e-2, 
-                lambda_guess=None, lambda_entropy=None, 
-                entropy_prior_intensity=1e-10, lambda_sparsity=None, lambda_TV=None, 
-                TV_epsilon=1e-10, lambda_TSV=None, 
-                train_diag_step=None, diag_fig_train=False, verbose=True):
+                lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
+                lambda_entropy=None, entropy_prior_intensity=1e-10, 
+                lambda_sparsity=None, lambda_TV=None, TV_epsilon=1e-10, 
+                lambda_TSV=None, train_diag_step=None, diag_fig_train=False, 
+                verbose=True):
         self._gridder = gridder
         self._optimizer = optimizer
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._lambda_guess = lambda_guess
+        self._lambda_guess_briggs = lambda_guess_briggs
         self._lambda_entropy = lambda_entropy
         self._entropy_prior_intensity = entropy_prior_intensity
         self._lambda_sparsity = lambda_sparsity
@@ -103,8 +108,10 @@ class TrainTest:
             Dictionary containing the names and initial guesses of regularizers
         """
         # generate images of the data using two briggs robust values
-        img1, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.0)
-        img2, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.5)
+        img1, _ = self._gridder.get_dirty_image(weighting='briggs', 
+                                                robust=self._lambda_guess_briggs[0])
+        img2, _ = self._gridder.get_dirty_image(weighting='briggs', 
+                                                robust=self._lambda_guess_briggs[1])
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
