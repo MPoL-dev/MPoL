@@ -236,7 +236,7 @@ class NuFFT(nn.Module):
         )
 
         if (uu is not None) and (vv is not None):
-            self.k_traj = self._assemble_ktraj(uu, vv)
+            self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
         else:
             raise ValueError("uu and vv are required arguments.")
 
@@ -245,9 +245,12 @@ class NuFFT(nn.Module):
         if self.sparse_matrices:
             if self.same_uv:
                 # precompute the sparse interpolation matrices
-                self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
+                real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
                     self.k_traj, im_size=(self.coords.npix, self.coords.npix)
                 )
+                self.register_buffer("real_interp_mat", real_interp_mat)
+                self.register_buffer("imag_interp_mat", imag_interp_mat)
+
             else:
                 import warnings
 
@@ -383,7 +386,7 @@ class NuFFT(nn.Module):
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         if self.sparse_matrices:
             output = self.coords.cell_size**2 * self.nufft_ob(
-                expanded, self.k_traj, interp_mats=self.interp_mats
+                expanded, self.k_traj, interp_mats=(self.real_interp_mat, self.imag_interp_mat)
             )
         else:
             output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)
