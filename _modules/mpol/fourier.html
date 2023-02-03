@@ -309,7 +309,6 @@ title="Source repository"
 <span class="sd">        cell_size (float): the width of an image-plane pixel [arcseconds]</span>
 <span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -332,6 +331,9 @@ title="Source repository"
 
             <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;vis&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="FourierCube.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the FFT of the image cube on each channel.</span>
@@ -350,7 +352,7 @@ title="Source repository"
         <span class="c1"># since it needs to correct for the spacing of the input grid.</span>
         <span class="c1"># See MPoL documentation and/or TMS Eqn A8.18 for more information.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-
+        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis</span></div>
 
     <span class="nd">@property</span>

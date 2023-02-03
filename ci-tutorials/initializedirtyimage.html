@@ -535,7 +535,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f2a2a327fd0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f086617aac0&gt;
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1920x1440 with 0 Axes&gt;
@@ -634,7 +634,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f2a28b66820&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f0864989280&gt;
 </pre></div>
 </div>
 <img alt="../_images/362cd0ed7a7c40c8c1ab80b3f5ef472852e99ad5aee590cbcd1682af185ba216.png" src="../_images/362cd0ed7a7c40c8c1ab80b3f5ef472852e99ad5aee590cbcd1682af185ba216.png" />
@@ -669,7 +669,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f2a28ab4e20&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f08648d67f0&gt;
 </pre></div>
 </div>
 <img alt="../_images/a4691cfcd78fcfef0049c07e6f93f0f2a827551b6baf3015058ad16c79f33bdd.png" src="../_images/a4691cfcd78fcfef0049c07e6f93f0f2a827551b6baf3015058ad16c79f33bdd.png" />
@@ -726,20 +726,23 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OrderedDict([(&#39;bcube.base_cube&#39;,
-              tensor([[[ -2.4145,  -1.2679,  -2.4439,  ...,  -3.9169,  -4.3179,  -3.9517],
-                       [ -4.0859,  -2.1172,  -4.1596,  ...,  -4.8748,  -5.2527,  -5.0201],
-                       [ -5.0305,  -4.4869,  -4.9043,  ...,  -5.5131,  -5.7732,  -5.5880],
-                       ...,
-                       [-14.7604, -20.9380, -14.0989,  ...,  -2.0000,  -1.7609,  -7.0087],
-                       [ -6.7399, -11.0350,  -6.4670,  ...,  -1.5676,  -2.0277,  -0.2905],
-                       [ -0.7768,  -1.9421,   1.6008,  ...,  -2.2245,  -2.7876,  -2.2624]]],
-                     dtype=torch.float64)),
-             (&#39;conv_layer.m.weight&#39;,
-              tensor([[[[0.0625, 0.1250, 0.0625],
-                        [0.1250, 0.2500, 0.1250],
-                        [0.0625, 0.1250, 0.0625]]]], dtype=torch.float64)),
-             (&#39;conv_layer.m.bias&#39;, tensor([0.], dtype=torch.float64))])
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">rml</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;dirty_image_model.pt&quot;</span><span class="p">))</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">rml</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>  <span class="c1"># the reloaded parameters of the model</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/module.py:1671,</span> in <span class="ni">Module.load_state_dict</span><span class="nt">(self, state_dict, strict)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1666</span>         <span class="n">error_msgs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1667</span>             <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Missing key(s) in state_dict: </span><span class="si">{}</span><span class="s1">. &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1668</span>                 <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">missing_keys</span><span class="p">)))</span>
+<span class="g g-Whitespace">   </span><span class="mi">1670</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error_msgs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1671</span>     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Error(s) in loading state_dict for </span><span class="si">{}</span><span class="s1">:</span><span class="se">\n\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1672</span>                        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_msgs</span><span class="p">)))</span>
+<span class="g g-Whitespace">   </span><span class="mi">1673</span> <span class="k">return</span> <span class="n">_IncompatibleKeys</span><span class="p">(</span><span class="n">missing_keys</span><span class="p">,</span> <span class="n">unexpected_keys</span><span class="p">)</span>
+
+<span class="ne">RuntimeError</span>: Error(s) in loading state_dict for SimpleNet:
+	<span class="n">Unexpected</span> <span class="n">key</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span> <span class="s2">&quot;fcube.vis&quot;</span><span class="o">.</span> 
 </pre></div>
 </div>
 </div>

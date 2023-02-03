@@ -669,7 +669,7 @@ title="Source repository"
         <span class="n">dartboard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">q_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">phi_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">npseed</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span> <span class="o">=</span> <span class="n">griddedDataset</span>
@@ -689,7 +689,7 @@ title="Source repository"
 
         <span class="c1"># 2D mask for any UV cells that contain visibilities</span>
         <span class="c1"># in *any* channel</span>
-        <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># get qs, phis from dataset and turn into 1D lists</span>
         <span class="n">qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span><span class="p">[</span><span class="n">stacked_mask</span><span class="p">]</span>
@@ -732,7 +732,9 @@ title="Source repository"
             <span class="n">test</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">test_mask</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
             <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span></div>
 </pre></div>

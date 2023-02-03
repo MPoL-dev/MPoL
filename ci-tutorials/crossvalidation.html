@@ -584,7 +584,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/4ba6662edf9e52943a7abfbf7e49223c4d340e401b71c0439f2ac670265e4652.png" src="../_images/4ba6662edf9e52943a7abfbf7e49223c4d340e401b71c0439f2ac670265e4652.png" />
+<img alt="../_images/4eec5835eab86a9c2bfd4d20fec09a60ec5f3579e4c2ea049861cb56661b5ce4.png" src="../_images/4eec5835eab86a9c2bfd4d20fec09a60ec5f3579e4c2ea049861cb56661b5ce4.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -802,7 +802,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 36.804441669976285
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 36.80444126902396
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
@@ -821,13 +821,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 14.431674550767076
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 14.431716696418786
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" src="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" />
+<img alt="../_images/5f4c0eb8cac55ff52721539682958e42ac170b30cb3ca6f78dc7c4e7e32c0c7c.png" src="../_images/5f4c0eb8cac55ff52721539682958e42ac170b30cb3ca6f78dc7c4e7e32c0c7c.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -840,13 +840,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.660814250108018
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.660800391218415
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" src="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" />
+<img alt="../_images/6abd51fd32314882245fb44b96f89dbc792f1a22d40d4acc4effee84d73d0793.png" src="../_images/6abd51fd32314882245fb44b96f89dbc792f1a22d40d4acc4effee84d73d0793.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
