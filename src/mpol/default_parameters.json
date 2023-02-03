@@ -35,6 +35,7 @@
 
   "cross_val" : {
     "kfolds"                    : 5,
+    "split_method"              : "uniform_cell",
     "seed"                      : null
   },
 

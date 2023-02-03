@@ -35,6 +35,7 @@
   
     "cross_val" : {
       "kfolds"                    : "Number of k-folds to use in k-fold cross-validation",
+      "split_method"              : "Method used for cross-validation train/test dataset splitting",
       "seed"                      : "Random seed for cross-validation train/test dataset splitting"
     },
   
