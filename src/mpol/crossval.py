@@ -48,6 +48,9 @@ class CrossValidate:
     diag_fig_train : bool, default=False
         Whether to generate a diagnostic figure during training
         (if True, `train_diag_step` must also be nonzero)
+    device : torch.device, default=None
+        Which hardware device to perform operations on (e.g., 'cuda:0').
+        'None' defaults to current device. 
     verbose : bool, default=True
         Whether to print notification messages. 
     """
@@ -56,7 +59,8 @@ class CrossValidate:
                 lambda_guess=None, lambda_entropy=None, 
                 entropy_prior_intensity=1e-10, lambda_sparsity=None, lambda_TV=None, 
                 TV_epsilon=1e-10, lambda_TSV=None, 
-                train_diag_step=None, diag_fig_train=False, verbose=True):
+                train_diag_step=None, diag_fig_train=False, device=None, 
+                verbose=True):
         self._coords = coords
         self._gridder = gridder        
         self._kfolds = kfolds
@@ -73,6 +77,7 @@ class CrossValidate:
         self._lambda_TSV = lambda_TSV
         self._train_diag_step = train_diag_step
         self._diag_fig_train = diag_fig_train
+        self._device = device
         self._verbose = verbose
 
 
