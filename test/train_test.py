@@ -90,18 +90,3 @@ def test_tensorboard(coords, dataset_cont, tmp_path):
 
         # update the model parameters
         optimizer.step()
-
-
-def test_train_workflow_gpu(coords, dataset, dataset_cont, tmp_path):
-    if torch.cuda.is_available():
-        device = torch.device('cuda:0')
-    
-        dataset = dataset.to(device)
-        dataset_cont = dataset_cont.to(device)
-        
-        test_init_train_class(coords, dataset, device)
-        test_train_loop(coords, dataset_cont, tmp_path, device)
-        test_tensorboard(coords, dataset_cont, tmp_path, device)
-
-    else:
-        pass
