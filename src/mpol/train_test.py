@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 import torch
 
 from mpol.connectors import GriddedResidualConnector
@@ -211,13 +212,16 @@ class TrainTest:
             # guess, update lambda values in 'self'
             lambda_guesses = self.loss_lambda_guess()
 
+            if self._verbose:
+                logging.info("    Autonomous guesses applied for the following "
+                            "initial regularizer strengths: {}".format(lambda_guesses))
 
         while (not self.loss_convergence(np.array(losses))
                 and count <= self._epochs):
 
             if self._verbose:
-                print('\r  epoch {} of {}'.format(count, self._epochs), end='', 
-                    flush=True)
+                logging.info('\r  Training: epoch {} of {}'.format(count, self._epochs), 
+                    end='', flush=True)
             
             self._optimizer.zero_grad()
 
@@ -246,6 +250,15 @@ class TrainTest:
             self._optimizer.step()  
 
             count += 1
+
+        if self._verbose:
+            if count < self._epochs:
+                logging.info("    Loss function convergence criterion met at epoch "
+                                "{}".format(count-1))
+            else:
+                logging.info("    Loss function convergence criterion not met; "
+                                "training stopped at 'epochs' specified in your "
+                                "parameter file, {}".format(self._epochs))
 
         # return loss value    
         return loss.item(), losses
