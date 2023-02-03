@@ -94,13 +94,20 @@ class TrainTest:
         Set an initial guess for regularizer strengths :math:`\lambda_{x}` by 
         comparing images generated with different visibility weighting. 
         
-        The guesses update \lambda values in `self`.
+        The guesses update `self._lambda_*` values.
+
+        Returns
+        -------
+        guesses : dict 
+            Dictionary containing the names and initial guesses of regularizers
         """
         # generate images of the data using two briggs robust values
         img1, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.0)
         img2, _ = self._gridder.get_dirty_image(weighting='briggs', robust=0.5)
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
+
+        guesses = {}
 
         if "entropy" in self._lambda_guess:
             # force negative pixel values to small positive value
@@ -111,21 +118,27 @@ class TrainTest:
             loss_e2 = entropy(img2_nn, self._entropy_prior_intensity)
             # update stored value
             self._lambda_entropy = 1 / (loss_e2 - loss_e1)
+            guesses["lambda_entropy"] = self._lambda_entropy
 
         if "sparsity" in self._lambda_guess:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
             self._lambda_sparsity = 1 / (loss_s2 - loss_s1)
+            guesses["lambda_sparsity"] = self._lambda_sparsity
 
         if "TV" in self._lambda_guess:
             loss_TV1 = TV_image(img1, self._TV_epsilon)
             loss_TV2 = TV_image(img2, self._TV_epsilon)
             self._lambda_TV = 1 / (loss_TV2 - loss_TV1)
+            guesses["lambda_TV"] = self._lambda_TV
 
         if "TSV" in self._lambda_guess:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
             self._lambda_TSV = 1 / (loss_TSV2 - loss_TSV1)
+            guesses["lambda_TSV"] = self._lambda_TSV
+
+        return guesses
 
 
     def loss_eval(self, vis, dataset, sky_cube=None):
@@ -196,7 +209,8 @@ class TrainTest:
         # optionally guess initial regularizer strengths
         if self._lambda_guess is not None:
             # guess, update lambda values in 'self'
-            self.loss_lambda_guess()
+            lambda_guesses = self.loss_lambda_guess()
+
 
         while (not self.loss_convergence(np.array(losses))
                 and count <= self._epochs):
