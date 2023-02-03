@@ -3,7 +3,6 @@ import logging
 import torch
 
 from mpol.precomposed import SimpleNet
-from mpol.datasets import Dartboard, KFoldCrossValidatorGridded
 from mpol.training import TrainTest
 
 class CrossValidate:
@@ -20,6 +19,8 @@ class CrossValidate:
         Instance of the `mpol.gridding.Gridder` class.
     kfolds : int, default=5
         Number of k-folds to use in cross-validation
+    split_method : str, default='random cell'
+        Method to split full dataset into train/test subsets
     seed : int, default=None 
         Seed for random number generator used in splitting data
     learn_rate : float, default=0.5
@@ -57,7 +58,8 @@ class CrossValidate:
     verbose : bool, default=True
         Whether to print notification messages. 
     """
-    def __init__(self, coords, gridder, kfolds=5, seed=None, learn_rate=0.5, 
+    def __init__(self, coords, gridder, kfolds=5, split_method='random_cell', 
+                seed=None, learn_rate=0.5, 
                 epochs=500, convergence_tol=1e-2, 
                 lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
                 lambda_entropy=None, entropy_prior_intensity=1e-10, 
@@ -68,6 +70,7 @@ class CrossValidate:
         self._coords = coords
         self._gridder = gridder        
         self._kfolds = kfolds
+        self._split_method = split_method
         self._seed = seed
         self._learn_rate = learn_rate
         self._epochs = epochs
