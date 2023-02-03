@@ -442,6 +442,40 @@ title="Source repository"
     <span class="k">return</span> <span class="n">xx</span></div>
 
 
+<div class="viewcode-block" id="check_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.check_baselines">[docs]</a><span class="k">def</span> <span class="nf">check_baselines</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">min_feasible_q</span><span class="o">=</span><span class="mf">1e0</span><span class="p">,</span> <span class="n">max_feasible_q</span><span class="o">=</span><span class="mf">1e5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if baseline lengths are sensible for expected code unit of </span>
+<span class="sd">    [k\lambda], or if instead they&#39;re being supplied in [\lambda].</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">     q : array, unit = :math:`k\lambda`</span>
+<span class="sd">        Baseline distribution (all values must be non-negative). </span>
+<span class="sd">    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0</span>
+<span class="sd">        Minimum baseline in code units expected for a dataset. The default </span>
+<span class="sd">        value of 1e0 is a conservative value for ALMA, assuming a minimum</span>
+<span class="sd">        antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.</span>
+<span class="sd">    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5</span>
+<span class="sd">        Maximum baseline in code units expected for a dataset. The default </span>
+<span class="sd">        value of 1e5 is a conservative value for ALMA, assuming a maximum </span>
+<span class="sd">        antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span>
+    
+    <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_feasible_q</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;Maximum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is &gt; maximum expected &quot;</span>
+                <span class="s2">&quot;value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
+                <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
+                <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">max_feasible_q</span><span class="p">))</span> 
+
+    <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">min_feasible_q</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;Minimum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is large for expected &quot;</span>
+                    <span class="s2">&quot;minimum value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
+                    <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
+                    <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">min_feasible_q</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">))</span> </div>
+
+
 <div class="viewcode-block" id="convert_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.convert_baselines">[docs]</a><span class="k">def</span> <span class="nf">convert_baselines</span><span class="p">(</span><span class="n">baselines</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert baselines in meters to kilolambda.</span>

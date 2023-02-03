@@ -597,6 +597,28 @@ title="Print to PDF"
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.check_baselines">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">check_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_feasible_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_feasible_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#check_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.check_baselines" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if baseline lengths are sensible for expected code unit of
+[klambda], or if instead they’re being supplied in [lambda].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (array, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>) – Baseline distribution (all values must be non-negative).</p>
+</dd>
+</dl>
+<dl>
+<dt>min_feasible_q<span class="classifier">float, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>, default=1e0</span></dt><dd><p>Minimum baseline in code units expected for a dataset. The default
+value of 1e0 is a conservative value for ALMA, assuming a minimum
+antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.</p>
+</dd>
+<dt>max_feasible_q<span class="classifier">float, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>, default=1e5</span></dt><dd><p>Maximum baseline in code units expected for a dataset. The default
+value of 1e5 is a conservative value for ALMA, assuming a maximum
+antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.convert_baselines">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">convert_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baselines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#convert_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.convert_baselines" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert baselines in meters to kilolambda.
