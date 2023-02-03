@@ -135,20 +135,24 @@ class CrossValidate:
 
             # create a new model and optimizer for this k_fold
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
-            # if use_gpu: # TODO
+            # if use_gpu: # TODO: once GPU syntax decided on
                 # model = model.cuda()
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
 
-            trainer = TrainTest(self._gridder, optimizer, self._epochs, 
-                                self._convergence_tol, 
-                                self._lambda_guess_regularizers, 
-                                self._lambda_entropy,
-                                self._entropy_prior_intensity,
-                                self._lambda_sparsity,
-                                self._lambda_TV, self._TV_epsilon,
-                                self._lambda_TSV,
-                                self._train_diag_step, self._diag_fig_train,
-                                self._verbose
+            trainer = TrainTest(gridder=self._gridder, 
+                                optimizer=optimizer, 
+                                epochs=self._epochs, 
+                                convergence_tol=self._convergence_tol, 
+                                lambda_guess=self._lambda_guess, 
+                                lambda_entropy=self._lambda_entropy,
+                                entropy_prior_intensity=self._entropy_prior_intensity,
+                                lambda_sparsity=self._lambda_sparsity,
+                                lambda_TV=self._lambda_TV, 
+                                TV_epsilon=self._TV_epsilon,
+                                lambda_TSV=self._lambda_TSV,
+                                train_diag_step=self._train_diag_step, 
+                                diag_fig_train=self._diag_fig_train,
+                                verbose=self._verbose
             )
 
             _, loss_history = trainer.train(model, train_subset)
