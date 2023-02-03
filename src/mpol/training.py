@@ -84,10 +84,10 @@ class TrainTest:
         min_len = 11 
         if len(loss) < min_len:
             return False
-        
+
         ratios = np.abs(loss[-1] / loss[-min_len:-1]) 
 
-        return np.all(1 - self._convergence_tol <= ratios) and np.all(ratios <= 1 + self._convergence_tol)
+        return all(1 - self._convergence_tol <= ratios) and all(ratios <= 1 + self._convergence_tol)
 
 
     def loss_lambda_guess(self):
@@ -222,7 +222,14 @@ class TrainTest:
             if self._verbose:
                 logging.info('\r  Training: epoch {} of {}'.format(count, self._epochs), 
                     end='', flush=True)
-            
+
+            # check early on whether the loss isn't evolving
+            if count == 20 and all(0.9 <= loss[:-1] / loss[1:]) and all(loss[:-1] / loss[1:] <= 1.1):
+                warn_msg = "The loss function is negligibly evolving. loss_rate " + \
+                            "may be too low."
+                logging.info(warn_msg)                            
+                raise Warning(warn_msg)
+
             self._optimizer.zero_grad()
 
             # calculate model visibility cube (corresponding to current pixel 
