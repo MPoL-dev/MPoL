@@ -4,7 +4,7 @@ import torch
 
 from mpol.precomposed import SimpleNet
 from mpol.datasets import Dartboard, KFoldCrossValidatorGridded
-from mpol.train_test import TrainTest
+from mpol.training import TrainTest
 
 class CrossValidate:
     r"""
