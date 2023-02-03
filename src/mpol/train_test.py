@@ -41,7 +41,7 @@ class TrainTest:
         self._verbose = verbose
 
 
-    def loss_convergence(self, loss, tol=1e-2):
+    def loss_convergence(self, loss):
         r"""
         Estimate whether the loss function has converged by assessing its 
         relative change over recent iterations.
@@ -65,7 +65,7 @@ class TrainTest:
         
         ratios = np.abs(loss[-1] / loss[-min_len:-1]) 
 
-        return np.all(1 - tol <= ratios) and np.all(ratios <= 1 + tol)
+        return np.all(1 - self._convergence_tol <= ratios) and np.all(ratios <= 1 + self._convergence_tol)
 
 
     def loss_lambda_guess(self):
