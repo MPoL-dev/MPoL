@@ -26,6 +26,21 @@ def test_traintestclass_training(coords, gridder, dataset, generic_parameters):
     loss, loss_history = trainer.train(model, dataset)
 
 
+def test_traintestclass_training_guess(coords, gridder, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop,
+    # with a call to the regularizer strength guesser
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"] 
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+
 def test_standalone_init_train(coords, dataset):
     # not using TrainTest class, 
     # configure a class to train with and test that it initializes
