@@ -31,6 +31,9 @@ class CrossValidate:
         loss function (suggested <= 1e-2)
     lambda_guess : list of str, default=None
         List of regularizers for which to guess an initial value 
+    lambda_guess_briggs : list of float, default=[0.0, 0.5]
+        Briggs robust values for two images used to guess initial regularizer 
+        values (if lambda_guess is not None)
     lambda_entropy : float
         Relative strength for entropy regularizer
     entropy_prior_intensity : float, default=1e-10
@@ -56,8 +59,9 @@ class CrossValidate:
     """
     def __init__(self, coords, gridder, kfolds=5, seed=None, learn_rate=0.5, 
                 epochs=500, convergence_tol=1e-2, 
-                lambda_guess=None, lambda_entropy=None, 
-                entropy_prior_intensity=1e-10, lambda_sparsity=None, lambda_TV=None, 
+                lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
+                lambda_entropy=None, entropy_prior_intensity=1e-10, 
+                lambda_sparsity=None, lambda_TV=None, 
                 TV_epsilon=1e-10, lambda_TSV=None, 
                 train_diag_step=None, diag_fig_train=False, device=None, 
                 verbose=True):
@@ -69,6 +73,7 @@ class CrossValidate:
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._lambda_guess = lambda_guess
+        self._lambda_guess_briggs = lambda_guess_briggs
         self._lambda_entropy = lambda_entropy
         self._entropy_prior_intensity = entropy_prior_intensity
         self._lambda_sparsity = lambda_sparsity
@@ -145,14 +150,15 @@ class CrossValidate:
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
             if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
                 model = model.to(self._device)
-                
+
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
 
             trainer = TrainTest(gridder=self._gridder, 
                                 optimizer=optimizer, 
                                 epochs=self._epochs, 
                                 convergence_tol=self._convergence_tol, 
-                                lambda_guess=self._lambda_guess, 
+                                lambda_guess=self._lambda_guess,
+                                lambda_guess_briggs=self._lambda_guess_briggs, 
                                 lambda_entropy=self._lambda_entropy,
                                 entropy_prior_intensity=self._entropy_prior_intensity,
                                 lambda_sparsity=self._lambda_sparsity,
