@@ -75,7 +75,7 @@ class CrossValidate:
         self._verbose = verbose
 
 
-    def split_dataset(self, dataset, kfolds, seed):
+    def split_dataset(self, dataset):
         r"""
         Split a dataset into training and test subsets. 
 
@@ -97,13 +97,13 @@ class CrossValidate:
         dartboard = Dartboard(coords=self._coords)
 
         # use 'dartboard' to split full dataset into train/test subsets
-        subsets = KFoldCrossValidatorGridded(dataset, kfolds,
+        subsets = KFoldCrossValidatorGridded(dataset, self._kfolds,
                                         dartboard=dartboard,
-                                        npseed=seed)#, device=device) # TODO
+                                        npseed=self._seed)
 
         # store the individual train/test subsets
         test_train_datasets = [(train_pair, test_pair) for (train_pair, test_pair) in subsets]
-        # test_train_datasets = [(train.to('cuda'), test.to('cuda')) for (train, test) in subsets] # TODO
+        # test_train_datasets = [(train.to('cuda'), test.to('cuda')) for (train, test) in subsets] # TODO: once GPU syntax decided on
 
         return test_train_datasets
 
