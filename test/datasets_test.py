@@ -291,17 +291,3 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
     ax[0, 0].set_title("train")
     ax[0, 2].set_title("test")
     fig.savefig(tmp_path / "images", dpi=300)
-
-
-def test_crossvalidator_workflow_gpu(crossvalidation_products, tmp_path):
-    if torch.cuda.is_available():
-        device = torch.device('cuda:0')
-
-        test_crossvalidator_init(crossvalidation_products, device)
-        test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path, 
-                                            device)
-        test_crossvalidator_iterate_images(crossvalidation_products, tmp_path, 
-                                            device)
-    
-    else:
-        pass
