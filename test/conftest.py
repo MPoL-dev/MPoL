@@ -128,6 +128,7 @@ def generic_parameters():
     # generic model parameters to test training loop and cross-val loop
     train_pars = {"epochs":50, "convergence_tol":1e-2, 
                 "lambda_guess": ["entropy", "sparsity", "TV", "TSV"],
+                "lambda_guess_briggs": [0.0, 0.5],
                 "lambda_entropy":1e-3, "lambda_sparsity":1e-3, "lambda_TV":1e-3,
                 "lambda_TSV":1e-3,"entropy_prior_intensity":1e-10, 
                 "TV_epsilon":1e-10, "train_diag_step":25, 
