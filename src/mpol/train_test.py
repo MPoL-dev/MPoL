@@ -128,11 +128,6 @@ class TrainTest:
 
         # regularizers
         if sky_cube is not None:
-            # optionally guess regularizer strengths
-            if self._lambda_guess_regularizers is not None:
-                self.loss_lambda_guess()
-
-            # apply regularizers
             if self._lambda_entropy is not None:
                 loss += self._lambda_entropy * entropy(sky_cube, 
                                                         self._entropy_prior_intensity)
@@ -177,14 +172,17 @@ class TrainTest:
         # track loss value over epochs
         losses = []
         
-        while (not self.loss_convergence(np.array(losses),
-                                        self._convergence_tol)
+        # optionally guess initial regularizer strengths
+        if self._lambda_guess is not None:
+            # guess, update lambda values in 'self'
+            self.loss_lambda_guess()
+
+        while (not self.loss_convergence(np.array(losses))
                 and count <= self._epochs):
 
             if self._verbose:
-                print('\r  epoch {} of {}'.format(count, 
-                                                 self._epochs), 
-                        end='', flush=True)
+                print('\r  epoch {} of {}'.format(count, self._epochs), end='', 
+                    flush=True)
             
             self._optimizer.zero_grad()
 
