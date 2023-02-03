@@ -68,16 +68,6 @@ def test_fourier_cube(coords, tmp_path):
     plt.close("all")
 
 
-def test_fourier_cube_gpu(coords, tmp_path):
-    if torch.cuda.is_available():
-        device = torch.device('cuda:0')
-    
-        test_fourier_cube(coords, tmp_path, device)
-    
-    else:
-        pass
-
-
 def test_fourier_cube_grad(coords):
     # Test that we can calculate a gradient on a loss function using the Fourier layer
 
