@@ -230,11 +230,11 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
     for k, (train, test) in enumerate(cv):
 
         ax[k, 0].imshow(
-            np.fft.fftshift(train.mask[chan].detach().cpu().numpy()),
+            np.fft.fftshift(train.mask[chan].detach().numpy()),
             interpolation="none",
         )
         ax[k, 1].imshow(
-            np.fft.fftshift(test.mask[chan].detach().cpu().numpy()),
+            np.fft.fftshift(test.mask[chan].detach().numpy()),
             interpolation="none",
         )
 
@@ -269,22 +269,22 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
         test_chan = utils.packed_cube_to_sky_cube(rtest.forward())[chan]
 
         im = ax[k, 0].imshow(
-            train_chan.real.detach().cpu().numpy(), interpolation="none", origin="lower"
+            train_chan.real.detach().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 0])
 
         im = ax[k, 1].imshow(
-            train_chan.imag.detach().cpu().numpy(), interpolation="none", origin="lower"
+            train_chan.imag.detach().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 1])
 
         im = ax[k, 2].imshow(
-            test_chan.real.detach().cpu().numpy(), interpolation="none", origin="lower"
+            test_chan.real.detach().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 2])
 
         im = ax[k, 3].imshow(
-            test_chan.imag.detach().cpu().numpy(), interpolation="none", origin="lower"
+            test_chan.imag.detach().numpy(), interpolation="none", origin="lower"
         )
         plt.colorbar(im, ax=ax[k, 3])
 
