@@ -8,7 +8,8 @@ from mpol import losses, precomposed
 from mpol.constants import *
 
 
-def test_init_train_class(coords, dataset):
+def test_standalone_init_train(coords, dataset):
+    # not using TrainTest class, 
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
@@ -27,7 +28,8 @@ def test_init_train_class(coords, dataset):
     print(rml.bcube.base_cube.grad)
 
 
-def test_train_loop(coords, dataset_cont, tmp_path):
+def test_standalone_train_loop(coords, dataset_cont, tmp_path):
+    # not using TrainTest class, 
     # set everything up to run on a single channel
     # and run a few iterations
 
@@ -64,6 +66,7 @@ def test_train_loop(coords, dataset_cont, tmp_path):
 
 
 def test_tensorboard(coords, dataset_cont, tmp_path):
+    # not using TrainTest class, 
     # set everything up to run on a single channel and then
     # test the writer function
 
