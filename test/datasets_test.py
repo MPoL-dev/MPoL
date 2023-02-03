@@ -203,21 +203,19 @@ def test_hermitian_mask_k(crossvalidation_products, tmp_path):
     fig.savefig(tmp_path / "hermitian.png", dpi=300)
 
 
-def test_crossvalidator_init(crossvalidation_products, device=None):
+def test_crossvalidator_init(crossvalidation_products):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
 
     # create cross validator through passing dartboard
-    datasets.KFoldCrossValidatorGridded(dataset, 5, dartboard=dartboard, 
-                                        device=device)
+    datasets.KFoldCrossValidatorGridded(dataset, 5, dartboard=dartboard)
 
     # create cross validator through implicit creation of dartboard
-    datasets.KFoldCrossValidatorGridded(dataset, 5, device=device)
+    datasets.KFoldCrossValidatorGridded(dataset, 5)
 
 
-def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path, 
-                                        device=None):
+def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
@@ -225,8 +223,7 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path,
     # create cross validator through passing dartboard
     k = 5
     chan = 4
-    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, 
-                                                device=device)
+    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard)
 
     fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(6, 12))
 
@@ -246,8 +243,7 @@ def test_crossvalidator_iterate_masks(crossvalidation_products, tmp_path,
     fig.savefig(tmp_path / "masks", dpi=300)
 
 
-def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path, 
-                                        device=None):
+def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path):
     coords, dataset = crossvalidation_products
 
     dartboard = datasets.Dartboard(coords=coords)
@@ -255,12 +251,11 @@ def test_crossvalidator_iterate_images(crossvalidation_products, tmp_path,
     # create cross validator through passing dartboard
     k = 5
     chan = 4
-    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard,
-                                            device=device)
+    cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard)
 
     # visualize dirty images
     # create mock fourier layer
-    flayer = fourier.FourierCube(coords=coords, device=device)
+    flayer = fourier.FourierCube(coords=coords)
     flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
     fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))
