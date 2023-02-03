@@ -8,11 +8,11 @@ from mpol import losses, precomposed
 from mpol.constants import *
 
 
-def test_init_train_class(coords, dataset, device=None):
+def test_init_train_class(coords, dataset):
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     vis = rml.forward()
 
@@ -27,12 +27,12 @@ def test_init_train_class(coords, dataset, device=None):
     print(rml.bcube.base_cube.grad)
 
 
-def test_train_loop(coords, dataset_cont, tmp_path, device=None):
+def test_train_loop(coords, dataset_cont, tmp_path):
     # set everything up to run on a single channel
     # and run a few iterations
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
@@ -63,12 +63,12 @@ def test_train_loop(coords, dataset_cont, tmp_path, device=None):
     plt.close("all")
 
 
-def test_tensorboard(coords, dataset_cont, tmp_path, device=None):
+def test_tensorboard(coords, dataset_cont, tmp_path):
     # set everything up to run on a single channel and then
     # test the writer function
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan, device=device)
+    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
