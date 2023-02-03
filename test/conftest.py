@@ -139,6 +139,7 @@ def generic_parameters():
     crossval_pars["learn_rate"] = 0.5
     crossval_pars["kfolds"] = 2
     crossval_pars["seed"] = 47
+    crossval_pars["device"] = None
 
     gen_pars  = { "train_pars":train_pars, "crossval_pars":crossval_pars}
 
