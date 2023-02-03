@@ -231,8 +231,9 @@ class TrainTest:
                     end='', flush=True)
 
             # check early on whether the loss isn't evolving
-            if count == 20: 
-                if all(0.9 <= loss[:-1] / loss[1:]) and all(loss[:-1] / loss[1:] <= 1.1):
+            if count == 20:
+                loss_arr = np.array(losses)
+                if all(0.9 <= loss_arr[:-1] / loss_arr[1:]) and all(loss_arr[:-1] / loss_arr[1:] <= 1.1):
                     warn_msg = "The loss function is negligibly evolving. loss_rate " + \
                                 "may be too low."
                     logging.info(warn_msg)                            
