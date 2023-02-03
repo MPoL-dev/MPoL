@@ -97,10 +97,6 @@ class CrossValidate:
         ----------
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class
-        kfolds : int 
-            Number of k-folds to use in cross-validation
-        seed : int 
-            Seed for random number generator used in splitting data
 
         Returns
         -------
