@@ -75,8 +75,6 @@ class TrainTest:
             Values of loss function over iterations (epochs). 
             If len(loss) < 11, `False` will be returned, as convergence 
             cannot be adequately assessed.
-        tol : float > 0, default=1e-2
-            Tolerence for convergence
 
         Returns
         -------
