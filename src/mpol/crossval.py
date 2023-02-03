@@ -52,18 +52,18 @@ class CrossValidate:
     """
     def __init__(self, coords, gridder, kfolds=5, seed=None, learn_rate=0.5, 
                 epochs=500, convergence_tol=1e-2, 
-                lambda_guess_regularizers="", lambda_entropy=None, 
-                entropy_prior_intensity=None, lambda_sparsity=None, lambda_TV=None, 
-                TV_epsilon=None, lambda_TSV=None, 
+                lambda_guess=None, lambda_entropy=None, 
+                entropy_prior_intensity=1e-10, lambda_sparsity=None, lambda_TV=None, 
+                TV_epsilon=1e-10, lambda_TSV=None, 
                 train_diag_step=None, diag_fig_train=False, verbose=True):
         self._coords = coords
+        self._gridder = gridder        
         self._kfolds = kfolds
         self._seed = seed
         self._learn_rate = learn_rate
-        self._gridder = gridder
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._lambda_guess_regularizers = lambda_guess_regularizers
+        self._lambda_guess = lambda_guess
         self._lambda_entropy = lambda_entropy
         self._entropy_prior_intensity = entropy_prior_intensity
         self._lambda_sparsity = lambda_sparsity
