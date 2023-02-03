@@ -45,7 +45,7 @@ class TrainTest:
 
     def __init__(self, gridder, optimizer, epochs=500, convergence_tol=1e-2, 
                 lambda_guess=None, lambda_entropy=None, 
-                entropy_prior_intensity=None, lambda_sparsity=None, lambda_TV=None, 
+                entropy_prior_intensity=1e-10, lambda_sparsity=None, lambda_TV=None, 
                 TV_epsilon=1e-10, lambda_TSV=None, 
                 train_diag_step=None, diag_fig_train=False, verbose=True):
         self._gridder = gridder
@@ -221,9 +221,9 @@ class TrainTest:
             losses.append(loss.item())
 
             # generate optional fit diagnostics
-            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
-                count == self._epochs - 1) :
-                    pass # TODO
+            # TODO: uncomment when plot.train_diagnostics in codebase 
+            # if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
+            #     count == self._epochs - 1) : 
                 # if self._diag_fig_train:
                 #     train_diagnostics(model, residuals, losses, count)
 
