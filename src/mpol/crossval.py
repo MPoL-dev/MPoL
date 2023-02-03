@@ -7,7 +7,48 @@ from mpol.train_test import TrainTest
 
 class CrossValidate:
     r"""
-    # TODO
+    Utilities to run a cross-validation loop (implicitly running a training
+    optimization loop), in order to compare MPoL models with different 
+    hyperparameter values
+
+    Parameters
+    ----------
+    coords : `mpol.coordinates.GridCoords` object
+        Instance of the `mpol.coordinates.GridCoords` class.
+    gridder : `mpol.gridding.Gridder` object
+        Instance of the `mpol.gridding.Gridder` class.
+    kfolds : int, default=5
+        Number of k-folds to use in cross-validation
+    seed : int, default=None 
+        Seed for random number generator used in splitting data
+    learn_rate : float, default=0.5
+        Neural network learning rate
+    epochs : int, default=500
+        Number of training iterations
+    convergence_tol : float, default=1e-2
+        Tolerance for training iteration stopping criterion as assessed by 
+        loss function (suggested <= 1e-2)
+    lambda_guess : list of str, default=None
+        List of regularizers for which to guess an initial value 
+    lambda_entropy : float
+        Relative strength for entropy regularizer
+    entropy_prior_intensity : float, default=1e-10
+        Prior value :math:`p` to calculate entropy against (suggested <<1)
+    lambda_sparsity : float, default=None 
+        Relative strength for sparsity regularizer
+    lambda_TV : float, default=None
+        Relative strength for total variation (TV) regularizer
+    TV_epsilon : float, default=1e-10
+        Softening parameter for TV regularizer (suggested <<1)
+    lambda_TSV : float, default=None
+        Relative strength for total squared variation (TSV) regularizer
+    train_diag_step : int, default=None
+        Interval at which optional training diagnostics are output
+    diag_fig_train : bool, default=False
+        Whether to generate a diagnostic figure during training
+        (if True, `train_diag_step` must also be nonzero)
+    verbose : bool, default=True
+        Whether to print notification messages. 
     """
     def __init__(self, coords, gridder, kfolds=5, seed=None, learn_rate=0.5, 
                 epochs=500, convergence_tol=1e-2, 
