@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 import pytest
 
 from mpol import coordinates, gridding
