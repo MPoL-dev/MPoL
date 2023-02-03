@@ -97,7 +97,7 @@ class CrossValidate:
         dartboard = Dartboard(coords=self._coords)
 
         # use 'dartboard' to split full dataset into train/test subsets
-        subsets = KFoldCrossValidatorGridded(dataset, self._kfolds,
+        subsets = KFoldCrossValidatorGridded(dataset, k=self._kfolds,
                                         dartboard=dartboard,
                                         npseed=self._seed)
 
@@ -155,7 +155,7 @@ class CrossValidate:
                                 verbose=self._verbose
             )
 
-            _, loss_history = trainer.train(model, train_subset)
+            loss, loss_history = trainer.train(model, train_subset)
             loss_histories.append(loss_history)
             all_scores.append(trainer.test(model, test_subset))
 
