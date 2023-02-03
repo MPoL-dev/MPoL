@@ -136,7 +136,7 @@ def generic_parameters():
     
     crossval_pars = train_pars.copy()
     crossval_pars["learn_rate"] = 0.5
-    crossval_pars["kfolds"] = 5
+    crossval_pars["kfolds"] = 2
     crossval_pars["seed"] = 47
 
     gen_pars  = { "train_pars":train_pars, "crossval_pars":crossval_pars}
