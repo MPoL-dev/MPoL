@@ -24,6 +24,7 @@
     "convergence_tol"           : 1e-2, 
     "train_diag_step"           : 50,
     "lambda_guess"              : null,
+    "lambda_guess_briggs"       : [0.0, 0.5],
     "lambda_entropy"            : null,
     "entropy_prior_intensity"   : 1e-10,
     "lambda_sparsity"           : null,
