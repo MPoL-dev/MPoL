@@ -77,7 +77,21 @@ class CrossValidate:
 
     def split_dataset(self, dataset, kfolds, seed):
         r"""
-        # TODO
+        Split a dataset into training and test subsets. 
+
+        Parameters
+        ----------
+        dataset : PyTorch dataset object
+            Instance of the `mpol.datasets.GriddedDataset` class
+        kfolds : int 
+            Number of k-folds to use in cross-validation
+        seed : int 
+            Seed for random number generator used in splitting data
+
+        Returns
+        -------
+        test_train_datasets : list of `mpol.datasets.GriddedDataset` objects
+            Training and test subsets obtained from splitting the input dataset
         """
         # create a radial and azimuthal partition for the dataset
         dartboard = Dartboard(coords=self._coords)
