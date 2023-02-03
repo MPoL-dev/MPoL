@@ -23,7 +23,7 @@
       "epochs"                    : "Number of training iterations",
       "convergence_tol"           : "Tolerance for training iteration stopping criterion as assessed by loss function (suggested <= 1e-2)", 
       "train_diag_step"           : "Interval at which optional training diagnostics are output",
-      "lambda_guess_regularizers" : "List of regularizers for which to guess an initial value in training loop",
+      "lambda_guess"              : "List of strings naming regularizers for which to guess an initial value in training loop. Example: ['entropy', 'sparsity', 'TV', 'TSV']",
       "lambda_entropy"            : "Relative strength for entropy regularizer (scaling factor \\lambda that multiplies entropy loss function)",
       "entropy_prior_intensity"   : "Prior value :math:`p` to calculate entropy against (suggested <<1; see `mpol.losses.entropy`)",
       "lambda_sparsity"           : "Relative strength for sparsity regularizer (scaling factor \\lambda that multiplies sparsity loss function)",

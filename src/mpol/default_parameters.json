@@ -23,7 +23,7 @@
     "epochs"                    : 1000,
     "convergence_tol"           : 1e-2, 
     "train_diag_step"           : 50,
-    "lambda_guess_regularizers" : null,
+    "lambda_guess"              : null,
     "lambda_entropy"            : null,
     "entropy_prior_intensity"   : 1e-10,
     "lambda_sparsity"           : null,
