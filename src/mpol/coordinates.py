@@ -1,7 +1,11 @@
-import numpy as np
-from numpy.fft import fftfreq, fftshift, ifft2, ifftshift, rfftfreq
+from __future__ import annotations
 
-from .constants import arcsec
+import numpy as np
+import numpy.fft as np_fft
+
+import mpol.constants as const
+from mpol.exceptions import CellSizeError
+
 from .utils import get_max_spatial_freq, get_maximum_cell_size
 
 
@@ -39,10 +43,13 @@ class GridCoords:
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
     """
 
-    def __init__(self, cell_size, npix):
+    def __init__(self, cell_size: float, npix: int):
         # set up the bin edges, centers, etc.
-        assert npix % 2 == 0, "Image must have an even number of pixels"
-        assert cell_size > 0, "cell_size must be positive"
+        if not npix % 2 == 0:
+            raise ValueError("Image must have an even number of pixels.")
+
+        if cell_size <= 0:
+            raise ValueError("cell_size must be a positive real.")
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix
@@ -56,8 +63,8 @@ class GridCoords:
         lmin = -cell_size * (self.npix // 2 + 0.5)
         self.img_ext = [lmax, lmin, lmin, lmax]  # arcsecs
 
-        self.dl = cell_size * arcsec  # [radians]
-        self.dm = cell_size * arcsec  # [radians]
+        self.dl = cell_size * const.arcsec  # [radians]
+        self.dm = cell_size * const.arcsec  # [radians]
 
         int_l_centers = np.arange(self.npix) - self.npix // 2
         int_m_centers = np.arange(self.npix) - self.npix // 2
@@ -105,7 +112,7 @@ class GridCoords:
 
         # only useful for plotting... uu, vv increasing, no fftshift
         self.sky_q_centers_2D = np.sqrt(
-            self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
+            self.sky_u_centers_2D**2 + self.sky_v_centers_2D**2
         )  # [kλ]
 
         # https://en.wikipedia.org/wiki/Atan2
@@ -114,12 +121,12 @@ class GridCoords:
         )  # (pi, pi]
 
         # for evaluating a packed vis... uu, vv increasing + fftshifted
-        self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
-        self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
+        self.packed_u_centers_2D = np_fft.fftshift(self.sky_u_centers_2D)
+        self.packed_v_centers_2D = np_fft.fftshift(self.sky_v_centers_2D)
 
         # and in polar coordinates too
-        self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
-        self.packed_phi_centers_2D = np.fft.fftshift(self.sky_phi_centers_2D)
+        self.packed_q_centers_2D = np_fft.fftshift(self.sky_q_centers_2D)
+        self.packed_phi_centers_2D = np_fft.fftshift(self.sky_phi_centers_2D)
 
         self.q_max = (
             np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
@@ -127,12 +134,12 @@ class GridCoords:
 
         # x_centers_2D and y_centers_2D are just l and m in units of arcsec
         x_centers_2D, y_centers_2D = np.meshgrid(
-            self.l_centers / arcsec, self.m_centers / arcsec, indexing="xy"
+            self.l_centers / const.arcsec, self.m_centers / const.arcsec, indexing="xy"
         )  # [arcsec] cartesian indexing (default)
 
         # for evaluating a packed cube... ll, mm increasing + fftshifted
-        self.packed_x_centers_2D = np.fft.fftshift(x_centers_2D)  # [arcsec]
-        self.packed_y_centers_2D = np.fft.fftshift(y_centers_2D)  # [arcsec]
+        self.packed_x_centers_2D = np_fft.fftshift(x_centers_2D)  # [arcsec]
+        self.packed_y_centers_2D = np_fft.fftshift(y_centers_2D)  # [arcsec]
 
         # for evaluating a sky image... ll mirrored, mm increasing, no fftshift
         self.sky_y_centers_2D = y_centers_2D  # [arcsec]
@@ -156,16 +163,15 @@ class GridCoords:
         # max freq needed to support dataset
         max_cell_size = get_maximum_cell_size(max_uu_vv)
 
-        assert (
-            np.max(np.abs(uu)) < self.max_grid
-        ), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
-            max_cell_size
-        )
-        assert (
-            np.max(np.abs(vv)) < self.max_grid
-        ), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
-            max_cell_size
-        )
+        if np.max(np.abs(uu)) > self.max_grid:
+            raise CellSizeError(
+                f"Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+            )
+
+        if np.max(np.abs(vv)) > self.max_grid:
+            raise CellSizeError(
+                f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+            )
 
         return True
 
