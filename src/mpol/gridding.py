@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
 
-from .coordinates import _setup_coords
+from mpol.coordinates import GridCoords
+
 from .datasets import GriddedDataset
 
 
@@ -156,8 +159,6 @@ class Gridder:
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
         uu=None,
         vv=None,
@@ -165,15 +166,14 @@ class Gridder:
         data_re=None,
         data_im=None,
     ):
-
         # check everything should be 2d, expand if not
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
 
         # setup the coordinates object
-        nchan = len(uu)
-        _setup_coords(self, cell_size, npix, coords, nchan)
+        self.coords = coords
+        self.nchan = len(uu)
 
         # expand the vectors to include complex conjugates
         uu_full = np.concatenate([uu, -uu], axis=1)
@@ -198,6 +198,20 @@ class Gridder:
         self.index_v = np.array(
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
+
+    @classmethod
+    def from_image_properties(
+        cls,
+        cell_size,
+        npix,
+        uu=None,
+        vv=None,
+        weight=None,
+        data_re=None,
+        data_im=None,
+    ) -> Gridder:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, uu, vv, weight, data_re, data_im)
 
     def _sum_cell_values_channel(self, uu, vv, values=None):
         r"""
@@ -615,7 +629,7 @@ class Gridder:
         unit="Jy/beam",
         check_visibility_scatter=True,
         max_scatter=1.2,
-        **beam_kwargs
+        **beam_kwargs,
     ):
         r"""
         Calculate the dirty image.

@@ -1,5 +1,7 @@
 r"""The ``fourier`` module provides the core functionality of MPoL via :class:`mpol.fourier.FourierCube`."""
 
+from __future__ import annotations
+
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
@@ -8,7 +10,6 @@ from torch import nn
 
 from . import utils
 from .coordinates import GridCoords
-from .gridding import _setup_coords
 
 
 class FourierCube(nn.Module):
@@ -23,7 +24,6 @@ class FourierCube(nn.Module):
     """
 
     def __init__(self, cell_size=None, npix=None, coords=None):
-
         super().__init__()
 
         # we don't want to bother with the nchan argument here, so
@@ -216,17 +216,16 @@ class NuFFT(nn.Module):
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         uu=None,
         vv=None,
         sparse_matrices=True,
     ):
-
         super().__init__()
-        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.coords = coords
+        self.nchan = nchan
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
@@ -258,6 +257,13 @@ class NuFFT(nn.Module):
                 )
                 self.interp_mats = None
                 self.sparse_matrices = False
+
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan=1, uu=None, vv=None, sparse_matrices=True
+    ) -> NuFFT:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, uu, vv, sparse_matrices)
 
     def _klambda_to_radpix(self, klambda):
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
@@ -384,7 +390,9 @@ class NuFFT(nn.Module):
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         if self.sparse_matrices:
             output = self.coords.cell_size**2 * self.nufft_ob(
-                expanded, self.k_traj, interp_mats=(self.real_interp_mat, self.imag_interp_mat)
+                expanded,
+                self.k_traj,
+                interp_mats=(self.real_interp_mat, self.imag_interp_mat),
             )
         else:
             output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)

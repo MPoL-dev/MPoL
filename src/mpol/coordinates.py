@@ -183,35 +183,3 @@ class GridCoords:
         # GridCoords objects are considered equal if they have the same cell_size and npix, since
         # all other attributes are derived from these two core properties.
         return self.cell_size == other.cell_size and self.npix == other.npix
-
-
-def _setup_coords(self, cell_size=None, npix=None, coords=None, nchan=None):
-    r"""
-    Convenience helper to setup coordinate objects inside BaseCube and ImageCube classes. This is meant to be called inside ``__init__``, and will create the instance attributes on ``self``.
-
-    Args:
-        self: reference to instance object of class.
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the image
-
-    Returns: None.
-    """
-    if coords:
-        assert (
-            npix is None and cell_size is None
-        ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-        self.coords = coords
-
-    elif npix or cell_size:
-        assert (
-            coords is None
-        ), "GridCoords must be empty if npix and cell_size are supplied."
-
-        self.coords = GridCoords(cell_size=cell_size, npix=npix)
-
-    if nchan is not None:
-        self.nchan = nchan
-    else:
-        self.nchan = 1
