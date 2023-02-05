@@ -20,7 +20,6 @@ class FourierCube(nn.Module):
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-
     """
 
     def __init__(self, cell_size=None, npix=None, coords=None):
@@ -42,6 +41,9 @@ class FourierCube(nn.Module):
 
             self.coords = GridCoords(cell_size=cell_size, npix=npix)
 
+        self.register_buffer("vis", None)
+
+
     def forward(self, cube):
         """
         Perform the FFT of the image cube on each channel.
@@ -60,7 +62,7 @@ class FourierCube(nn.Module):
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
         self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
-
+        
         return self.vis
 
     @property
