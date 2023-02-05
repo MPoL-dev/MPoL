@@ -49,7 +49,7 @@ class GridCoords:
             raise ValueError("Image must have an even number of pixels.")
 
         if cell_size <= 0:
-            raise ValueError("cell_size must be a positive real.")
+            raise ValueError("cell_size must be a positive real number.")
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix

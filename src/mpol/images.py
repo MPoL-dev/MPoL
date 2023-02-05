@@ -69,7 +69,7 @@ class BaseCube(nn.Module):
 
     @classmethod
     def from_image_properties(
-        cls, cell_size, npix, nchan, pixel_mapping, base_cube
+        cls, cell_size, npix, nchan=1, pixel_mapping=None, base_cube=None
     ) -> BaseCube:
         coords = GridCoords(cell_size, npix)
         return cls(coords, nchan, pixel_mapping, base_cube)
