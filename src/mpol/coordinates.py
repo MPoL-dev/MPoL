@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import numpy.fft as np_fft
+import numpy.typing as npt
 
 import mpol.constants as const
 from mpol.exceptions import CellSizeError
@@ -43,7 +46,7 @@ class GridCoords:
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
     """
 
-    def __init__(self, cell_size: float, npix: int):
+    def __init__(self, cell_size: float, npix: int) -> None:
         # set up the bin edges, centers, etc.
         if not npix % 2 == 0:
             raise ValueError("Image must have an even number of pixels.")
@@ -145,7 +148,7 @@ class GridCoords:
         self.sky_y_centers_2D = y_centers_2D  # [arcsec]
         self.sky_x_centers_2D = np.fliplr(x_centers_2D)  # [arcsec]
 
-    def check_data_fit(self, uu, vv):
+    def check_data_fit(self, uu: npt.ArrayLike, vv: npt.ArrayLike) -> None:
         r"""
         Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
 
@@ -173,9 +176,7 @@ class GridCoords:
                 f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
             )
 
-        return True
-
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GridCoords):
             # don't attempt to compare against different types
             return NotImplemented
