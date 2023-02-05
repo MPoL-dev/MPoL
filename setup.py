@@ -32,6 +32,7 @@ EXTRA_REQUIRES = {
         "requests",
         "astropy",
         "tensorboard",
+        "mypy",
     ],
     "docs": [
         "sphinx>=2.3.0",
@@ -54,7 +55,7 @@ EXTRA_REQUIRES = {
 }
 
 EXTRA_REQUIRES["dev"] = (
-    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit", "mypy"]
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
 )
 
 
