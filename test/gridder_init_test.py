@@ -2,7 +2,7 @@ import pytest
 
 from mpol import coordinates, gridding
 from mpol.constants import *
-from mpol.exceptions import CellSizeError
+from mpol.exceptions import CellSizeError, DataError
 
 
 def test_hermitian_pairs(mock_visibility_data):
@@ -12,7 +12,7 @@ def test_hermitian_pairs(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     # should *NOT* contain Hermitian pairs
-    assert not gridding.contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
+    gridding.verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
     # expand the vectors to include complex conjugates
     uu = np.concatenate([uu, -uu], axis=1)
@@ -21,7 +21,11 @@ def test_hermitian_pairs(mock_visibility_data):
     data_im = np.concatenate([data_im, -data_im], axis=1)
 
     # should contain Hermitian pairs
-    assert gridding.contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
+    with pytest.raises(
+        DataError,
+        match="Hermitian pairs were found in the data. Please provide data without Hermitian pairs.",
+    ):
+        gridding.verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
 
 def test_gridder_instantiate_cell_npix(mock_visibility_data):
