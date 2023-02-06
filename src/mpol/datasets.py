@@ -271,15 +271,15 @@ class Dartboard:
         self.phi_edges = phi_edges
 
     @property
-    def cartesian_qs(self):
+    def cartesian_qs(self) -> npt.NDArray[np.floating[Any]]:
         return self.coords.packed_q_centers_2D
 
     @property
-    def cartesian_phis(self):
+    def cartesian_phis(self) -> npt.NDArray[np.floating[Any]]:
         return self.coords.packed_phi_centers_2D
 
     @property
-    def q_max(self):
+    def q_max(self) -> npt.NDArray[np.floating[Any]]:
         return self.coords.q_max
 
     @classmethod
@@ -302,7 +302,9 @@ class Dartboard:
         coords = GridCoords(cell_size, npix)
         return cls(coords, q_edges, phi_edges)
 
-    def get_polar_histogram(self, qs, phis):
+    def get_polar_histogram(
+        self, qs: npt.NDArray[np.floating[Any]], phis: npt.NDArray[np.floating[Any]]
+    ) -> npt.NDArray[np.floating[Any]]:
         r"""
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -317,14 +319,17 @@ class Dartboard:
 
         """
 
+        histogram: npt.NDArray
         # make a polar histogram
-        H, x_edges, y_edges = np.histogram2d(
-            qs, phis, bins=[self.q_edges, self.phi_edges]
+        histogram, *_ = np.histogram2d(
+            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()]
         )
 
-        return H
+        return histogram
 
-    def get_nonzero_cell_indices(self, qs, phis):
+    def get_nonzero_cell_indices(
+        self, qs: npt.NDArray[np.floating[Any]], phis: npt.NDArray[np.floating[Any]]
+    ) -> npt.NDArray[np.integer[Any]]:
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -339,13 +344,15 @@ class Dartboard:
         """
 
         # make a polar histogram
-        H = self.get_polar_histogram(qs, phis)
+        histogram = self.get_polar_histogram(qs, phis)
 
-        indices = np.argwhere(H > 0)  # [i,j] indexes to go to q, phi
+        indices = np.argwhere(histogram > 0)  # [i,j] indexes to go to q, phi
 
         return indices
 
-    def build_grid_mask_from_cells(self, cell_index_list):
+    def build_grid_mask_from_cells(
+        self, cell_index_list: npt.NDArray[np.integer[Any]]
+    ) -> npt.NDArray[np.bool_]:
         r"""
         Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
 
