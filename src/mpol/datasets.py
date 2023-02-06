@@ -156,8 +156,8 @@ class UVDataset(torch_ud.Dataset):
         weights: NDArray[floating[Any]],
         data_re: NDArray[floating[Any]],
         data_im: NDArray[floating[Any]],
-        cell_size: float,
-        npix: int,
+        cell_size: float | None = None,
+        npix: int | None = None,
         device: torch.device = torch.device("cpu"),
         **kwargs,
     ):
@@ -174,50 +174,44 @@ class UVDataset(torch_ud.Dataset):
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
-        self.nchan = uu.shape[0]
-
         if np.any(weights <= 0.0):
             raise ValueError("Not all thermal weights are positive, check inputs.")
 
-        if cell_size is not None and npix is not None:
-            self.cell_size = cell_size * arcsec  # [radians]
-            self.npix = npix
+        self.nchan = uu.shape[0]
+        self.gridded = False
 
+        if cell_size is not None and npix is not None:
             (
-                uu_grid,
-                vv_grid,
+                uu,
+                vv,
                 grid_mask,
-                g_weights,
-                g_re,
-                g_im,
+                weights,
+                data_re,
+                data_im,
             ) = spheroidal_gridding.grid_dataset(
                 uu,
                 vv,
                 weights,
                 data_re,
                 data_im,
-                self.cell_size / arcsec,
-                npix=self.npix,
+                cell_size,
+                npix,
             )
 
-            # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
-            self.uu = torch.tensor(uu_grid, device=device)
-            self.vv = torch.tensor(vv_grid, device=device)
+            # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT
+            # designed to directly index into the output to evaluate against pre-gridded visibilities.
             self.grid_mask = torch.tensor(grid_mask, dtype=torch.bool, device=device)
-            self.weights = torch.tensor(g_weights, device=device)
-            self.re = torch.tensor(g_re, device=device)
-            self.im = torch.tensor(g_im, device=device)
+            self.cell_size = cell_size * arcsec  # [radians]
+            self.npix = npix
             self.gridded = True
 
-        else:
-            self.gridded = False
-            self.uu = torch.tensor(uu, dtype=torch.double, device=device)  # klambda
-            self.vv = torch.tensor(vv, dtype=torch.double, device=device)  # klambda
-            self.weights = torch.tensor(
-                weights, dtype=torch.double, device=device
-            )  # 1/Jy^2
-            self.re = torch.tensor(data_re, dtype=torch.double, device=device)  # Jy
-            self.im = torch.tensor(data_im, dtype=torch.double, device=device)  # Jy
+        self.uu = torch.tensor(uu, dtype=torch.double, device=device)  # klambda
+        self.vv = torch.tensor(vv, dtype=torch.double, device=device)  # klambda
+        self.weights = torch.tensor(
+            weights, dtype=torch.double, device=device
+        )  # 1/Jy^2
+        self.re = torch.tensor(data_re, dtype=torch.double, device=device)  # Jy
+        self.im = torch.tensor(data_im, dtype=torch.double, device=device)  # Jy
 
         # TODO: store kwargs to do something for antenna self-cal
 
