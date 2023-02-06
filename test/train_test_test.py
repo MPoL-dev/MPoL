@@ -5,10 +5,57 @@ import torch.optim
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
+from mpol.training import TrainTest
 from mpol.constants import *
 
 
-def test_init_train_class(coords, dataset):
+def test_traintestclass_training(coords, gridder, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"]
+    # reset a key to bypass TrainTest.loss_lambda_guess
+    train_pars["lambda_guess"] = None
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+
+def test_traintestclass_training_guess(coords, gridder, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop,
+    # with a call to the regularizer strength guesser
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"] 
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+
+def test_traintestclass_testing(coords, gridder, dataset, generic_parameters):
+    # using the TrainTest class, perform a call to test
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(gridder=gridder, optimizer=optimizer)
+    trainer.test(model, dataset)
+
+
+def test_standalone_init_train(coords, dataset):
+    # not using TrainTest class, 
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
@@ -27,7 +74,8 @@ def test_init_train_class(coords, dataset):
     print(rml.bcube.base_cube.grad)
 
 
-def test_train_loop(coords, dataset_cont, tmp_path):
+def test_standalone_train_loop(coords, dataset_cont, tmp_path):
+    # not using TrainTest class, 
     # set everything up to run on a single channel
     # and run a few iterations
 
@@ -64,6 +112,7 @@ def test_train_loop(coords, dataset_cont, tmp_path):
 
 
 def test_tensorboard(coords, dataset_cont, tmp_path):
+    # not using TrainTest class, 
     # set everything up to run on a single channel and then
     # test the writer function
 

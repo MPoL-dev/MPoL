@@ -152,6 +152,40 @@ def fftspace(width, N):
     return xx
 
 
+def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
+    """
+    Check if baseline lengths are sensible for expected code unit of 
+    [k\lambda], or if instead they're being supplied in [\lambda].
+
+    Parameters
+    ----------
+     q : array, unit = :math:`k\lambda`
+        Baseline distribution (all values must be non-negative). 
+    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0
+        Minimum baseline in code units expected for a dataset. The default 
+        value of 1e0 is a conservative value for ALMA, assuming a minimum
+        antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.
+    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5
+        Maximum baseline in code units expected for a dataset. The default 
+        value of 1e5 is a conservative value for ALMA, assuming a maximum 
+        antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.
+    """
+    
+    assert np.all(q >= 0), "All baselines should be >=0."
+    
+    if max(q) > max_feasible_q:
+        raise Warning("Maximum baseline of {:.1e} is > maximum expected "
+                "value of {:.1e}. Baselines must be in units of "
+                "[k\lambda], but it looks like they're in "
+                "[\lambda].".format(max(q), max_feasible_q)) 
+
+    if min(q) > min_feasible_q * 1e3:
+        raise Warning("Minimum baseline of {:.1e} is large for expected "
+                    "minimum value of {:.1e}. Baselines must be in units of "
+                    "[k\lambda], but it looks like they're in "
+                    "[\lambda].".format(min(q), min_feasible_q * 1e3)) 
+
+
 def convert_baselines(baselines, freq=None, wle=None):
     r"""
     Convert baselines in meters to kilolambda.

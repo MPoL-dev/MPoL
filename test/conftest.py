@@ -54,6 +54,22 @@ def coords():
 
 
 @pytest.fixture
+def gridder(mock_visibility_data, coords):
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+
+    gridder = gridding.Gridder(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    return gridder
+    
+
+@pytest.fixture
 def dataset(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
@@ -105,3 +121,26 @@ def crossvalidation_products(mock_visibility_data):
     dataset = gridder.to_pytorch_dataset()
 
     return coords, dataset
+
+
+@pytest.fixture
+def generic_parameters():
+    # generic model parameters to test training loop and cross-val loop
+    train_pars = {"epochs":50, "convergence_tol":1e-2, 
+                "lambda_guess": ["entropy", "sparsity", "TV", "TSV"],
+                "lambda_guess_briggs": [0.0, 0.5],
+                "lambda_entropy":1e-3, "lambda_sparsity":1e-3, "lambda_TV":1e-3,
+                "lambda_TSV":1e-3,"entropy_prior_intensity":1e-10, 
+                "TV_epsilon":1e-10, "train_diag_step":25, 
+                "diag_fig_train":False, "verbose":True     
+    }
+    
+    crossval_pars = train_pars.copy()
+    crossval_pars["learn_rate"] = 0.5
+    crossval_pars["kfolds"] = 2
+    crossval_pars["seed"] = 47
+    crossval_pars["device"] = None
+
+    gen_pars  = { "train_pars":train_pars, "crossval_pars":crossval_pars}
+
+    return gen_pars 

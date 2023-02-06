@@ -1,7 +1,14 @@
-import numpy as np
-from numpy.fft import fftfreq, fftshift, ifft2, ifftshift, rfftfreq
+from __future__ import annotations
 
-from .constants import arcsec
+from typing import Any
+
+import numpy as np
+import numpy.fft as np_fft
+import numpy.typing as npt
+
+import mpol.constants as const
+from mpol.exceptions import CellSizeError
+
 from .utils import get_max_spatial_freq, get_maximum_cell_size
 
 
@@ -43,10 +50,13 @@ class GridCoords:
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
     """
 
-    def __init__(self, cell_size, npix):
+    def __init__(self, cell_size: float, npix: int) -> None:
         # set up the bin edges, centers, etc.
-        assert npix % 2 == 0, "Image must have an even number of pixels"
-        assert cell_size > 0, "cell_size must be positive"
+        if not npix % 2 == 0:
+            raise ValueError("Image must have an even number of pixels.")
+
+        if cell_size <= 0:
+            raise ValueError("cell_size must be a positive real number.")
 
         self.cell_size = cell_size  # arcsec
         self.npix = npix
@@ -60,8 +70,8 @@ class GridCoords:
         lmin = -cell_size * (self.npix // 2 + 0.5)
         self.img_ext = [lmax, lmin, lmin, lmax]  # arcsecs
 
-        self.dl = cell_size * arcsec  # [radians]
-        self.dm = cell_size * arcsec  # [radians]
+        self.dl = cell_size * const.arcsec  # [radians]
+        self.dm = cell_size * const.arcsec  # [radians]
 
         int_l_centers = np.arange(self.npix) - self.npix // 2
         int_m_centers = np.arange(self.npix) - self.npix // 2
@@ -109,7 +119,7 @@ class GridCoords:
 
         # only useful for plotting... uu, vv increasing, no fftshift
         self.sky_q_centers_2D = np.sqrt(
-            self.sky_u_centers_2D ** 2 + self.sky_v_centers_2D ** 2
+            self.sky_u_centers_2D**2 + self.sky_v_centers_2D**2
         )  # [kλ]
 
         # https://en.wikipedia.org/wiki/Atan2
@@ -118,12 +128,12 @@ class GridCoords:
         )  # (pi, pi]
 
         # for evaluating a packed vis... uu, vv increasing + fftshifted
-        self.packed_u_centers_2D = np.fft.fftshift(self.sky_u_centers_2D)
-        self.packed_v_centers_2D = np.fft.fftshift(self.sky_v_centers_2D)
+        self.packed_u_centers_2D = np_fft.fftshift(self.sky_u_centers_2D)
+        self.packed_v_centers_2D = np_fft.fftshift(self.sky_v_centers_2D)
 
         # and in polar coordinates too
-        self.packed_q_centers_2D = np.fft.fftshift(self.sky_q_centers_2D)
-        self.packed_phi_centers_2D = np.fft.fftshift(self.sky_phi_centers_2D)
+        self.packed_q_centers_2D = np_fft.fftshift(self.sky_q_centers_2D)
+        self.packed_phi_centers_2D = np_fft.fftshift(self.sky_phi_centers_2D)
 
         self.q_max = (
             np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
@@ -131,18 +141,18 @@ class GridCoords:
 
         # x_centers_2D and y_centers_2D are just l and m in units of arcsec
         x_centers_2D, y_centers_2D = np.meshgrid(
-            self.l_centers / arcsec, self.m_centers / arcsec, indexing="xy"
+            self.l_centers / const.arcsec, self.m_centers / const.arcsec, indexing="xy"
         )  # [arcsec] cartesian indexing (default)
 
         # for evaluating a packed cube... ll, mm increasing + fftshifted
-        self.packed_x_centers_2D = np.fft.fftshift(x_centers_2D)  # [arcsec]
-        self.packed_y_centers_2D = np.fft.fftshift(y_centers_2D)  # [arcsec]
+        self.packed_x_centers_2D = np_fft.fftshift(x_centers_2D)  # [arcsec]
+        self.packed_y_centers_2D = np_fft.fftshift(y_centers_2D)  # [arcsec]
 
         # for evaluating a sky image... ll mirrored, mm increasing, no fftshift
         self.sky_y_centers_2D = y_centers_2D  # [arcsec]
         self.sky_x_centers_2D = np.fliplr(x_centers_2D)  # [arcsec]
 
-    def check_data_fit(self, uu, vv):
+    def check_data_fit(self, uu: npt.ArrayLike, vv: npt.ArrayLike) -> None:
         r"""
         Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
 
@@ -160,20 +170,17 @@ class GridCoords:
         # max freq needed to support dataset
         max_cell_size = get_maximum_cell_size(max_uu_vv)
 
-        assert (
-            np.max(np.abs(uu)) < self.max_grid
-        ), "Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
-            max_cell_size
-        )
-        assert (
-            np.max(np.abs(vv)) < self.max_grid
-        ), "Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {:} arcsec.".format(
-            max_cell_size
-        )
+        if np.max(np.abs(uu)) > self.max_grid:
+            raise CellSizeError(
+                f"Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+            )
 
-        return True
+        if np.max(np.abs(vv)) > self.max_grid:
+            raise CellSizeError(
+                f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+            )
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GridCoords):
             # don't attempt to compare against different types
             return NotImplemented
@@ -181,35 +188,3 @@ class GridCoords:
         # GridCoords objects are considered equal if they have the same cell_size and npix, since
         # all other attributes are derived from these two core properties.
         return self.cell_size == other.cell_size and self.npix == other.npix
-
-
-def _setup_coords(self, cell_size=None, npix=None, coords=None, nchan=None):
-    r"""
-    Convenience helper to setup coordinate objects inside BaseCube and ImageCube classes. This is meant to be called inside ``__init__``, and will create the instance attributes on ``self``.
-
-    Args:
-        self: reference to instance object of class.
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the image
-
-    Returns: None.
-    """
-    if coords:
-        assert (
-            npix is None and cell_size is None
-        ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-        self.coords = coords
-
-    elif npix or cell_size:
-        assert (
-            coords is None
-        ), "GridCoords must be empty if npix and cell_size are supplied."
-
-        self.coords = GridCoords(cell_size=cell_size, npix=npix)
-
-    if nchan is not None:
-        self.nchan = nchan
-    else:
-        self.nchan = 1

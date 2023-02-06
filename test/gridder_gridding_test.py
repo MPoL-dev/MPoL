@@ -14,7 +14,7 @@ def test_grid_cont(mock_visibility_data_cont):
     """
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
-    gridder = gridding.Gridder(
+    gridder = gridding.Gridder.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -102,7 +102,7 @@ def test_weight_gridding(mock_visibility_data):
     data_re = np.ones_like(uu)
     data_im = np.ones_like(uu)
 
-    gridder = gridding.Gridder(
+    gridder = gridding.Gridder.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,

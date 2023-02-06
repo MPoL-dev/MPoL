@@ -1,18 +1,19 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from mpol import (
-    losses,
-    coordinates,
-    images,
-    precomposed,
-    gridding,
-    datasets,
-    connectors,
-    utils,
-)
 from astropy.utils.data import download_file
 from ray import tune
-import matplotlib.pyplot as plt
+
+from mpol import (
+    connectors,
+    coordinates,
+    datasets,
+    gridding,
+    images,
+    losses,
+    precomposed,
+    utils,
+)
 
 # load the data
 fname = "HD143006_continuum.npz"
@@ -29,8 +30,6 @@ coords = coordinates.GridCoords(cell_size=0.01, npix=512)
 
 gridder = gridding.Gridder(
     coords=coords,
-    uu=uu,
-    vv=vv,
     weight=weight,
     data_re=data_re,
     data_im=data_im,

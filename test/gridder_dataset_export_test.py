@@ -10,7 +10,7 @@ from mpol.constants import *
 def gridder(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.Gridder(
+    return gridding.Gridder.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
