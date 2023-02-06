@@ -187,7 +187,7 @@ class CrossValidate:
 
         # average individual test scores as a cross-val metric for chosen 
         # hyperparameters
-        cv_score = np.mean(all_scores)
+        cv_score = (np.mean(all_scores), np.std(all_scores))
 
         return cv_score, all_scores, loss_histories
     
