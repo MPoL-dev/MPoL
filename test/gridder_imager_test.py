@@ -14,7 +14,7 @@ from mpol.constants import *
 def gridder(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.Gridder(
+    return gridding.Gridder.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -122,7 +122,6 @@ def test_beam_area_before_beam(gridder):
 
 # compare uniform and robust = -2.0
 def test_grid_uniform(gridder, tmp_path):
-
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
     chan = 4
@@ -165,7 +164,6 @@ def test_grid_uniform(gridder, tmp_path):
 
 # compare uniform and robust = -2.0
 def test_grid_uniform_arcsec2(gridder, tmp_path):
-
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
     chan = 4
@@ -208,7 +206,6 @@ def test_grid_uniform_arcsec2(gridder, tmp_path):
 
 
 def test_grid_natural(gridder, tmp_path):
-
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
     chan = 4
@@ -250,7 +247,6 @@ def test_grid_natural(gridder, tmp_path):
 
 
 def test_grid_natural_arcsec2(gridder, tmp_path):
-
     kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
 
     chan = 4

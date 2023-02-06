@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import copy
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from mpol.coordinates import GridCoords
+
 from . import spheroidal_gridding, utils
 from .constants import *
-from .coordinates import _setup_coords
 from .utils import loglinspace
 
 
@@ -33,17 +36,15 @@ class GriddedDataset:
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         vis_gridded=None,
         weight_gridded=None,
         mask=None,
         device=None,
     ):
-
-        _setup_coords(self, cell_size, npix, coords, nchan)
+        self.coords = coords
+        self.nchan = nchan
 
         self.vis_gridded = torch.tensor(vis_gridded, device=device)
         self.weight_gridded = torch.tensor(weight_gridded, device=device)
@@ -54,6 +55,13 @@ class GriddedDataset:
         # 1D array
         self.vis_indexed = self.vis_gridded[self.mask]
         self.weight_indexed = self.weight_gridded[self.mask]
+
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan, vis_gridded, weight_gridded, mask, device
+    ):
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, vis_gridded, weight_gridded, mask, device)
 
     def add_mask(self, mask, device=None):
         r"""
@@ -147,9 +155,8 @@ class UVDataset(Dataset):
         cell_size=None,
         npix=None,
         device=None,
-        **kwargs
+        **kwargs,
     ):
-
         # assert that all vectors are the same shape
         shape = uu.shape
         for a in [vv, weights, data_re, data_im]:
@@ -236,11 +243,9 @@ class Dartboard:
 
     """
 
-    def __init__(
-        self, cell_size=None, npix=None, coords=None, q_edges=None, phi_edges=None
-    ):
-
-        _setup_coords(self, cell_size, npix, coords)
+    def __init__(self, coords=None, q_edges=None, phi_edges=None):
+        self.coords = coords
+        self.nchan = 1
 
         # copy over relevant quantities from coords
         # these are in packed format
@@ -270,6 +275,11 @@ class Dartboard:
         else:
             # set phi edges
             self.phi_edges = np.linspace(0, np.pi, num=8 + 1)  # [radians]
+
+    @classmethod
+    def from_image_properties(cls, cell_size, npix, q_edges, phi_edges) -> Dartboard:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, q_edges, phi_edges)
 
     def get_polar_histogram(self, qs, phis):
         r"""
@@ -327,7 +337,6 @@ class Dartboard:
 
         # uses about a Gb..., and this only 256x256
         for cell_index in cell_index_list:
-
             qi, pi = cell_index
             q_min, q_max = self.q_edges[qi : qi + 2]
             p0_min, p0_max = self.phi_edges[pi : pi + 2]
@@ -381,7 +390,6 @@ class KFoldCrossValidatorGridded:
         phi_edges=None,
         npseed=None
     ):
-
         self.griddedDataset = griddedDataset
 
         assert k > 0, "k must be a positive integer"

@@ -4,6 +4,7 @@ import pytest
 
 from mpol import coordinates
 from mpol.constants import *
+from mpol.exceptions import CellSizeError
 
 
 def test_grid_coords_instantiate():
@@ -74,12 +75,12 @@ def test_grid_coords_plot_2D_uvq_packed(tmp_path):
 
 
 def test_grid_coords_odd_fail():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError, match="Image must have an even number of pixels."):
         coordinates.GridCoords(cell_size=0.01, npix=511)
 
 
 def test_grid_coords_neg_cell_size():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError, match="cell_size must be a positive real number."):
         coordinates.GridCoords(cell_size=-0.01, npix=512)
 
 
@@ -99,5 +100,5 @@ def test_grid_coords_fail(mock_visibility_data):
     print("max u data", np.max(uu))
     print("max u grid", coords.max_grid)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
