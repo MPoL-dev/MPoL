@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.utils.data as torch_ud
 from numpy import floating, integer
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from mpol.coordinates import GridCoords
 from mpol.exceptions import WrongDimensionError
@@ -20,15 +20,12 @@ from .utils import loglinspace
 class GriddedDataset:
     r"""
     Args:
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the image (default = 1).
         vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
         weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
         mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+        nchan (int): the number of channels in the image (default = 1).
         device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
-
 
     After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.
 
@@ -40,13 +37,14 @@ class GriddedDataset:
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        vis_gridded=None,
-        weight_gridded=None,
-        mask=None,
-        device=None,
-    ):
+        *,
+        coords: GridCoords,
+        vis_gridded: torch.Tensor,
+        weight_gridded: torch.Tensor,
+        mask: torch.Tensor,
+        nchan: int = 1,
+        device: torch.device = torch.device("cpu"),
+    ) -> None:
         self.coords = coords
         self.nchan = nchan
 
@@ -62,12 +60,39 @@ class GriddedDataset:
 
     @classmethod
     def from_image_properties(
-        cls, cell_size, npix, nchan, vis_gridded, weight_gridded, mask, device
+        cls,
+        cell_size: float,
+        npix: int,
+        *,
+        vis_gridded: torch.Tensor,
+        weight_gridded: torch.Tensor,
+        mask: torch.Tensor,
+        nchan: int = 1,
+        device: torch.device = torch.device("cpu"),
     ):
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, vis_gridded, weight_gridded, mask, device)
+        """Alternative method to instantiate a GriddedDataset object from cell_size and npix.
 
-    def add_mask(self, mask, device=None):
+        Args:
+            cell_size (float): the width of a pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
+            weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
+            mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+            nchan (int): the number of channels in the image (default = 1).
+            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
+        """
+        return cls(
+            coords=GridCoords(cell_size, npix),
+            vis_gridded=vis_gridded,
+            weight_gridded=weight_gridded,
+            mask=mask,
+            nchan=nchan,
+            device=device,
+        )
+
+    def add_mask(
+        self, mask: ArrayLike, device: torch.device = torch.device("cpu")
+    ) -> None:
         r"""
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
 
@@ -96,7 +121,7 @@ class GriddedDataset:
         self.weight_indexed = self.weight_gridded[self.mask]
 
     @property
-    def ground_mask(self):
+    def ground_mask(self) -> torch.Tensor:
         r"""
         The boolean mask, arranged in ground format.
 
@@ -106,7 +131,7 @@ class GriddedDataset:
         """
         return utils.packed_cube_to_ground_cube(self.mask)
 
-    def to(self, device):
+    def to(self, device: torch.device = torch.device("cpu")) -> GriddedDataset:
         """
         Moves the tensors of the dataset to specified device.
 
