@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
 
-from .coordinates import _setup_coords
+from mpol.coordinates import GridCoords
+from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
+
 from .datasets import GriddedDataset
 
 
@@ -16,24 +20,24 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
 
     """
 
-    assert (
-        uu.ndim == 2 or uu.ndim == 1
-    ), "Input data vectors should be either 1D or 2D numpy arrays."
-    shape = uu.shape
+    if not 1 <= uu.ndim <= 2:
+        raise WrongDimensionError(
+            "Input data vectors should be either 1D or 2D numpy arrays."
+        )
 
-    for a in [vv, weight, data_re, data_im]:
-        assert (
-            a.shape == shape
-        ), "All dataset inputs must be the same input shape and size."
+    if not all(array.shape == uu.shape for array in [vv, weight, data_re, data_im]):
+        raise WrongDimensionError(
+            "All dataset inputs must be the same input shape and size."
+        )
 
-    assert np.all(weight > 0.0), "Not all thermal weights are positive, check inputs."
+    if np.any(weight <= 0.0):
+        raise ValueError("Not all thermal weights are positive, check inputs.")
 
-    assert (data_re.dtype == np.single) or (
-        data_re.dtype == np.double
-    ), "data_re should be type single or double"
-    assert (data_im.dtype == np.single) or (
-        data_im.dtype == np.double
-    ), "data_im should be type single or double"
+    if data_re.dtype not in (np.single, np.double):
+        raise TypeError("data_re should be of type np.single or np.double.")
+
+    if data_im.dtype not in (np.single, np.double):
+        raise TypeError("data_im should be of type np.single or np.double.")
 
     if uu.ndim == 1:
         uu = np.atleast_2d(uu)
@@ -43,12 +47,12 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_im = np.atleast_2d(data_im)
 
     # check to see that uu, vv and data do not contain Hermitian pairs
-    assert not contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
+    verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
     return uu, vv, weight, data_re, data_im
 
 
-def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
+def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     r"""
     Check that the dataset does not contain Hermitian pairs. Because the sky brightness :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian, meaning that
 
@@ -104,23 +108,27 @@ def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
         # we only need the first dimension, not the u_v dimension
         ind = np.nonzero(uu_vv == -uv_point)[0]
 
-        # if we found something, then take the first result
-        if ind.size > 0:
-            ind = ind[0]
+        # if we found nothing, move on to checking the next point
+        if ind.size == 0:
+            continue
 
-            # test to see whether the data is a conjugate
-            if data[i] == np.conj(data[ind]):
-                num_pairs += 1
+        # if we found something, then take the first result
+        ind = ind[0]
+
+        # test to see whether the data is a conjugate
+        if data[i] == np.conj(data[ind]):
+            num_pairs += 1
 
     if num_pairs == 0:
-        return False
-    elif num_pairs == test_vis:
-        return True
+        return
+
+    if num_pairs == test_vis:
+        raise DataError(
+            "Hermitian pairs were found in the data. Please provide data without Hermitian pairs."
+        )
     else:
-        raise RuntimeError(
-            "{:} Hermitian pairs were found out of {:} visibilities tested, dataset is inconsistent.".format(
-                num_pairs, test_vis
-            )
+        raise DataError(
+            f"{num_pairs} Hermitian pairs were found out of {test_vis} visibilities tested, dataset is inconsistent."
         )
 
     # choose a uu, vv point, then see if the opposite value exists in the dataset
@@ -156,8 +164,6 @@ class Gridder:
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
         uu=None,
         vv=None,
@@ -165,15 +171,14 @@ class Gridder:
         data_re=None,
         data_im=None,
     ):
-
         # check everything should be 2d, expand if not
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
 
         # setup the coordinates object
-        nchan = len(uu)
-        _setup_coords(self, cell_size, npix, coords, nchan)
+        self.coords = coords
+        self.nchan = len(uu)
 
         # expand the vectors to include complex conjugates
         uu_full = np.concatenate([uu, -uu], axis=1)
@@ -198,6 +203,20 @@ class Gridder:
         self.index_v = np.array(
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
+
+    @classmethod
+    def from_image_properties(
+        cls,
+        cell_size,
+        npix,
+        uu=None,
+        vv=None,
+        weight=None,
+        data_re=None,
+        data_im=None,
+    ) -> Gridder:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, uu, vv, weight, data_re, data_im)
 
     def _sum_cell_values_channel(self, uu, vv, values=None):
         r"""
@@ -316,13 +335,10 @@ class Gridder:
             density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
 
         elif weighting == "briggs":
-            if robust is None:
+            if robust is None or not -2 <= robust <= 2:
                 raise ValueError(
-                    "If 'briggs' weighting, a robust value must be specified between [-2, 2]."
+                    "With 'briggs' weighting, a robust value must be specified between [-2, 2]."
                 )
-            assert (robust >= -2) and (
-                robust <= 2
-            ), "robust parameter must be in the range [-2, 2]"
 
             # implement robust weighting using the definition used in CASA
             # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
@@ -517,9 +533,10 @@ class Gridder:
             )
         )
 
-        assert (
-            np.max(beam.imag) < 1e-10
-        ), "Dirty beam contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        if np.max(beam.imag) >= 1e-10:
+            raise ThresholdExceededError(
+                "Dirty beam contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+            )
 
         self.beam = beam.real
 
@@ -615,7 +632,7 @@ class Gridder:
         unit="Jy/beam",
         check_visibility_scatter=True,
         max_scatter=1.2,
-        **beam_kwargs
+        **beam_kwargs,
     ):
         r"""
         Calculate the dirty image.
@@ -681,9 +698,10 @@ class Gridder:
 
             img /= beam_area_per_chan[:, np.newaxis, np.newaxis]
 
-        assert (
-            np.max(img.imag) < 1e-10
-        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        if np.max(img.imag) >= 1e-10:
+            raise ThresholdExceededError(
+                "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+            )
 
         return img.real, beam
 
@@ -718,7 +736,7 @@ class Gridder:
             nchan=self.nchan,
             vis_gridded=self.vis_gridded,
             weight_gridded=self.weight_gridded,
-            mask=self.mask
+            mask=self.mask,
         )
 
     @property
