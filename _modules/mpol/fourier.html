@@ -290,6 +290,8 @@ title="Source repository"
   <h1>Source code for mpol.fourier</h1><div class="highlight"><pre>
 <span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The ``fourier`` module provides the core functionality of MPoL via :class:`mpol.fourier.FourierCube`.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
@@ -298,7 +300,6 @@ title="Source repository"
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span>
-<span class="kn">from</span> <span class="nn">.gridding</span> <span class="kn">import</span> <span class="n">_setup_coords</span>
 
 
 <div class="viewcode-block" id="FourierCube"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube">[docs]</a><span class="k">class</span> <span class="nc">FourierCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -312,7 +313,6 @@ title="Source repository"
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># we don&#39;t want to bother with the nchan argument here, so</span>
@@ -508,17 +508,16 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
 
         <span class="c1"># initialize the non-uniform FFT object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">KbNufft</span><span class="p">(</span>
@@ -550,6 +549,13 @@ title="Source repository"
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">interp_mats</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NuFFT</span><span class="p">:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
@@ -676,7 +682,9 @@ title="Source repository"
         <span class="c1"># torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span>
-                <span class="n">expanded</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span> <span class="n">interp_mats</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">)</span>
+                <span class="n">expanded</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span>
+                <span class="n">interp_mats</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">)</span>

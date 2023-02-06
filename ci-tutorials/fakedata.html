@@ -700,7 +700,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7feec00ed8e0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7fca1012d8e0&gt;
 </pre></div>
 </div>
 <img alt="../_images/5dafd2252f9b384956e26a168cd7c12b645cc798e1beeacd1c1b3f798e8cfbc4.png" src="../_images/5dafd2252f9b384956e26a168cd7c12b645cc798e1beeacd1c1b3f798e8cfbc4.png" />
@@ -715,7 +715,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7feebb331970&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7fca10055af0&gt;
 </pre></div>
 </div>
 <img alt="../_images/761bfdab078b72f029cd61bb7fc8785459f32fbcf63fa87ac09149a9709de5ed.png" src="../_images/761bfdab078b72f029cd61bb7fc8785459f32fbcf63fa87ac09149a9709de5ed.png" />
@@ -818,6 +818,17 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">27</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">mpol.images</span> <span class="kn">import</span> <span class="n">ImageCube</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">image</span> <span class="o">=</span> <span class="n">ImageCube</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="n">img_tensor_packed</span><span class="p">)</span>
+
+<span class="ne">TypeError</span>: __init__() got an unexpected keyword argument &#39;cell_size&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <p>If you want to double-check that the image was correctly inserted, you can do</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># double check it went in correctly</span>
@@ -862,11 +873,6 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The maximum cell_size that will still Nyquist sample the spatial frequency represented by the maximum u,v value is 0.09 arcseconds
-</pre></div>
-</div>
-</div>
 </div>
 <p>Thankfully, we see that we already chose a sufficiently small <code class="docutils literal notranslate"><span class="pre">cell_size</span></code>.</p>
 </section>
@@ -882,15 +888,6 @@ title="Print to PDF"
 <span class="nb">print</span><span class="p">(</span><span class="n">data_noise</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data_noiseless</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data_noise</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1, 325080)
-(1, 325080)
-[[-1.16735464-1.42997366j  7.62039264+1.02023351j  1.68012334+1.63271811j
-  ... -0.26110217-2.78483427j  0.53946586-0.96509755j
-   0.26442951-1.635529j  ]]
 </pre></div>
 </div>
 </div>
@@ -937,11 +934,6 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0025689290972358914 Jy / dirty beam
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -965,9 +957,6 @@ title="Print to PDF"
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.14</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/c1e71d49f422a13a692a109543a7d7f340b69bcf95e9c3c8b743fed37536783d.png" src="../_images/c1e71d49f422a13a692a109543a7d7f340b69bcf95e9c3c8b743fed37536783d.png" />
 </div>
 </div>
 <p>We can even subtract this on a pixel-by-pixel basis and compare to the original image.</p>
@@ -996,9 +985,6 @@ title="Print to PDF"
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.14</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/b6002e3b816ebbdf2139caca15102e62d7e2d1e50441452ea9fdd9f249761fae.png" src="../_images/b6002e3b816ebbdf2139caca15102e62d7e2d1e50441452ea9fdd9f249761fae.png" />
 </div>
 </div>
 <p>The subtraction revears some interesting artefacts.</p>

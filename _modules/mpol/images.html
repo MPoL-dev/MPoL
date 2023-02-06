@@ -290,6 +290,8 @@ title="Source repository"
   <h1>Source code for mpol.images</h1><div class="highlight"><pre>
 <span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
@@ -297,7 +299,6 @@ title="Source repository"
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span>
-<span class="kn">from</span> <span class="nn">.gridding</span> <span class="kn">import</span> <span class="n">_setup_coords</span>
 
 
 <div class="viewcode-block" id="BaseCube"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube">[docs]</a><span class="k">class</span> <span class="nc">BaseCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -321,16 +322,15 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">pixel_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">base_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
 
         <span class="c1"># The ``base_cube`` is already packed to make the Fourier transformation easier</span>
         <span class="k">if</span> <span class="n">base_cube</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -356,6 +356,13 @@ title="Source repository"
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># TODO assert that this is a PyTorch function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pixel_mapping</span> <span class="o">=</span> <span class="n">pixel_mapping</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pixel_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_cube</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseCube</span><span class="p">:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">pixel_mapping</span><span class="p">,</span> <span class="n">base_cube</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -393,7 +400,6 @@ title="Source repository"
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># simple convolutional filter operates on per-channel basis</span>
         <span class="c1"># 3x3 Hann filter</span>
@@ -468,15 +474,15 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">passthrough</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">_setup_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">passthrough</span> <span class="o">=</span> <span class="n">passthrough</span>
 
@@ -503,6 +509,13 @@ title="Source repository"
             <span class="c1"># only be provided as an arg to the forward method, not as</span>
             <span class="c1"># an initialization argument</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cube</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properteis</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">passthrough</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageCube</span><span class="p">:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">passthrough</span><span class="p">,</span> <span class="n">cube</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ImageCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
