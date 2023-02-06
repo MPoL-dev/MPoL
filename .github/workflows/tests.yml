@@ -1,6 +1,6 @@
 name: package test
 
-on: [push, pull_request]
+on: [push, pull_request_target]
 
 jobs:
   dl_files:
