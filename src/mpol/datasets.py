@@ -4,9 +4,10 @@ import copy
 from typing import Any
 
 import numpy as np
-import numpy.typing as npt
 import torch
 import torch.utils.data as torch_ud
+from numpy import floating, integer
+from numpy.typing import NDArray
 
 from mpol.coordinates import GridCoords
 from mpol.exceptions import WrongDimensionError
@@ -150,11 +151,11 @@ class UVDataset(torch_ud.Dataset):
 
     def __init__(
         self,
-        uu: npt.NDArray[np.floating[Any]],
-        vv: npt.NDArray[np.floating[Any]],
-        weights: npt.NDArray[np.floating[Any]],
-        data_re: npt.NDArray[np.floating[Any]],
-        data_im: npt.NDArray[np.floating[Any]],
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        weights: NDArray[floating[Any]],
+        data_re: NDArray[floating[Any]],
+        data_im: NDArray[floating[Any]],
         cell_size: float,
         npix: int,
         device: torch.device = torch.device("cpu"),
@@ -246,8 +247,8 @@ class Dartboard:
     def __init__(
         self,
         coords: GridCoords,
-        q_edges: npt.NDArray[np.floating[Any]] | None = None,
-        phi_edges: npt.NDArray[np.floating[Any]] | None = None,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
     ) -> None:
         self.coords = coords
         self.nchan = 1
@@ -272,11 +273,11 @@ class Dartboard:
         self.phi_edges = phi_edges
 
     @property
-    def cartesian_qs(self) -> npt.NDArray[np.floating[Any]]:
+    def cartesian_qs(self) -> NDArray[floating[Any]]:
         return self.coords.packed_q_centers_2D
 
     @property
-    def cartesian_phis(self) -> npt.NDArray[np.floating[Any]]:
+    def cartesian_phis(self) -> NDArray[floating[Any]]:
         return self.coords.packed_phi_centers_2D
 
     @property
@@ -288,8 +289,8 @@ class Dartboard:
         cls,
         cell_size: float,
         npix: int,
-        q_edges: npt.NDArray[np.floating[Any]] | None = None,
-        phi_edges: npt.NDArray[np.floating[Any]] | None = None,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
     ) -> Dartboard:
         """Alternative method to instantiate a Dartboard object from cell_size
         and npix.
@@ -304,8 +305,8 @@ class Dartboard:
         return cls(coords, q_edges, phi_edges)
 
     def get_polar_histogram(
-        self, qs: npt.NDArray[np.floating[Any]], phis: npt.NDArray[np.floating[Any]]
-    ) -> npt.NDArray[np.floating[Any]]:
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[floating[Any]]:
         r"""
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -320,7 +321,7 @@ class Dartboard:
 
         """
 
-        histogram: npt.NDArray
+        histogram: NDArray
         # make a polar histogram
         histogram, *_ = np.histogram2d(
             qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()]
@@ -329,8 +330,8 @@ class Dartboard:
         return histogram
 
     def get_nonzero_cell_indices(
-        self, qs: npt.NDArray[np.floating[Any]], phis: npt.NDArray[np.floating[Any]]
-    ) -> npt.NDArray[np.integer[Any]]:
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[integer[Any]]:
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -352,8 +353,8 @@ class Dartboard:
         return indices
 
     def build_grid_mask_from_cells(
-        self, cell_index_list: npt.NDArray[np.integer[Any]]
-    ) -> npt.NDArray[np.bool_]:
+        self, cell_index_list: NDArray[integer[Any]]
+    ) -> NDArray[np.bool_]:
         r"""
         Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
 
