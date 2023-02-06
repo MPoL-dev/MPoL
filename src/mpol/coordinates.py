@@ -131,7 +131,7 @@ class GridCoords:
         self.packed_q_centers_2D = np_fft.fftshift(self.sky_q_centers_2D)
         self.packed_phi_centers_2D = np_fft.fftshift(self.sky_phi_centers_2D)
 
-        self.q_max = (
+        self.q_max = float(
             np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
         )  # outer edge [klambda]
 

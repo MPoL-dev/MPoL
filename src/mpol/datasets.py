@@ -6,9 +6,10 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 import torch
-from torch.utils.data import Dataset
+import torch.utils.data as torch_ud
 
 from mpol.coordinates import GridCoords
+from mpol.exceptions import WrongDimensionError
 
 from . import spheroidal_gridding, utils
 from .constants import *
@@ -128,7 +129,7 @@ class GriddedDataset:
 
 
 # custom dataset loader
-class UVDataset(Dataset):
+class UVDataset(torch_ud.Dataset):
     r"""
     Container for loose interferometric visibilities.
 
@@ -149,33 +150,33 @@ class UVDataset(Dataset):
 
     def __init__(
         self,
-        uu=None,
-        vv=None,
-        weights=None,
-        data_re=None,
-        data_im=None,
-        cell_size=None,
-        npix=None,
-        device=None,
+        uu: npt.NDArray[np.floating[Any]],
+        vv: npt.NDArray[np.floating[Any]],
+        weights: npt.NDArray[np.floating[Any]],
+        data_re: npt.NDArray[np.floating[Any]],
+        data_im: npt.NDArray[np.floating[Any]],
+        cell_size: float,
+        npix: int,
+        device: torch.device = torch.device("cpu"),
         **kwargs,
     ):
-        # assert that all vectors are the same shape
-        shape = uu.shape
-        for a in [vv, weights, data_re, data_im]:
-            assert a.shape == shape, "All dataset inputs must be the same shape."
+        # ensure that all vectors are the same shape
+        if not all(
+            array.shape == uu.shape for array in [vv, weights, data_re, data_im]
+        ):
+            raise WrongDimensionError("All dataset inputs must be the same shape.")
 
-        if len(shape) == 1:
+        if uu.ndim == 1:
             uu = np.atleast_2d(uu)
             vv = np.atleast_2d(vv)
             data_re = np.atleast_2d(data_re)
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
-        self.nchan = shape[0]
+        self.nchan = uu.shape[0]
 
-        assert np.all(
-            weights > 0.0
-        ), "Not all thermal weights are positive, check inputs."
+        if np.any(weights <= 0.0):
+            raise ValueError("Not all thermal weights are positive, check inputs.")
 
         if cell_size is not None and npix is not None:
             self.cell_size = cell_size * arcsec  # [radians]
@@ -219,7 +220,7 @@ class UVDataset(Dataset):
 
         # TODO: store kwargs to do something for antenna self-cal
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, ...]:
         return (
             self.uu[index],
             self.vv[index],
@@ -228,7 +229,7 @@ class UVDataset(Dataset):
             self.im[index],
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.uu)
 
 
@@ -279,7 +280,7 @@ class Dartboard:
         return self.coords.packed_phi_centers_2D
 
     @property
-    def q_max(self) -> npt.NDArray[np.floating[Any]]:
+    def q_max(self) -> float:
         return self.coords.q_max
 
     @classmethod
