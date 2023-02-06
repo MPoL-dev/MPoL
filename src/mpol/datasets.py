@@ -432,31 +432,24 @@ class KFoldCrossValidatorGridded:
 
     def __init__(
         self,
-        griddedDataset,
-        k,
-        dartboard=None,
-        q_edges=None,
-        phi_edges=None,
-        npseed=None,
+        gridded_dataset: GriddedDataset,
+        k: int,
+        dartboard: Dartboard | None = None,
+        npseed: int | None = None,
     ):
-        self.griddedDataset = griddedDataset
+        if k <= 0:
+            raise ValueError("k must be a positive integer")
 
-        assert k > 0, "k must be a positive integer"
+        if dartboard is None:
+            dartboard = Dartboard(coords=gridded_dataset.coords)
+
+        self.griddedDataset = gridded_dataset
         self.k = k
-
-        if dartboard is not None:
-            assert (q_edges is None) and (
-                phi_edges is None
-            ), "If providing a Dartboard instance, do not provide q_edges and phi_edges parameters."
-            self.dartboard = dartboard
-        else:
-            self.dartboard = Dartboard(
-                coords=self.griddedDataset.coords, q_edges=q_edges, phi_edges=phi_edges
-            )
+        self.dartboard = dartboard
 
         # 2D mask for any UV cells that contain visibilities
         # in *any* channel
-        stacked_mask = torch.any(self.griddedDataset.mask, axis=0)
+        stacked_mask = torch.any(self.griddedDataset.mask, dim=0)
 
         # get qs, phis from dataset and turn into 1D lists
         qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
@@ -470,15 +463,38 @@ class KFoldCrossValidatorGridded:
         # we don't get structured radial/azimuthal patterns
         if npseed is not None:
             np.random.seed(npseed)
+
         self.k_split_cell_list = np.array_split(
             np.random.permutation(self.cell_list), k
         )
 
-    def __iter__(self):
+    @classmethod
+    def from_dartboard_properties(
+        cls,
+        gridded_dataset: GriddedDataset,
+        k: int,
+        q_edges: NDArray[floating[Any]],
+        phi_edges: NDArray[floating[Any]],
+        npseed: int | None = None,
+    ) -> KFoldCrossValidatorGridded:
+        """
+        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.
+
+         Args:
+             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+             k (int): the number of subpartitions of the dataset
+             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        """
+        dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
+        return cls(gridded_dataset, k, dartboard, npseed)
+
+    def __iter__(self) -> KFoldCrossValidatorGridded:
         self.n = 0  # the current k-slice we're on
         return self
 
-    def __next__(self):
+    def __next__(self) -> tuple[GriddedDataset, GriddedDataset]:
         if self.n < self.k:
             k_list = self.k_split_cell_list.copy()
             cell_list_test = k_list.pop(self.n)
