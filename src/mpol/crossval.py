@@ -19,7 +19,7 @@ class CrossValidate:
         Instance of the `mpol.gridding.Gridder` class.
     kfolds : int, default=5
         Number of k-folds to use in cross-validation
-    split_method : str, default='random cell'
+    split_method : str, default='random_cell'
         Method to split full dataset into train/test subsets
     seed : int, default=None 
         Seed for random number generator used in splitting data

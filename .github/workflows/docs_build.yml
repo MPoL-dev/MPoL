@@ -6,8 +6,6 @@ on:
   pull_request_target:
     types: [review_requested, closed]
     branches: [main]
-  pull_request_target:
-    types: [opened, synchronize, reopened, review_requested]
 
 # Prevent multiple PRs from building/deploying the docs at the same time
 concurrency:

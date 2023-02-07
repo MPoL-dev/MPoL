@@ -138,7 +138,7 @@ def generic_parameters():
     crossval_pars = train_pars.copy()
     crossval_pars["learn_rate"] = 0.5
     crossval_pars["kfolds"] = 2
-    crossval_pars["split_method"] = 'uniform_cell'
+    crossval_pars["split_method"] = 'random_cell'
     crossval_pars["seed"] = 47
     crossval_pars["device"] = None
 
