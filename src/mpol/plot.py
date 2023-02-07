@@ -68,7 +68,7 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
         hist_lab = 'Count'
         
     elif bin_quantity == 'weight':
-        weights = torch2npy(dataset.weight_indexed)
+        data_weight = torch2npy(dataset.weight_indexed)
         weights = np.copy(data_weight)
         hist_lab = 'Weight'
 
