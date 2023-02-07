@@ -197,53 +197,74 @@ class Dartboard:
     A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
 
     Args:
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-
     """
 
-    def __init__(self, coords=None, q_edges=None, phi_edges=None):
+    def __init__(
+        self,
+        coords: GridCoords,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
+    ) -> None:
         self.coords = coords
         self.nchan = 1
 
-        # copy over relevant quantities from coords
-        # these are in packed format
-        self.cartesian_qs = self.coords.packed_q_centers_2D
-        self.cartesian_phis = self.coords.packed_phi_centers_2D
+        # if phi_edges is not given, we'll instantiate
+        if phi_edges is None:
+            phi_edges = np.linspace(0, np.pi, num=8 + 1)  # [radians]
+        elif not all(0 <= edge <= np.pi for edge in phi_edges):
+            raise ValueError("Elements of phi_edges must be between 0 and pi.")
 
-        # set q_max to the max q in coords
-        self.q_max = self.coords.q_max  # [klambda]
-
-        if q_edges is not None:
-            self.q_edges = q_edges
-        else:
+        if q_edges is None:
             # set q edges approximately following inspriation from Petry et al. scheme:
             # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
             # first two bins set to 7m width
             # after third bin, bin width increases linearly until it is 700m at 16km baseline.
             # From 16m to 16km, bin width goes from 7m to 700m.
-
+            # ---
             # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
-            self.q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
+            q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
 
-        if phi_edges is not None:
-            assert np.all(phi_edges >= 0) & np.all(
-                phi_edges <= np.pi
-            ), "phi edges must be between 0 and pi"
+        self.q_edges = q_edges
             self.phi_edges = phi_edges
-        else:
-            # set phi edges
-            self.phi_edges = np.linspace(0, np.pi, num=8 + 1)  # [radians]
+
+    @property
+    def cartesian_qs(self) -> NDArray[floating[Any]]:
+        return self.coords.packed_q_centers_2D
+
+    @property
+    def cartesian_phis(self) -> NDArray[floating[Any]]:
+        return self.coords.packed_phi_centers_2D
+
+    @property
+    def q_max(self) -> float:
+        return self.coords.q_max
 
     @classmethod
-    def from_image_properties(cls, cell_size, npix, q_edges, phi_edges) -> Dartboard:
+    def from_image_properties(
+        cls,
+        cell_size: float,
+        npix: int,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
+    ) -> Dartboard:
+        """Alternative method to instantiate a Dartboard object from cell_size
+        and npix.
+
+        Args:
+            cell_size (float): the width of a pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+            phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+        """
         coords = GridCoords(cell_size, npix)
         return cls(coords, q_edges, phi_edges)
 
-    def get_polar_histogram(self, qs, phis):
+    def get_polar_histogram(
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[floating[Any]]:
         r"""
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -258,14 +279,17 @@ class Dartboard:
 
         """
 
+        histogram: NDArray
         # make a polar histogram
-        H, x_edges, y_edges = np.histogram2d(
-            qs, phis, bins=[self.q_edges, self.phi_edges]
+        histogram, *_ = np.histogram2d(
+            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()]
         )
 
-        return H
+        return histogram
 
-    def get_nonzero_cell_indices(self, qs, phis):
+    def get_nonzero_cell_indices(
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[integer[Any]]:
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
 
@@ -280,13 +304,15 @@ class Dartboard:
         """
 
         # make a polar histogram
-        H = self.get_polar_histogram(qs, phis)
+        histogram = self.get_polar_histogram(qs, phis)
 
-        indices = np.argwhere(H > 0)  # [i,j] indexes to go to q, phi
+        indices = np.argwhere(histogram > 0)  # [i,j] indexes to go to q, phi
 
         return indices
 
-    def build_grid_mask_from_cells(self, cell_index_list):
+    def build_grid_mask_from_cells(
+        self, cell_index_list: NDArray[integer[Any]]
+    ) -> NDArray[np.bool_]:
         r"""
         Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
 
@@ -345,31 +371,24 @@ class KFoldCrossValidatorGridded:
 
     def __init__(
         self,
-        griddedDataset,
-        k,
-        dartboard=None,
-        q_edges=None,
-        phi_edges=None,
-        npseed=None
+        gridded_dataset: GriddedDataset,
+        k: int,
+        dartboard: Dartboard | None = None,
+        npseed: int | None = None,
     ):
-        self.griddedDataset = griddedDataset
+        if k <= 0:
+            raise ValueError("k must be a positive integer")
 
-        assert k > 0, "k must be a positive integer"
+        if dartboard is None:
+            dartboard = Dartboard(coords=gridded_dataset.coords)
+
+        self.griddedDataset = gridded_dataset
         self.k = k
-
-        if dartboard is not None:
-            assert (q_edges is None) and (
-                phi_edges is None
-            ), "If providing a Dartboard instance, do not provide q_edges and phi_edges parameters."
             self.dartboard = dartboard
-        else:
-            self.dartboard = Dartboard(
-                coords=self.griddedDataset.coords, q_edges=q_edges, phi_edges=phi_edges
-            )
 
         # 2D mask for any UV cells that contain visibilities
         # in *any* channel
-        stacked_mask = torch.any(self.griddedDataset.mask, axis=0)
+        stacked_mask = torch.any(self.griddedDataset.mask, dim=0)
 
         # get qs, phis from dataset and turn into 1D lists
         qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
@@ -383,15 +402,38 @@ class KFoldCrossValidatorGridded:
         # we don't get structured radial/azimuthal patterns
         if npseed is not None:
             np.random.seed(npseed)
+
         self.k_split_cell_list = np.array_split(
             np.random.permutation(self.cell_list), k
         )
 
-    def __iter__(self):
+    @classmethod
+    def from_dartboard_properties(
+        cls,
+        gridded_dataset: GriddedDataset,
+        k: int,
+        q_edges: NDArray[floating[Any]],
+        phi_edges: NDArray[floating[Any]],
+        npseed: int | None = None,
+    ) -> KFoldCrossValidatorGridded:
+        """
+        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.
+
+         Args:
+             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+             k (int): the number of subpartitions of the dataset
+             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        """
+        dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
+        return cls(gridded_dataset, k, dartboard, npseed)
+
+    def __iter__(self) -> KFoldCrossValidatorGridded:
         self.n = 0  # the current k-slice we're on
         return self
 
-    def __next__(self):
+    def __next__(self) -> tuple[GriddedDataset, GriddedDataset]:
         if self.n < self.k:
             k_list = self.k_split_cell_list.copy()
             cell_list_test = k_list.pop(self.n)
