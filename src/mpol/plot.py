@@ -112,7 +112,9 @@ def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None,
     discrete_colors = cmap(np.linspace(0, 1, 10))
     cmap = mco.LinearSegmentedColormap.from_list(None, discrete_colors, 10)
 
-    norm = mco.LogNorm(vmin=1)
+    # choose sensible minimum for colormap
+    vmin = max(H2d.flatten()[H2d.flatten() > 0].min(), 1)
+    norm = mco.LogNorm(vmin=vmin)
 
     im = ax2.pcolormesh(
         phi_edges, 
