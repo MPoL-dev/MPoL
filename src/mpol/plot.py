@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt 
-import matplotlib.colors as mco 
+import matplotlib.pyplot as plt # type: ignore
+import matplotlib.colors as mco # type: ignore
 
 from mpol.utils import loglinspace, torch2npy
 
