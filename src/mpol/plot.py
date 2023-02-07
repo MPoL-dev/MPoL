@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.colors as mco 
 
-from mpol.utils import loglinspace
+from mpol.utils import loglinspace, torch2npy
 
-def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None, 
-    q_edges1d=None, show_datapoints=False, savename=None):
+def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
+    phi_edges=None, q_edges1d=None, show_datapoints=False, savename=None):
     r"""
     Generate a figure with 1d and 2d histograms of (u,v)-plane coverage. 
     Histograms can give raw counts or weighted counts using the dataset weights.
@@ -13,10 +13,15 @@ def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None,
     Parameters
     ----------
     dataset : `mpol.datasets.GriddedDataset` object
-    show_weights : bool, default=False
-        Whether to weight histogram bin counts by the data weight (inherited 
-        from `dataset` normalized to the mean data weight across all points in
-        full dataset)
+    bin_quantity : str or numpy.ndarray, default='count'
+        Which quantity to bin:
+            - 'count' bins (u,v) points by their count
+            - 'weight' bins points by the data weight (inherited from `dataset`)
+            - 'vis_real' bins points by data Re(V)
+            - 'vis_imag' bins points by data Im(V)
+            - A user-supplied numpy.ndarray to be used as 'weights' in np.histogram 
+    bin_label : str, default=None
+        Label for 1d histogram y-axis and 2d histogram colorbar.
     q_edges : array, optional (default=None), unit=:math:[`k\lambda`] 
         Radial bin edges for the 1d and 2d histogram. If `None`, defaults to 
         12 log-linearly radial bins over [0, 1.1 * maximum baseline in 
