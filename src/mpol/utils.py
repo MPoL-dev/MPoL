@@ -5,6 +5,10 @@ import torch
 
 from .constants import arcsec, c_ms, cc, deg, kB
 
+def torch2npy(tensor):
+    """Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting"""
+    return tensor.detach().cpu().numpy()
+
 
 def ground_cube_to_packed_cube(ground_cube):
     r"""
