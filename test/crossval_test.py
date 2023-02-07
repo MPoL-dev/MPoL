@@ -13,7 +13,7 @@ def test_crossvalclass_split_dartboard(coords, gridder, dataset, generic_paramet
     test_train_datasets = cross_validator.split_dataset(dataset)
 
 
-def test_crossvalclass_split_uniformcell(coords, gridder, dataset, generic_parameters):
+def test_crossvalclass_split_randomcell(coords, gridder, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'dartboard' splitter
 
