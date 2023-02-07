@@ -4,6 +4,7 @@ import torch
 
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
+from mpol.datasets import Dartboard
 
 class CrossValidate:
     r"""
@@ -192,7 +193,7 @@ class CrossValidate:
         return cv_score, all_scores, loss_histories
     
 
-class KFoldCrossValidatorGridded:
+class DartboardSplitGridded:
     r"""
     Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.
 
@@ -206,7 +207,7 @@ class KFoldCrossValidatorGridded:
 
     Once initialized, iterate through the datasets like
 
-    >>> cv = datasets.KFoldCrossValidatorGridded(dataset, k)
+    >>> cv = crossval.DartboardSplitGridded(dataset, k)
     >>> for (train, test) in cv: # iterate among k datasets
     >>> ... # working with the n-th slice of k datasets
     >>> ... # do operations with train dataset
@@ -260,9 +261,9 @@ class KFoldCrossValidatorGridded:
         q_edges: NDArray[floating[Any]],
         phi_edges: NDArray[floating[Any]],
         npseed: int | None = None,
-    ) -> KFoldCrossValidatorGridded:
+    ) -> DartboardSplitGridded:
         """
-        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.
+        Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.
 
          Args:
              griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
@@ -274,7 +275,7 @@ class KFoldCrossValidatorGridded:
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
         return cls(gridded_dataset, k, dartboard, npseed)
 
-    def __iter__(self) -> KFoldCrossValidatorGridded:
+    def __iter__(self) -> DartboardSplitGridded:
         self.n = 0  # the current k-slice we're on
         return self
 
