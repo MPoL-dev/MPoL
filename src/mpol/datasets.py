@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 
 import numpy as np
 import torch
-from torch.utils.data import Dataset
+import torch.utils.data as torch_ud
+from numpy import floating, integer
+from numpy.typing import ArrayLike, NDArray
 
 from mpol.coordinates import GridCoords
+from mpol.exceptions import WrongDimensionError
 
 from . import spheroidal_gridding, utils
 from .constants import *
@@ -16,15 +20,12 @@ from .utils import loglinspace
 class GriddedDataset:
     r"""
     Args:
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the image (default = 1).
         vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
         weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
         mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+        nchan (int): the number of channels in the image (default = 1).
         device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
-
 
     After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.
 
@@ -36,13 +37,14 @@ class GriddedDataset:
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        vis_gridded=None,
-        weight_gridded=None,
-        mask=None,
-        device=None,
-    ):
+        *,
+        coords: GridCoords,
+        vis_gridded: torch.Tensor,
+        weight_gridded: torch.Tensor,
+        mask: torch.Tensor,
+        nchan: int = 1,
+        device: torch.device = torch.device("cpu"),
+    ) -> None:
         self.coords = coords
         self.nchan = nchan
 
@@ -58,12 +60,39 @@ class GriddedDataset:
 
     @classmethod
     def from_image_properties(
-        cls, cell_size, npix, nchan, vis_gridded, weight_gridded, mask, device
+        cls,
+        cell_size: float,
+        npix: int,
+        *,
+        vis_gridded: torch.Tensor,
+        weight_gridded: torch.Tensor,
+        mask: torch.Tensor,
+        nchan: int = 1,
+        device: torch.device = torch.device("cpu"),
     ):
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, vis_gridded, weight_gridded, mask, device)
+        """Alternative method to instantiate a GriddedDataset object from cell_size and npix.
 
-    def add_mask(self, mask, device=None):
+        Args:
+            cell_size (float): the width of a pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
+            weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
+            mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+            nchan (int): the number of channels in the image (default = 1).
+            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
+        """
+        return cls(
+            coords=GridCoords(cell_size, npix),
+            vis_gridded=vis_gridded,
+            weight_gridded=weight_gridded,
+            mask=mask,
+            nchan=nchan,
+            device=device,
+        )
+
+    def add_mask(
+        self, mask: ArrayLike, device: torch.device = torch.device("cpu")
+    ) -> None:
         r"""
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
 
@@ -92,7 +121,7 @@ class GriddedDataset:
         self.weight_indexed = self.weight_gridded[self.mask]
 
     @property
-    def ground_mask(self):
+    def ground_mask(self) -> torch.Tensor:
         r"""
         The boolean mask, arranged in ground format.
 
@@ -102,7 +131,7 @@ class GriddedDataset:
         """
         return utils.packed_cube_to_ground_cube(self.mask)
 
-    def to(self, device):
+    def to(self, device: torch.device = torch.device("cpu")) -> GriddedDataset:
         """
         Moves the tensors of the dataset to specified device.
 
@@ -126,7 +155,7 @@ class GriddedDataset:
 
 
 # custom dataset loader
-class UVDataset(Dataset):
+class UVDataset(torch_ud.Dataset):
     r"""
     Container for loose interferometric visibilities.
 
@@ -147,77 +176,71 @@ class UVDataset(Dataset):
 
     def __init__(
         self,
-        uu=None,
-        vv=None,
-        weights=None,
-        data_re=None,
-        data_im=None,
-        cell_size=None,
-        npix=None,
-        device=None,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        weights: NDArray[floating[Any]],
+        data_re: NDArray[floating[Any]],
+        data_im: NDArray[floating[Any]],
+        cell_size: float | None = None,
+        npix: int | None = None,
+        device: torch.device = torch.device("cpu"),
         **kwargs,
     ):
-        # assert that all vectors are the same shape
-        shape = uu.shape
-        for a in [vv, weights, data_re, data_im]:
-            assert a.shape == shape, "All dataset inputs must be the same shape."
+        # ensure that all vectors are the same shape
+        if not all(
+            array.shape == uu.shape for array in [vv, weights, data_re, data_im]
+        ):
+            raise WrongDimensionError("All dataset inputs must be the same shape.")
 
-        if len(shape) == 1:
+        if uu.ndim == 1:
             uu = np.atleast_2d(uu)
             vv = np.atleast_2d(vv)
             data_re = np.atleast_2d(data_re)
             data_im = np.atleast_2d(data_im)
             weights = np.atleast_2d(weights)
 
-        self.nchan = shape[0]
+        if np.any(weights <= 0.0):
+            raise ValueError("Not all thermal weights are positive, check inputs.")
 
-        assert np.all(
-            weights > 0.0
-        ), "Not all thermal weights are positive, check inputs."
+        self.nchan = uu.shape[0]
+        self.gridded = False
 
         if cell_size is not None and npix is not None:
-            self.cell_size = cell_size * arcsec  # [radians]
-            self.npix = npix
-
             (
-                uu_grid,
-                vv_grid,
+                uu,
+                vv,
                 grid_mask,
-                g_weights,
-                g_re,
-                g_im,
+                weights,
+                data_re,
+                data_im,
             ) = spheroidal_gridding.grid_dataset(
                 uu,
                 vv,
                 weights,
                 data_re,
                 data_im,
-                self.cell_size / arcsec,
-                npix=self.npix,
+                cell_size,
+                npix,
             )
 
-            # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.
-            self.uu = torch.tensor(uu_grid, device=device)
-            self.vv = torch.tensor(vv_grid, device=device)
+            # grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT
+            # designed to directly index into the output to evaluate against pre-gridded visibilities.
             self.grid_mask = torch.tensor(grid_mask, dtype=torch.bool, device=device)
-            self.weights = torch.tensor(g_weights, device=device)
-            self.re = torch.tensor(g_re, device=device)
-            self.im = torch.tensor(g_im, device=device)
+            self.cell_size = cell_size * arcsec  # [radians]
+            self.npix = npix
             self.gridded = True
 
-        else:
-            self.gridded = False
-            self.uu = torch.tensor(uu, dtype=torch.double, device=device)  # klambda
-            self.vv = torch.tensor(vv, dtype=torch.double, device=device)  # klambda
-            self.weights = torch.tensor(
-                weights, dtype=torch.double, device=device
-            )  # 1/Jy^2
-            self.re = torch.tensor(data_re, dtype=torch.double, device=device)  # Jy
-            self.im = torch.tensor(data_im, dtype=torch.double, device=device)  # Jy
+        self.uu = torch.tensor(uu, dtype=torch.double, device=device)  # klambda
+        self.vv = torch.tensor(vv, dtype=torch.double, device=device)  # klambda
+        self.weights = torch.tensor(
+            weights, dtype=torch.double, device=device
+        )  # 1/Jy^2
+        self.re = torch.tensor(data_re, dtype=torch.double, device=device)  # Jy
+        self.im = torch.tensor(data_im, dtype=torch.double, device=device)  # Jy
 
         # TODO: store kwargs to do something for antenna self-cal
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, ...]:
         return (
             self.uu[index],
             self.vv[index],
@@ -226,5 +249,274 @@ class UVDataset(Dataset):
             self.im[index],
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.uu)
+
+
+class Dartboard:
+    r"""
+    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
+
+    Args:
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+    """
+
+    def __init__(
+        self,
+        coords: GridCoords,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
+    ) -> None:
+        self.coords = coords
+        self.nchan = 1
+
+        # if phi_edges is not given, we'll instantiate
+        if phi_edges is None:
+            phi_edges = np.linspace(0, np.pi, num=8 + 1)  # [radians]
+        elif not all(0 <= edge <= np.pi for edge in phi_edges):
+            raise ValueError("Elements of phi_edges must be between 0 and pi.")
+
+        if q_edges is None:
+            # set q edges approximately following inspriation from Petry et al. scheme:
+            # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
+            # first two bins set to 7m width
+            # after third bin, bin width increases linearly until it is 700m at 16km baseline.
+            # From 16m to 16km, bin width goes from 7m to 700m.
+            # ---
+            # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
+            q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
+
+        self.q_edges = q_edges
+        self.phi_edges = phi_edges
+
+    @property
+    def cartesian_qs(self) -> NDArray[floating[Any]]:
+        return self.coords.packed_q_centers_2D
+
+    @property
+    def cartesian_phis(self) -> NDArray[floating[Any]]:
+        return self.coords.packed_phi_centers_2D
+
+    @property
+    def q_max(self) -> float:
+        return self.coords.q_max
+
+    @classmethod
+    def from_image_properties(
+        cls,
+        cell_size: float,
+        npix: int,
+        q_edges: NDArray[floating[Any]] | None = None,
+        phi_edges: NDArray[floating[Any]] | None = None,
+    ) -> Dartboard:
+        """Alternative method to instantiate a Dartboard object from cell_size
+        and npix.
+
+        Args:
+            cell_size (float): the width of a pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+            phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+        """
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, q_edges, phi_edges)
+
+    def get_polar_histogram(
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[floating[Any]]:
+        r"""
+        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
+
+        Data coordinates should include the points for the Hermitian visibilities.
+
+        Args:
+            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
+        Returns:
+            2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.
+
+        """
+
+        histogram: NDArray
+        # make a polar histogram
+        histogram, *_ = np.histogram2d(
+            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()]
+        )
+
+        return histogram
+
+    def get_nonzero_cell_indices(
+        self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
+    ) -> NDArray[integer[Any]]:
+        r"""
+        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
+
+        Data coordinates should include the points for the Hermitian visibilities.
+
+        Args:
+            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
+        Returns:
+            list of cell indices where cell contains at least one datapoint.
+        """
+
+        # make a polar histogram
+        histogram = self.get_polar_histogram(qs, phis)
+
+        indices = np.argwhere(histogram > 0)  # [i,j] indexes to go to q, phi
+
+        return indices
+
+    def build_grid_mask_from_cells(
+        self, cell_index_list: NDArray[integer[Any]]
+    ) -> NDArray[np.bool_]:
+        r"""
+        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
+
+        Args:
+            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
+
+        Returns: (numpy array) 2D boolean mask in packed format.
+        """
+        mask = np.zeros_like(self.cartesian_qs, dtype="bool")
+
+        # uses about a Gb..., and this only 256x256
+        for cell_index in cell_index_list:
+            qi, pi = cell_index
+            q_min, q_max = self.q_edges[qi : qi + 2]
+            p0_min, p0_max = self.phi_edges[pi : pi + 2]
+            # also include Hermitian values
+            p1_min, p1_max = self.phi_edges[pi : pi + 2] - np.pi
+
+            # whether or not the q and phi values of the coordinate array
+            # fit in the q cell and *either of* the regular or Hermitian phi cell
+            ind = (
+                (self.cartesian_qs >= q_min)
+                & (self.cartesian_qs < q_max)
+                & (
+                    ((self.cartesian_phis > p0_min) & (self.cartesian_phis <= p0_max))
+                    | ((self.cartesian_phis > p1_min) & (self.cartesian_phis <= p1_max))
+                )
+            )
+
+            mask[ind] = True
+
+        return mask
+
+
+class KFoldCrossValidatorGridded:
+    r"""
+    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.
+
+    Args:
+        griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+        k (int): the number of subpartitions of the dataset
+        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+
+    Once initialized, iterate through the datasets like
+
+    >>> cv = datasets.KFoldCrossValidatorGridded(dataset, k)
+    >>> for (train, test) in cv: # iterate among k datasets
+    >>> ... # working with the n-th slice of k datasets
+    >>> ... # do operations with train dataset
+    >>> ... # do operations with test dataset
+
+    """
+
+    def __init__(
+        self,
+        gridded_dataset: GriddedDataset,
+        k: int,
+        dartboard: Dartboard | None = None,
+        npseed: int | None = None,
+    ):
+        if k <= 0:
+            raise ValueError("k must be a positive integer")
+
+        if dartboard is None:
+            dartboard = Dartboard(coords=gridded_dataset.coords)
+
+        self.griddedDataset = gridded_dataset
+        self.k = k
+        self.dartboard = dartboard
+
+        # 2D mask for any UV cells that contain visibilities
+        # in *any* channel
+        stacked_mask = torch.any(self.griddedDataset.mask, dim=0)
+
+        # get qs, phis from dataset and turn into 1D lists
+        qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
+        phis = self.griddedDataset.coords.packed_phi_centers_2D[stacked_mask]
+
+        # create the full cell_list
+        self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
+
+        # partition the cell_list into k pieces
+        # first, randomly permute the sequence to make sure
+        # we don't get structured radial/azimuthal patterns
+        if npseed is not None:
+            np.random.seed(npseed)
+
+        self.k_split_cell_list = np.array_split(
+            np.random.permutation(self.cell_list), k
+        )
+
+    @classmethod
+    def from_dartboard_properties(
+        cls,
+        gridded_dataset: GriddedDataset,
+        k: int,
+        q_edges: NDArray[floating[Any]],
+        phi_edges: NDArray[floating[Any]],
+        npseed: int | None = None,
+    ) -> KFoldCrossValidatorGridded:
+        """
+        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.
+
+         Args:
+             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+             k (int): the number of subpartitions of the dataset
+             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
+             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        """
+        dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
+        return cls(gridded_dataset, k, dartboard, npseed)
+
+    def __iter__(self) -> KFoldCrossValidatorGridded:
+        self.n = 0  # the current k-slice we're on
+        return self
+
+    def __next__(self) -> tuple[GriddedDataset, GriddedDataset]:
+        if self.n < self.k:
+            k_list = self.k_split_cell_list.copy()
+            cell_list_test = k_list.pop(self.n)
+
+            # put the remaining indices back into a full list
+            cell_list_train = np.concatenate(k_list)
+
+            # create the masks for each cell_list
+            train_mask = self.dartboard.build_grid_mask_from_cells(cell_list_train)
+            test_mask = self.dartboard.build_grid_mask_from_cells(cell_list_test)
+
+            # copy original dateset
+            train = copy.deepcopy(self.griddedDataset)
+            test = copy.deepcopy(self.griddedDataset)
+
+            # and use these masks to limit new datasets to only unmasked cells
+            train.add_mask(train_mask)
+            test.add_mask(test_mask)
+
+            self.n += 1
+
+            return train, test
+
+        else:
+            raise StopIteration

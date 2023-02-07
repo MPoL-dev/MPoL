@@ -60,3 +60,9 @@ The objects in the Images and Precomposed modules are focused on bringing some i
 Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
 
 .. automodule:: mpol.connectors
+
+
+Plotting
+------
+
+.. automodule:: mpol.plot
