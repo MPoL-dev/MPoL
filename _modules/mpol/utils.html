@@ -295,6 +295,10 @@ title="Source repository"
 
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">c_ms</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">kB</span>
 
+<div class="viewcode-block" id="torch2npy"><a class="viewcode-back" href="../../api.html#mpol.utils.torch2npy">[docs]</a><span class="k">def</span> <span class="nf">torch2npy</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>

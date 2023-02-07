@@ -381,6 +381,11 @@ title="Print to PDF"
    Connectors
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting">
+   Plotting
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -445,6 +450,11 @@ title="Print to PDF"
    Connectors
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting">
+   Plotting
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -460,6 +470,12 @@ title="Print to PDF"
 <p>This page documents all of the available components of the MPoL package. If you do not see something that you think should be documented, please raise an <a class="reference external" href="https://github.com/iancze/MPoL/issues">issue</a>.</p>
 <section id="module-mpol.utils">
 <span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-mpol.utils" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.torch2npy">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">torch2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#torch2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.torch2npy" title="Permalink to this definition">#</a></dt>
+<dd><p>Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.ground_cube_to_packed_cube">
 <span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">ground_cube_to_packed_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#ground_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.ground_cube_to_packed_cube" title="Permalink to this definition">#</a></dt>
@@ -2122,6 +2138,55 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">#</a></h2>
+<span class="target" id="module-mpol.plot"></span><dl class="py function">
+<dt class="sig sig-object py" id="mpol.plot.vis_histogram">
+<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">vis_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges1d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_datapoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#vis_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.vis_histogram" title="Permalink to this definition">#</a></dt>
+<dd><p>Generate a figure with 1d and 2d histograms of (u,v)-plane coverage.
+Histograms can give raw counts or weighted counts using the dataset weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<cite>mpol.datasets.GriddedDataset</cite> object) – </p></li>
+<li><p><strong>bin_quantity</strong> (<em>str</em><em> or </em><em>numpy.ndarray</em><em>, </em><em>default='count'</em>) – <dl class="simple">
+<dt>Which quantity to bin:</dt><dd><ul>
+<li><p>’count’ bins (u,v) points by their count</p></li>
+<li><p>’weight’ bins points by the data weight (inherited from <cite>dataset</cite>)</p></li>
+<li><p>’vis_real’ bins points by data Re(V)</p></li>
+<li><p>’vis_imag’ bins points by data Im(V)</p></li>
+<li><p>A user-supplied numpy.ndarray to be used as ‘weights’ in np.histogram</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>bin_label</strong> (<em>str</em><em>, </em><em>default=None</em>) – Label for 1d histogram y-axis and 2d histogram colorbar.</p></li>
+<li><p><strong>q_edges</strong> (array, optional (default=None), unit=:math:[<cite>klambda</cite>]) – Radial bin edges for the 1d and 2d histogram. If <cite>None</cite>, defaults to
+12 log-linearly radial bins over [0, 1.1 * maximum baseline in
+<cite>dataset</cite>].</p></li>
+<li><p><strong>phi_edges</strong> (<em>array</em><em>, </em><em>optional</em><em> (</em><em>default=None</em><em>)</em><em>, </em><em>unit=</em><em>[</em><em>rad</em><em>]</em>) – Azimuthal bin edges for the 2d histogram. If <cite>None</cite>, defaults to
+16 bins over [-pi, pi]</p></li>
+<li><p><strong>q_edges1d</strong> (array, optional (default=None), unit=:math:[<cite>klambda</cite>]) – Radial bin edges for a second 1d histogram. If <cite>None</cite>, defaults to
+50 bins equispaced over [0, 1.1 * maximum baseline in <cite>dataset</cite>].</p></li>
+<li><p><strong>show_datapoints</strong> (<em>bool</em><em>, </em><em>default = False</em>) – Whether to overplot the raw visibilities in <cite>dataset</cite> on the 2d
+histogram.</p></li>
+<li><p><strong>savename</strong> (<em>string</em><em>, </em><em>default = None</em>) – If provided, the generated figure will be saved to <cite>savename</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (Matplotlib <cite>.Figure</cite> instance) – The generated figure</p></li>
+<li><p><strong>axes</strong> (Matplotlib <cite>~.axes.Axes</cite> class) – Axes of the generated figure</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>No assumption or correction is made concerning whether the (u,v) distances
+are projected or deprojected.</p>
 </dd></dl>
 
 </section>
