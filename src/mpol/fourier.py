@@ -1,5 +1,7 @@
 r"""The ``fourier`` module provides the core functionality of MPoL via :class:`mpol.fourier.FourierCube`."""
 
+from __future__ import annotations
+
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
@@ -8,7 +10,6 @@ from torch import nn
 
 from . import utils
 from .coordinates import GridCoords
-from .gridding import _setup_coords
 
 
 class FourierCube(nn.Module):
@@ -19,11 +20,9 @@ class FourierCube(nn.Module):
         cell_size (float): the width of an image-plane pixel [arcseconds]
         npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-
     """
 
     def __init__(self, cell_size=None, npix=None, coords=None):
-
         super().__init__()
 
         # we don't want to bother with the nchan argument here, so
@@ -41,6 +40,9 @@ class FourierCube(nn.Module):
             ), "GridCoords must be empty if npix and cell_size are supplied."
 
             self.coords = GridCoords(cell_size=cell_size, npix=npix)
+
+        self.register_buffer("vis", None)
+
 
     def forward(self, cube):
         """
@@ -60,7 +62,7 @@ class FourierCube(nn.Module):
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
         self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
-
+        
         return self.vis
 
     @property
@@ -216,17 +218,16 @@ class NuFFT(nn.Module):
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         uu=None,
         vv=None,
         sparse_matrices=True,
     ):
-
         super().__init__()
-        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.coords = coords
+        self.nchan = nchan
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
@@ -234,7 +235,7 @@ class NuFFT(nn.Module):
         )
 
         if (uu is not None) and (vv is not None):
-            self.k_traj = self._assemble_ktraj(uu, vv)
+            self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
         else:
             raise ValueError("uu and vv are required arguments.")
 
@@ -243,9 +244,12 @@ class NuFFT(nn.Module):
         if self.sparse_matrices:
             if self.same_uv:
                 # precompute the sparse interpolation matrices
-                self.interp_mats = torchkbnufft.calc_tensor_spmatrix(
+                real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
                     self.k_traj, im_size=(self.coords.npix, self.coords.npix)
                 )
+                self.register_buffer("real_interp_mat", real_interp_mat)
+                self.register_buffer("imag_interp_mat", imag_interp_mat)
+
             else:
                 import warnings
 
@@ -255,6 +259,13 @@ class NuFFT(nn.Module):
                 )
                 self.interp_mats = None
                 self.sparse_matrices = False
+
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan=1, uu=None, vv=None, sparse_matrices=True
+    ) -> NuFFT:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, uu, vv, sparse_matrices)
 
     def _klambda_to_radpix(self, klambda):
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
@@ -381,7 +392,9 @@ class NuFFT(nn.Module):
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         if self.sparse_matrices:
             output = self.coords.cell_size**2 * self.nufft_ob(
-                expanded, self.k_traj, interp_mats=self.interp_mats
+                expanded,
+                self.k_traj,
+                interp_mats=(self.real_interp_mat, self.imag_interp_mat),
             )
         else:
             output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)

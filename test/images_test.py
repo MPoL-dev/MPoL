@@ -8,34 +8,37 @@ from mpol.constants import *
 
 
 def test_odd_npix():
-    with pytest.raises(AssertionError):
-        images.BaseCube(npix=853, nchan=30, cell_size=0.015)
+    expected_error_message = "Image must have an even number of pixels."
 
-    with pytest.raises(AssertionError):
-        images.ImageCube(npix=853, nchan=30, cell_size=0.015)
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.BaseCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
+
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.ImageCube.from_image_properteis(npix=853, nchan=30, cell_size=0.015)
 
 
 def test_negative_cell_size():
-    with pytest.raises(AssertionError):
-        images.BaseCube(npix=800, nchan=30, cell_size=-0.015)
+    expected_error_message = "cell_size must be a positive real number."
 
-    with pytest.raises(AssertionError):
-        images.ImageCube(npix=800, nchan=30, cell_size=-0.015)
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.BaseCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
+
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.ImageCube.from_image_properteis(npix=800, nchan=30, cell_size=-0.015)
 
 
 def test_single_chan():
-    im = images.ImageCube(cell_size=0.015, npix=800)
+    im = images.ImageCube.from_image_properteis(cell_size=0.015, npix=800)
     assert im.nchan == 1
 
 
 def test_basecube_grad():
-    bcube = images.BaseCube(npix=800, cell_size=0.015)
+    bcube = images.BaseCube.from_image_properties(npix=800, cell_size=0.015)
     loss = torch.sum(bcube.forward())
     loss.backward()
 
 
 def test_imagecube_grad(coords):
-
     bcube = images.BaseCube(coords=coords)
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, passthrough=True)
@@ -69,7 +72,6 @@ def test_imagecube_tofits(coords, tmp_path):
 
 
 def test_basecube_imagecube(coords, tmp_path):
-
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
