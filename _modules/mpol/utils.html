@@ -288,8 +288,9 @@ title="Source repository"
               <div>
                 
   <h1>Source code for mpol.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">arcsec</span><span class="p">,</span> <span class="n">c_ms</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">kB</span>
@@ -309,7 +310,7 @@ title="Source repository"
     <span class="k">return</span> <span class="n">shifted</span></div>
 
 
-<div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
+<div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.</span>
 
@@ -320,6 +321,7 @@ title="Source repository"
 <span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Ground Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
+    <span class="n">shifted</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">shifted</span></div>
 
@@ -444,36 +446,40 @@ title="Source repository"
 
 <div class="viewcode-block" id="check_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.check_baselines">[docs]</a><span class="k">def</span> <span class="nf">check_baselines</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">min_feasible_q</span><span class="o">=</span><span class="mf">1e0</span><span class="p">,</span> <span class="n">max_feasible_q</span><span class="o">=</span><span class="mf">1e5</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check if baseline lengths are sensible for expected code unit of </span>
+<span class="sd">    Check if baseline lengths are sensible for expected code unit of</span>
 <span class="sd">    [k\lambda], or if instead they&#39;re being supplied in [\lambda].</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">     q : array, unit = :math:`k\lambda`</span>
-<span class="sd">        Baseline distribution (all values must be non-negative). </span>
+<span class="sd">        Baseline distribution (all values must be non-negative).</span>
 <span class="sd">    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0</span>
-<span class="sd">        Minimum baseline in code units expected for a dataset. The default </span>
+<span class="sd">        Minimum baseline in code units expected for a dataset. The default</span>
 <span class="sd">        value of 1e0 is a conservative value for ALMA, assuming a minimum</span>
 <span class="sd">        antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.</span>
 <span class="sd">    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5</span>
-<span class="sd">        Maximum baseline in code units expected for a dataset. The default </span>
-<span class="sd">        value of 1e5 is a conservative value for ALMA, assuming a maximum </span>
+<span class="sd">        Maximum baseline in code units expected for a dataset. The default</span>
+<span class="sd">        value of 1e5 is a conservative value for ALMA, assuming a maximum</span>
 <span class="sd">        antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span>
-    
+
     <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_feasible_q</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;Maximum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is &gt; maximum expected &quot;</span>
-                <span class="s2">&quot;value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
-                <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
-                <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">max_feasible_q</span><span class="p">))</span> 
+        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span>
+            <span class="s2">&quot;Maximum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is &gt; maximum expected &quot;</span>
+            <span class="s2">&quot;value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
+            <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
+            <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">max_feasible_q</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">min_feasible_q</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;Minimum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is large for expected &quot;</span>
-                    <span class="s2">&quot;minimum value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
-                    <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
-                    <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">min_feasible_q</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">))</span> </div>
+        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span>
+            <span class="s2">&quot;Minimum baseline of </span><span class="si">{:.1e}</span><span class="s2"> is large for expected &quot;</span>
+            <span class="s2">&quot;minimum value of </span><span class="si">{:.1e}</span><span class="s2">. Baselines must be in units of &quot;</span>
+            <span class="s2">&quot;[k\lambda], but it looks like they&#39;re in &quot;</span>
+            <span class="s2">&quot;[\lambda].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">min_feasible_q</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="convert_baselines"><a class="viewcode-back" href="../../api.html#mpol.utils.convert_baselines">[docs]</a><span class="k">def</span> <span class="nf">convert_baselines</span><span class="p">(</span><span class="n">baselines</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -481,11 +487,11 @@ title="Source repository"
 <span class="sd">    Convert baselines in meters to kilolambda.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        baselines (float or np.array): baselines in [m].</span>
-<span class="sd">        freq (float or np.array), optional: frequencies in [Hz]. </span>
+<span class="sd">        freq (float or np.array), optional: frequencies in [Hz].</span>
 <span class="sd">        wle (float or np.array), optional: wavelengths in [m].</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        (1D array nvis): baselines in [klambda]</span>
-<span class="sd">    Notes: </span>
+<span class="sd">    Notes:</span>
 <span class="sd">        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be broadcast-able.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">wle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">wle</span> <span class="ow">and</span> <span class="n">freq</span><span class="p">):</span>
@@ -563,41 +569,41 @@ title="Source repository"
 
 <div class="viewcode-block" id="get_optimal_image_properties"><a class="viewcode-back" href="../../api.html#mpol.utils.get_optimal_image_properties">[docs]</a><span class="k">def</span> <span class="nf">get_optimal_image_properties</span><span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For an image of desired width, determine the maximum pixel size that </span>
-<span class="sd">    ensures Nyquist sampling of the provided baseline (or baseline </span>
-<span class="sd">    distribution, out to a chosen percentile), and the number of pixels </span>
+<span class="sd">    For an image of desired width, determine the maximum pixel size that</span>
+<span class="sd">    ensures Nyquist sampling of the provided baseline (or baseline</span>
+<span class="sd">    distribution, out to a chosen percentile), and the number of pixels</span>
 <span class="sd">    (given this pixel size) to obtain the desired image width.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    image_width : float, unit = arcsec</span>
-<span class="sd">        Desired width of the image (i.e., image will be a </span>
+<span class="sd">        Desired width of the image (i.e., image will be a</span>
 <span class="sd">        image_width :math:`\times` image_width square).</span>
 <span class="sd">    q : float or array, unit = :math:`k\lambda`</span>
-<span class="sd">        Baseline distribution (all values must be non-negative). If a single </span>
+<span class="sd">        Baseline distribution (all values must be non-negative). If a single</span>
 <span class="sd">        value, &#39;percentile&#39; has no effect.</span>
 <span class="sd">    percentile : int, default = 100</span>
-<span class="sd">        Percentile of the baseline distribution (between 0 - 100) out to which </span>
-<span class="sd">        the desired image will Nyquist sample. </span>
+<span class="sd">        Percentile of the baseline distribution (between 0 - 100) out to which</span>
+<span class="sd">        the desired image will Nyquist sample.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    cell_size : float, unit = arcsec</span>
 <span class="sd">        Image pixel size required to Nyquist sample.</span>
 <span class="sd">    npix : int</span>
-<span class="sd">        Number of pixels of cell_size to equal (or slightly exceed) the image </span>
+<span class="sd">        Number of pixels of cell_size to equal (or slightly exceed) the image</span>
 <span class="sd">        width (npix will be rounded up and enforced as even).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    To obtain the image properties for a single baseline distance, pass &#39;q&#39; as </span>
+<span class="sd">    To obtain the image properties for a single baseline distance, pass &#39;q&#39; as</span>
 <span class="sd">    a float. In this case, &#39;percentile&#39; has no effect.</span>
 
-<span class="sd">    No assumption or correction is made concerning whether the baseline </span>
+<span class="sd">    No assumption or correction is made concerning whether the baseline</span>
 <span class="sd">    (distribution) is projected or deprojected.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span> 
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span>
 
     <span class="n">q_optimal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="p">)</span>
     <span class="n">cell_size</span> <span class="o">=</span> <span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">q_optimal</span><span class="p">)</span>

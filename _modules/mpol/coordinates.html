@@ -421,7 +421,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">packed_q_centers_2D</span> <span class="o">=</span> <span class="n">np_fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sky_q_centers_2D</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">packed_phi_centers_2D</span> <span class="o">=</span> <span class="n">np_fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sky_phi_centers_2D</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packed_q_centers_2D</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">du</span>
         <span class="p">)</span>  <span class="c1"># outer edge [klambda]</span>
 

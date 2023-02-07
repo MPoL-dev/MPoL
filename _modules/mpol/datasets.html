@@ -291,12 +291,16 @@ title="Source repository"
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">torch_ud</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">floating</span><span class="p">,</span> <span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span> <span class="nn">mpol.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span>
+<span class="kn">from</span> <span class="nn">mpol.exceptions</span> <span class="kn">import</span> <span class="n">WrongDimensionError</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">spheroidal_gridding</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
@@ -306,15 +310,12 @@ title="Source repository"
 <div class="viewcode-block" id="GriddedDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset">[docs]</a><span class="k">class</span> <span class="nc">GriddedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
-<span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
-<span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
-<span class="sd">        nchan (int): the number of channels in the image (default = 1).</span>
 <span class="sd">        vis_gridded (torch complex): the gridded visibility data stored in a &quot;packed&quot; format (pre-shifted for fft)</span>
 <span class="sd">        weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format</span>
 <span class="sd">        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.</span>
+<span class="sd">        nchan (int): the number of channels in the image (default = 1).</span>
 <span class="sd">        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
-
 
 <span class="sd">    After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.</span>
 
@@ -326,13 +327,14 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">vis_gridded</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">weight_gridded</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+        <span class="n">vis_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">weight_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
 
@@ -346,14 +348,41 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="GriddedDataset.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">vis_gridded</span><span class="p">,</span> <span class="n">weight_gridded</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">device</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">vis_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">weight_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
     <span class="p">):</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">vis_gridded</span><span class="p">,</span> <span class="n">weight_gridded</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Alternative method to instantiate a GriddedDataset object from cell_size and npix.</span>
 
-<div class="viewcode-block" id="GriddedDataset.add_mask"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.add_mask">[docs]</a>    <span class="k">def</span> <span class="nf">add_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cell_size (float): the width of a pixel [arcseconds]</span>
+<span class="sd">            npix (int): the number of pixels per image side</span>
+<span class="sd">            vis_gridded (torch complex): the gridded visibility data stored in a &quot;packed&quot; format (pre-shifted for fft)</span>
+<span class="sd">            weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format</span>
+<span class="sd">            mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.</span>
+<span class="sd">            nchan (int): the number of channels in the image (default = 1).</span>
+<span class="sd">            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">coords</span><span class="o">=</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">),</span>
+            <span class="n">vis_gridded</span><span class="o">=</span><span class="n">vis_gridded</span><span class="p">,</span>
+            <span class="n">weight_gridded</span><span class="o">=</span><span class="n">weight_gridded</span><span class="p">,</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+            <span class="n">nchan</span><span class="o">=</span><span class="n">nchan</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GriddedDataset.add_mask"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.add_mask">[docs]</a>    <span class="k">def</span> <span class="nf">add_mask</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).</span>
 
@@ -382,7 +411,7 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The boolean mask, arranged in ground format.</span>
 
@@ -392,7 +421,7 @@ title="Source repository"
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GriddedDataset.to"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<div class="viewcode-block" id="GriddedDataset.to"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">GriddedDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moves the tensors of the dataset to specified device.</span>
 
@@ -416,7 +445,7 @@ title="Source repository"
 
 
 <span class="c1"># custom dataset loader</span>
-<div class="viewcode-block" id="UVDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.UVDataset">[docs]</a><span class="k">class</span> <span class="nc">UVDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="UVDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.UVDataset">[docs]</a><span class="k">class</span> <span class="nc">UVDataset</span><span class="p">(</span><span class="n">torch_ud</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Container for loose interferometric visibilities.</span>
 
@@ -437,77 +466,71 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">data_re</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">data_im</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">data_re</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">data_im</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="c1"># assert that all vectors are the same shape</span>
-        <span class="n">shape</span> <span class="o">=</span> <span class="n">uu</span><span class="o">.</span><span class="n">shape</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">vv</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="p">]:</span>
-            <span class="k">assert</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;All dataset inputs must be the same shape.&quot;</span>
+        <span class="c1"># ensure that all vectors are the same shape</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">uu</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="p">[</span><span class="n">vv</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">WrongDimensionError</span><span class="p">(</span><span class="s2">&quot;All dataset inputs must be the same shape.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">uu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
             <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
             <span class="n">data_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">data_re</span><span class="p">)</span>
             <span class="n">data_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">data_im</span><span class="p">)</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not all thermal weights are positive, check inputs.&quot;</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
-            <span class="n">weights</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
-        <span class="p">),</span> <span class="s2">&quot;Not all thermal weights are positive, check inputs.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">uu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridded</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">cell_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">npix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">=</span> <span class="n">cell_size</span> <span class="o">*</span> <span class="n">arcsec</span>  <span class="c1"># [radians]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">npix</span> <span class="o">=</span> <span class="n">npix</span>
-
             <span class="p">(</span>
-                <span class="n">uu_grid</span><span class="p">,</span>
-                <span class="n">vv_grid</span><span class="p">,</span>
+                <span class="n">uu</span><span class="p">,</span>
+                <span class="n">vv</span><span class="p">,</span>
                 <span class="n">grid_mask</span><span class="p">,</span>
-                <span class="n">g_weights</span><span class="p">,</span>
-                <span class="n">g_re</span><span class="p">,</span>
-                <span class="n">g_im</span><span class="p">,</span>
+                <span class="n">weights</span><span class="p">,</span>
+                <span class="n">data_re</span><span class="p">,</span>
+                <span class="n">data_im</span><span class="p">,</span>
             <span class="p">)</span> <span class="o">=</span> <span class="n">spheroidal_gridding</span><span class="o">.</span><span class="n">grid_dataset</span><span class="p">(</span>
                 <span class="n">uu</span><span class="p">,</span>
                 <span class="n">vv</span><span class="p">,</span>
                 <span class="n">weights</span><span class="p">,</span>
                 <span class="n">data_re</span><span class="p">,</span>
                 <span class="n">data_im</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">/</span> <span class="n">arcsec</span><span class="p">,</span>
-                <span class="n">npix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span>
+                <span class="n">cell_size</span><span class="p">,</span>
+                <span class="n">npix</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="c1"># grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT, designed to directly index into the output to evaluate against pre-gridded visibilities.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu_grid</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv_grid</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1"># grid_mask (nchan, npix, npix//2 + 1) bool: a boolean array the same size as the output of the RFFT</span>
+            <span class="c1"># designed to directly index into the output to evaluate against pre-gridded visibilities.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">grid_mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">g_weights</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">re</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">g_re</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">im</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">g_im</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">=</span> <span class="n">cell_size</span> <span class="o">*</span> <span class="n">arcsec</span>  <span class="c1"># [radians]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npix</span> <span class="o">=</span> <span class="n">npix</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gridded</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gridded</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># klambda</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># klambda</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-                <span class="n">weights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-            <span class="p">)</span>  <span class="c1"># 1/Jy^2</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">re</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data_re</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># Jy</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">im</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data_im</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># Jy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># klambda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># klambda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="n">weights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+        <span class="p">)</span>  <span class="c1"># 1/Jy^2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">re</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data_re</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># Jy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">im</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data_im</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># Jy</span>
 
         <span class="c1"># TODO: store kwargs to do something for antenna self-cal</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uu</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vv</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
@@ -516,7 +539,7 @@ title="Source repository"
             <span class="bp">self</span><span class="o">.</span><span class="n">im</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uu</span><span class="p">)</span></div>
 
 
@@ -525,53 +548,74 @@ title="Source repository"
 <span class="sd">    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
-<span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
 <span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">q_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+        <span class="n">q_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">phi_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="c1"># copy over relevant quantities from coords</span>
-        <span class="c1"># these are in packed format</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cartesian_qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cartesian_phis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_phi_centers_2D</span>
+        <span class="c1"># if phi_edges is not given, we&#39;ll instantiate</span>
+        <span class="k">if</span> <span class="n">phi_edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">phi_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">8</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># [radians]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">edge</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">phi_edges</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Elements of phi_edges must be between 0 and pi.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># set q_max to the max q in coords</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">q_max</span>  <span class="c1"># [klambda]</span>
-
-        <span class="k">if</span> <span class="n">q_edges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span> <span class="o">=</span> <span class="n">q_edges</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">q_edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># set q edges approximately following inspriation from Petry et al. scheme:</span>
             <span class="c1"># https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract</span>
             <span class="c1"># first two bins set to 7m width</span>
             <span class="c1"># after third bin, bin width increases linearly until it is 700m at 16km baseline.</span>
             <span class="c1"># From 16m to 16km, bin width goes from 7m to 700m.</span>
-
+            <span class="c1"># ---</span>
             <span class="c1"># We aren&#39;t doing quite the same thing, just logspacing with a few linear cells at the start.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span> <span class="o">=</span> <span class="n">loglinspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span><span class="p">,</span> <span class="n">N_log</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">q_edges</span> <span class="o">=</span> <span class="n">loglinspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span><span class="p">,</span> <span class="n">N_log</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">phi_edges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">phi_edges</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
-                <span class="n">phi_edges</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
-            <span class="p">),</span> <span class="s2">&quot;phi edges must be between 0 and pi&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span> <span class="o">=</span> <span class="n">phi_edges</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># set phi edges</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">8</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># [radians]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span> <span class="o">=</span> <span class="n">q_edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span> <span class="o">=</span> <span class="n">phi_edges</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dartboard</span><span class="p">:</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cartesian_qs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cartesian_phis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_phi_centers_2D</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">q_max</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">q_max</span>
+
+<div class="viewcode-block" id="Dartboard.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">q_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">phi_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dartboard</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Alternative method to instantiate a Dartboard object from cell_size</span>
+<span class="sd">        and npix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cell_size (float): the width of a pixel [arcseconds]</span>
+<span class="sd">            npix (int): the number of pixels per image side</span>
+<span class="sd">            q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
+<span class="sd">            phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Dartboard.get_polar_histogram"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.get_polar_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">get_polar_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">):</span>
+<div class="viewcode-block" id="Dartboard.get_polar_histogram"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.get_polar_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">get_polar_histogram</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">qs</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">phis</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
 
@@ -586,14 +630,17 @@ title="Source repository"
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">histogram</span><span class="p">:</span> <span class="n">NDArray</span>
         <span class="c1"># make a polar histogram</span>
-        <span class="n">H</span><span class="p">,</span> <span class="n">x_edges</span><span class="p">,</span> <span class="n">y_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
-            <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="p">]</span>
+        <span class="n">histogram</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
+            <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">H</span></div>
+        <span class="k">return</span> <span class="n">histogram</span></div>
 
-<div class="viewcode-block" id="Dartboard.get_nonzero_cell_indices"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.get_nonzero_cell_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_nonzero_cell_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">):</span>
+<div class="viewcode-block" id="Dartboard.get_nonzero_cell_indices"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.get_nonzero_cell_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_nonzero_cell_indices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">qs</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">phis</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">integer</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
 
@@ -608,13 +655,15 @@ title="Source repository"
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># make a polar histogram</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_polar_histogram</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">)</span>
+        <span class="n">histogram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_polar_histogram</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">)</span>
 
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">H</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># [i,j] indexes to go to q, phi</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">histogram</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># [i,j] indexes to go to q, phi</span>
 
         <span class="k">return</span> <span class="n">indices</span></div>
 
-<div class="viewcode-block" id="Dartboard.build_grid_mask_from_cells"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.build_grid_mask_from_cells">[docs]</a>    <span class="k">def</span> <span class="nf">build_grid_mask_from_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_index_list</span><span class="p">):</span>
+<div class="viewcode-block" id="Dartboard.build_grid_mask_from_cells"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard.build_grid_mask_from_cells">[docs]</a>    <span class="k">def</span> <span class="nf">build_grid_mask_from_cells</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cell_index_list</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">integer</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .</span>
 
@@ -673,31 +722,24 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">griddedDataset</span><span class="p">,</span>
-        <span class="n">k</span><span class="p">,</span>
-        <span class="n">dartboard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">q_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">phi_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">npseed</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">gridded_dataset</span><span class="p">:</span> <span class="n">GriddedDataset</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">dartboard</span><span class="p">:</span> <span class="n">Dartboard</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span> <span class="o">=</span> <span class="n">griddedDataset</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;k must be a positive integer&quot;</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;k must be a positive integer&quot;</span>
+        <span class="k">if</span> <span class="n">dartboard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span> <span class="o">=</span> <span class="n">gridded_dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
-
-        <span class="k">if</span> <span class="n">dartboard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="n">q_edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">phi_edges</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="p">),</span> <span class="s2">&quot;If providing a Dartboard instance, do not provide q_edges and phi_edges parameters.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span> <span class="o">=</span> <span class="n">dartboard</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span>
-                <span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="o">=</span><span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="o">=</span><span class="n">phi_edges</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span> <span class="o">=</span> <span class="n">dartboard</span>
 
         <span class="c1"># 2D mask for any UV cells that contain visibilities</span>
         <span class="c1"># in *any* channel</span>
-        <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># get qs, phis from dataset and turn into 1D lists</span>
         <span class="n">qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span><span class="p">[</span><span class="n">stacked_mask</span><span class="p">]</span>
@@ -711,15 +753,38 @@ title="Source repository"
         <span class="c1"># we don&#39;t get structured radial/azimuthal patterns</span>
         <span class="k">if</span> <span class="n">npseed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">npseed</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">),</span> <span class="n">k</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="KFoldCrossValidatorGridded.from_dartboard_properties"><a class="viewcode-back" href="../../api.html#mpol.datasets.KFoldCrossValidatorGridded.from_dartboard_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dartboard_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">gridded_dataset</span><span class="p">:</span> <span class="n">GriddedDataset</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">q_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">phi_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KFoldCrossValidatorGridded</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.</span>
+
+<span class="sd">         Args:</span>
+<span class="sd">             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset</span>
+<span class="sd">             k (int): the number of subpartitions of the dataset</span>
+<span class="sd">             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
+<span class="sd">             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
+<span class="sd">             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KFoldCrossValidatorGridded</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the current k-slice we&#39;re on</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GriddedDataset</span><span class="p">,</span> <span class="n">GriddedDataset</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
             <span class="n">k_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">cell_list_test</span> <span class="o">=</span> <span class="n">k_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>

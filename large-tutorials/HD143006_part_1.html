@@ -428,7 +428,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/ian/Documents/Research/Disks/RML/MPoL/docs/large-tutorials/notebook_setup.py:7: DeprecationWarning: `magic(...)` is deprecated since IPython 0.13 (warning added in 8.1), use run_line_magic(magic_name, parameter_s).
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/kxm6078/Documents/GitHub/MPoL/docs/large-tutorials/notebook_setup.py:7: DeprecationWarning: `magic(...)` is deprecated since IPython 0.13 (warning added in 8.1), use run_line_magic(magic_name, parameter_s).
   get_ipython().magic(&#39;config InlineBackend.figure_format = &quot;retina&quot;&#39;)
 </pre></div>
 </div>
@@ -519,7 +519,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-<img alt="../_images/519d33eac463f0e21b96735ed6fe8c4715d61332e7600b2369a2a83040aa547a.png" src="../_images/519d33eac463f0e21b96735ed6fe8c4715d61332e7600b2369a2a83040aa547a.png" />
+<img alt="../_images/860a21eaa4ad3b4ab0d17795bdf7ce7282e6c1040173baf490355e64b4ced4d4.png" src="../_images/860a21eaa4ad3b4ab0d17795bdf7ce7282e6c1040173baf490355e64b4ced4d4.png" />
 </div>
 </div>
 </section>
@@ -567,7 +567,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Baselines&#39;)
 </pre></div>
 </div>
-<img alt="../_images/566e158fa8ec839533def1206bb0e5498e1cbb523aec3e44cb0d27a8702b98a0.png" src="../_images/566e158fa8ec839533def1206bb0e5498e1cbb523aec3e44cb0d27a8702b98a0.png" />
+<img alt="../_images/9918f9e5f6869272083d16166096c3e06621f4429b4e2c00817f56f2023beebc.png" src="../_images/9918f9e5f6869272083d16166096c3e06621f4429b4e2c00817f56f2023beebc.png" />
 </div>
 </div>
 <p>As you can see, there is a very dense grouping of visibilities with <span class="math notranslate nohighlight">\(q &lt; 2000\, \mathrm{k}\lambda\)</span>, where <span class="math notranslate nohighlight">\(q=\sqrt{u^2 + v^2}\)</span>, which primarily consists of data taken in more compact ALMA configurations. There are also several visibilities with baselines &gt; 7,000 (<span class="math notranslate nohighlight">\(k\lambda\)</span>), which correspond to the extended ALMA configurations and is the reason why the DSHARP data can generate some of the highest spatial resolution images of protoplanetary disks to date.</p>
@@ -597,7 +597,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">gridding</span>
 
-<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="o">.</span><span class="n">from_image_properties</span><span class="p">(</span>
     <span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span>
     <span class="n">npix</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
@@ -653,7 +653,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a1efa2a62a58ea0257a35fa70bd08c9d7ced2fa741ffca81380f48b064e96e4d.png" src="../_images/a1efa2a62a58ea0257a35fa70bd08c9d7ced2fa741ffca81380f48b064e96e4d.png" />
+<img alt="../_images/aa8073eaf9cfc5da988b7500b767ec3338dba435d03c162b96deb2d63b2602c7.png" src="../_images/aa8073eaf9cfc5da988b7500b767ec3338dba435d03c162b96deb2d63b2602c7.png" />
 </div>
 </div>
 <p>Natural weighting frequently produces images with the best sensitivity to point sources, but at the expense of spatial resolution.</p>
@@ -664,7 +664,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/92188645c412bd593685cc1fa2ca97475b4183e964247646097483798e429bae.png" src="../_images/92188645c412bd593685cc1fa2ca97475b4183e964247646097483798e429bae.png" />
+<img alt="../_images/de810f7729b244d9b948140c9eb86e13e4c87fb57d640d45a2b0d49bb4317f1c.png" src="../_images/de810f7729b244d9b948140c9eb86e13e4c87fb57d640d45a2b0d49bb4317f1c.png" />
 </div>
 </div>
 <p>Robust weigting provides a (nonlinear) tradeoff between these two regimes, and some form of robust weighting is typically chosen for ALMA imaging.</p>
@@ -675,7 +675,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/02ecbdbe8763512ee8bbecb2e5aa9ec9a6ae151ea777712921d9a47596800c56.png" src="../_images/02ecbdbe8763512ee8bbecb2e5aa9ec9a6ae151ea777712921d9a47596800c56.png" />
+<img alt="../_images/197b5aca9c164be22610ec427ca5e3559359e07b6e2c51f929103e1a367d8dcd.png" src="../_images/197b5aca9c164be22610ec427ca5e3559359e07b6e2c51f929103e1a367d8dcd.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -685,7 +685,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3fc7b8fbd18620e9f860000ce3229839ca5815a0b88eef744a6a28f9536a4021.png" src="../_images/3fc7b8fbd18620e9f860000ce3229839ca5815a0b88eef744a6a28f9536a4021.png" />
+<img alt="../_images/05cc67fb0e2bd8537a578dbc902fc068521616f7e1df0ade8295e1e68ab06f99.png" src="../_images/05cc67fb0e2bd8537a578dbc902fc068521616f7e1df0ade8295e1e68ab06f99.png" />
 </div>
 </div>
 </section>
@@ -716,7 +716,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/79a635fad4a8ac8580c9742125065d21fc61ae20958bb1c34dc6875479d2d25d.png" src="../_images/79a635fad4a8ac8580c9742125065d21fc61ae20958bb1c34dc6875479d2d25d.png" />
+<img alt="../_images/da4e7d5f77873a80d3509d2d28ee9715c4df51b8342990dc23ad6892cfed7b21.png" src="../_images/da4e7d5f77873a80d3509d2d28ee9715c4df51b8342990dc23ad6892cfed7b21.png" />
 </div>
 </div>
 <p>All in all, it seems like we’re on the right track. The diagnostic dirty image that we’ve produced with the MPoL gridder object is approximately the same size and orientation as the DSHARP CLEAN image, and it retains many of the same morphological features as well. Of course, the dirty image is noisier because it still contains the sidelobe response of the dirty beam—it hasn’t been CLEANed yet!</p>
