@@ -105,6 +105,7 @@ def vis_histogram(dataset, show_weights=False, q_edges=None, phi_edges=None,
 
     # 2d polar histogram
     ax2 = fig.add_subplot(122, polar=True)
+    ax2.set_theta_offset(np.pi / 2)
 
     # discrete colormap
     cmap = plt.cm.get_cmap("plasma")
