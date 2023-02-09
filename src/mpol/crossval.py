@@ -304,7 +304,7 @@ class RandomCellSplitGridded:
 
         else:
             raise StopIteration
-    
+
 
 class DartboardSplitGridded:
     r"""
@@ -343,7 +343,7 @@ class DartboardSplitGridded:
 
         self.griddedDataset = gridded_dataset
         self.k = k
-            self.dartboard = dartboard
+        self.dartboard = dartboard
 
         # 2D mask for any UV cells that contain visibilities
         # in *any* channel
