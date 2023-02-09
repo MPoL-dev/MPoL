@@ -256,7 +256,6 @@ class UVDataset(torch_ud.Dataset):
 class Dartboard:
     r"""
     A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
-
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
@@ -313,7 +312,6 @@ class Dartboard:
     ) -> Dartboard:
         """Alternative method to instantiate a Dartboard object from cell_size
         and npix.
-
         Args:
             cell_size (float): the width of a pixel [arcseconds]
             npix (int): the number of pixels per image side
@@ -328,16 +326,12 @@ class Dartboard:
     ) -> NDArray[floating[Any]]:
         r"""
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
-
         Data coordinates should include the points for the Hermitian visibilities.
-
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
-
         Returns:
             2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.
-
         """
 
         histogram: NDArray
@@ -353,13 +347,10 @@ class Dartboard:
     ) -> NDArray[integer[Any]]:
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
-
         Data coordinates should include the points for the Hermitian visibilities.
-
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
-
         Returns:
             list of cell indices where cell contains at least one datapoint.
         """
@@ -376,10 +367,8 @@ class Dartboard:
     ) -> NDArray[np.bool_]:
         r"""
         Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
-
         Args:
             cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
-
         Returns: (numpy array) 2D boolean mask in packed format.
         """
         mask = np.zeros_like(self.cartesian_qs, dtype="bool")
@@ -406,117 +395,3 @@ class Dartboard:
             mask[ind] = True
 
         return mask
-
-
-class KFoldCrossValidatorGridded:
-    r"""
-    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.
-
-    Args:
-        griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
-        k (int): the number of subpartitions of the dataset
-        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
-        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
-
-    Once initialized, iterate through the datasets like
-
-    >>> cv = datasets.KFoldCrossValidatorGridded(dataset, k)
-    >>> for (train, test) in cv: # iterate among k datasets
-    >>> ... # working with the n-th slice of k datasets
-    >>> ... # do operations with train dataset
-    >>> ... # do operations with test dataset
-
-    """
-
-    def __init__(
-        self,
-        gridded_dataset: GriddedDataset,
-        k: int,
-        dartboard: Dartboard | None = None,
-        npseed: int | None = None,
-    ):
-        if k <= 0:
-            raise ValueError("k must be a positive integer")
-
-        if dartboard is None:
-            dartboard = Dartboard(coords=gridded_dataset.coords)
-
-        self.griddedDataset = gridded_dataset
-        self.k = k
-        self.dartboard = dartboard
-
-        # 2D mask for any UV cells that contain visibilities
-        # in *any* channel
-        stacked_mask = torch.any(self.griddedDataset.mask, dim=0)
-
-        # get qs, phis from dataset and turn into 1D lists
-        qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
-        phis = self.griddedDataset.coords.packed_phi_centers_2D[stacked_mask]
-
-        # create the full cell_list
-        self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
-
-        # partition the cell_list into k pieces
-        # first, randomly permute the sequence to make sure
-        # we don't get structured radial/azimuthal patterns
-        if npseed is not None:
-            np.random.seed(npseed)
-
-        self.k_split_cell_list = np.array_split(
-            np.random.permutation(self.cell_list), k
-        )
-
-    @classmethod
-    def from_dartboard_properties(
-        cls,
-        gridded_dataset: GriddedDataset,
-        k: int,
-        q_edges: NDArray[floating[Any]],
-        phi_edges: NDArray[floating[Any]],
-        npseed: int | None = None,
-    ) -> KFoldCrossValidatorGridded:
-        """
-        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.
-
-         Args:
-             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
-             k (int): the number of subpartitions of the dataset
-             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
-        """
-        dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
-        return cls(gridded_dataset, k, dartboard, npseed)
-
-    def __iter__(self) -> KFoldCrossValidatorGridded:
-        self.n = 0  # the current k-slice we're on
-        return self
-
-    def __next__(self) -> tuple[GriddedDataset, GriddedDataset]:
-        if self.n < self.k:
-            k_list = self.k_split_cell_list.copy()
-            cell_list_test = k_list.pop(self.n)
-
-            # put the remaining indices back into a full list
-            cell_list_train = np.concatenate(k_list)
-
-            # create the masks for each cell_list
-            train_mask = self.dartboard.build_grid_mask_from_cells(cell_list_train)
-            test_mask = self.dartboard.build_grid_mask_from_cells(cell_list_test)
-
-            # copy original dateset
-            train = copy.deepcopy(self.griddedDataset)
-            test = copy.deepcopy(self.griddedDataset)
-
-            # and use these masks to limit new datasets to only unmasked cells
-            train.add_mask(train_mask)
-            test.add_mask(test_mask)
-
-            self.n += 1
-
-            return train, test
-
-        else:
-            raise StopIteration
