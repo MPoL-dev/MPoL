@@ -138,19 +138,16 @@ class CrossValidate:
 
         return split_iterator
 
-        return test_train_datasets
 
-
-    def run_crossval(self, test_train_datasets):
+    def run_crossval(self, dataset):
         r"""
         Run a cross-validation loop for a model obtained with a given set of 
         hyperparameters.
 
         Parameters
         ----------
-        test_train_datasets : list of `mpol.datasets.GriddedDataset` objects
-            Training and test subsets pre-split from the true dataset
-
+        dataset : PyTorch dataset object
+            Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------
         cv_score : float 
