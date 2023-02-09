@@ -57,9 +57,14 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
     are projected or deprojected.
     """
 
+    # convert dataset pytorch tensors to numpy for convenience
+    mask_npy = torch2npy(dataset.mask)
+    vis_npy = torch2npy(dataset.vis_indexed)
+    weight_npy = torch2npy(dataset.weight_indexed)
+
     # 2D mask for any UV cells that contain visibilities
     # in *any* channel
-    stacked_mask = np.any(torch2npy(dataset.mask), axis=0)
+    stacked_mask = np.any(mask_npy, axis=0)
 
     # get qs, phis from dataset and turn into 1D lists
     qs = dataset.coords.packed_q_centers_2D[stacked_mask]
@@ -74,18 +79,15 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
         hist_lab = 'Count'
         
     elif bin_quantity == 'weight':
-        data_weight = torch2npy(dataset.weight_indexed)
-        weights = np.copy(data_weight)
+        weights = np.copy(weight_npy)
         hist_lab = 'Weight'
 
     elif bin_quantity == 'vis_real':
-        data_vis = torch2npy(dataset.vis_indexed)
-        weights = np.abs(np.real(data_vis))
+        weights = np.abs(np.real(vis_npy))
         hist_lab = '|Re(V)|'
 
     elif bin_quantity == 'vis_imag':
-        data_vis = torch2npy(dataset.vis_indexed)
-        weights = np.abs(np.imag(data_vis))
+        weights = np.abs(np.imag(vis_npy))
         hist_lab = '|Im(V)|'
 
     else:
