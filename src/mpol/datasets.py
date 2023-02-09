@@ -101,10 +101,7 @@ class GriddedDataset:
             device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
         """
 
-        if torch.is_tensor(mask):
-            new_2D_mask = mask.clone().detach().to(device)
-        else:
-            new_2D_mask = torch.tensor(mask, device=device)
+        new_2D_mask = torch.Tensor(mask).detach().to(device)
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
 
         # update mask via an AND operation, meaning we will only keep visibilities that are
