@@ -12,7 +12,7 @@ import torch
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
 from mpol.datasets import Dartboard, GriddedDataset
-from mpol.plot import splitter_diagnostics_fig
+# from mpol.plot import splitter_diagnostics_fig # TODO
 
 
 class CrossValidate:
