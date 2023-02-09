@@ -52,6 +52,12 @@ Losses
 .. automodule:: mpol.losses
 
 
+Training and testing
+--------------------
+
+.. automodule:: mpol.training
+
+
 Connectors
 ----------
 
