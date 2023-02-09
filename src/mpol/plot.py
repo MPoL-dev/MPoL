@@ -284,3 +284,74 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
 
     return fig, axes
 
+
+def train_diagnostics_fig(model, residuals, channel=0, save_prefix=None):
+    """
+    For a `model` in a given state, generate a figure showing the image plane 
+    model cube, image plane residuals, amplitude of the Fourier plane model, 
+    and amplitude of the Fourier plane residuals.
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    residuals: `mpol.connectors.ResidualConnector` object
+    channel : int, default=0
+        Channel (of the datasets in `splitter`) to use to generate figure
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+    """
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
+
+    # populate residual connector
+    residuals()
+
+    i_amp = torch2npy(model.icube.sky_cube[channel])
+    i_resid = torch2npy(residuals.sky_cube[channel])
+    f_amp = torch2npy(model.fcube.ground_amp[channel])
+    f_resid = torch2npy(residuals.ground_amp[channel])
+
+    im = axes[0, 0].imshow(
+        np.log(i_amp),
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+    )
+    plt.colorbar(im, ax=axes[0, 0])
+
+    im = axes[0, 1].imshow(
+        np.log(i_resid),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.img_ext,
+    )
+    plt.colorbar(im, ax=axes[0, 1])
+
+    im = axes[1, 0].imshow(
+        np.log(f_amp),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.vis_ext,
+    )
+    plt.colorbar(im, ax=axes[1, 0])
+
+    im = axes[1, 1].imshow(
+        np.log(f_resid),
+        origin="lower",
+        interpolation="none",
+        extent=residuals.coords.vis_ext,
+    )
+    plt.colorbar(im, ax=axes[1, 1])
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_train_diagnostics_fig.png', dpi=300)
+        plt.close()
+
+    return fig, axes
