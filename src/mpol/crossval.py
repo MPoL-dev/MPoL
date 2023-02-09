@@ -5,6 +5,7 @@ import torch
 from mpol.precomposed import SimpleNet
 from mpol.datasets import Dartboard, KFoldCrossValidatorGridded
 from mpol.training import TrainTest
+from mpol.plot import splitter_diagnostics_fig
 
 class CrossValidate:
     r"""
@@ -144,6 +145,8 @@ class CrossValidate:
 
         if self._split_diag_fig:
             splitter_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
+
+        for kfold, (train_subset, test_subset) in enumerate(test_train_datasets):
             if self._verbose:
                 logging.info("\nCross-validation: K-fold {} of {}".format(kfold, np.shape(test_train_datasets)[0] - 1))
 
