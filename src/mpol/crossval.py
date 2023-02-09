@@ -113,33 +113,30 @@ class CrossValidate:
 
         Returns
         -------
-        test_train_datasets : list of `mpol.datasets.GriddedDataset` objects
-            Training and test subsets obtained from splitting the input dataset
+        subsets : iterator returning tuple
+            Iterator that provides a (train, test) pair of 
+            :class:`~mpol.datasets.GriddedDataset` for each k-fold
         """
-        if self._split_method == 'dartboard':
+        if self._split_method == 'random_cell':
+            split_iterator = RandomCellSplitGridded(dataset=dataset, 
+                                            kfolds=self._kfolds, 
+                                            seed=self._seed)
+
+        elif self._split_method == 'dartboard':
             # create a radial and azimuthal partition for the dataset
             dartboard = Dartboard(coords=self._coords)
 
             # use 'dartboard' to split full dataset into train/test subsets
-            subsets = KFoldCrossValidatorGridded(dataset, k=self._kfolds,
+            split_iterator = DartboardSplitGridded(dataset, k=self._kfolds,
                                             dartboard=dartboard,
                                             npseed=self._seed)
 
-        elif self._split_method == 'random_cell':
-            # get indices for the 20 cells with the highest binned weight
-            top20 = np.argpartition(dataset.weight_indexed, -20)[-20:]
-            vis_all = dataset.vis_indexed
-            # subsets = # TODO
-
         else:
-            supported_methods = ['dartboard, random_cell']
+            supported_methods = ['dartboard', 'random_cell']
             raise ValueError("'split_method' {} must be one of "
-                            "{}".format(split_method, supported_methods))
+                            "{}".format(self._split_method, supported_methods))
 
-        if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            test_train_datasets = [(train.to(self._device), test.to(self._device)) for (train, test) in subsets]
-        else:
-            test_train_datasets = [(train_pair, test_pair) for (train_pair, test_pair) in subsets]
+        return split_iterator
 
         return test_train_datasets
 
