@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import numpy as np
+import copy
+from collections import defaultdict
 import logging
 import torch
 
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
-from mpol.datasets import Dartboard
+from mpol.datasets import Dartboard, GriddedDataset
 
 class CrossValidate:
     r"""
