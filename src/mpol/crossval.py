@@ -150,8 +150,9 @@ class CrossValidate:
             Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------
-        cv_score : float 
-            Mean cross-validation score across all k-folds
+        cv_score : (float, float) 
+            Tuple of (mean, standard deviation) of cross-validation scores 
+            across all k-folds
         all_scores : list of float
             Individual cross-validation scores for each k-fold 
         loss_histories : list of float 
@@ -192,8 +193,13 @@ class CrossValidate:
             loss_histories.append(loss_history)
             all_scores.append(trainer.test(model, test_subset))
 
-        # average individual test scores as a cross-val metric for chosen 
+        # average individual test scores to get the cross-val metric for chosen 
         # hyperparameters
+        cv_score = {"mean": np.mean(all_scores), 
+                    "std": np.std(all_scores), 
+                    "all": all_scores}
+
+        return cv_score
 
 
 class RandomCellSplitGridded:
