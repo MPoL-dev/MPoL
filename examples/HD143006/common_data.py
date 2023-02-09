@@ -7,6 +7,7 @@ from ray import tune
 from mpol import (
     connectors,
     coordinates,
+    crossval,
     datasets,
     gridding,
     images,
@@ -55,7 +56,7 @@ dartboard = datasets.Dartboard(coords=coords)
 
 # create cross validator using this "dartboard"
 k = 5
-cv = datasets.KFoldCrossValidatorGridded(dataset, k, dartboard=dartboard, npseed=42)
+cv = crossval.DartboardSplitGridded(dataset, k, dartboard=dartboard, npseed=42)
 k_fold_datasets = [(train, test) for (train, test) in cv]
 
 # create the model

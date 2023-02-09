@@ -8,7 +8,7 @@ from mpol.plot import train_diagnostics_fig
 
 class TrainTest:
     r"""
-    Utilities training and testing an MPoL neural network.
+    Utilities for training and testing an MPoL neural network.
 
     Parameters
     ----------
@@ -39,20 +39,21 @@ class TrainTest:
     lambda_TSV : float, default=None
         Relative strength for total squared variation (TSV) regularizer
     train_diag_step : int, default=None
-        Interval at which optional training diagnostics are output
-    diag_fig_train : bool, default=False
-        Whether to generate a diagnostic figure during training
-        (if True, `train_diag_step` must also be nonzero)
+        Interval at which training diagnostics are output. If None, no 
+        diagnostics will be generated.
+    save_prefix : str, default=None
+        Prefix (path) used for saved figure names. If None, figures won't be 
+        saved
     verbose : bool, default=True
-        Whether to print notification messages. 
+        Whether to print notification messages
     """
 
     def __init__(self, gridder, optimizer, epochs=500, convergence_tol=1e-2, 
                 lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
                 lambda_entropy=None, entropy_prior_intensity=1e-10, 
                 lambda_sparsity=None, lambda_TV=None, TV_epsilon=1e-10, 
-                lambda_TSV=None, train_diag_step=None, diag_fig_train=False, 
-                verbose=True):
+                lambda_TSV=None, train_diag_step=None, 
+                save_prefix=None, verbose=True):
         self._gridder = gridder
         self._optimizer = optimizer
         self._epochs = epochs
@@ -66,7 +67,7 @@ class TrainTest:
         self._TV_epsilon = TV_epsilon
         self._lambda_TSV = lambda_TSV
         self._train_diag_step = train_diag_step
-        self._diag_fig_train = diag_fig_train
+        self._save_prefix = save_prefix
         self._verbose = verbose
 
 
