@@ -136,7 +136,7 @@ class CrossValidate:
             Mean cross-validation score across all k-folds
         all_scores : list of float
             Individual cross-validation scores for each k-fold 
-        loss_histories : list of float 
+        loss_histories : list of float
             Loss function values for each training loop
         """
         loss_histories = []
