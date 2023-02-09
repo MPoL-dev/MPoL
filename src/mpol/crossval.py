@@ -158,8 +158,9 @@ class CrossValidate:
         loss_histories : list of float 
             Loss function values for each training loop
         """
-        loss_histories = []
         all_scores = []
+        if self._store_cv_diagnostics:
+            self._cv_diagnostics = defaultdict(list) 
 
         split_iterator = self.split_dataset(dataset)
         for kk, (train_set, test_set) in enumerate(split_iterator):
@@ -195,6 +196,8 @@ class CrossValidate:
             )
 
             loss, loss_history = trainer.train(model, train_set)
+            if self._store_cv_diagnostics:
+                self._cv_diagnostics['loss_histories'].append(loss_history)
             all_scores.append(trainer.test(model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen 
@@ -204,6 +207,11 @@ class CrossValidate:
                     "all": all_scores}
 
         return cv_score
+    
+    @property
+    def cv_diagnostics(self):
+        """Dict containing diagnostics of the cross-validation loop"""
+        return self._cv_diagnostics
 
 
 class RandomCellSplitGridded:
