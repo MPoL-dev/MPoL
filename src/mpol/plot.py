@@ -9,11 +9,12 @@ from mpol.fourier import FourierCube
 from mpol.connectors import GriddedResidualConnector
 from mpol.utils import loglinspace, torch2npy
 
-def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
-    phi_edges=None, q_edges1d=None, show_datapoints=False, savename=None):
+
+def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
+    phi_edges=None, q_edges1d=None, show_datapoints=False, save_prefix=None):
     r"""
     Generate a figure with 1d and 2d histograms of (u,v)-plane coverage. 
-    Histograms can give raw counts or weighted counts using the dataset weights.
+    Histograms can show different data; see `bin_quantity` parameter.
 
     Parameters
     ----------
@@ -40,8 +41,8 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
     show_datapoints : bool, default = False 
         Whether to overplot the raw visibilities in `dataset` on the 2d 
         histogram.
-    savename : string, default = None
-        If provided, the generated figure will be saved to `savename`.
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
 
     Returns
     -------
@@ -166,7 +167,8 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
         ax2.scatter(phis, qs, s=1.5, rasterized=True, linewidths=0.0, c="k", 
                     alpha=0.3)
 
-    if savename:
-        fig.savefig(savename, dpi=300)
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_vis_histogram_fig.png', dpi=300)
+        plt.close()
 
     return fig, (ax0, ax1, ax2)
