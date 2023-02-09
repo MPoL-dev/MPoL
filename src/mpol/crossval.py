@@ -191,7 +191,6 @@ class CrossValidate:
                                 TV_epsilon=self._TV_epsilon,
                                 lambda_TSV=self._lambda_TSV,
                                 train_diag_step=self._train_diag_step, 
-                                diag_fig_train=self._diag_fig_train,
                                 verbose=self._verbose
             )
 
