@@ -161,9 +161,11 @@ class CrossValidate:
         loss_histories = []
         all_scores = []
 
-        for kfold, (train_subset, test_subset) in enumerate(test_train_datasets):
+        split_iterator = self.split_dataset(dataset)
+        for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
-                logging.info("\nCross-validation: K-fold {} of {}".format(kfold, np.shape(test_train_datasets)[0] - 1))
+                logging.info("\nCross-validation: k-fold {} of "
+                            "{}".format(kk, self._kfolds))
 
             # create a new model and optimizer for this k_fold
             model = SimpleNet(coords=self._coords, nchan=train_subset.nchan)
@@ -189,9 +191,8 @@ class CrossValidate:
                                 verbose=self._verbose
             )
 
-            loss, loss_history = trainer.train(model, train_subset)
-            loss_histories.append(loss_history)
-            all_scores.append(trainer.test(model, test_subset))
+            loss, loss_history = trainer.train(model, train_set)
+            all_scores.append(trainer.test(model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen 
         # hyperparameters
