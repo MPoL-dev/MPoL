@@ -118,7 +118,7 @@ class CrossValidate:
 
         Returns
         -------
-        subsets : iterator returning tuple
+        split_iterator : iterator returning tuple
             Iterator that provides a (train, test) pair of 
             :class:`~mpol.datasets.GriddedDataset` for each k-fold
         """
@@ -245,7 +245,9 @@ class RandomCellSplitGridded:
 
     Notes
     -----
-    Treats `dataset` as a single-channel object with all data in `channel`
+    Treats `dataset` as a single-channel object with all data in `channel`.
+
+    The splitting doesn't select (preserve) Hermitian pairs of visibilities.
     """
 
     def __init__(self, dataset, kfolds=5, seed=None, channel=0):
