@@ -23,8 +23,8 @@ Gridding
 
 .. automodule:: mpol.gridding
 
-Datasets and Cross-Validation
------------------------------
+Datasets
+--------
 
 .. automodule:: mpol.datasets
 
@@ -60,6 +60,12 @@ The objects in the Images and Precomposed modules are focused on bringing some i
 Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
 
 .. automodule:: mpol.connectors
+
+
+Cross-validation
+----------------
+
+.. automodule:: mpol.crossval
 
 
 Plotting
