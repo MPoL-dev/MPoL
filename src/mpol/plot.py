@@ -9,6 +9,37 @@ from mpol.fourier import FourierCube
 from mpol.connectors import GriddedResidualConnector
 from mpol.utils import loglinspace, torch2npy
 
+def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
+    """
+    Get a colormap normalization to apply to an image. 
+
+    image : array
+        An image array.
+    stretch : string, default = 'power'
+        Transformation to apply to the colormap. 'power' is a
+        power law stretch; 'asinh' is an arcsinh stretch.
+    gamma : float, default = 1.0
+        Index of power law normalization (see matplotlib.colors.PowerNorm).
+        gamma=1.0 yields a linear colormap.
+    asinh_a : float, default = 0.02
+        Scale parameter for an asinh stretch.
+    """
+    vmax = image.max()
+
+    if stretch == 'power':
+        vmin = 0
+        norm = mco.PowerNorm(gamma, vmin, vmax)    
+    
+    elif stretch == 'asinh':
+        vmin = max(0, image.min())
+        norm = simple_norm(image, stretch='asinh', asinh_a=asinh_a, 
+                        min_cut=vmin, max_cut=vmax)
+
+    else:
+        raise ValueError("'stretch' must be one of 'asinh' or 'power'.")
+    
+    return norm
+
 
 def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
     phi_edges=None, q_edges1d=None, show_datapoints=False, save_prefix=None):
