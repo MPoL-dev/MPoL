@@ -1,6 +1,16 @@
+import numpy as np
+import copy
+import matplotlib.pyplot as plt
+import torch
+
 from mpol.crossval import CrossValidate, DartboardSplitGridded, RandomCellSplitGridded
 from mpol.datasets import Dartboard
+from mpol.fourier import FourierCube
+from mpol.connectors import GriddedResidualConnector
+from mpol.utils import packed_cube_to_sky_cube
 
+# TODO: test of RandomCellSplitGridded output
+# TODO: GPU tests
 
 def test_crossvalclass_split_dartboard(coords, gridder, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
@@ -31,7 +41,12 @@ def test_crossvalclass_kfold(coords, gridder, dataset, generic_parameters):
     crossval_pars["epochs"] = 11
 
     cross_validator = CrossValidate(coords, gridder, **crossval_pars)
-    cv_score, all_scores, loss_histories = cross_validator.run_crossval(dataset)
+    cross_validator.run_crossval(dataset)
+
+
+def test_randomcellsplit(dataset, generic_parameters):
+    pars = generic_parameters["crossval_pars"]
+    RandomCellSplitGridded(dataset, pars["kfolds"], pars["seed"])
 
 
 def test_dartboardsplit_init(crossvalidation_products):
@@ -119,18 +134,18 @@ def test_dartboardsplit_iterate_images(crossvalidation_products, tmp_path):
 
     # visualize dirty images
     # create mock fourier layer
-    flayer = fourier.FourierCube(coords=coords)
+    flayer = FourierCube(coords=coords)
     flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
     fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))
 
     for k, (train, test) in enumerate(cv):
 
-        rtrain = connectors.GriddedResidualConnector(flayer, train)
-        rtest = connectors.GriddedResidualConnector(flayer, test)
+        rtrain = GriddedResidualConnector(flayer, train)
+        rtest = GriddedResidualConnector(flayer, test)
 
-        train_chan = utils.packed_cube_to_sky_cube(rtrain.forward())[chan]
-        test_chan = utils.packed_cube_to_sky_cube(rtest.forward())[chan]
+        train_chan = packed_cube_to_sky_cube(rtrain.forward())[chan]
+        test_chan = packed_cube_to_sky_cube(rtest.forward())[chan]
 
         im = ax[k, 0].imshow(
             train_chan.real.detach().numpy(), interpolation="none", origin="lower"
@@ -155,6 +170,3 @@ def test_dartboardsplit_iterate_images(crossvalidation_products, tmp_path):
     ax[0, 0].set_title("train")
     ax[0, 2].set_title("test")
     fig.savefig(tmp_path / "images", dpi=300)
-
-
-# TODO: add gpu test
