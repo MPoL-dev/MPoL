@@ -1,7 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
+import torch 
 
+from astropy.visualization.mpl_normalize import simple_norm
+
+from mpol.fourier import FourierCube
+from mpol.connectors import GriddedResidualConnector
 from mpol.utils import loglinspace, torch2npy
 
 def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
