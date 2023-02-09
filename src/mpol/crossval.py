@@ -53,10 +53,16 @@ class CrossValidate:
     lambda_TSV : float, default=None
         Relative strength for total squared variation (TSV) regularizer
     train_diag_step : int, default=None
-        Interval at which optional training diagnostics are output
-    diag_fig_train : bool, default=False
-        Whether to generate a diagnostic figure during training
-        (if True, `train_diag_step` must also be nonzero)
+        Interval at which training diagnostics are output. If None, no 
+        diagnostics will be generated.
+    split_diag_fig : bool, default=False
+        Whether to generate a diagnostic figure of dataset splitting into
+        train/test sets.
+    store_cv_diagnostics : bool, default=False
+        Whether to store diagnostics of the cross-validation loop.
+    save_prefix : str, default=None
+        Prefix (path) used for saved figure names. If None, figures won't be 
+        saved
     device : torch.device, default=None
         Which hardware device to perform operations on (e.g., 'cuda:0').
         'None' defaults to current device. 
@@ -70,8 +76,9 @@ class CrossValidate:
                 lambda_entropy=None, entropy_prior_intensity=1e-10, 
                 lambda_sparsity=None, lambda_TV=None, 
                 TV_epsilon=1e-10, lambda_TSV=None, 
-                train_diag_step=None, diag_fig_train=False, device=None, 
-                verbose=True):
+                train_diag_step=None, split_diag_fig=False, 
+                store_cv_diagnostics=False, 
+                save_prefix=None, device=None, verbose=True):
         self._coords = coords
         self._gridder = gridder        
         self._kfolds = kfolds
@@ -89,10 +96,11 @@ class CrossValidate:
         self._TV_epsilon = TV_epsilon
         self._lambda_TSV = lambda_TSV
         self._train_diag_step = train_diag_step
-        self._diag_fig_train = diag_fig_train
+        self._split_diag_fig = split_diag_fig
+        self._store_cv_diagnostics = store_cv_diagnostics
+        self._save_prefix = save_prefix
         self._device = device
         self._verbose = verbose
-
 
     def split_dataset(self, dataset):
         r"""
