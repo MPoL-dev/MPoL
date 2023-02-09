@@ -142,7 +142,8 @@ class CrossValidate:
         loss_histories = []
         all_scores = []
 
-        for kfold, (train_subset, test_subset) in enumerate(test_train_datasets):
+        if self._split_diag_fig:
+            splitter_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
             if self._verbose:
                 logging.info("\nCross-validation: K-fold {} of {}".format(kfold, np.shape(test_train_datasets)[0] - 1))
 
