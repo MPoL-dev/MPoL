@@ -188,9 +188,99 @@ class CrossValidate:
 
         # average individual test scores as a cross-val metric for chosen 
         # hyperparameters
-        cv_score = (np.mean(all_scores), np.std(all_scores))
 
-        return cv_score, all_scores, loss_histories
+
+class RandomCellSplitGridded:
+    r"""
+    Split a GriddedDataset into :math:`k` subsets. Inherit the properties of 
+    the GriddedDataset. This object creates an iterator providing a 
+    (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each 
+    k-fold.
+
+    Parameters
+    ----------
+    dataset : PyTorch dataset object
+        Instance of the `mpol.datasets.GriddedDataset` class
+    kfolds : int, default=5
+        Number of k-folds (partitions) of `dataset`
+    seed : int, default=None 
+        Seed for PyTorch random number generator used to shuffle data before
+        splitting
+    channel : int, default=0 
+        Channel of the dataset to use in determining the splits
+
+    Once initialized, iterate through the datasets like:
+        >>> split_iterator = crossval.RandomCellSplitGridded(dataset, kfolds)
+        >>> for (train, test) in split_iterator: # iterate through `kfolds` datasets
+        >>> ... # working with the n-th slice of `kfolds` datasets
+        >>> ... # do operations with train dataset
+        >>> ... # do operations with test dataset    
+
+    Notes
+    -----
+    Treats `dataset` as a single-channel object with all data in `channel`
+    """
+
+    def __init__(self, dataset, kfolds=5, seed=None, channel=0):
+        self.dataset = dataset
+        self.kfolds = kfolds
+        self.channel = channel
+
+        # get indices for cells in the top 1% of gridded weight 
+        # (we'll want all training sets to have these high SNR points)
+        nvis = len(self.dataset.vis_indexed)
+        nn = int(nvis * 0.01)
+        # get the nn-th largest value in weight_indexed
+        w_thresh = np.partition(self.dataset.weight_indexed, -nn)[-nn]
+        self._top_nn = torch.argwhere(self.dataset.weight_gridded[self.channel] >= w_thresh).T
+
+        # mask these indices
+        self.top_mask = torch.ones(self.dataset.weight_gridded[self.channel].shape, dtype=bool)
+        self.top_mask[self._top_nn[0], self._top_nn[1]] = False
+        # use unmasked cells that also have data for splits
+        self.split_mask = torch.logical_and(self.dataset.mask[self.channel], self.top_mask)
+        split_idx = torch.argwhere(self.split_mask).T 
+
+        # shuffle indices to prevent radial/azimuthal patterns in splits
+        if seed is not None:
+            torch.manual_seed(seed) 
+        shuffle = torch.randperm(split_idx.shape[1])
+        split_idx = split_idx[:,shuffle] 
+
+        # split indices into k subsets
+        self.splits = torch.tensor_split(split_idx, self.kfolds, dim=1) 
+
+    def __iter__(self):
+        # current k-slice
+        self._n = 0  
+        return self
+
+    def __next__(self): 
+        if self._n < self.kfolds:
+            test_idx = self.splits[self._n]
+            train_idx = torch.cat(([self.splits[x] for x in range(len(self.splits)) if x != self._n]), dim=1)
+            # add the masked (high SNR) points to the current training set 
+            train_idx = torch.cat((train_idx, self._top_nn), dim=1) 
+
+            train_mask = torch.zeros(self.dataset.weight_gridded[self.channel].shape, dtype=bool)
+            test_mask = torch.zeros(self.dataset.weight_gridded[self.channel].shape, dtype=bool)            
+            train_mask[train_idx[0], train_idx[1]] = True
+            test_mask[test_idx[0], test_idx[1]] = True
+
+            # copy original dataset
+            train = copy.deepcopy(self.dataset)
+            test = copy.deepcopy(self.dataset)
+
+            # use the masks to limit new datasets to only unmasked cells
+            train.add_mask(train_mask) 
+            test.add_mask(test_mask)
+
+            self._n += 1
+
+            return train, test
+
+        else:
+            raise StopIteration
     
 
 class DartboardSplitGridded:
