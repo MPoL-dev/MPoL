@@ -2,10 +2,8 @@ name: package test
 
 on:
   pull_request_target:
-    paths:
-      - '*.*'
+    types: [opened, synchronize, reopened]
   push:
-    branches: ['main']
 
 jobs:
   dl_files:
