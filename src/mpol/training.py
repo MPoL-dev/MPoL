@@ -4,7 +4,7 @@ import torch
 
 from mpol.connectors import GriddedResidualConnector
 from mpol.losses import nll_gridded, entropy, sparsity, TV_image, TSV
-# from mpol.plot import train_diagnostics # TODO
+from mpol.plot import train_diagnostics_fig
 
 class TrainTest:
     r"""
@@ -207,16 +207,17 @@ class TrainTest:
         # set model to training mode
         model.train()
         
-        # track model residuals
-        residuals = GriddedResidualConnector(model.fcube, dataset)
+        if self._train_diag_step is not None:
+            # track model residuals for diagnostics
+            residuals = GriddedResidualConnector(model.fcube, dataset)
 
         count = 0
         # track loss value over epochs
         losses = []
         
-        # optionally guess initial regularizer strengths
         if self._lambda_guess is not None:
-            # guess, update lambda values in 'self'
+            # guess initial regularizer strengths ('lambda's); 
+            # update lambda values in 'self'
             lambda_guesses = self.loss_lambda_guess()
 
             if self._verbose:
@@ -230,7 +231,7 @@ class TrainTest:
                 logging.info('\r  Training: epoch {} of {}'.format(count, self._epochs), 
                     end='', flush=True)
 
-            # check early on whether the loss isn't evolving
+            # check early-on whether the loss isn't evolving
             if count == 20:
                 loss_arr = np.array(losses)
                 if all(0.9 <= loss_arr[:-1] / loss_arr[1:]) and all(loss_arr[:-1] / loss_arr[1:] <= 1.1):
@@ -253,11 +254,10 @@ class TrainTest:
             losses.append(loss.item())
 
             # generate optional fit diagnostics
-            # TODO: uncomment when plot.train_diagnostics in codebase 
-            # if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
-            #     count == self._epochs - 1) : 
-                # if self._diag_fig_train:
-                #     train_diagnostics(model, residuals, losses, count)
+            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
+                count == self._epochs - 1) : 
+                train_diagnostics_fig(model, residuals, 
+                                        save_prefix=self._save_prefix)
 
             # calculate gradients of loss function w.r.t. model parameters
             loss.backward() 
@@ -269,15 +269,14 @@ class TrainTest:
 
         if self._verbose:
             if count < self._epochs:
-                logging.info("    Loss function convergence criterion met at epoch "
+                logging.info("\n    Loss function convergence criterion met at epoch "
                                 "{}".format(count-1))
             else:
-                logging.info("    Loss function convergence criterion not met; "
-                                "training stopped at 'epochs' specified in your "
-                                "parameter file, {}".format(self._epochs))
+                logging.info("\n    Loss function convergence criterion not met; "
+                                "training stopped at specified maximum epochs, {}".format(self._epochs))
 
         # return loss value    
-        return loss.item(), losses # TODO: once have object collecting pipeline outputs, return anything needed here
+        return loss.item(), losses
 
 
     def test(self, model, dataset):
