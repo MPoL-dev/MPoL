@@ -221,7 +221,7 @@ class ImageCube(nn.Module):
             self.cube = None
 
     @classmethod
-    def from_image_properteis(
+    def from_image_properties(
         cls, cell_size, npix, nchan=1, passthrough=False, cube=None
     ) -> ImageCube:
         coords = GridCoords(cell_size, npix)
