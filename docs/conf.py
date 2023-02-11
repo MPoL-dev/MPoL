@@ -90,7 +90,7 @@ html_js_files = ["https://buttons.github.io/buttons.js"]
 #     # (mmdc itself not in $PATH automatically, like local)
 #     mermaid_cmd = "../node_modules/.bin/mmdc"
 
-nb_execution_mode = "cache"
+nb_execution_mode = "force"
 nb_execution_timeout = -1
 nb_execution_raise_on_error = True
 # .ipynb are produced using Makefile on own terms,
