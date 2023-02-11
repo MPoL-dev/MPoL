@@ -454,6 +454,7 @@ title="Print to PDF"
 <span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">connectors</span><span class="p">,</span>
     <span class="n">coordinates</span><span class="p">,</span>
+    <span class="n">crossval</span><span class="p">,</span>
     <span class="n">datasets</span><span class="p">,</span>
     <span class="n">gridding</span><span class="p">,</span>
     <span class="n">images</span><span class="p">,</span>
@@ -584,7 +585,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/a884abaaa9588c2ce6ba7f5a24a6e625e9563bbd46a2b87da531a6abf04defb4.png" src="../_images/a884abaaa9588c2ce6ba7f5a24a6e625e9563bbd46a2b87da531a6abf04defb4.png" />
+<img alt="../_images/8657fb01d1fb30249d11bdcdf7975baa418001941372349be4cdf5b3a92f6cb8.png" src="../_images/8657fb01d1fb30249d11bdcdf7975baa418001941372349be4cdf5b3a92f6cb8.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -597,7 +598,7 @@ title="Print to PDF"
 
 <span class="c1"># create cross validator using this &quot;dartboard&quot;</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">cv</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">KFoldCrossValidatorGridded</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
 <span class="c1"># ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.</span>
 <span class="c1"># Because we&#39;ll want to revisit the individual datasets</span>
@@ -802,7 +803,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 36.80444126902396
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 36.804441669976285
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
@@ -821,13 +822,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 14.431716696418786
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 14.431674550767076
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/5f4c0eb8cac55ff52721539682958e42ac170b30cb3ca6f78dc7c4e7e32c0c7c.png" src="../_images/5f4c0eb8cac55ff52721539682958e42ac170b30cb3ca6f78dc7c4e7e32c0c7c.png" />
+<img alt="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" src="../_images/929ebe705d31845228d5099461f82aca7531972a0454068cd0d4e84d516cdeea.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -840,13 +841,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.660800391218415
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.660814250108018
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;AxesSubplot: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/6abd51fd32314882245fb44b96f89dbc792f1a22d40d4acc4effee84d73d0793.png" src="../_images/6abd51fd32314882245fb44b96f89dbc792f1a22d40d4acc4effee84d73d0793.png" />
+<img alt="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" src="../_images/c26fe89f53ae9919b55bef72835a20b704b81ec01f2f5706d854152d2fad4866.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>

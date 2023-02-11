@@ -156,7 +156,7 @@ gridder = gridding.Gridder(
 Instantiating the {class}`~mpol.gridding.Gridder` object attaches the {class}`~mpol.coordinates.GridCoords`  object and the loose visibilities. There is also a convenience method to create the {class}`~mpol.coordinates.GridCoords` and {class}`~mpol.gridding.Gridder` object in one shot by
 
 ```{code-cell}
-gridder = gridding.Gridder(
+gridder = gridding.Gridder.from_image_properties(
     cell_size=0.005,  # [arcsec]
     npix=800,
     uu=uu,

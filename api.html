@@ -347,13 +347,18 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.geometry">
+   Geometry
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#module-mpol.gridding">
    Gridding
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#module-mpol.datasets">
-   Datasets and Cross-Validation
+   Datasets
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -377,12 +382,22 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.training">
+   Training and testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#connectors">
    Connectors
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plotting">
+  <a class="reference internal nav-link" href="#module-mpol.crossval">
+   Cross-validation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.plot">
    Plotting
   </a>
  </li>
@@ -416,13 +431,18 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.geometry">
+   Geometry
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#module-mpol.gridding">
    Gridding
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#module-mpol.datasets">
-   Datasets and Cross-Validation
+   Datasets
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -446,12 +466,22 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.training">
+   Training and testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#connectors">
    Connectors
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plotting">
+  <a class="reference internal nav-link" href="#module-mpol.crossval">
+   Cross-validation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-mpol.plot">
    Plotting
   </a>
  </li>
@@ -920,6 +950,10 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>dl</strong> – image-plane cell spacing in RA direction (assumed to be positive) [radians]</p></li>
 <li><p><strong>dm</strong> – image-plane cell spacing in DEC direction [radians]</p></li>
 <li><p><strong>img_ext</strong> – The length-4 list of (left, right, bottom, top) expected by routines like <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> in the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter assuming <code class="docutils literal notranslate"><span class="pre">origin='lower'</span></code>. Units of [arcsec]</p></li>
+<li><p><strong>packed_x_centers_2D</strong> – 2D array of l increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</p></li>
+<li><p><strong>packed_y_centers_2D</strong> – 2D array of m increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</p></li>
+<li><p><strong>sky_x_centers_2D</strong> – 2D array of l arranged for evaluating a sky image [arcseconds]. l coordinate increases to the left (as on sky).</p></li>
+<li><p><strong>sky_y_centers_2D</strong> – 2D array of m arranged for evaluating a sky image [arcseconds].</p></li>
 <li><p><strong>du</strong> – Fourier-plane cell spacing in East-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
 <li><p><strong>dv</strong> – Fourier-plane cell spacing in North-South direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
 <li><p><strong>u_centers</strong> – 1D array of cell centers in East-West direction [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p></li>
@@ -952,6 +986,66 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="module-mpol.geometry">
+<span id="geometry"></span><h2>Geometry<a class="headerlink" href="#module-mpol.geometry" title="Permalink to this headline">#</a></h2>
+<p>The geometry package provides routines for projecting and de-projecting sky images.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.geometry.flat_to_observer">
+<span class="sig-prename descclassname"><span class="pre">mpol.geometry.</span></span><span class="sig-name descname"><span class="pre">flat_to_observer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/geometry.html#flat_to_observer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.geometry.flat_to_observer" title="Permalink to this definition">#</a></dt>
+<dd><p>Rotate the frame to convert a point in the flat (x,y,z) frame to observer frame (X,Y,Z).</p>
+<p>It is assumed that the +Z axis points <em>towards</em> the observer. It is assumed that the model is flat in the (x,y) frame (like a flat disk), and so the operations involving <code class="docutils literal notranslate"><span class="pre">z</span></code> are neglected. But the model lives in 3D Cartesian space.</p>
+<p>In order,</p>
+<ol class="arabic simple">
+<li><p>rotate about the z axis by an amount omega -&gt; x1, y1, z1</p></li>
+<li><p>rotate about the x1 axis by an amount -incl -&gt; x2, y2, z2</p></li>
+<li><p>rotate about the z2 axis by an amount Omega -&gt; x3, y3, z3 = X, Y, Z</p></li>
+</ol>
+<p>Inspired by <a class="reference external" href="https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py">exoplanet/keplerian.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch tensor</em>) – A tensor representing the x coordinate in the plane of the orbit.</p></li>
+<li><p><strong>y</strong> (<em>torch tensor</em>) – A tensor representing the y coordinate in the plane of the orbit.</p></li>
+<li><p><strong>omega</strong> (<em>torch float tensor</em>) – A tensor representing an argument of periastron [radians] Default 0.0.</p></li>
+<li><p><strong>incl</strong> (<em>torch float tensor</em>) – A tensor representing an inclination value [radians]. Default 0.0.</p></li>
+<li><p><strong>Omega</strong> (<em>torch float tensor</em>) – A tensor representing the position angle of the ascending node in [radians]. Default 0.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Two tensors representing <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">Y)</span></code> in the observer frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.geometry.observer_to_flat">
+<span class="sig-prename descclassname"><span class="pre">mpol.geometry.</span></span><span class="sig-name descname"><span class="pre">observer_to_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/geometry.html#observer_to_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.geometry.observer_to_flat" title="Permalink to this definition">#</a></dt>
+<dd><p>Rotate the from to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</p>
+<p>It is assumed that the +Z axis points <em>towards</em> the observer. The rotation operations are the inverse of the <a class="reference internal" href="#mpol.geometry.flat_to_observer" title="mpol.geometry.flat_to_observer"><code class="xref py py-func docutils literal notranslate"><span class="pre">flat_to_observer()</span></code></a> operations.</p>
+<p>In order,</p>
+<ol class="arabic simple">
+<li><p>inverse rotation about the Z axis by an amount Omega -&gt; x2, y2, z2</p></li>
+<li><p>inverse rotation about the x2 axis by an amount -incl -&gt; x1, y1, z1</p></li>
+<li><p>inverse rotation about the z1 axis by an amount omega -&gt; x, y, z</p></li>
+</ol>
+<p>Inspired by <a class="reference external" href="https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py">exoplanet/keplerian.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>torch tensor</em>) – A tensor representing the x coodinate in the plane of the orbit.</p></li>
+<li><p><strong>Y</strong> (<em>torch.tensor</em>) – A tensor representing the y coodinate in the plane of the orbit.</p></li>
+<li><p><strong>omega</strong> (<em>torch float tensor</em>) – A tensor representing an argument of periastron [radians] Default 0.0.</p></li>
+<li><p><strong>incl</strong> (<em>torch float tensor</em>) – A tensor representing an inclination value [radians]. Default 0.0.</p></li>
+<li><p><strong>Omega</strong> (<em>torch float tensor</em>) – A tensor representing the position angle of the ascending node in [radians]. Default 0.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Two tensors representing <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in the observer frame.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -1079,7 +1173,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 
 </section>
 <section id="module-mpol.datasets">
-<span id="datasets-and-cross-validation"></span><h2>Datasets and Cross-Validation<a class="headerlink" href="#module-mpol.datasets" title="Permalink to this headline">#</a></h2>
+<span id="datasets"></span><h2>Datasets<a class="headerlink" href="#module-mpol.datasets" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.datasets.GriddedDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">GriddedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">mpol.coordinates.GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_gridded</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_gridded</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">torch.device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset" title="Permalink to this definition">#</a></dt>
@@ -1193,47 +1287,38 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.datasets.Dartboard">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">Dartboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#Dartboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.Dartboard" title="Permalink to this definition">#</a></dt>
-<dd><p>A polar coordinate grid relative to a <a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
-<li><p><strong>q_edges</strong> (<em>1D numpy array</em>) – an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.</p></li>
-<li><p><strong>phi_edges</strong> (<em>1D numpy array</em>) – an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain <span class="math notranslate nohighlight">\([0, \pi]\)</span>, which is also implicitly mapped to the domain <span class="math notranslate nohighlight">\([-\pi, \pi]\)</span> to preserve the Hermitian nature of the visibilities. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>A polar coordinate grid relative to a <a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
+:param coords: an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.
+:type coords: GridCoords
+:param q_edges: an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.
+:type q_edges: 1D numpy array
+:param phi_edges: an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain <span class="math notranslate nohighlight">\([0, \pi]\)</span>, which is also implicitly mapped to the domain <span class="math notranslate nohighlight">\([-\pi, \pi]\)</span> to preserve the Hermitian nature of the visibilities. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.
+:type phi_edges: 1D numpy array</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.datasets.Dartboard.from_image_properties">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_image_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><span class="pre">Dartboard</span></a></span></span><a class="reference internal" href="_modules/mpol/datasets.html#Dartboard.from_image_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.Dartboard.from_image_properties" title="Permalink to this definition">#</a></dt>
 <dd><p>Alternative method to instantiate a Dartboard object from cell_size
-and npix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cell_size</strong> (<em>float</em>) – the width of a pixel [arcseconds]</p></li>
-<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
-<li><p><strong>q_edges</strong> (<em>1D numpy array</em>) – an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.</p></li>
-<li><p><strong>phi_edges</strong> (<em>1D numpy array</em>) – an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain <span class="math notranslate nohighlight">\([0, \pi]\)</span>, which is also implicitly mapped to the domain <span class="math notranslate nohighlight">\([-\pi, \pi]\)</span> to preserve the Hermitian nature of the visibilities. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.</p></li>
-</ul>
-</dd>
-</dl>
+and npix.
+:param cell_size: the width of a pixel [arcseconds]
+:type cell_size: float
+:param npix: the number of pixels per image side
+:type npix: int
+:param q_edges: an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.
+:type q_edges: 1D numpy array
+:param phi_edges: an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain <span class="math notranslate nohighlight">\([0, \pi]\)</span>, which is also implicitly mapped to the domain <span class="math notranslate nohighlight">\([-\pi, \pi]\)</span> to preserve the Hermitian nature of the visibilities. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.
+:type phi_edges: 1D numpy array</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.datasets.Dartboard.get_polar_histogram">
 <span class="sig-name descname"><span class="pre">get_polar_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mpol/datasets.html#Dartboard.get_polar_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.Dartboard.get_polar_histogram" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculate a histogram in polar coordinates, using the bin edges defined by <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code> during initialization.</p>
-<p>Data coordinates should include the points for the Hermitian visibilities.</p>
+<dd><p>Calculate a histogram in polar coordinates, using the bin edges defined by <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code> during initialization.
+Data coordinates should include the points for the Hermitian visibilities.
+:param qs: 1d array of q values <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>
+:param phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qs</strong> – 1d array of q values <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span></p></li>
-<li><p><strong>phis</strong> – 1d array of datapoint azimuth values [radians] (must be the same length as qs)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1241,17 +1326,13 @@ and npix.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.datasets.Dartboard.get_nonzero_cell_indices">
 <span class="sig-name descname"><span class="pre">get_nonzero_cell_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">integer</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mpol/datasets.html#Dartboard.get_nonzero_cell_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.Dartboard.get_nonzero_cell_indices" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a list of the cell indices that contain data points, using the bin edges defined by <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code> during initialization.</p>
-<p>Data coordinates should include the points for the Hermitian visibilities.</p>
+<dd><p>Return a list of the cell indices that contain data points, using the bin edges defined by <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code> during initialization.
+Data coordinates should include the points for the Hermitian visibilities.
+:param qs: 1d array of q values <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>
+:param phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>qs</strong> – 1d array of q values <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span></p></li>
-<li><p><strong>phis</strong> – 1d array of datapoint azimuth values [radians] (must be the same length as qs)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of cell indices where cell contains at least one datapoint.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of cell indices where cell contains at least one datapoint.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1259,55 +1340,10 @@ and npix.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.datasets.Dartboard.build_grid_mask_from_cells">
 <span class="sig-name descname"><span class="pre">build_grid_mask_from_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_index_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">integer</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">np.bool_</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mpol/datasets.html#Dartboard.build_grid_mask_from_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.Dartboard.build_grid_mask_from_cells" title="Permalink to this definition">#</a></dt>
-<dd><p>Create a boolean mask of size <code class="docutils literal notranslate"><span class="pre">(npix,</span> <span class="pre">npix)</span></code> (in packed format) corresponding to the <code class="docutils literal notranslate"><span class="pre">vis_gridded</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_gridded</span></code> quantities of the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> .</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>cell_index_list</strong> (<em>list</em>) – list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.</p>
-</dd>
-</dl>
+<dd><p>Create a boolean mask of size <code class="docutils literal notranslate"><span class="pre">(npix,</span> <span class="pre">npix)</span></code> (in packed format) corresponding to the <code class="docutils literal notranslate"><span class="pre">vis_gridded</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_gridded</span></code> quantities of the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> .
+:param cell_index_list: list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
+:type cell_index_list: list</p>
 <p>Returns: (numpy array) 2D boolean mask in packed format.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="mpol.datasets.KFoldCrossValidatorGridded">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">KFoldCrossValidatorGridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridded_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dartboard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><span class="pre">Dartboard</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npseed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#KFoldCrossValidatorGridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.KFoldCrossValidatorGridded" title="Permalink to this definition">#</a></dt>
-<dd><p>Split a GriddedDataset into <span class="math notranslate nohighlight">\(k\)</span> non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> for each k-fold.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>griddedDataset</strong> (<a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>) – instance of the gridded dataset</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – the number of subpartitions of the dataset</p></li>
-<li><p><strong>dartboard</strong> (<a class="reference internal" href="#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dartboard</span></code></a>) – a pre-initialized Dartboard instance. If <code class="docutils literal notranslate"><span class="pre">dartboard</span></code> is provided, do not provide <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> or <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code>.</p></li>
-<li><p><strong>q_edges</strong> (<em>1D numpy array</em>) – an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.</p></li>
-<li><p><strong>phi_edges</strong> (<em>1D numpy array</em>) – an array of azimuthal bin edges to set the dartboard cells in [radians]. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.</p></li>
-<li><p><strong>npseed</strong> (<em>int</em>) – (optional) numpy random seed to use for the permutation, for reproducibility</p></li>
-</ul>
-</dd>
-</dl>
-<p>Once initialized, iterate through the datasets like</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cv</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">KFoldCrossValidatorGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cv</span><span class="p">:</span> <span class="c1"># iterate among k datasets</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># working with the n-th slice of k datasets</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with train dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with test dataset</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="mpol.datasets.KFoldCrossValidatorGridded.from_dartboard_properties">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dartboard_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridded_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npseed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mpol.datasets.KFoldCrossValidatorGridded" title="mpol.datasets.KFoldCrossValidatorGridded"><span class="pre">KFoldCrossValidatorGridded</span></a></span></span><a class="reference internal" href="_modules/mpol/datasets.html#KFoldCrossValidatorGridded.from_dartboard_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.KFoldCrossValidatorGridded.from_dartboard_properties" title="Permalink to this definition">#</a></dt>
-<dd><p>Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Args:</dt><dd><p>griddedDataset (<a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>): instance of the gridded dataset
-k (int): the number of subpartitions of the dataset
-q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.
-phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.
-npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -1454,7 +1490,7 @@ npseed (int): (optional) numpy random seed to use for the permutation, for repro
 <p>The <code class="docutils literal notranslate"><span class="pre">fourier</span></code> module provides the core functionality of MPoL via <a class="reference internal" href="#mpol.fourier.FourierCube" title="mpol.fourier.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.fourier.FourierCube">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">FourierCube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/fourier.html#FourierCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.FourierCube" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">FourierCube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/fourier.html#FourierCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.FourierCube" title="Permalink to this definition">#</a></dt>
 <dd><p>This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., <a class="reference internal" href="#mpol.losses.nll_gridded" title="mpol.losses.nll_gridded"><code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses.nll_gridded()</span></code></a>) and a gridded dataset (e.g., <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1462,6 +1498,7 @@ npseed (int): (optional) numpy random seed to use for the permutation, for repro
 <li><p><strong>cell_size</strong> (<em>float</em>) – the width of an image-plane pixel [arcseconds]</p></li>
 <li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side</p></li>
 <li><p><strong>coords</strong> (<a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class. If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>persistent_vis</strong> (<em>Boolean</em>) – should the visibility cube be stored as part of the modules <cite>state_dict</cite>? If <cite>True</cite>, the state of the UV grid will be stored. It is recommended to use <cite>False</cite> for most applications, since the visibility cube will rarely be a direct parameter of the model.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2014,6 +2051,136 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 </dd></dl>
 
 </section>
+<section id="module-mpol.training">
+<span id="training-and-testing"></span><h2>Training and testing<a class="headerlink" href="#module-mpol.training" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.training.TrainTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.training.</span></span><span class="sig-name descname"><span class="pre">TrainTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess_briggs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_prior_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_sparsity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TV_epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest" title="Permalink to this definition">#</a></dt>
+<dd><p>Utilities for training and testing an MPoL neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gridder</strong> (<cite>mpol.gridding.Gridder</cite> object) – Instance of the <cite>mpol.gridding.Gridder</cite> class.</p></li>
+<li><p><strong>optimizer</strong> (<cite>torch.optim</cite> object) – PyTorch optimizer class for the training loop.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>default=500</em>) – Number of training iterations</p></li>
+<li><p><strong>convergence_tol</strong> (<em>float</em><em>, </em><em>default=1e-2</em>) – Tolerance for training iteration stopping criterion as assessed by
+loss function (suggested &lt;= 1e-2)</p></li>
+<li><p><strong>lambda_guess</strong> (<em>list of str</em><em>, </em><em>default=None</em>) – List of regularizers for which to guess an initial value</p></li>
+<li><p><strong>lambda_guess_briggs</strong> (<em>list of float</em><em>, </em><em>default=</em><em>[</em><em>0.0</em><em>, </em><em>0.5</em><em>]</em>) – Briggs robust values for two images used to guess initial regularizer
+values (if lambda_guess is not None)</p></li>
+<li><p><strong>lambda_entropy</strong> (<em>float</em>) – Relative strength for entropy regularizer</p></li>
+<li><p><strong>entropy_prior_intensity</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against (suggested &lt;&lt;1)</p></li>
+<li><p><strong>lambda_sparsity</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for sparsity regularizer</p></li>
+<li><p><strong>lambda_TV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total variation (TV) regularizer</p></li>
+<li><p><strong>TV_epsilon</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Softening parameter for TV regularizer (suggested &lt;&lt;1)</p></li>
+<li><p><strong>lambda_TSV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total squared variation (TSV) regularizer</p></li>
+<li><p><strong>train_diag_step</strong> (<em>int</em><em>, </em><em>default=None</em>) – Interval at which training diagnostics are output. If None, no
+diagnostics will be generated.</p></li>
+<li><p><strong>save_prefix</strong> (<em>str</em><em>, </em><em>default=None</em>) – Prefix (path) used for saved figure names. If None, figures won’t be
+saved</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to print notification messages</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.loss_convergence">
+<span class="sig-name descname"><span class="pre">loss_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.loss_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.loss_convergence" title="Permalink to this definition">#</a></dt>
+<dd><p>Estimate whether the loss function has converged by assessing its
+relative change over recent iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>array</em>) – Values of loss function over iterations (epochs).
+If len(loss) &lt; 11, <cite>False</cite> will be returned, as convergence
+cannot be adequately assessed.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>True</cite> if the convergence criterion is met, else <cite>False</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.loss_lambda_guess">
+<span class="sig-name descname"><span class="pre">loss_lambda_guess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.loss_lambda_guess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.loss_lambda_guess" title="Permalink to this definition">#</a></dt>
+<dd><p>Set an initial guess for regularizer strengths <span class="math notranslate nohighlight">\(\lambda_{x}\)</span> by
+comparing images generated with different visibility weighting.</p>
+<p>The guesses update <cite>self._lambda_*</cite> values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>guesses</strong> – Dictionary containing the names and initial guesses of regularizers</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.loss_eval">
+<span class="sig-name descname"><span class="pre">loss_eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.loss_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.loss_eval" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vis</strong> (<em>torch.complex tensor</em>) – Model visibility cube (see <cite>mpol.fourier.FourierCube.forward</cite>)</p></li>
+<li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
+<li><p><strong>sky_cube</strong> (<em>torch.double</em>) – MPoL Ground Cube (see <cite>mpol.utils.packed_cube_to_ground_cube</cite>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>loss</strong> – Value of loss function</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.train" title="Permalink to this definition">#</a></dt>
+<dd><p>Trains a neural network, forward modeling a visibility dataset and
+evaluating the corresponding model image against the data, using
+PyTorch with gradient descent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>loss.item()</strong> (<em>float</em>) – Value of loss function at end of optimization loop</p></li>
+<li><p><strong>losses</strong> (<em>list</em>) – Loss value at each iteration (epoch) in the loop</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.test" title="Permalink to this definition">#</a></dt>
+<dd><p>Test a model visibility cube against withheld data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>loss.item()</strong> – Value of loss function</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="connectors">
 <h2>Connectors<a class="headerlink" href="#connectors" title="Permalink to this headline">#</a></h2>
 <p>The objects in the Images and Precomposed modules are focused on bringing some image-plane model to the space of the data, where the similarity of the model visibilities to the data visibilities will be evaluated by a negative log-likelihood loss. In some situations, though, it is useful to have access to the residual visibilities directly. For example, for visualization or debugging purposes.</p>
@@ -2141,9 +2308,179 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 </dd></dl>
 
 </section>
-<section id="plotting">
-<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">#</a></h2>
-<span class="target" id="module-mpol.plot"></span><dl class="py function">
+<section id="module-mpol.crossval">
+<span id="cross-validation"></span><h2>Cross-validation<a class="headerlink" href="#module-mpol.crossval" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.crossval.</span></span><span class="sig-name descname"><span class="pre">CrossValidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_cell'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess_briggs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_prior_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_sparsity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TV_epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_diag_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_cv_diagnostics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#CrossValidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.CrossValidate" title="Permalink to this definition">#</a></dt>
+<dd><p>Utilities to run a cross-validation loop (implicitly running a training
+optimization loop), in order to compare MPoL models with different
+hyperparameter values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<cite>mpol.coordinates.GridCoords</cite> object) – Instance of the <cite>mpol.coordinates.GridCoords</cite> class.</p></li>
+<li><p><strong>gridder</strong> (<cite>mpol.gridding.Gridder</cite> object) – Instance of the <cite>mpol.gridding.Gridder</cite> class.</p></li>
+<li><p><strong>kfolds</strong> (<em>int</em><em>, </em><em>default=5</em>) – Number of k-folds to use in cross-validation</p></li>
+<li><p><strong>split_method</strong> (<em>str</em><em>, </em><em>default='random_cell'</em>) – Method to split full dataset into train/test subsets</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default=None</em>) – Seed for random number generator used in splitting data</p></li>
+<li><p><strong>learn_rate</strong> (<em>float</em><em>, </em><em>default=0.5</em>) – Neural network learning rate</p></li>
+<li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>default=500</em>) – Number of training iterations</p></li>
+<li><p><strong>convergence_tol</strong> (<em>float</em><em>, </em><em>default=1e-2</em>) – Tolerance for training iteration stopping criterion as assessed by
+loss function (suggested &lt;= 1e-2)</p></li>
+<li><p><strong>lambda_guess</strong> (<em>list of str</em><em>, </em><em>default=None</em>) – List of regularizers for which to guess an initial value</p></li>
+<li><p><strong>lambda_guess_briggs</strong> (<em>list of float</em><em>, </em><em>default=</em><em>[</em><em>0.0</em><em>, </em><em>0.5</em><em>]</em>) – Briggs robust values for two images used to guess initial regularizer
+values (if lambda_guess is not None)</p></li>
+<li><p><strong>lambda_entropy</strong> (<em>float</em>) – Relative strength for entropy regularizer</p></li>
+<li><p><strong>entropy_prior_intensity</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against (suggested &lt;&lt;1)</p></li>
+<li><p><strong>lambda_sparsity</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for sparsity regularizer</p></li>
+<li><p><strong>lambda_TV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total variation (TV) regularizer</p></li>
+<li><p><strong>TV_epsilon</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Softening parameter for TV regularizer (suggested &lt;&lt;1)</p></li>
+<li><p><strong>lambda_TSV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total squared variation (TSV) regularizer</p></li>
+<li><p><strong>train_diag_step</strong> (<em>int</em><em>, </em><em>default=None</em>) – Interval at which training diagnostics are output. If None, no
+diagnostics will be generated.</p></li>
+<li><p><strong>split_diag_fig</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to generate a diagnostic figure of dataset splitting into
+train/test sets.</p></li>
+<li><p><strong>store_cv_diagnostics</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to store diagnostics of the cross-validation loop.</p></li>
+<li><p><strong>save_prefix</strong> (<em>str</em><em>, </em><em>default=None</em>) – Prefix (path) used for saved figure names. If None, figures won’t be
+saved</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>default=None</em>) – Which hardware device to perform operations on (e.g., ‘cuda:0’).
+‘None’ defaults to current device.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to print notification messages.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.split_dataset">
+<span class="sig-name descname"><span class="pre">split_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#CrossValidate.split_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.CrossValidate.split_dataset" title="Permalink to this definition">#</a></dt>
+<dd><p>Split a dataset into training and test subsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>subsets</strong> – Iterator that provides a (train, test) pair of
+<a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> for each k-fold</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterator returning tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.run_crossval">
+<span class="sig-name descname"><span class="pre">run_crossval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#CrossValidate.run_crossval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.CrossValidate.run_crossval" title="Permalink to this definition">#</a></dt>
+<dd><p>Run a cross-validation loop for a model obtained with a given set of
+hyperparameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cv_score</strong> (<em>(float, float)</em>) – Tuple of (mean, standard deviation) of cross-validation scores
+across all k-folds</p></li>
+<li><p><strong>all_scores</strong> (<em>list of float</em>) – Individual cross-validation scores for each k-fold</p></li>
+<li><p><strong>loss_histories</strong> (<em>list of float</em>) – Loss function values for each training loop</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.cv_diagnostics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cv_diagnostics</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.cv_diagnostics" title="Permalink to this definition">#</a></dt>
+<dd><p>Dict containing diagnostics of the cross-validation loop</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.crossval.RandomCellSplitGridded">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.crossval.</span></span><span class="sig-name descname"><span class="pre">RandomCellSplitGridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#RandomCellSplitGridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.RandomCellSplitGridded" title="Permalink to this definition">#</a></dt>
+<dd><p>Split a GriddedDataset into <span class="math notranslate nohighlight">\(k\)</span> subsets. Inherit the properties of
+the GriddedDataset. This object creates an iterator providing a
+(train, test) pair of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> for each
+k-fold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class</p></li>
+<li><p><strong>kfolds</strong> (<em>int</em><em>, </em><em>default=5</em>) – Number of k-folds (partitions) of <cite>dataset</cite></p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default=None</em>) – Seed for PyTorch random number generator used to shuffle data before
+splitting</p></li>
+<li><p><strong>channel</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel of the dataset to use in determining the splits</p></li>
+<li><p><strong>initialized</strong> (<em>Once</em>) – <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_iterator</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">RandomCellSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">kfolds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="ow">in</span> <span class="n">split_iterator</span><span class="p">:</span> <span class="c1"># iterate through `kfolds` datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># working with the n-th slice of `kfolds` datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with train dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with test dataset</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>like</strong> (<em>iterate through the datasets</em>) – <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_iterator</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">RandomCellSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">kfolds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="ow">in</span> <span class="n">split_iterator</span><span class="p">:</span> <span class="c1"># iterate through `kfolds` datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># working with the n-th slice of `kfolds` datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with train dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with test dataset</span>
+</pre></div>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Treats <cite>dataset</cite> as a single-channel object with all data in <cite>channel</cite></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.crossval.DartboardSplitGridded">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.crossval.</span></span><span class="sig-name descname"><span class="pre">DartboardSplitGridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridded_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dartboard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><span class="pre">Dartboard</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npseed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#DartboardSplitGridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.DartboardSplitGridded" title="Permalink to this definition">#</a></dt>
+<dd><p>Split a GriddedDataset into <span class="math notranslate nohighlight">\(k\)</span> non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> for each k-fold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>griddedDataset</strong> (<a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>) – instance of the gridded dataset</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – the number of subpartitions of the dataset</p></li>
+<li><p><strong>dartboard</strong> (<a class="reference internal" href="#mpol.datasets.Dartboard" title="mpol.datasets.Dartboard"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dartboard</span></code></a>) – a pre-initialized Dartboard instance. If <code class="docutils literal notranslate"><span class="pre">dartboard</span></code> is provided, do not provide <code class="docutils literal notranslate"><span class="pre">q_edges</span></code> or <code class="docutils literal notranslate"><span class="pre">phi_edges</span></code>.</p></li>
+<li><p><strong>q_edges</strong> (<em>1D numpy array</em>) – an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.</p></li>
+<li><p><strong>phi_edges</strong> (<em>1D numpy array</em>) – an array of azimuthal bin edges to set the dartboard cells in [radians]. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.</p></li>
+<li><p><strong>npseed</strong> (<em>int</em>) – (optional) numpy random seed to use for the permutation, for reproducibility</p></li>
+</ul>
+</dd>
+</dl>
+<p>Once initialized, iterate through the datasets like</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cv</span><span class="p">:</span> <span class="c1"># iterate among k datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># working with the n-th slice of k datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with train dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span> <span class="c1"># do operations with test dataset</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.crossval.DartboardSplitGridded.from_dartboard_properties">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dartboard_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridded_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npseed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mpol.crossval.DartboardSplitGridded" title="mpol.crossval.DartboardSplitGridded"><span class="pre">DartboardSplitGridded</span></a></span></span><a class="reference internal" href="_modules/mpol/crossval.html#DartboardSplitGridded.from_dartboard_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.DartboardSplitGridded.from_dartboard_properties" title="Permalink to this definition">#</a></dt>
+<dd><p>Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>griddedDataset (<a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>): instance of the gridded dataset
+k (int): the number of subpartitions of the dataset
+q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in <span class="math notranslate nohighlight">\([\mathrm{k}\lambda]\)</span>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 12 log-linearly radial bins stretching from 0 to the <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span> represented by <code class="docutils literal notranslate"><span class="pre">coords</span></code>.
+phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to 8 equal-spaced azimuthal bins stretched from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.
+npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mpol.plot">
+<span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-mpol.plot" title="Permalink to this headline">#</a></h2>
+<dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.vis_histogram">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">vis_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_edges1d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_datapoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#vis_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.vis_histogram" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a figure with 1d and 2d histograms of (u,v)-plane coverage.

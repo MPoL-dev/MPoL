@@ -322,6 +322,10 @@ title="Source repository"
 <span class="sd">    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]</span>
 <span class="sd">    :ivar dm: image-plane cell spacing in DEC direction [radians]</span>
 <span class="sd">    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin=&#39;lower&#39;``. Units of [arcsec]</span>
+<span class="sd">    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</span>
+<span class="sd">    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</span>
+<span class="sd">    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image [arcseconds]. l coordinate increases to the left (as on sky).</span>
+<span class="sd">    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image [arcseconds]. </span>
 <span class="sd">    :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].</span>

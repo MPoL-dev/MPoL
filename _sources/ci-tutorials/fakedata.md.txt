@@ -253,7 +253,7 @@ img_tensor_packed = utils.sky_cube_to_packed_cube(img_tensor)
 
 ```{code-cell} ipython3
 from mpol.images import ImageCube
-image = ImageCube(cell_size=cell_size, npix=npix, nchan=1, cube=img_tensor_packed)
+image = ImageCube.from_image_properties(cell_size=cell_size, npix=npix, nchan=1, cube=img_tensor_packed)
 ```
 
 If you want to double-check that the image was correctly inserted, you can do

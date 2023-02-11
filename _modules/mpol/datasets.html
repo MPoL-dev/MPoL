@@ -391,7 +391,7 @@ title="Source repository"
 <span class="sd">            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">new_2D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">new_2D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="n">new_3D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">new_2D_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 
         <span class="c1"># update mask via an AND operation, meaning we will only keep visibilities that are</span>
@@ -546,7 +546,6 @@ title="Source repository"
 <div class="viewcode-block" id="Dartboard"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard">[docs]</a><span class="k">class</span> <span class="nc">Dartboard</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.</span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
@@ -603,7 +602,6 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dartboard</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Alternative method to instantiate a Dartboard object from cell_size</span>
 <span class="sd">        and npix.</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            cell_size (float): the width of a pixel [arcseconds]</span>
 <span class="sd">            npix (int): the number of pixels per image side</span>
@@ -618,16 +616,12 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
-
 <span class="sd">        Data coordinates should include the points for the Hermitian visibilities.</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`</span>
 <span class="sd">            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">histogram</span><span class="p">:</span> <span class="n">NDArray</span>
@@ -643,13 +637,10 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">integer</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
-
 <span class="sd">        Data coordinates should include the points for the Hermitian visibilities.</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`</span>
 <span class="sd">            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            list of cell indices where cell contains at least one datapoint.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -666,10 +657,8 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.</span>
-
 <span class="sd">        Returns: (numpy array) 2D boolean mask in packed format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartesian_qs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
@@ -696,120 +685,6 @@ title="Source repository"
             <span class="n">mask</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">return</span> <span class="n">mask</span></div></div>
-
-
-<div class="viewcode-block" id="KFoldCrossValidatorGridded"><a class="viewcode-back" href="../../api.html#mpol.datasets.KFoldCrossValidatorGridded">[docs]</a><span class="k">class</span> <span class="nc">KFoldCrossValidatorGridded</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset</span>
-<span class="sd">        k (int): the number of subpartitions of the dataset</span>
-<span class="sd">        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.</span>
-<span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
-<span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
-<span class="sd">        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
-
-<span class="sd">    Once initialized, iterate through the datasets like</span>
-
-<span class="sd">    &gt;&gt;&gt; cv = datasets.KFoldCrossValidatorGridded(dataset, k)</span>
-<span class="sd">    &gt;&gt;&gt; for (train, test) in cv: # iterate among k datasets</span>
-<span class="sd">    &gt;&gt;&gt; ... # working with the n-th slice of k datasets</span>
-<span class="sd">    &gt;&gt;&gt; ... # do operations with train dataset</span>
-<span class="sd">    &gt;&gt;&gt; ... # do operations with test dataset</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">gridded_dataset</span><span class="p">:</span> <span class="n">GriddedDataset</span><span class="p">,</span>
-        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">dartboard</span><span class="p">:</span> <span class="n">Dartboard</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;k must be a positive integer&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dartboard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span> <span class="o">=</span> <span class="n">gridded_dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span> <span class="o">=</span> <span class="n">dartboard</span>
-
-        <span class="c1"># 2D mask for any UV cells that contain visibilities</span>
-        <span class="c1"># in *any* channel</span>
-        <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="c1"># get qs, phis from dataset and turn into 1D lists</span>
-        <span class="n">qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span><span class="p">[</span><span class="n">stacked_mask</span><span class="p">]</span>
-        <span class="n">phis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_phi_centers_2D</span><span class="p">[</span><span class="n">stacked_mask</span><span class="p">]</span>
-
-        <span class="c1"># create the full cell_list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">get_nonzero_cell_indices</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">)</span>
-
-        <span class="c1"># partition the cell_list into k pieces</span>
-        <span class="c1"># first, randomly permute the sequence to make sure</span>
-        <span class="c1"># we don&#39;t get structured radial/azimuthal patterns</span>
-        <span class="k">if</span> <span class="n">npseed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">npseed</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">),</span> <span class="n">k</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="KFoldCrossValidatorGridded.from_dartboard_properties"><a class="viewcode-back" href="../../api.html#mpol.datasets.KFoldCrossValidatorGridded.from_dartboard_properties">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dartboard_properties</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">gridded_dataset</span><span class="p">:</span> <span class="n">GriddedDataset</span><span class="p">,</span>
-        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">q_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">phi_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KFoldCrossValidatorGridded</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Alternative method to initialize a KFoldCrossValidatorGridded object from Dartboard parameters.</span>
-
-<span class="sd">         Args:</span>
-<span class="sd">             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset</span>
-<span class="sd">             k (int): the number of subpartitions of the dataset</span>
-<span class="sd">             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
-<span class="sd">             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
-<span class="sd">             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KFoldCrossValidatorGridded</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the current k-slice we&#39;re on</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GriddedDataset</span><span class="p">,</span> <span class="n">GriddedDataset</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
-            <span class="n">k_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">cell_list_test</span> <span class="o">=</span> <span class="n">k_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
-
-            <span class="c1"># put the remaining indices back into a full list</span>
-            <span class="n">cell_list_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">k_list</span><span class="p">)</span>
-
-            <span class="c1"># create the masks for each cell_list</span>
-            <span class="n">train_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">build_grid_mask_from_cells</span><span class="p">(</span><span class="n">cell_list_train</span><span class="p">)</span>
-            <span class="n">test_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">build_grid_mask_from_cells</span><span class="p">(</span><span class="n">cell_list_test</span><span class="p">)</span>
-
-            <span class="c1"># copy original dateset</span>
-            <span class="n">train</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="p">)</span>
-            <span class="n">test</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">griddedDataset</span><span class="p">)</span>
-
-            <span class="c1"># and use these masks to limit new datasets to only unmasked cells</span>
-            <span class="n">train</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">train_mask</span><span class="p">)</span>
-            <span class="n">test</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">test_mask</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">StopIteration</span></div>
 </pre></div>
 
               </div>

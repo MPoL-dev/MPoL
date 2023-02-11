@@ -863,14 +863,14 @@ title="Print to PDF"
 <p>Now that we have our functions defined, we need to divide our dataset into training and test datasets. There are many ways of going about this; here we are splitting the dataset into radial and azimuthal chunks in a dartboard-like pattern. MPoL’s <code class="docutils literal notranslate"><span class="pre">Dartboard</span></code> presents an easy built-in way to get the polar coordinate grid of a dataset. To to read more, please see <a class="reference internal" href="../ci-tutorials/crossvalidation.html#choosing-the-k-folds"><span class="std std-doc">Choosing the K-folds</span></a> in the <a class="reference internal" href="../ci-tutorials/crossvalidation.html"><span class="doc std std-doc">Cross Validation tutorial</span></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">datasets</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">crossval</span><span class="p">,</span> <span class="n">datasets</span>
 
 <span class="c1"># create a radial and azimuthal partition for the dataset</span>
 <span class="n">dartboard</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
 
 <span class="c1"># create cross validator using this &quot;dartboard&quot;</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">cv</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">KFoldCrossValidatorGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
 <span class="c1"># ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.</span>
 <span class="c1"># Because we&#39;ll want to revisit the individual datasets</span>

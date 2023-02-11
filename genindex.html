@@ -300,11 +300,12 @@ title="Source repository"
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
- | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
@@ -340,13 +341,17 @@ title="Source repository"
 </li>
       <li><a href="api.html#mpol.coordinates.GridCoords.check_data_fit">check_data_fit() (mpol.coordinates.GridCoords method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.losses.chi_squared">chi_squared() (in module mpol.losses)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.losses.chi_squared_gridded">chi_squared_gridded() (in module mpol.losses)</a>
 </li>
       <li><a href="api.html#mpol.utils.convert_baselines">convert_baselines() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.crossval.CrossValidate">CrossValidate (class in mpol.crossval)</a>
+</li>
+      <li><a href="api.html#mpol.crossval.CrossValidate.cv_diagnostics">cv_diagnostics (mpol.crossval.CrossValidate property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -355,6 +360,10 @@ title="Source repository"
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.datasets.Dartboard">Dartboard (class in mpol.datasets)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.crossval.DartboardSplitGridded">DartboardSplitGridded (class in mpol.crossval)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -375,6 +384,8 @@ title="Source repository"
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.fftspace">fftspace() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.geometry.flat_to_observer">flat_to_observer() (in module mpol.geometry)</a>
 </li>
       <li><a href="api.html#mpol.connectors.GriddedResidualConnector.forward">forward() (mpol.connectors.GriddedResidualConnector method)</a>
 
@@ -400,7 +411,7 @@ title="Source repository"
 </li>
       <li><a href="api.html#mpol.fourier.FourierCube">FourierCube (class in mpol.fourier)</a>
 </li>
-      <li><a href="api.html#mpol.datasets.KFoldCrossValidatorGridded.from_dartboard_properties">from_dartboard_properties() (mpol.datasets.KFoldCrossValidatorGridded class method)</a>
+      <li><a href="api.html#mpol.crossval.DartboardSplitGridded.from_dartboard_properties">from_dartboard_properties() (mpol.crossval.DartboardSplitGridded class method)</a>
 </li>
       <li><a href="api.html#mpol.datasets.Dartboard.from_image_properties">from_image_properties() (mpol.datasets.Dartboard class method)</a>
 
@@ -489,14 +500,6 @@ title="Source repository"
   </ul></td>
 </tr></table>
 
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mpol.datasets.KFoldCrossValidatorGridded">KFoldCrossValidatorGridded (class in mpol.datasets)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -504,11 +507,17 @@ title="Source repository"
 </li>
       <li><a href="api.html#mpol.losses.log_likelihood_gridded">log_likelihood_gridded() (in module mpol.losses)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.log_stretch">log_stretch() (in module mpol.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#mpol.utils.loglinspace">loglinspace() (in module mpol.utils)</a>
+</li>
+      <li><a href="api.html#mpol.training.TrainTest.loss_convergence">loss_convergence() (mpol.training.TrainTest method)</a>
+</li>
+      <li><a href="api.html#mpol.training.TrainTest.loss_eval">loss_eval() (mpol.training.TrainTest method)</a>
+</li>
+      <li><a href="api.html#mpol.training.TrainTest.loss_lambda_guess">loss_lambda_guess() (mpol.training.TrainTest method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -526,9 +535,13 @@ title="Source repository"
 </li>
         <li><a href="api.html#module-mpol.coordinates">mpol.coordinates</a>
 </li>
+        <li><a href="api.html#module-mpol.crossval">mpol.crossval</a>
+</li>
         <li><a href="api.html#module-mpol.datasets">mpol.datasets</a>
 </li>
         <li><a href="api.html#module-mpol.fourier">mpol.fourier</a>
+</li>
+        <li><a href="api.html#module-mpol.geometry">mpol.geometry</a>
 </li>
         <li><a href="api.html#module-mpol.gridding">mpol.gridding</a>
 </li>
@@ -539,6 +552,8 @@ title="Source repository"
         <li><a href="api.html#module-mpol.plot">mpol.plot</a>
 </li>
         <li><a href="api.html#module-mpol.precomposed">mpol.precomposed</a>
+</li>
+        <li><a href="api.html#module-mpol.training">mpol.training</a>
 </li>
         <li><a href="api.html#module-mpol.utils">mpol.utils</a>
 </li>
@@ -557,6 +572,13 @@ title="Source repository"
         <li><a href="api.html#module-mpol.coordinates">module</a>
 </li>
       </ul></li>
+      <li>
+    mpol.crossval
+
+      <ul>
+        <li><a href="api.html#module-mpol.crossval">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -571,6 +593,13 @@ title="Source repository"
 
       <ul>
         <li><a href="api.html#module-mpol.fourier">module</a>
+</li>
+      </ul></li>
+      <li>
+    mpol.geometry
+
+      <ul>
+        <li><a href="api.html#module-mpol.geometry">module</a>
 </li>
       </ul></li>
       <li>
@@ -609,6 +638,13 @@ title="Source repository"
 </li>
       </ul></li>
       <li>
+    mpol.training
+
+      <ul>
+        <li><a href="api.html#module-mpol.training">module</a>
+</li>
+      </ul></li>
+      <li>
     mpol.utils
 
       <ul>
@@ -632,6 +668,14 @@ title="Source repository"
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.geometry.observer_to_flat">observer_to_flat() (in module mpol.geometry)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -642,6 +686,18 @@ title="Source repository"
       <li><a href="api.html#mpol.utils.packed_cube_to_sky_cube">packed_cube_to_sky_cube() (in module mpol.utils)</a>
 </li>
       <li><a href="api.html#mpol.losses.PSD">PSD() (in module mpol.losses)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.crossval.RandomCellSplitGridded">RandomCellSplitGridded (class in mpol.crossval)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.crossval.CrossValidate.run_crossval">run_crossval() (mpol.crossval.CrossValidate method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -671,21 +727,29 @@ title="Source repository"
 </li>
       <li><a href="api.html#mpol.losses.sparsity">sparsity() (in module mpol.losses)</a>
 </li>
+      <li><a href="api.html#mpol.crossval.CrossValidate.split_dataset">split_dataset() (mpol.crossval.CrossValidate method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#mpol.training.TrainTest.test">test() (mpol.training.TrainTest method)</a>
+</li>
       <li><a href="api.html#mpol.datasets.GriddedDataset.to">to() (mpol.datasets.GriddedDataset method)</a>
 </li>
       <li><a href="api.html#mpol.images.ImageCube.to_FITS">to_FITS() (mpol.images.ImageCube method)</a>
 </li>
       <li><a href="api.html#mpol.gridding.Gridder.to_pytorch_dataset">to_pytorch_dataset() (mpol.gridding.Gridder method)</a>
 </li>
+      <li><a href="api.html#mpol.utils.torch2npy">torch2npy() (in module mpol.utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#mpol.utils.torch2npy">torch2npy() (in module mpol.utils)</a>
+      <li><a href="api.html#mpol.training.TrainTest.train">train() (mpol.training.TrainTest method)</a>
+</li>
+      <li><a href="api.html#mpol.training.TrainTest">TrainTest (class in mpol.training)</a>
 </li>
       <li><a href="api.html#mpol.losses.TSV">TSV() (in module mpol.losses)</a>
 </li>
