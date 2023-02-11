@@ -205,7 +205,7 @@ rml = precomposed.SimpleNet(coords=coords)
 rml.state_dict()  # the now uninitialized parameters of the model (the ones we started with)
 ```
 
-Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the paramters through the optimization function. Loading our saved dirty image state into the model is as simple as
+Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the parameters through the optimization function. Loading our saved dirty image state into the model is as simple as
 
 ```{code-cell}
 rml.load_state_dict(torch.load("dirty_image_model.pt"))

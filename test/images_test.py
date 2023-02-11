@@ -14,7 +14,7 @@ def test_odd_npix():
         images.BaseCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
 
     with pytest.raises(ValueError, match=expected_error_message):
-        images.ImageCube.from_image_properteis(npix=853, nchan=30, cell_size=0.015)
+        images.ImageCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
 
 
 def test_negative_cell_size():
@@ -24,11 +24,11 @@ def test_negative_cell_size():
         images.BaseCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
 
     with pytest.raises(ValueError, match=expected_error_message):
-        images.ImageCube.from_image_properteis(npix=800, nchan=30, cell_size=-0.015)
+        images.ImageCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
 
 
 def test_single_chan():
-    im = images.ImageCube.from_image_properteis(cell_size=0.015, npix=800)
+    im = images.ImageCube.from_image_properties(cell_size=0.015, npix=800)
     assert im.nchan == 1
 
 
