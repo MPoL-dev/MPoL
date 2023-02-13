@@ -79,6 +79,6 @@ Cross-validation
 
 
 Plotting
-------
+--------
 
 .. automodule:: mpol.plot
