@@ -144,15 +144,11 @@ class DataAverager:
     r"""
     The DataAverager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.' The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
     If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
 
-    If you want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
-
     Args:
-        cell_size (float): width of a single square pixel in [arcsec]
-        npix (int): number of pixels in the width of the image
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
@@ -187,9 +183,9 @@ class DataAverager:
 
         self.uu = uu
         self.vv = vv
-        self.weight = np.concatenate([weight, weight], axis=1)
-        self.data_re = np.concatenate([data_re, data_re], axis=1)
-        self.data_im = np.concatenate([data_im, -data_im], axis=1)
+        self.weight = weight
+        self.data_re = data_re
+        self.data_im = data_im
 
         # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
@@ -326,17 +322,11 @@ class DataAverager:
             self.data_im * density_weight * self.weight
         )
 
-        # the beam is the response to a point source, which is data_re = constant, data_im = 0
-        # so we save time and only calculate the reals, because gridded_beam_im = 0
-        re_gridded_beam = self._sum_cell_values_cube(density_weight * self.weight
-        )
-
         # store the pre-packed FFT products for access by outside routines
         self.mask = np.fft.fftshift(mask)
         self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
         self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-        self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
 
     def _grid_weights(self):
         r"""
