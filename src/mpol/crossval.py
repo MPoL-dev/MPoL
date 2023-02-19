@@ -1,55 +1,57 @@
 from __future__ import annotations
+
+import copy
+import logging
+from collections import defaultdict
 from typing import Any
+
+import numpy as np
+import torch
 from numpy import floating
 from numpy.typing import NDArray
 
-import numpy as np
-import copy
-from collections import defaultdict
-import logging
-import torch
-
+from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
-from mpol.datasets import Dartboard, GriddedDataset
+
 # from mpol.plot import splitter_diagnostics_fig # TODO
 
 
 class CrossValidate:
     r"""
     Utilities to run a cross-validation loop (implicitly running a training
-    optimization loop), in order to compare MPoL models with different 
+    optimization loop), in order to compare MPoL models with different
     hyperparameter values
 
     Parameters
     ----------
     coords : `mpol.coordinates.GridCoords` object
         Instance of the `mpol.coordinates.GridCoords` class.
-    gridder : `mpol.gridding.Gridder` object
-        Instance of the `mpol.gridding.Gridder` class.
+    imager : `mpol.gridding.DirtyImager` object
+        Instance of the `mpol.gridding.DirtyImager` class.
     kfolds : int, default=5
         Number of k-folds to use in cross-validation
     split_method : str, default='random_cell'
         Method to split full dataset into train/test subsets
-    seed : int, default=None 
+    seed : int, default=None
         Seed for random number generator used in splitting data
     learn_rate : float, default=0.5
         Neural network learning rate
     epochs : int, default=500
         Number of training iterations
     convergence_tol : float, default=1e-2
-        Tolerance for training iteration stopping criterion as assessed by 
+        Tolerance for training iteration stopping criterion as assessed by
         loss function (suggested <= 1e-2)
     lambda_guess : list of str, default=None
-        List of regularizers for which to guess an initial value 
+        List of regularizers for which to guess an initial value
     lambda_guess_briggs : list of float, default=[0.0, 0.5]
-        Briggs robust values for two images used to guess initial regularizer 
+        Briggs robust values for two images used to guess initial regularizer
         values (if lambda_guess is not None)
     lambda_entropy : float
         Relative strength for entropy regularizer
     entropy_prior_intensity : float, default=1e-10
         Prior value :math:`p` to calculate entropy against (suggested <<1)
-    lambda_sparsity : float, default=None 
+    lambda_sparsity : float, default=None
         Relative strength for sparsity regularizer
     lambda_TV : float, default=None
         Relative strength for total variation (TV) regularizer
@@ -58,7 +60,7 @@ class CrossValidate:
     lambda_TSV : float, default=None
         Relative strength for total squared variation (TSV) regularizer
     train_diag_step : int, default=None
-        Interval at which training diagnostics are output. If None, no 
+        Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
     split_diag_fig : bool, default=False
         Whether to generate a diagnostic figure of dataset splitting into
@@ -66,26 +68,42 @@ class CrossValidate:
     store_cv_diagnostics : bool, default=False
         Whether to store diagnostics of the cross-validation loop.
     save_prefix : str, default=None
-        Prefix (path) used for saved figure names. If None, figures won't be 
+        Prefix (path) used for saved figure names. If None, figures won't be
         saved
     device : torch.device, default=None
         Which hardware device to perform operations on (e.g., 'cuda:0').
-        'None' defaults to current device. 
+        'None' defaults to current device.
     verbose : bool, default=True
-        Whether to print notification messages. 
+        Whether to print notification messages.
     """
-    def __init__(self, coords, gridder, kfolds=5, split_method='random_cell', 
-                seed=None, learn_rate=0.5, 
-                epochs=500, convergence_tol=1e-2, 
-                lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
-                lambda_entropy=None, entropy_prior_intensity=1e-10, 
-                lambda_sparsity=None, lambda_TV=None, 
-                TV_epsilon=1e-10, lambda_TSV=None, 
-                train_diag_step=None, split_diag_fig=False, 
-                store_cv_diagnostics=False, 
-                save_prefix=None, device=None, verbose=True):
+
+    def __init__(
+        self,
+        coords,
+        imager,
+        kfolds=5,
+        split_method="random_cell",
+        seed=None,
+        learn_rate=0.5,
+        epochs=500,
+        convergence_tol=1e-2,
+        lambda_guess=None,
+        lambda_guess_briggs=[0.0, 0.5],
+        lambda_entropy=None,
+        entropy_prior_intensity=1e-10,
+        lambda_sparsity=None,
+        lambda_TV=None,
+        TV_epsilon=1e-10,
+        lambda_TSV=None,
+        train_diag_step=None,
+        split_diag_fig=False,
+        store_cv_diagnostics=False,
+        save_prefix=None,
+        device=None,
+        verbose=True,
+    ):
         self._coords = coords
-        self._gridder = gridder        
+        self._imager = imager
         self._kfolds = kfolds
         self._split_method = split_method
         self._seed = seed
@@ -109,7 +127,7 @@ class CrossValidate:
 
     def split_dataset(self, dataset):
         r"""
-        Split a dataset into training and test subsets. 
+        Split a dataset into training and test subsets.
 
         Parameters
         ----------
@@ -119,34 +137,35 @@ class CrossValidate:
         Returns
         -------
         subsets : iterator returning tuple
-            Iterator that provides a (train, test) pair of 
+            Iterator that provides a (train, test) pair of
             :class:`~mpol.datasets.GriddedDataset` for each k-fold
         """
-        if self._split_method == 'random_cell':
-            split_iterator = RandomCellSplitGridded(dataset=dataset, 
-                                            kfolds=self._kfolds, 
-                                            seed=self._seed)
+        if self._split_method == "random_cell":
+            split_iterator = RandomCellSplitGridded(
+                dataset=dataset, kfolds=self._kfolds, seed=self._seed
+            )
 
-        elif self._split_method == 'dartboard':
+        elif self._split_method == "dartboard":
             # create a radial and azimuthal partition for the dataset
             dartboard = Dartboard(coords=self._coords)
 
             # use 'dartboard' to split full dataset into train/test subsets
-            split_iterator = DartboardSplitGridded(dataset, k=self._kfolds,
-                                            dartboard=dartboard,
-                                            npseed=self._seed)
+            split_iterator = DartboardSplitGridded(
+                dataset, k=self._kfolds, dartboard=dartboard, npseed=self._seed
+            )
 
         else:
-            supported_methods = ['dartboard', 'random_cell']
-            raise ValueError("'split_method' {} must be one of "
-                            "{}".format(self._split_method, supported_methods))
+            supported_methods = ["dartboard", "random_cell"]
+            raise ValueError(
+                "'split_method' {} must be one of "
+                "{}".format(self._split_method, supported_methods)
+            )
 
         return split_iterator
 
-
     def run_crossval(self, dataset):
         r"""
-        Run a cross-validation loop for a model obtained with a given set of 
+        Run a cross-validation loop for a model obtained with a given set of
         hyperparameters.
 
         Parameters
@@ -155,63 +174,67 @@ class CrossValidate:
             Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------
-        cv_score : (float, float) 
-            Tuple of (mean, standard deviation) of cross-validation scores 
+        cv_score : (float, float)
+            Tuple of (mean, standard deviation) of cross-validation scores
             across all k-folds
         all_scores : list of float
-            Individual cross-validation scores for each k-fold 
-        loss_histories : list of float 
+            Individual cross-validation scores for each k-fold
+        loss_histories : list of float
             Loss function values for each training loop
         """
         all_scores = []
         if self._store_cv_diagnostics:
-            self._cv_diagnostics = defaultdict(list) 
+            self._cv_diagnostics = defaultdict(list)
 
         split_iterator = self.split_dataset(dataset)
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
-                logging.info("\nCross-validation: k-fold {} of "
-                            "{}".format(kk, self._kfolds))
+                logging.info(
+                    "\nCross-validation: k-fold {} of " "{}".format(kk, self._kfolds)
+                )
 
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
-            
+
             # create a new model and optimizer for this k_fold
-            model = SimpleNet(coords=self._coords, nchan=self._gridder.nchan)
+            model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     model = model.to(self._device)
 
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
 
-            trainer = TrainTest(gridder=self._gridder, 
-                                optimizer=optimizer, 
-                                epochs=self._epochs, 
-                                convergence_tol=self._convergence_tol, 
-                                lambda_guess=self._lambda_guess,
-                                lambda_guess_briggs=self._lambda_guess_briggs, 
-                                lambda_entropy=self._lambda_entropy,
-                                entropy_prior_intensity=self._entropy_prior_intensity,
-                                lambda_sparsity=self._lambda_sparsity,
-                                lambda_TV=self._lambda_TV, 
-                                TV_epsilon=self._TV_epsilon,
-                                lambda_TSV=self._lambda_TSV,
-                                train_diag_step=self._train_diag_step, 
-                                verbose=self._verbose
+            trainer = TrainTest(
+                imager=self._imager,
+                optimizer=optimizer,
+                epochs=self._epochs,
+                convergence_tol=self._convergence_tol,
+                lambda_guess=self._lambda_guess,
+                lambda_guess_briggs=self._lambda_guess_briggs,
+                lambda_entropy=self._lambda_entropy,
+                entropy_prior_intensity=self._entropy_prior_intensity,
+                lambda_sparsity=self._lambda_sparsity,
+                lambda_TV=self._lambda_TV,
+                TV_epsilon=self._TV_epsilon,
+                lambda_TSV=self._lambda_TSV,
+                train_diag_step=self._train_diag_step,
+                verbose=self._verbose,
             )
 
             loss, loss_history = trainer.train(model, train_set)
             if self._store_cv_diagnostics:
-                self._cv_diagnostics['loss_histories'].append(loss_history)
+                self._cv_diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(model, test_set))
 
-        # average individual test scores to get the cross-val metric for chosen 
+        # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
-        cv_score = {"mean": np.mean(all_scores), 
-                    "std": np.std(all_scores), 
-                    "all": all_scores}
+        cv_score = {
+            "mean": np.mean(all_scores),
+            "std": np.std(all_scores),
+            "all": all_scores,
+        }
 
         return cv_score
-    
+
     @property
     def cv_diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop"""
@@ -220,9 +243,9 @@ class CrossValidate:
 
 class RandomCellSplitGridded:
     r"""
-    Split a GriddedDataset into :math:`k` subsets. Inherit the properties of 
-    the GriddedDataset. This object creates an iterator providing a 
-    (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each 
+    Split a GriddedDataset into :math:`k` subsets. Inherit the properties of
+    the GriddedDataset. This object creates an iterator providing a
+    (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each
     k-fold.
 
     Parameters
@@ -231,10 +254,10 @@ class RandomCellSplitGridded:
         Instance of the `mpol.datasets.GriddedDataset` class
     kfolds : int, default=5
         Number of k-folds (partitions) of `dataset`
-    seed : int, default=None 
+    seed : int, default=None
         Seed for PyTorch random number generator used to shuffle data before
         splitting
-    channel : int, default=0 
+    channel : int, default=0
         Channel of the dataset to use in determining the splits
 
     Once initialized, iterate through the datasets like:
@@ -242,7 +265,7 @@ class RandomCellSplitGridded:
         >>> for (train, test) in split_iterator: # iterate through `kfolds` datasets
         >>> ... # working with the n-th slice of `kfolds` datasets
         >>> ... # do operations with train dataset
-        >>> ... # do operations with test dataset    
+        >>> ... # do operations with test dataset
 
     Notes
     -----
@@ -254,44 +277,57 @@ class RandomCellSplitGridded:
         self.kfolds = kfolds
         self.channel = channel
 
-        # get indices for cells in the top 1% of gridded weight 
+        # get indices for cells in the top 1% of gridded weight
         # (we'll want all training sets to have these high SNR points)
         nvis = len(self.dataset.vis_indexed)
         nn = int(nvis * 0.01)
         # get the nn-th largest value in weight_indexed
         w_thresh = np.partition(self.dataset.weight_indexed, -nn)[-nn]
-        self._top_nn = torch.argwhere(self.dataset.weight_gridded[self.channel] >= w_thresh).T
+        self._top_nn = torch.argwhere(
+            self.dataset.weight_gridded[self.channel] >= w_thresh
+        ).T
 
         # mask these indices
-        self.top_mask = torch.ones(self.dataset.weight_gridded[self.channel].shape, dtype=bool)
+        self.top_mask = torch.ones(
+            self.dataset.weight_gridded[self.channel].shape, dtype=bool
+        )
         self.top_mask[self._top_nn[0], self._top_nn[1]] = False
         # use unmasked cells that also have data for splits
-        self.split_mask = torch.logical_and(self.dataset.mask[self.channel], self.top_mask)
-        split_idx = torch.argwhere(self.split_mask).T 
+        self.split_mask = torch.logical_and(
+            self.dataset.mask[self.channel], self.top_mask
+        )
+        split_idx = torch.argwhere(self.split_mask).T
 
         # shuffle indices to prevent radial/azimuthal patterns in splits
         if seed is not None:
-            torch.manual_seed(seed) 
+            torch.manual_seed(seed)
         shuffle = torch.randperm(split_idx.shape[1])
-        split_idx = split_idx[:,shuffle] 
+        split_idx = split_idx[:, shuffle]
 
         # split indices into k subsets
-        self.splits = torch.tensor_split(split_idx, self.kfolds, dim=1) 
+        self.splits = torch.tensor_split(split_idx, self.kfolds, dim=1)
 
     def __iter__(self):
         # current k-slice
-        self._n = 0  
+        self._n = 0
         return self
 
-    def __next__(self): 
+    def __next__(self):
         if self._n < self.kfolds:
             test_idx = self.splits[self._n]
-            train_idx = torch.cat(([self.splits[x] for x in range(len(self.splits)) if x != self._n]), dim=1)
-            # add the masked (high SNR) points to the current training set 
-            train_idx = torch.cat((train_idx, self._top_nn), dim=1) 
+            train_idx = torch.cat(
+                ([self.splits[x] for x in range(len(self.splits)) if x != self._n]),
+                dim=1,
+            )
+            # add the masked (high SNR) points to the current training set
+            train_idx = torch.cat((train_idx, self._top_nn), dim=1)
 
-            train_mask = torch.zeros(self.dataset.weight_gridded[self.channel].shape, dtype=bool)
-            test_mask = torch.zeros(self.dataset.weight_gridded[self.channel].shape, dtype=bool)            
+            train_mask = torch.zeros(
+                self.dataset.weight_gridded[self.channel].shape, dtype=bool
+            )
+            test_mask = torch.zeros(
+                self.dataset.weight_gridded[self.channel].shape, dtype=bool
+            )
             train_mask[train_idx[0], train_idx[1]] = True
             test_mask[test_idx[0], test_idx[1]] = True
 
@@ -300,7 +336,7 @@ class RandomCellSplitGridded:
             test = copy.deepcopy(self.dataset)
 
             # use the masks to limit new datasets to only unmasked cells
-            train.add_mask(train_mask) 
+            train.add_mask(train_mask)
             test.add_mask(test_mask)
 
             self._n += 1
