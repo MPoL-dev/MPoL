@@ -12,27 +12,27 @@ from mpol.utils import packed_cube_to_sky_cube
 # TODO: test of RandomCellSplitGridded output
 # TODO: GPU tests
 
-def test_crossvalclass_split_dartboard(coords, gridder, dataset, generic_parameters):
+def test_crossvalclass_split_dartboard(coords, averager, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'dartboard' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
     crossval_pars["split_method"] = "dartboard"
 
-    cross_validator = CrossValidate(coords, gridder, **crossval_pars)
+    cross_validator = CrossValidate(coords, averager, **crossval_pars)
     cross_validator.split_dataset(dataset)
 
 
-def test_crossvalclass_split_randomcell(coords, gridder, dataset, generic_parameters):
+def test_crossvalclass_split_randomcell(coords, averager, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'random_cell' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
-    cross_validator = CrossValidate(coords, gridder, **crossval_pars)
+    cross_validator = CrossValidate(coords, averager, **crossval_pars)
     cross_validator.split_dataset(dataset)
 
 
-def test_crossvalclass_kfold(coords, gridder, dataset, generic_parameters):
+def test_crossvalclass_kfold(coords, averager, dataset, generic_parameters):
     # using the CrossValidate class, perform k-fold cross-validation
  
     crossval_pars = generic_parameters["crossval_pars"]
@@ -40,7 +40,7 @@ def test_crossvalclass_kfold(coords, gridder, dataset, generic_parameters):
     crossval_pars["lambda_guess"] = None
     crossval_pars["epochs"] = 11
 
-    cross_validator = CrossValidate(coords, gridder, **crossval_pars)
+    cross_validator = CrossValidate(coords, averager, **crossval_pars)
     cross_validator.run_crossval(dataset)
 
 

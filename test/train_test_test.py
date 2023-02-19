@@ -9,7 +9,7 @@ from mpol.training import TrainTest
 from mpol.constants import *
 
 
-def test_traintestclass_training(coords, gridder, dataset, generic_parameters):
+def test_traintestclass_training(coords, imager, dataset, generic_parameters):
     # using the TrainTest class, run a training loop
     nchan = dataset.nchan
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
@@ -22,11 +22,11 @@ def test_traintestclass_training(coords, gridder, dataset, generic_parameters):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
-    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
 
 
-def test_traintestclass_training_guess(coords, gridder, dataset, generic_parameters):
+def test_traintestclass_training_guess(coords, imager, dataset, generic_parameters):
     # using the TrainTest class, run a training loop,
     # with a call to the regularizer strength guesser
     nchan = dataset.nchan
@@ -37,11 +37,11 @@ def test_traintestclass_training_guess(coords, gridder, dataset, generic_paramet
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
-    trainer = TrainTest(gridder=gridder, optimizer=optimizer, **train_pars)
+    trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
 
 
-def test_traintestclass_testing(coords, gridder, dataset, generic_parameters):
+def test_traintestclass_testing(coords, imager, dataset, generic_parameters):
     # using the TrainTest class, perform a call to test
     nchan = dataset.nchan
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
@@ -50,7 +50,7 @@ def test_traintestclass_testing(coords, gridder, dataset, generic_parameters):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
-    trainer = TrainTest(gridder=gridder, optimizer=optimizer)
+    trainer = TrainTest(imager=imager, optimizer=optimizer)
     trainer.test(model, dataset)
 
 

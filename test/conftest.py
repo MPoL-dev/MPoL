@@ -68,6 +68,22 @@ def averager(mock_visibility_data, coords):
 
     return averager
     
+@pytest.fixture
+def imager(mock_visibility_data, coords):
+    uu, vv, weight, data_re, data_im = mock_visibility_data
+
+    imager = gridding.DirtyImager(
+        coords=coords,
+        uu=uu,
+        vv=vv,
+        weight=weight,
+        data_re=data_re,
+        data_im=data_im,
+    )
+
+    return imager
+
+
 
 @pytest.fixture
 def dataset(mock_visibility_data, coords):
