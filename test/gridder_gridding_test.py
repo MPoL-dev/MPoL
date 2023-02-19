@@ -72,29 +72,6 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
     plt.close("all")
 
-    print("unique vals mask", np.unique(averager.data_re_gridded[averager.mask]))
-    print("unique vals ~mask", np.unique(averager.data_re_gridded[~averager.mask]))
-
-    # To me this seems like the mask is messed up, but possibly it's an averaging problem too
-    # At least one masked cell has 0.0 values
-    # At at least one unmasked cell has 1.0 values.
-    # Curiously, this doesn't appear to show up in the plots.
-
-    packed_u_centers_2D = np.fft.fftshift(coords.sky_u_centers_2D)
-    packed_v_centers_2D = np.fft.fftshift(coords.sky_v_centers_2D)
-
-    # select cells that should have data but actually have 0.0 values
-    ind = (averager.data_re_gridded == 0.0) & averager.mask
-    print(packed_u_centers_2D[ind[0]])
-    print(packed_v_centers_2D[ind[0]])
-
-    # select cells that *shouldn't* have data but actually have 1.0 values
-    ind = (averager.data_re_gridded == 1.0) & ~averager.mask
-    print(np.argwhere(ind))
-    print(packed_u_centers_2D[ind[0]])
-    print(packed_v_centers_2D[ind[0]])
-
-
     # if the gridding worked, 
     # cells with no data should be 0
     assert averager.data_re_gridded[~averager.mask] == pytest.approx(0)
