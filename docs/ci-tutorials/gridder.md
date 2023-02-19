@@ -143,7 +143,7 @@ which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow
 The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the {class}`~mpol.coordinates.GridCoords` object. We can instantiate a {class}`~mpol.gridding.Gridder` object by
 
 ```{code-cell}
-gridder = gridding.Gridder(
+averager = gridding.Gridder(
     coords=coords,
     uu=uu,
     vv=vv,

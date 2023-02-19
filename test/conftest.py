@@ -54,10 +54,10 @@ def coords():
 
 
 @pytest.fixture
-def gridder(mock_visibility_data, coords):
+def averager(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    dataavg = gridding.DataAverager(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -66,14 +66,14 @@ def gridder(mock_visibility_data, coords):
         data_im=data_im,
     )
 
-    return dataavg
+    return averager
     
 
 @pytest.fixture
 def dataset(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    dataavg = gridding.DataAverager(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -82,14 +82,14 @@ def dataset(mock_visibility_data, coords):
         data_im=data_im,
     )
 
-    return dataavg.to_pytorch_dataset()
+    return averager.to_pytorch_dataset()
 
 
 @pytest.fixture
 def dataset_cont(mock_visibility_data_cont, coords):
 
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
-    dataavg = gridding.DataAverager(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -98,7 +98,7 @@ def dataset_cont(mock_visibility_data_cont, coords):
         data_im=data_im,
     )
 
-    return dataavg.to_pytorch_dataset()
+    return averager.to_pytorch_dataset()
 
 
 @pytest.fixture
@@ -109,7 +109,7 @@ def crossvalidation_products(mock_visibility_data):
 
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    dataavg = gridding.DataAverager(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -118,7 +118,7 @@ def crossvalidation_products(mock_visibility_data):
         data_im=data_im,
     )
 
-    dataset = dataavg.to_pytorch_dataset()
+    dataset = averager.to_pytorch_dataset()
 
     return coords, dataset
 

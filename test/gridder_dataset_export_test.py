@@ -7,7 +7,7 @@ from mpol.constants import *
 
 # cache an instantiated DataAverager for future imaging ops
 @pytest.fixture
-def dataavg(mock_visibility_data):
+def averager(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     return gridding.DataAverager.from_image_properties(
@@ -21,11 +21,11 @@ def dataavg(mock_visibility_data):
     )
 
 
-def test_pytorch_export(dataavg):
+def test_pytorch_export(averager):
     """
     Test that the dataset export routine doesn't error.
     """
-    dataavg.to_pytorch_dataset()
+    averager.to_pytorch_dataset()
 
 
 def test_cell_variance_error_pytorch(mock_visibility_data):
@@ -41,7 +41,7 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    dataavg = gridding.DataAverager(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -51,4 +51,4 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
     )
 
     with pytest.raises(RuntimeError):
-        dataavg.to_pytorch_dataset()
+        averager.to_pytorch_dataset()
