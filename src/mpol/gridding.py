@@ -289,9 +289,7 @@ class DataAverager:
             ]
         )
 
-    def _grid_visibilities(
-        self
-    ):
+    def _grid_visibilities(self):
         r"""
         Average the loose data visibilities to the Fourier grid.
         """
@@ -303,6 +301,8 @@ class DataAverager:
 
         # boolean index for cells that *contain* visibilities
         mask = cell_weight > 0.0
+
+        print("mask shape", mask.shape)
 
         # calculate the density weights under "uniform"
         # the density weights have the same shape as the re, im samples.
@@ -322,7 +322,7 @@ class DataAverager:
         )
 
         # store the pre-packed FFT products for access by outside routines
-        self.mask = np.fft.fftshift(mask)
+        self.mask = np.fft.fftshift(mask, axes=(1,2))
         self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
         self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
