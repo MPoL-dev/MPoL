@@ -2,6 +2,10 @@
 
 # Changelog
 
+## v0.1.4
+
+- Removed the `GriddedResidualConnector` class and the `src/connectors.py` module. Moved `index_vis` to `datasets.py`.
+
 ## v0.1.3
 
 - Added the {func}`mpol.fourier.make_fake_data` routine and the [Mock Data tutorial](ci-tutorials/fakedata.md).
