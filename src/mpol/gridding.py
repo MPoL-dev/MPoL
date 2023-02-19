@@ -140,7 +140,7 @@ def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     return False
 
 
-class DataAverager:
+class GridderBase:
     r"""
     The DataAverager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
@@ -180,22 +180,16 @@ class DataAverager:
         # make sure we still fit into the grid
         self.coords.check_data_fit(uu, vv)
 
+        # classes that inherit this will need to set data attributes 
+        # deciding on whether to include Hermitian pairs
         self.uu = uu
         self.vv = vv
         self.weight = weight
         self.data_re = data_re
         self.data_im = data_im
 
-        # figure out which visibility cell each datapoint lands in, so that
-        # we can later assign it the appropriate robust weight for that cell
-        # do this by calculating the nearest cell index [0, N] for all samples
-        self.index_u = np.array(
-            [np.digitize(u_chan, self.coords.u_edges) - 1 for u_chan in self.uu]
-        )
-
-        self.index_v = np.array(
-            [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
-        )
+        # and register cell indices against data
+        self._create_cell_indices()
 
     @classmethod
     def from_image_properties(
@@ -210,6 +204,18 @@ class DataAverager:
     ) -> DataAverager:
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, weight, data_re, data_im)
+
+    def _create_cell_indices(self):
+        # figure out which visibility cell each datapoint lands in, so that
+        # we can later assign it the appropriate robust weight for that cell
+        # do this by calculating the nearest cell index [0, N] for all samples
+        self.index_u = np.array(
+            [np.digitize(u_chan, self.coords.u_edges) - 1 for u_chan in self.uu]
+        )
+
+        self.index_v = np.array(
+            [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
+        )
 
     def _sum_cell_values_channel(self, uu, vv, values=None):
         r"""
@@ -288,59 +294,6 @@ class DataAverager:
                 for i in range(self.nchan)
             ]
         )
-
-    def _grid_visibilities(self):
-        r"""
-        Average the loose data visibilities to the Fourier grid.
-        """
-
-        # create the cells as edges around the existing points
-        # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._sum_cell_values_cube(self.weight)
-
-        # boolean index for cells that *contain* visibilities
-        mask = cell_weight > 0.0
-
-        print("mask shape", mask.shape)
-
-        # calculate the density weights under "uniform"
-        # the density weights have the same shape as the re, im samples.
-        # cell_weight is (nchan, ncell_v, ncell_u)
-        # self.index_v, self.index_u are (nchan, nvis)
-        # we want density_weights to be (nchan, nvis)
-        density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
-
-        # grid the reals and imaginaries separately
-        # outputs from _sum_cell_values_cube are *not* pre-packed
-        data_re_gridded = self._sum_cell_values_cube(
-            self.data_re * density_weight * self.weight
-        )
-
-        data_im_gridded = self._sum_cell_values_cube(
-            self.data_im * density_weight * self.weight
-        )
-
-        # store the pre-packed FFT products for access by outside routines
-        self.mask = np.fft.fftshift(mask, axes=(1,2))
-        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
-        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
-        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-
-    def _grid_weights(self):
-        r"""
-        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
-        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
-        within that cell.
-        """
-
-        # create the cells as edges around the existing points
-        # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._sum_cell_values_cube(self.weight)
-
-        # instantiate uncertainties for each averaged visibility.
-        self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
 
     def _estimate_cell_standard_deviation(self):
         r"""
@@ -442,6 +395,91 @@ class DataAverager:
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
 
+
+    @property
+    def ground_cube(self):
+        r"""
+        The visibility FFT cube fftshifted for plotting with ``imshow``.
+
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
+        """
+
+        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
+
+
+class DataAverager(GridderBase):
+    r"""
+    The DataAverager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
+
+    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DataAverager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.DataAverager.to_pytorch_dataset` routine.
+
+    Args:
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
+        data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+    
+    """
+
+    def _grid_visibilities(self):
+        r"""
+        Average the loose data visibilities to the Fourier grid.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # boolean index for cells that *contain* visibilities
+        mask = cell_weight > 0.0
+
+        print("mask shape", mask.shape)
+
+        # calculate the density weights under "uniform"
+        # the density weights have the same shape as the re, im samples.
+        # cell_weight is (nchan, ncell_v, ncell_u)
+        # self.index_v, self.index_u are (nchan, nvis)
+        # we want density_weights to be (nchan, nvis)
+        density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
+
+        # grid the reals and imaginaries separately
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
+            self.data_re * density_weight * self.weight
+        )
+
+        data_im_gridded = self._sum_cell_values_cube(
+            self.data_im * density_weight * self.weight
+        )
+
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask, axes=(1,2))
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+
+
+    def _grid_weights(self):
+        r"""
+        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
+        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
+        within that cell.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # instantiate uncertainties for each averaged visibility.
+        self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
+
     def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
         r"""
         Export gridded visibilities to a PyTorch dataset object.
@@ -476,19 +514,9 @@ class DataAverager:
             mask=self.mask,
         )
 
-    @property
-    def ground_cube(self):
-        r"""
-        The visibility FFT cube fftshifted for plotting with ``imshow``.
-
-        Returns:
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
-        """
-
-        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
 
 
-class DirtyImager(DataAverager):
+class DirtyImager(GridderBase):
     r"""
     The DirtyImager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
@@ -519,6 +547,7 @@ class DirtyImager(DataAverager):
     ):
 
         # check everything should be 2d, expand if not
+        # also checks data does not contain Hermitian pairs
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
@@ -527,11 +556,14 @@ class DirtyImager(DataAverager):
         self.coords = coords
         self.nchan = len(uu)
 
+        # make sure we still fit into the grid
+        self.coords.check_data_fit(uu, vv)
+
         # expand the vectors to include complex conjugates
         uu_full = np.concatenate([uu, -uu], axis=1)
         vv_full = np.concatenate([vv, -vv], axis=1)
 
-        # make sure we still fit into the grid
+        # make sure we still fit into the grid (with expansion)
         self.coords.check_data_fit(uu_full, vv_full)
 
         self.uu = uu_full
@@ -540,17 +572,8 @@ class DirtyImager(DataAverager):
         self.data_re = np.concatenate([data_re, data_re], axis=1)
         self.data_im = np.concatenate([data_im, -data_im], axis=1)
 
-        # figure out which visibility cell each datapoint lands in, so that
-        # we can later assign it the appropriate robust weight for that cell
-        # do this by calculating the nearest cell index [0, N] for all samples
-        self.index_u = np.array(
-            [np.digitize(u_chan, self.coords.u_edges) - 1 for u_chan in self.uu]
-        )
-
-        self.index_v = np.array(
-            [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
-        )
-
+        # and register cell indices against data
+        self._create_cell_indices()
 
     def _grid_visibilities(
         self,
