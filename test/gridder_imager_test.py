@@ -299,7 +299,7 @@ def test_cell_variance_warning_image(mock_visibility_data):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    imager = gridding.Gridder(
+    imager = gridding.DirtyImager(
         coords=coords,
         uu=uu,
         vv=vv,

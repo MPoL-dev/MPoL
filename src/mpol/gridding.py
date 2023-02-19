@@ -168,11 +168,10 @@ class DataAverager:
         data_im=None,
     ):
         # check everything should be 2d, expand if not
+        # also checks data does not contain Hermitian pairs
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
-
-        verify_no_hermitian_pairs(uu, vv)
 
         # setup the coordinates object
         self.coords = coords
@@ -368,7 +367,7 @@ class DataAverager:
         """
 
         # 1. use the gridding routine to calculate the mean real and imaginary values on the grid
-        self._grid_visibilities(weighting="uniform")
+        self._grid_visibilities()
 
         # convert grid back to ground format
         mu_re_gridded = np.fft.fftshift(self.data_re_gridded, axes=(1, 2))
@@ -465,8 +464,8 @@ class DataAverager:
                     )
                 )
 
-        # grid visibilites (uniform weighting necessary here) and weights
-        self._grid_visibilities(weighting="uniform")
+        # grid visibilities (uniform weighting necessary here) and weights
+        self._grid_visibilities()
         self._grid_weights()
 
         return GriddedDataset(

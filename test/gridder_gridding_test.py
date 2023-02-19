@@ -8,7 +8,7 @@ from mpol import coordinates, gridding
 from mpol.constants import *
 
 
-def test_grid_cont(mock_visibility_data_cont):
+def test_average_cont(mock_visibility_data_cont):
     """
     Test that the gridding operation doesn't error.
     """
@@ -27,7 +27,7 @@ def test_grid_cont(mock_visibility_data_cont):
     print(averager.uu.shape)
     print(averager.nchan)
 
-    averager._grid_visibilities(weighting="uniform")
+    averager._grid_visibilities()
 
 
 # test that we're getting the right numbers back for some well defined operations
@@ -44,7 +44,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     data_re = np.ones_like(uu)
     data_im = np.zeros_like(uu)
 
-    averager = gridding.datavg(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -53,19 +53,11 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    # with uniform weighting, the gridded sheet should be uniform and = 1
-    averager._grid_visibilities(weighting="uniform")
-
-    print(
-        "re",
-        np.mean(averager.data_re_gridded),
-        np.std(averager.data_re_gridded),
-        np.min(averager.data_re_gridded),
-        np.max(averager.data_re_gridded),
-    )
+    # with uniform weighting, the gridded values should be == 1
+    averager._grid_visibilities()
 
     im = plt.imshow(
-        averager.ground_cube[4].real, origin="lower", extent=averager.coords.vis_ext
+        averager.ground_cube[4].real, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
@@ -73,25 +65,41 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.figure()
 
     im2 = plt.imshow(
-        averager.ground_cube[4].imag, origin="lower", extent=averager.coords.vis_ext
+        averager.ground_cube[4].imag, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
     )
     plt.colorbar(im2)
     plt.savefig(tmp_path / "gridded_im.png", dpi=300)
 
     plt.close("all")
 
-    # if the gridding worked, we should have real values approximately 1
-    assert np.max(averager.data_re_gridded) == pytest.approx(1)
-    # except in the cells with no data
-    assert np.min(averager.data_re_gridded) == pytest.approx(0)
+    print("unique vals mask", np.unique(averager.data_re_gridded[averager.mask]))
+    print("unique vals ~mask", np.unique(averager.data_re_gridded[~averager.mask]))
 
-    # make sure all average values are set to 1
-    diff_real = np.abs(1 - averager.vis_gridded[averager.mask].real)
-    assert np.all(diff_real < 1e-10)
+    # To me this seems like the mask is messed up, but possibly it's an averaging problem too
+    # At least one masked cell has 0.0 values
+    # At at least one unmasked cell has 1.0 values.
+    # Curiously, this doesn't appear to show up in the plots.
 
+    # pick a channel
+    uv_mask = averager.mask[4]
+
+
+    packed_u_centers_2D = np.fft.fftshift(coords.sky_u_centers_2D)
+    packed_v_centers_2D = np.fft.fftshift(coords.sky_v_centers_2D)
+
+    print(packed_u_centers_2D[averager.mask])
+    print(packed_v_centers_2D[averager.mask])
+
+
+    # if the gridding worked, 
+    # cells with no data should be 0
+    assert averager.data_re_gridded[~averager.mask] == pytest.approx(0)
+    
+    # and cells with data should have real values approximately 1
+    assert averager.data_re_gridded[averager.mask] == pytest.approx(1)
+    
     # and imaginary values approximately 0 everywhere
-    assert np.min(averager.data_im_gridded) == pytest.approx(0)
-    assert np.max(averager.data_im_gridded) == pytest.approx(0)
+    assert averager.data_im_gridded == pytest.approx(0)
 
 
 def test_weight_gridding(mock_visibility_data):
@@ -116,12 +124,10 @@ def test_weight_gridding(mock_visibility_data):
 
     print("sum of ungridded weights", np.sum(weight))
 
-    # test that the weights all sum to the same value, modulo Hermitian aspects
-    # should be twice that of the ungridded weights, since Hermitian weights have
-    # been double-counted
+    # test that the weights all sum to the same value
     print("sum of gridded weights", np.sum(averager.weight_gridded))
 
-    assert np.sum(weight) == pytest.approx(0.5 * np.sum(averager.weight_gridded))
+    assert np.sum(weight) == pytest.approx(np.sum(averager.weight_gridded))
 
 
 # test the standard deviation estimation routines
