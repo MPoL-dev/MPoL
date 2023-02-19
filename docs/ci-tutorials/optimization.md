@@ -5,15 +5,16 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.14.4
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [hide-cell]
+
 %run notebook_setup
 ```
 
@@ -24,7 +25,7 @@ In this tutorial, we'll construct an optimization loop demonstrating how we can 
 ## Gridding recap
 Let's set up the {class}`~mpol.gridding.Gridder` and {class}`~mpol.coordinates.GridCoords` objects as before
 
-```{code-cell}
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -32,11 +33,11 @@ from astropy.utils.data import download_file
 from IPython.display import SVG, display
 ```
 
-```{code-cell}
-from mpol import coordinates, gridding, losses, precomposed, utils
+```{code-cell} ipython3
+from mpol import coordinates, fourier, gridding, losses, precomposed, utils
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # load the mock dataset of the ALMA logo
 fname = download_file(
     "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
@@ -57,7 +58,7 @@ data_re = np.real(data)
 data_im = np.imag(data)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # define the image dimensions, as in the previous tutorial
 coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 gridder = gridding.Gridder(
@@ -80,7 +81,7 @@ Now we will export the visibilities to a PyTorch dataset to use in the imaging l
 
 In the following [tutorial on the NuFFT](loose-visibilities.md), we'll explore an alternate MPoL layer that avoids gridding the visibilities all together. This approach may be more accurate for certain applications, but is usually slower to execute than the gridding approach described in this tutorial. For that reason, we recommend starting with the default gridding approach and only moving to the NuFFT layers once you are reasonably happy with the images you are getting.
 
-```{code-cell}
+```{code-cell} ipython3
 dset = gridder.to_pytorch_dataset()
 print("this dataset has {:} channel".format(dset.nchan))
 ```
@@ -98,7 +99,7 @@ It isn't necessary to construct a meta-module to do RML imaging with MPoL, thoug
 
 We then initialize SimpleNet with the relevant information
 
-```{code-cell}
+```{code-cell} ipython3
 rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
 ```
 
@@ -112,7 +113,7 @@ Our goal for the rest of the tutorial is to set up a loop that will
 
 We'll start by creating the optimizer
 
-```{code-cell}
+```{code-cell} ipython3
 optimizer = torch.optim.SGD(rml.parameters(), lr=8000.0)
 ```
 
@@ -126,7 +127,7 @@ In the parlance of the machine learning community, one defines "loss" functions 
 
 Let's walk through how we calculate a loss value and optimize the parameters. To start, let's [examine the parameters of the model](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
 
-```{code-cell}
+```{code-cell} ipython3
 rml.state_dict()
 ```
 
@@ -134,20 +135,20 @@ These are the default values that were used to initialize the {class}`mpol.image
 
 For demonstration purposes, lets access and plot the base cube with matplotlib. In a normal workflow you probably won't need to do this, but to access the basecube in sky orientation, we do
 
-```{code-cell}
+```{code-cell} ipython3
 bcube_pytorch = utils.packed_cube_to_sky_cube(rml.bcube.base_cube)
 ```
 
 ``bcube`` is still a PyTorch tensor, but matplotlib requires numpy arrays. To convert back, we need to first ["detach" the computational graph](https://stackoverflow.com/questions/63582590/why-do-we-call-detach-before-calling-numpy-on-a-pytorch-tensor) from the PyTorch tensor (used to propagate gradients) and then call the numpy conversion routine.
 
-```{code-cell}
+```{code-cell} ipython3
 bcube_numpy = bcube_pytorch.detach().numpy()
 print(bcube_numpy.shape)
 ```
 
 lastly, we remove the channel dimension to plot the 2D image using ``np.squeeze``
 
-```{code-cell}
+```{code-cell} ipython3
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
     np.squeeze(bcube_numpy),
@@ -164,13 +165,13 @@ A blank image is not that exciting, but hopefully this demonstrates the state of
 
 Because we'll want to compute a clean set of gradient values in a later step, we "zero out" any gradients attached to the tensor components so that they aren't counted twice.
 
-```{code-cell}
+```{code-cell} ipython3
 rml.zero_grad()
 ```
 
 Most modules in MPoL are designed to work in a "feed forward" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the {class}`mpol.images.BaseCube`.
 
-```{code-cell}
+```{code-cell} ipython3
 vis = rml.forward()
 print(vis)
 ```
@@ -179,7 +180,7 @@ Of course, these aren't that exciting since they just reflect the constant value
 
 But, exciting things are about to happen! We can calculate the loss between these model visibilities and the data
 
-```{code-cell}
+```{code-cell} ipython3
 # calculate a loss
 loss = losses.nll_gridded(vis, dset)
 print(loss.item())
@@ -187,13 +188,13 @@ print(loss.item())
 
 and then we can calculate the gradient of the loss function with respect to the parameters
 
-```{code-cell}
+```{code-cell} ipython3
 loss.backward()
 ```
 
 We can even visualize what the gradient of the {class}`mpol.images.BaseCube` looks like (using a similar ``.detach()`` call as before)
 
-```{code-cell}
+```{code-cell} ipython3
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
     np.squeeze(
@@ -210,19 +211,19 @@ plt.colorbar(im)
 
 The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient
 
-```{code-cell}
+```{code-cell} ipython3
 optimizer.step()
 ```
 
 We can see that the parameter values have changed
 
-```{code-cell}
+```{code-cell} ipython3
 rml.state_dict()
 ```
 
 as has the base image
 
-```{code-cell}
+```{code-cell} ipython3
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
     np.squeeze(utils.packed_cube_to_sky_cube(rml.bcube.base_cube).detach().numpy()),
@@ -241,7 +242,7 @@ Now that we've covered how to use gradient descent to optimize a set of image pa
 
 In addition to the steps just outlined, we'll also track the loss values as we optimize.
 
-```{code-cell}
+```{code-cell} ipython3
 %%time
 
 loss_tracker = []
@@ -264,7 +265,7 @@ for i in range(300):
     optimizer.step()
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 fig, ax = plt.subplots(nrows=1)
 ax.plot(loss_tracker)
 ax.set_xlabel("iteration")
@@ -275,15 +276,16 @@ and we see that we've reasonably converged to a set of parameters without much f
 
 All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the {ref}`GPU Setup Tutorial <gpu-reference-label>`.
 
-## Visualizing output
+## Visualizing the image
 
-Let's visualize the final product. The bounds for `matplotlib.pyplot.imshow` are available in the `img_ext` parameter.
+Let's visualize the final image product. The bounds for `matplotlib.pyplot.imshow` are available in the `img_ext` parameter.
 
-```{code-cell}
+```{code-cell} ipython3
 # let's see what one channel of the image looks like
 fig, ax = plt.subplots(nrows=1)
+img_cube = rml.icube.sky_cube.detach().numpy()
 im = ax.imshow(
-    np.squeeze(rml.icube.sky_cube.detach().numpy()),
+    np.squeeze(img_cube),
     origin="lower",
     interpolation="none",
     extent=rml.icube.coords.img_ext,
@@ -293,10 +295,120 @@ plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
 plt.colorbar(im)
 ```
 
-## Wrapup
-
 And there you have it, an image optimized to fit the data. To be honest, the results aren't great---that's because we've used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the {class}`mpol.images.BaseCube` documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it's easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike "uniform"ly weighted images).
+
+
+## Wrapup and visualizing the residuals
+
+We started this process with a collection of visibility data---the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and then used an optimizer to gradually evolve new models of the sky brightness until the loss function is minimized. At the end of this process, we were left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.
+
+It can be useful to visualize the residuals left at the end of this process, defined as
+
+$$
+\mathrm{residuals} = \mathrm{data} - \mathrm{model}
+$$
+
+For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but we generally instantiate the NuFFT layer like
+
+```{code-cell} ipython3
+nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan, uu=uu, vv=vv, sparse_matrices=False)
+```
+
+and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since this returns a Pytorch tensor, we'll need to detach it, convert it to numpy. We'll also remove the channel dimension.
+
+```{code-cell} ipython3
+# note this expects a "packed image cube"
+vis_model = np.squeeze(nufft(torch.as_tensor(img_cube)).detach().numpy())
+```
+
+and then use these model visibilities to calculate residual visibilities
+
+```{code-cell} ipython3
+vis_resid = data - vis_model
+```
+
+There are many ways we could visualize these residuals. The simplest type of visualization is to examine the scatter of the residuals relative to their expected standard deviation (given by their thermal weights).
+
+```{code-cell} ipython3
+sigmas = np.sqrt(1/weight)
+resid_real = np.real(vis_resid) / sigmas
+resid_imag = np.imag(vis_resid) / sigmas
+
+
+def gaussian(x, sigma=1):
+    r"""
+    Evaluate a reference Gaussian as a function of :math:`x`
+
+    Args:
+        x (float): location to evaluate Gaussian
+
+    The Gaussian is defined as
+
+    .. math::
+
+        f(x) = \frac{1}{\sqrt{2 \pi}} \exp \left ( -\frac{x^2}{2}\right )
+
+    Returns:
+        Gaussian function evaluated at :math:`x`
+    """
+    return 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-0.5 * (x / sigma) ** 2)
+
+
+fig, ax = plt.subplots(ncols=2, figsize=(5, 2.5))
+
+xs = np.linspace(-5, 5)
+
+ax[0].hist(resid_real, density=True, bins=40)
+ax[1].hist(resid_imag, density=True, bins=40)
+
+ax[0].set_xlabel(
+    r"$\mathrm{Re} \{ V_\mathrm{data} - V_\mathrm{model} \} / \sigma$"
+)
+
+ax[1].set_xlabel(
+    r"$\mathrm{Im} \{ V_\mathrm{data} - V_\mathrm{model} \} / \sigma$"
+)
+
+for a in ax.flatten():
+    a.plot(xs, gaussian(xs))
+
+fig.subplots_adjust(wspace=0.3)
+```
+
+If our model is good, we would expect it to fit the signal contained in the data, such that the residuals contain only noise. As far as this plot is concerned, it appears as though we have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, we should examine the calibration of the data (in particular, the calculation of the visibility weights).
+
+A more useful diagnostic is to image the residual visibilities. We can do that be treating them as a new "dataset" and using our dirty imaging capabilities. Here we'll choose a Briggs "robust" value of 0.0, but you are free to image the residual visibilities with whatever weighting makes sense for your science application.
+
+```{code-cell} ipython3
+gridder = gridding.Gridder(
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=np.real(vis_resid),
+    data_im=np.imag(vis_resid),
+)
+
+img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
+
+fig, ax = plt.subplots(nrows=1)
+im = ax.imshow(
+    img[0],
+    origin="lower",
+    interpolation="none",
+    extent=rml.icube.coords.img_ext,
+)
+plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+plt.colorbar(im);
+```
+
+We see that there is still some faint emission remaining in the shape of the ALMA logo. This suggests that our model is not yet a good representation to the signal in the data.
 
 In the following tutorials we'll examine how to set up additional regularizer terms that can yield more desireable image characteristics.
 
 Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a [GitHub discussion](https://github.com/MPoL-dev/MPoL/discussions). If you spot a bug or have an idea to improve these tutorials, please raise a [GitHub issue](https://github.com/MPoL-dev/MPoL/issues) or better yet submit a pull request.
+
+```{code-cell} ipython3
+
+```
