@@ -17,6 +17,33 @@ from .constants import *
 from .utils import loglinspace
 
 
+def index_vis(vis, griddedDataset):
+    r"""
+    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is "packed" just like the :class:`~mpol.datasets.GriddedDataset`
+
+    Args:
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+
+    Returns:
+        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
+    """
+    assert (
+        vis.size()[0] == griddedDataset.mask.size()[0]
+    ), "vis and dataset mask do not have the same number of channels."
+
+    # As of Pytorch 1.7.0, complex numbers are partially supported.
+    # However, masked_select does not yet work (with gradients)
+    # on the complex vis, so hence this awkward step of selecting
+    # the reals and imaginaries separately
+    re = vis.real.masked_select(griddedDataset.mask)
+    im = vis.imag.masked_select(griddedDataset.mask)
+
+    # we had trouble returning things as re + 1.0j * im,
+    # but for some reason torch.complex seems to work OK.
+    return torch.complex(re, im)
+
+
 class GriddedDataset:
     r"""
     Args:
@@ -32,7 +59,7 @@ class GriddedDataset:
     :ivar vis_indexed: 1D complex tensor of visibility data
     :ivar weight_indexd: 1D tensor of weight values
 
-    If you index the output of the Fourier layer in the same manner using ``self.mask`` (as done internally within :class:`~mpol.connectors.DataConnector`), then the model and data visibilities can be directly compared using a loss function.
+    If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.
     """
 
     def __init__(
