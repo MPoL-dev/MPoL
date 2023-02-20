@@ -207,7 +207,7 @@ class GridderBase:
         weight=None,
         data_re=None,
         data_im=None,
-    ) -> DataAverager:
+    ) -> GridderBase:
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, weight, data_re, data_im)
 
