@@ -6,8 +6,7 @@ import torch
 from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.fourier import FourierCube
-from mpol.connectors import GriddedResidualConnector
-from mpol.utils import loglinspace, torch2npy
+from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 
 def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
     """
@@ -246,8 +245,6 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     for ii, (train, test) in enumerate(splitter): 
         rtrain = GriddedResidualConnector(f_layer, train)
         rtrain.forward()
-        rtest = GriddedResidualConnector(f_layer, test)
-        rtest.forward()
 
         train_mask = torch2npy(rtrain.ground_mask[channel])
         train_chan = torch2npy(rtrain.sky_cube[channel])
@@ -285,17 +282,16 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     return fig, axes
 
 
-def train_diagnostics_fig(model, residuals, channel=0, save_prefix=None):
+def train_diagnostics_fig(model, channel=0, save_prefix=None):
     """
-    For a `model` in a given state, generate a figure showing the image plane 
-    model cube, image plane residuals, amplitude of the Fourier plane model, 
-    and amplitude of the Fourier plane residuals.
+    For a `model` in a given state, generate a figure showing the model image, 
+    gradient image, Fourier plane model, and dirty image of Fourier plane 
+    residuals.
 
     Parameters
     ----------
     model : `torch.nn.Module` object
         A neural network; instance of the `mpol.precomposed.SimpleNet` class.
-    residuals: `mpol.connectors.ResidualConnector` object
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure
     save_prefix : string, default = None
@@ -310,45 +306,30 @@ def train_diagnostics_fig(model, residuals, channel=0, save_prefix=None):
     """
     fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
 
-    # populate residual connector
-    residuals()
-
-    i_amp = torch2npy(model.icube.sky_cube[channel])
-    i_resid = torch2npy(residuals.sky_cube[channel])
-    f_amp = torch2npy(model.fcube.ground_amp[channel])
-    f_resid = torch2npy(residuals.ground_amp[channel])
+    mod_im = torch2npy(model.icube.sky_cube[channel])
+    mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
 
     im = axes[0, 0].imshow(
-        np.log(i_amp),
+        mod_im,
         origin="lower",
         interpolation="none",
         extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_im)
     )
-    plt.colorbar(im, ax=axes[0, 0])
+    cbar = plt.colorbar(im, ax=axes[0, 0])
+    cbar.set_label('Jy arcsec$^{-2}$')
 
     im = axes[0, 1].imshow(
-        np.log(i_resid),
+        mod_grad,
         origin="lower",
         interpolation="none",
-        extent=residuals.coords.img_ext,
+        extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_grad)
     )
-    plt.colorbar(im, ax=axes[0, 1])
-
-    im = axes[1, 0].imshow(
-        np.log(f_amp),
-        origin="lower",
-        interpolation="none",
-        extent=residuals.coords.vis_ext,
-    )
-    plt.colorbar(im, ax=axes[1, 0])
-
-    im = axes[1, 1].imshow(
-        np.log(f_resid),
-        origin="lower",
-        interpolation="none",
-        extent=residuals.coords.vis_ext,
-    )
-    plt.colorbar(im, ax=axes[1, 1])
+    cbar = plt.colorbar(im, ax=axes[0, 1])
+    cbar.set_label('Jy arcsec$^{-2}$')
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_train_diagnostics_fig.png', dpi=300)
