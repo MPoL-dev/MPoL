@@ -62,16 +62,6 @@ Training and testing
 .. automodule:: mpol.training
 
 
-Connectors
-----------
-
-The objects in the Images and Precomposed modules are focused on bringing some image-plane model to the space of the data, where the similarity of the model visibilities to the data visibilities will be evaluated by a negative log-likelihood loss. In some situations, though, it is useful to have access to the residual visibilities directly. For example, for visualization or debugging purposes.
-
-Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
-
-.. automodule:: mpol.connectors
-
-
 Cross-validation
 ----------------
 

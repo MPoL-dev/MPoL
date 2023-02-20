@@ -6,7 +6,7 @@ If you don't see a loss function you need, it's easy to write your own directly 
 import numpy as np
 import torch
 
-from . import connectors
+from . import datasets
 from .constants import *
 
 
@@ -113,7 +113,7 @@ def chi_squared_gridded(vis, griddedDataset):
     # use the index connector to get the model_visibilities from the dataset
     # 1D torch tensor collapsed across cube dimensions, like
     # griddedDataset.vis_indexed and griddedDataset.weight_indexed
-    model_vis = connectors.index_vis(vis, griddedDataset)
+    model_vis = datasets.index_vis(vis, griddedDataset)
 
     return chi_squared(
         model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
@@ -136,7 +136,7 @@ def log_likelihood_gridded(vis, griddedDataset):
     # use the index connector to get the model_visibilities from the dataset
     # 1D torch tensor collapsed across cube dimensions, like
     # griddedDataset.vis_indexed and griddedDataset.weight_indexed
-    model_vis = connectors.index_vis(vis, griddedDataset)
+    model_vis = datasets.index_vis(vis, griddedDataset)
 
     return log_likelihood(
         model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
@@ -154,7 +154,7 @@ def nll_gridded(vis, datasetGridded):
     Returns:
         torch.double: the normalized negative log likelihood likelihood loss
     """
-    model_vis = connectors.index_vis(vis, datasetGridded)
+    model_vis = datasets.index_vis(vis, datasetGridded)
 
     return nll(model_vis, datasetGridded.vis_indexed, datasetGridded.weight_indexed)
 

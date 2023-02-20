@@ -39,7 +39,6 @@ from astropy.utils.data import download_file
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import (
-    connectors,
     coordinates,
     crossval,
     datasets,
@@ -181,46 +180,34 @@ flayer = fourier.FourierCube(coords=coords)
 flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
-The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities, the dirty image corresponding to those training visibilities, and the "test" visibilities which will be used to evaluate the predictive ability of the model.
+The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities and the "test" visibilities which will be used to evaluate the predictive ability of the model.
 
 ```{code-cell}
-fig, ax = plt.subplots(nrows=k, ncols=3, figsize=(6, 10))
+fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(4, 10))
 
 for i, (train_subset, test_subset) in enumerate(k_fold_datasets):
 
-    rtrain = connectors.GriddedResidualConnector(flayer, train_subset)
-    rtrain.forward()
-    rtest = connectors.GriddedResidualConnector(flayer, test_subset)
-    rtest.forward()
+    # train_subset and test_subset are `GriddedDataset`s
 
-    vis_ext = rtrain.coords.vis_ext
-    img_ext = rtrain.coords.img_ext
-
-    train_mask = rtrain.ground_mask[0]
-    train_chan = rtrain.sky_cube[0]
-
-    test_mask = rtest.ground_mask[0]
-    test_chan = rtest.sky_cube[0]
+    train_mask = train_subset.ground_mask[0]
+    test_mask = test_subset.ground_mask[0]
 
     ax[i, 0].imshow(
         train_mask.detach().numpy(),
         interpolation="none",
         origin="lower",
-        extent=vis_ext,
+        extent=coords.vis_ext,
         cmap="GnBu",
     )
 
-    ax[i, 1].imshow(train_chan.detach().numpy(), origin="lower", extent=img_ext)
-
-    ax[i, 2].imshow(
-        test_mask.detach().numpy(), origin="lower", extent=vis_ext, cmap="GnBu"
+    ax[i, 1].imshow(
+        test_mask.detach().numpy(), origin="lower", extent=coords.vis_ext, cmap="GnBu"
     )
 
     ax[i, 0].set_ylabel("k-fold {:}".format(i))
 
 ax[0, 0].set_title("train mask")
-ax[0, 1].set_title("train dirty img.")
-ax[0, 2].set_title("test mask")
+ax[0, 1].set_title("test mask")
 
 for a in ax.flatten():
     a.xaxis.set_ticklabels([])
