@@ -1,4 +1,4 @@
-"""The geometry package provides routines for projecting and de-projecting sky images.
+"""The geometry package provides routines for projecting and de-projecting sky images and visibilities.
 """
 
 import numpy as np
@@ -129,3 +129,70 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
         y = y1
 
     return x, y
+
+
+# TODO
+def deproject_vis(u, v, V, weights, source_geom, inverse=False, rescale_flux=True): 
+    r"""
+    Deproject (or reproject) visibilities (and optionally rescale their 
+    amplitudes and weights, according to the source inclination) using routines 
+    in `frank <https://github.com/discsim/frank>`_
+
+    Parameters
+    ----------
+    u : array of real, size = N, unit = :math:`\lambda`
+        u-points of the visibilities
+    v : array of real, size = N, unit = :math:`\lambda`
+        v-points of the visibilities
+    V : array of real, size = N, unit = Jy
+        Complex visibilites
+    weights : array of real, size = N, unit = Jy
+        Weights on the visibilities    
+    source_geom : dict
+        Dictionary with source geometry parameters. Keys:
+            "inc" : float, unit = deg
+                Inclination
+            "PA" : float, unit = deg
+                Position angle, defined east of north.  
+            "dRA" : float, unit = arcsec
+                Phase centre offset in right ascension.
+            "dDec" : float, units = arcsec
+                Phase centre offset in declination.           
+    inverse : bool, default=False
+        If True, the uv-points are reprojected rather than deprojected
+    rescale_flux : bool, default=True
+        If True, the visibility amplitudes and weights are rescaled to account 
+        for the difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit.
+    Returns
+    -------
+    up : array of real, size = N, unit = :math:`\lambda`
+        Corrected u-points of the visibilities
+    vp : array of real, size = N, unit = :math:`\lambda`
+        Corrected v-points of the visibilities
+    Vp : array of real, size = N, unit = Jy
+        Corrected complex visibilites
+    weights_scaled : array of real, size = N, unit = Jy
+        Rescaled weights on the visibilities        
+
+    """
+    from frank.geometry import FixedGeometry
+
+    geom = FixedGeometry(**source_geom)
+
+    weights_scaled = weights * 1
+
+    if inverse:
+        up, vp, Vp = geom.apply_correction(u, v, V)
+        if rescale_flux:
+            Vp, weights_scaled = geom.rescale_total_flux(V, weights)
+
+    else:
+        if rescale_flux:
+            Vp, weights_scaled = geom.rescale_total_flux(V, weights)
+         up, vp, Vp = geom.undo_correction(u, v, V)
+
+    return up, vp, Vp, weights_scaled
