@@ -180,7 +180,7 @@ flayer = fourier.FourierCube(coords=coords)
 flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
-The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities, the dirty image corresponding to those training visibilities, and the "test" visibilities which will be used to evaluate the predictive ability of the model.
+The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities and the "test" visibilities which will be used to evaluate the predictive ability of the model.
 
 ```{code-cell}
 fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(4, 10))
