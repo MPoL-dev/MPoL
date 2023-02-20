@@ -104,12 +104,12 @@ nufft = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
 
 Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.Gridder` object and create an image for use in the forward model.
 
-## Compared to the Gridder object
+## Compared to the {class}`mpol.gridding.DataAverager` object
 
 As before, we simply send the visibilities to the object and export a {class}`mpol.datasets.GriddedDataset`
 
 ```{code-cell}
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -118,10 +118,10 @@ gridder = gridding.Gridder(
     data_im=data_im,
 )
 
-gridded_dset = gridder.to_pytorch_dataset()
+gridded_dset = averager.to_pytorch_dataset()
 ```
 
-And we can initialize a :class:`mpol.fourier.FourierCube`
+And we can initialize a {class}`mpol.fourier.FourierCube`
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)

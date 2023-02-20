@@ -1,3 +1,6 @@
+r"""The ``gridding`` module provides two core classes in :class:`mpol.gridding.DataAverager` and :class:`mpol.gridding.DirtyImager`."""
+
+
 from __future__ import annotations
 
 import warnings
@@ -441,8 +444,6 @@ class DataAverager(GridderBase):
 
         # boolean index for cells that *contain* visibilities
         mask = cell_weight > 0.0
-
-        print("mask shape", mask.shape)
 
         # calculate the density weights under "uniform"
         # the density weights have the same shape as the re, im samples.
