@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import connectors, datasets, fourier, utils
+from mpol import datasets
 
 
 def test_dataset_device(dataset):
@@ -28,7 +28,6 @@ def test_dartboard_init(coords):
 
 
 def test_dartboard_histogram(crossvalidation_products, tmp_path):
-
     coords, dataset = crossvalidation_products
 
     # use default bins

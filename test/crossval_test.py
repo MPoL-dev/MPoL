@@ -1,19 +1,17 @@
-import numpy as np
 import copy
+
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 
-from mpol.crossval import CrossValidate, DartboardSplitGridded, RandomCellSplitGridded
+from mpol.crossval import (CrossValidate, DartboardSplitGridded,
+                           RandomCellSplitGridded)
 from mpol.datasets import Dartboard
 from mpol.fourier import FourierCube
-from mpol.connectors import GriddedResidualConnector
-from mpol.utils import packed_cube_to_sky_cube
 
-# TODO: test of RandomCellSplitGridded output
-# TODO: GPU tests
 
 def test_crossvalclass_split_dartboard(coords, gridder, dataset, generic_parameters):
-    # using the CrossValidate class, split a dataset into train/test subsets 
+    # using the CrossValidate class, split a dataset into train/test subsets
     # using 'dartboard' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
@@ -24,7 +22,7 @@ def test_crossvalclass_split_dartboard(coords, gridder, dataset, generic_paramet
 
 
 def test_crossvalclass_split_randomcell(coords, gridder, dataset, generic_parameters):
-    # using the CrossValidate class, split a dataset into train/test subsets 
+    # using the CrossValidate class, split a dataset into train/test subsets
     # using 'random_cell' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
@@ -34,7 +32,7 @@ def test_crossvalclass_split_randomcell(coords, gridder, dataset, generic_parame
 
 def test_crossvalclass_kfold(coords, gridder, dataset, generic_parameters):
     # using the CrossValidate class, perform k-fold cross-validation
- 
+
     crossval_pars = generic_parameters["crossval_pars"]
     # reset some keys to bypass functionality tested elsewhere and speed up test
     crossval_pars["lambda_guess"] = None
@@ -107,7 +105,6 @@ def test_dartboardsplit_iterate_masks(crossvalidation_products, tmp_path):
     fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(6, 12))
 
     for k, (train, test) in enumerate(cv):
-
         ax[k, 0].imshow(
             np.fft.fftshift(train.mask[chan].detach().numpy()),
             interpolation="none",
@@ -137,36 +134,38 @@ def test_dartboardsplit_iterate_images(crossvalidation_products, tmp_path):
     flayer = FourierCube(coords=coords)
     flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
-    fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))
+    # TODO: rewrite with Briggs framework
 
-    for k, (train, test) in enumerate(cv):
+    # fig, ax = plt.subplots(nrows=k, ncols=4, figsize=(12, 12))
 
-        rtrain = GriddedResidualConnector(flayer, train)
-        rtest = GriddedResidualConnector(flayer, test)
+    # for k, (train, test) in enumerate(cv):
 
-        train_chan = packed_cube_to_sky_cube(rtrain.forward())[chan]
-        test_chan = packed_cube_to_sky_cube(rtest.forward())[chan]
+    #     rtrain = GriddedResidualConnector(flayer, train)
+    #     rtest = GriddedResidualConnector(flayer, test)
 
-        im = ax[k, 0].imshow(
-            train_chan.real.detach().numpy(), interpolation="none", origin="lower"
-        )
-        plt.colorbar(im, ax=ax[k, 0])
+    #     train_chan = packed_cube_to_sky_cube(rtrain.forward())[chan]
+    #     test_chan = packed_cube_to_sky_cube(rtest.forward())[chan]
 
-        im = ax[k, 1].imshow(
-            train_chan.imag.detach().numpy(), interpolation="none", origin="lower"
-        )
-        plt.colorbar(im, ax=ax[k, 1])
+    #     im = ax[k, 0].imshow(
+    #         train_chan.real.detach().numpy(), interpolation="none", origin="lower"
+    #     )
+    #     plt.colorbar(im, ax=ax[k, 0])
 
-        im = ax[k, 2].imshow(
-            test_chan.real.detach().numpy(), interpolation="none", origin="lower"
-        )
-        plt.colorbar(im, ax=ax[k, 2])
+    #     im = ax[k, 1].imshow(
+    #         train_chan.imag.detach().numpy(), interpolation="none", origin="lower"
+    #     )
+    #     plt.colorbar(im, ax=ax[k, 1])
 
-        im = ax[k, 3].imshow(
-            test_chan.imag.detach().numpy(), interpolation="none", origin="lower"
-        )
-        plt.colorbar(im, ax=ax[k, 3])
+    #     im = ax[k, 2].imshow(
+    #         test_chan.real.detach().numpy(), interpolation="none", origin="lower"
+    #     )
+    #     plt.colorbar(im, ax=ax[k, 2])
 
-    ax[0, 0].set_title("train")
-    ax[0, 2].set_title("test")
-    fig.savefig(tmp_path / "images", dpi=300)
+    #     im = ax[k, 3].imshow(
+    #         test_chan.imag.detach().numpy(), interpolation="none", origin="lower"
+    #     )
+    #     plt.colorbar(im, ax=ax[k, 3])
+
+    # ax[0, 0].set_title("train")
+    # ax[0, 2].set_title("test")
+    # fig.savefig(tmp_path / "images", dpi=300)
