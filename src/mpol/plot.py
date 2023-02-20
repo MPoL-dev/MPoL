@@ -1,11 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
-import torch 
 
 from astropy.visualization.mpl_normalize import simple_norm
 
-from mpol.fourier import FourierCube
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 
 def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
@@ -208,9 +206,8 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
 
 def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     r"""
-    Generate a figure showing:
-        - (u,v) coverage in train and test sets split from a parent dataset
-        - a dirty image of the train sets
+    Generate a figure showing (u,v) coverage in train and test sets split from 
+    a parent dataset.
 
     Parameters
     ----------
@@ -234,40 +231,22 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.kfolds, ncols=3, figsize=(6, 10))
-
-    f_layer = FourierCube(coords=splitter.dataset.coords)
-    f_layer.forward(torch.zeros(splitter.dataset.nchan, 
-                                splitter.dataset.coords.npix, 
-                                splitter.dataset.coords.npix)
-                    )
+    fig, axes = plt.subplots(nrows=splitter.kfolds, ncols=2, figsize=(4, 10))
 
     for ii, (train, test) in enumerate(splitter): 
-        rtrain = GriddedResidualConnector(f_layer, train)
-        rtrain.forward()
+        train_mask = torch2npy(train.ground_mask[channel])
+        test_mask = torch2npy(test.ground_mask[channel])
+        vis_ext = train.coords.vis_ext
 
-        train_mask = torch2npy(rtrain.ground_mask[channel])
-        train_chan = torch2npy(rtrain.sky_cube[channel])
-        test_mask = torch2npy(rtest.ground_mask[channel])
-
-        vis_ext = rtrain.coords.vis_ext
-        img_ext = rtrain.coords.img_ext
-
-        # (u,v) points
         axes[ii, 0].imshow(train_mask, origin="lower", extent=vis_ext, 
             cmap="Greys", interpolation="none")        
-        axes[ii, 2].imshow(test_mask, origin="lower", extent=vis_ext, 
+        axes[ii, 1].imshow(test_mask, origin="lower", extent=vis_ext, 
             cmap="Greys", interpolation="none")            
-
-        # dirty image
-        axes[ii, 1].imshow(train_chan, origin="lower", extent=img_ext,
-            cmap="inferno", norm=get_image_cmap_norm(train_chan))
 
         axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
 
     axes[0, 0].set_title("Train - mask")
-    axes[0, 1].set_title("Train - dirty image")
-    axes[0, 2].set_title("Test - mask")
+    axes[0, 1].set_title("Test - mask")
 
     for aa in axes.flatten():
         aa.xaxis.set_ticklabels([])
