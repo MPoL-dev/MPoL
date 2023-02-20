@@ -52,10 +52,13 @@ EXTRA_REQUIRES = {
         "jupyter-cache",
         "Pillow",
     ],
+    "analysis": [
+        "frank>=1.2.1",
+    ],
 }
 
 EXTRA_REQUIRES["dev"] = (
-    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
 )
 
 
