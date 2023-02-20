@@ -1,7 +1,7 @@
 import numpy as np 
-import matplotlib.pyplot as plt 
 
 from mpol.fourier import NuFFT
+from mpol.geometry import deproject_vis, observer_to_flat
 from mpol.utils import torch2npy
 
 
@@ -12,6 +12,7 @@ def get_1d_vis_fit(model, u, v, chan=0):
 
     Parameters
     ----------
+    # TODO 
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
     u : array, unit=:math:[`k\lambda`] 
@@ -25,14 +26,16 @@ def get_1d_vis_fit(model, u, v, chan=0):
     -------
     q : array, unit=:math:[`k\lambda`]
         Baselines corresponding to `u` and `v`
-    Vmod : array, unit=[Jy] # TODO: right unit?
+    Vmod : array, unit=[Jy] 
         Visibility amplitudes at `q`
     """
+    # deproject_vis(u, v, V, weights, source_geom, inverse, rescale_flux) # TODO
+
     q = np.hypot(u, v)
 
     nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u, vv=v)
     # get model visibilities 
-    Vmod = nufft(model.icube()).detach()[chan] 
+    Vmod = nufft(model.icube()).detach()[chan]
     
     return q, Vmod
 
