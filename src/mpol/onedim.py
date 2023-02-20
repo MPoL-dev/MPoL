@@ -37,18 +37,17 @@ def get_1d_vis_fit(model, u, v, chan=0):
     return q, Vmod
 
 
-def get_radial_profile(model, l_center=0.0, m_center=0.0, bins=None, chan=0):     
+def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
     r"""
-    Obtain a 1D (radial) brightness profile I(r) from an MPoL model. 
+    Obtain a 1D (radial) brightness profile I(r) from an MPoL model.
 
     Parameters
     ----------
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
-    l_center : float, default=0.0, unit=[arcsec]
-        Image center along l-axis. If None, the image center pixel will be used
-    m_center : float, default=0.0, unit=[arcsec]
-        Image center along m-axis. If None, the image center pixel will be used
+    center : 2-tuple of float, default=(0.0, 0.0), unit=[arcsec]
+        Offset (RA, Dec) of source in image. Postive RA offset is west of
+        north. If None, the source is assumed to be at the image center pixel
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r)
     chan : int, default=0
@@ -67,7 +66,7 @@ def get_radial_profile(model, l_center=0.0, m_center=0.0, bins=None, chan=0):
     # get image center in Cartesian [arcsec]
     xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D
     # shift center coordinate
-    xshift, yshift = xx - l_center, yy - m_center
+    xshift, yshift = xx - center[0], yy - center[1]
     rshift = np.hypot(xshift, yshift.T) 
     rshift = rshift.flatten()
 
