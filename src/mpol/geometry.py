@@ -70,7 +70,7 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
 
 
 def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
-    """Rotate the from to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.
+    """Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.
 
     It is assumed that the +Z axis points *towards* the observer. The rotation operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.
 
@@ -90,7 +90,7 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
         Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0
 
     Returns:
-        Two tensors representing ``(x, y)`` in the observer frame.
+        Two tensors representing ``(x, y)`` in the flat frame.
     """
 
     # Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.
