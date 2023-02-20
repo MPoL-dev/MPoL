@@ -288,13 +288,15 @@ title="Source repository"
               <div>
                 
   <h1>Source code for mpol.training</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">mpol.connectors</span> <span class="kn">import</span> <span class="n">GriddedResidualConnector</span>
-<span class="kn">from</span> <span class="nn">mpol.losses</span> <span class="kn">import</span> <span class="n">nll_gridded</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">sparsity</span><span class="p">,</span> <span class="n">TV_image</span><span class="p">,</span> <span class="n">TSV</span>
+<span class="kn">from</span> <span class="nn">mpol.losses</span> <span class="kn">import</span> <span class="n">TSV</span><span class="p">,</span> <span class="n">TV_image</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">nll_gridded</span><span class="p">,</span> <span class="n">sparsity</span>
+
 <span class="c1"># from mpol.plot import train_diagnostics # TODO</span>
+
 
 <div class="viewcode-block" id="TrainTest"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest">[docs]</a><span class="k">class</span> <span class="nc">TrainTest</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -309,18 +311,18 @@ title="Source repository"
 <span class="sd">    epochs : int, default=500</span>
 <span class="sd">        Number of training iterations</span>
 <span class="sd">    convergence_tol : float, default=1e-2</span>
-<span class="sd">        Tolerance for training iteration stopping criterion as assessed by </span>
+<span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
 <span class="sd">        loss function (suggested &lt;= 1e-2)</span>
 <span class="sd">    lambda_guess : list of str, default=None</span>
-<span class="sd">        List of regularizers for which to guess an initial value </span>
+<span class="sd">        List of regularizers for which to guess an initial value</span>
 <span class="sd">    lambda_guess_briggs : list of float, default=[0.0, 0.5]</span>
-<span class="sd">        Briggs robust values for two images used to guess initial regularizer </span>
+<span class="sd">        Briggs robust values for two images used to guess initial regularizer</span>
 <span class="sd">        values (if lambda_guess is not None)</span>
 <span class="sd">    lambda_entropy : float</span>
 <span class="sd">        Relative strength for entropy regularizer</span>
 <span class="sd">    entropy_prior_intensity : float, default=1e-10</span>
 <span class="sd">        Prior value :math:`p` to calculate entropy against (suggested &lt;&lt;1)</span>
-<span class="sd">    lambda_sparsity : float, default=None </span>
+<span class="sd">    lambda_sparsity : float, default=None</span>
 <span class="sd">        Relative strength for sparsity regularizer</span>
 <span class="sd">    lambda_TV : float, default=None</span>
 <span class="sd">        Relative strength for total variation (TV) regularizer</span>
@@ -329,21 +331,33 @@ title="Source repository"
 <span class="sd">    lambda_TSV : float, default=None</span>
 <span class="sd">        Relative strength for total squared variation (TSV) regularizer</span>
 <span class="sd">    train_diag_step : int, default=None</span>
-<span class="sd">        Interval at which training diagnostics are output. If None, no </span>
+<span class="sd">        Interval at which training diagnostics are output. If None, no</span>
 <span class="sd">        diagnostics will be generated.</span>
 <span class="sd">    save_prefix : str, default=None</span>
-<span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be </span>
+<span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be</span>
 <span class="sd">        saved</span>
 <span class="sd">    verbose : bool, default=True</span>
 <span class="sd">        Whether to print notification messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridder</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> 
-                <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> 
-                <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
-                <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
-                <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">gridder</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+        <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+        <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span> <span class="o">=</span> <span class="n">gridder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
@@ -360,49 +374,51 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
-
 <div class="viewcode-block" id="TrainTest.loss_convergence"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">loss_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Estimate whether the loss function has converged by assessing its </span>
+<span class="sd">        Estimate whether the loss function has converged by assessing its</span>
 <span class="sd">        relative change over recent iterations.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        loss : array</span>
-<span class="sd">            Values of loss function over iterations (epochs). </span>
-<span class="sd">            If len(loss) &lt; 11, `False` will be returned, as convergence </span>
+<span class="sd">            Values of loss function over iterations (epochs).</span>
+<span class="sd">            If len(loss) &lt; 11, `False` will be returned, as convergence</span>
 <span class="sd">            cannot be adequately assessed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        `True` if the convergence criterion is met, else `False`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">min_len</span> <span class="o">=</span> <span class="mi">11</span> 
+        <span class="n">min_len</span> <span class="o">=</span> <span class="mi">11</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_len</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="n">min_len</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> 
+        <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="n">min_len</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">&lt;=</span> <span class="n">ratios</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">ratios</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">&lt;=</span> <span class="n">ratios</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">ratios</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainTest.loss_lambda_guess"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_lambda_guess">[docs]</a>    <span class="k">def</span> <span class="nf">loss_lambda_guess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set an initial guess for regularizer strengths :math:`\lambda_{x}` by </span>
-<span class="sd">        comparing images generated with different visibility weighting. </span>
-<span class="sd">        </span>
+<span class="sd">        Set an initial guess for regularizer strengths :math:`\lambda_{x}` by</span>
+<span class="sd">        comparing images generated with different visibility weighting.</span>
+
 <span class="sd">        The guesses update `self._lambda_*` values.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        guesses : dict </span>
+<span class="sd">        guesses : dict</span>
 <span class="sd">            Dictionary containing the names and initial guesses of regularizers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># generate images of the data using two briggs robust values</span>
-        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> 
-                                                <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> 
-                                                <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
+            <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
+            <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">img1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img1</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">img2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img2</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
@@ -439,7 +455,6 @@ title="Source repository"
 
         <span class="k">return</span> <span class="n">guesses</span></div>
 
-
 <div class="viewcode-block" id="TrainTest.loss_eval"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_eval">[docs]</a>    <span class="k">def</span> <span class="nf">loss_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">sky_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -462,25 +477,24 @@ title="Source repository"
         <span class="c1"># regularizers</span>
         <span class="k">if</span> <span class="n">sky_cube</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_entropy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_entropy</span> <span class="o">*</span> <span class="n">entropy</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> 
-                                                        <span class="bp">self</span><span class="o">.</span><span class="n">_entropy_prior_intensity</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_entropy</span> <span class="o">*</span> <span class="n">entropy</span><span class="p">(</span>
+                    <span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entropy_prior_intensity</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_sparsity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_sparsity</span> <span class="o">*</span> <span class="n">sparsity</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TV</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TV</span> <span class="o">*</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> 
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">_TV_epsilon</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TV</span> <span class="o">*</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TV_epsilon</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TSV</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TSV</span> <span class="o">*</span> <span class="n">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">loss</span> </div>
-
+        <span class="k">return</span> <span class="n">loss</span></div>
 
 <div class="viewcode-block" id="TrainTest.train"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Trains a neural network, forward modeling a visibility dataset and </span>
-<span class="sd">        evaluating the corresponding model image against the data, using </span>
+<span class="sd">        Trains a neural network, forward modeling a visibility dataset and</span>
+<span class="sd">        evaluating the corresponding model image against the data, using</span>
 <span class="sd">        PyTorch with gradient descent.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : `torch.nn.Module` object</span>
@@ -497,44 +511,52 @@ title="Source repository"
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># set model to training mode</span>
         <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-        
+
         <span class="c1"># track model residuals</span>
-        <span class="n">residuals</span> <span class="o">=</span> <span class="n">GriddedResidualConnector</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">fcube</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="c1"># residuals = GriddedResidualConnector(model.fcube, dataset)</span>
+        <span class="c1"># TODO: replace with Briggs residual imaging workflow</span>
 
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># track loss value over epochs</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="c1"># optionally guess initial regularizer strengths</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># guess, update lambda values in &#39;self&#39;</span>
             <span class="n">lambda_guesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_lambda_guess</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Autonomous guesses applied for the following &quot;</span>
-                            <span class="s2">&quot;initial regularizer strengths: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lambda_guesses</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;    Autonomous guesses applied for the following &quot;</span>
+                    <span class="s2">&quot;initial regularizer strengths: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lambda_guesses</span><span class="p">)</span>
+                <span class="p">)</span>
 
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))</span>
-                <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">):</span>
-
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">  Training: epoch </span><span class="si">{}</span><span class="s1"> of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">),</span> 
-                    <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">  Training: epoch </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">),</span>
+                    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
 
             <span class="c1"># check early on whether the loss isn&#39;t evolving</span>
             <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
                 <span class="n">loss_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">&lt;=</span> <span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="mf">1.1</span><span class="p">):</span>
-                    <span class="n">warn_msg</span> <span class="o">=</span> <span class="s2">&quot;The loss function is negligibly evolving. loss_rate &quot;</span> <span class="o">+</span> \
-                                <span class="s2">&quot;may be too low.&quot;</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">warn_msg</span><span class="p">)</span>                            
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">&lt;=</span> <span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="mf">1.1</span>
+                <span class="p">):</span>
+                    <span class="n">warn_msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s2">&quot;The loss function is negligibly evolving. loss_rate &quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;may be too low.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">warn_msg</span><span class="p">)</span>
                     <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="n">warn_msg</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-            <span class="c1"># calculate model visibility cube (corresponding to current pixel </span>
+            <span class="c1"># calculate model visibility cube (corresponding to current pixel</span>
             <span class="c1"># values of mpol.images.BaseCube)</span>
-            <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span> 
+            <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
 
             <span class="c1"># get predicted sky cube corresponding to model visibilities</span>
             <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
@@ -544,37 +566,43 @@ title="Source repository"
             <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
             <span class="c1"># generate optional fit diagnostics</span>
-            <span class="c1"># TODO: uncomment when plot.train_diagnostics in codebase </span>
+            <span class="c1"># TODO: uncomment when plot.train_diagnostics in codebase</span>
             <span class="c1"># if self._train_diag_step is not None and (count % self._train_diag_step == 0 or</span>
-            <span class="c1">#     count == self._epochs - 1) : </span>
-                <span class="c1"># if self._diag_fig_train:</span>
-                <span class="c1">#     train_diagnostics(model, residuals, losses, count)</span>
+            <span class="c1">#     count == self._epochs - 1) :</span>
+            <span class="c1"># if self._diag_fig_train:</span>
+            <span class="c1">#     train_diagnostics(model, residuals, losses, count)</span>
 
             <span class="c1"># calculate gradients of loss function w.r.t. model parameters</span>
-            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span> 
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
             <span class="c1"># update model parameters via gradient descent</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
             <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Loss function convergence criterion met at epoch &quot;</span>
-                                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;    Loss function convergence criterion met at epoch &quot;</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Loss function convergence criterion not met; &quot;</span>
-                                <span class="s2">&quot;training stopped at &#39;epochs&#39; specified in your &quot;</span>
-                                <span class="s2">&quot;parameter file, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;    Loss function convergence criterion not met; &quot;</span>
+                    <span class="s2">&quot;training stopped at &#39;epochs&#39; specified in your &quot;</span>
+                    <span class="s2">&quot;parameter file, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">)</span>
+                <span class="p">)</span>
 
-        <span class="c1"># return loss value    </span>
-        <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">losses</span> <span class="c1"># TODO: once have object collecting pipeline outputs, return anything needed here</span></div>
-
+        <span class="c1"># return loss value</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+            <span class="n">losses</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># TODO: once have object collecting pipeline outputs, return anything needed here</span></div>
 
 <div class="viewcode-block" id="TrainTest.test"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test a model visibility cube against withheld data.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : `torch.nn.Module` object</span>
@@ -585,7 +613,7 @@ title="Source repository"
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        loss.item() : float</span>
-<span class="sd">            Value of loss function </span>
+<span class="sd">            Value of loss function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># evaluate trained model against a set of withheld (test) visibilities</span>
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>

@@ -296,7 +296,7 @@ title="Source repository"
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">connectors</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">datasets</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
 
 
@@ -403,7 +403,7 @@ title="Source repository"
     <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
     <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
     <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">chi_squared</span><span class="p">(</span>
         <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
@@ -426,7 +426,7 @@ title="Source repository"
     <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
     <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
     <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span>
         <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
@@ -444,7 +444,7 @@ title="Source repository"
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: the normalized negative log likelihood likelihood loss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">connectors</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">)</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span></div>
 

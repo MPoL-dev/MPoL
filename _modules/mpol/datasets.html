@@ -307,6 +307,33 @@ title="Source repository"
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">loglinspace</span>
 
 
+<div class="viewcode-block" id="index_vis"><a class="viewcode-back" href="../../api.html#mpol.datasets.index_vis">[docs]</a><span class="k">def</span> <span class="nf">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is &quot;packed&quot; just like the :class:`~mpol.datasets.GriddedDataset`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed.&quot;</span>
+<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">vis</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
+
+    <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
+    <span class="c1"># However, masked_select does not yet work (with gradients)</span>
+    <span class="c1"># on the complex vis, so hence this awkward step of selecting</span>
+    <span class="c1"># the reals and imaginaries separately</span>
+    <span class="n">re</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+
+    <span class="c1"># we had trouble returning things as re + 1.0j * im,</span>
+    <span class="c1"># but for some reason torch.complex seems to work OK.</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="GriddedDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset">[docs]</a><span class="k">class</span> <span class="nc">GriddedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
@@ -322,7 +349,7 @@ title="Source repository"
 <span class="sd">    :ivar vis_indexed: 1D complex tensor of visibility data</span>
 <span class="sd">    :ivar weight_indexd: 1D tensor of weight values</span>
 
-<span class="sd">    If you index the output of the Fourier layer in the same manner using ``self.mask`` (as done internally within :class:`~mpol.connectors.DataConnector`), then the model and data visibilities can be directly compared using a loss function.</span>
+<span class="sd">    If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
