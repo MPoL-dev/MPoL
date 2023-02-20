@@ -43,6 +43,7 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
 
     Parameters
     ----------
+    # TODO
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
     center : 2-tuple of float, default=(0.0, 0.0), unit=[arcsec]
@@ -61,13 +62,16 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
         Azimuthally averaged pixel brightness at `rs`
 
     """
+    # observer_to_flat(X, Y, omega, incl, Omega) # TODO
+
     skycube = torch2npy(model.icube.sky_cube)[chan]
 
-    # get image center in Cartesian [arcsec]
+    # Cartesian pixel coordinates [arcsec]
     xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D
-    # shift center coordinate
+    # shift image center
     xshift, yshift = xx - center[0], yy - center[1]
-    rshift = np.hypot(xshift, yshift.T) 
+    # radial pixel coordinates
+    rshift = np.hypot(xshift, yshift) 
     rshift = rshift.flatten()
 
     if bins is None:
