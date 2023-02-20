@@ -8,7 +8,8 @@ import warnings
 import numpy as np
 
 from mpol.coordinates import GridCoords
-from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
+from mpol.exceptions import (DataError, ThresholdExceededError,
+                             WrongDimensionError)
 
 from .datasets import GriddedDataset
 
@@ -146,13 +147,12 @@ def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
 class GridderBase:
     r"""
     This class is not designed to be used directly, but rather to be subclassed.
-    
-    
+
     Subclasses will need to implement a `_grid_visibilities(self,...)` method.
 
     The GridderBase object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the GridderBase assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    Subclasses will accept "loose" *ungridded* visibility data and store the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, GridderBase assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
@@ -186,7 +186,7 @@ class GridderBase:
         # make sure we still fit into the grid
         self.coords.check_data_fit(uu, vv)
 
-        # classes that inherit this will need to set data attributes 
+        # classes that inherit this will need to set data attributes
         # deciding on whether to include Hermitian pairs
         self.uu = uu
         self.vv = vv
@@ -401,7 +401,6 @@ class GridderBase:
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
 
-
     @property
     def ground_cube(self):
         r"""
@@ -418,9 +417,25 @@ class DataAverager(GridderBase):
     r"""
     The DataAverager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DataAverager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered). (Note that, unlike :class:`~mpol.gridding.DirtyImager`, this class *will not* augment the dataset to include Hermitian pairs. This is by design, since Hermitian pairs should not be used in likelihood calculations).
 
-    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.DataAverager.to_pytorch_dataset` routine.
+    The input visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DataAverager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    Once the DataAverager object is initialized with loose visibilities, you can average them and export them for use in Regularized Maximum Likelihood imaging with the :func:`mpol.gridding.DataAverager.to_pytorch_dataset` routine.
+
+    Example::
+
+        averager = gridding.DataAverager(
+            coords=coords,
+            uu=uu,
+            vv=vv,
+            weight=weight,
+            data_re=data_re,
+            data_im=data_im,
+            )
+
+        dset = averager.to_pytorch_dataset()
+
 
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
@@ -429,7 +444,7 @@ class DataAverager(GridderBase):
         weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
         data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
-    
+
     """
 
     def _grid_visibilities(self):
@@ -463,11 +478,10 @@ class DataAverager(GridderBase):
         )
 
         # store the pre-packed FFT products for access by outside routines
-        self.mask = np.fft.fftshift(mask, axes=(1,2))
+        self.mask = np.fft.fftshift(mask, axes=(1, 2))
         self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
         self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-
 
     def _grid_weights(self):
         r"""
@@ -519,12 +533,29 @@ class DataAverager(GridderBase):
         )
 
 
-
 class DirtyImager(GridderBase):
     r"""
+    This class is mainly used for producing diagnostic "dirty" images of the visibility data.
+
     The DirtyImager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    The :class:`.DirtyImager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the DirtyImager will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.' The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DirtyImager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    The :class:`.DirtyImager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the normal set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain; internally the DirtyImager will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.'
+
+    The input visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DirtyImager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    Example::
+
+        imager = gridding.DirtyImager(
+            coords=coords,
+            uu=uu,
+            vv=vv,
+            weight=weight,
+            data_re=data_re,
+            data_im=data_im,
+            )
+
+        img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0)
+
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
@@ -535,6 +566,8 @@ class DirtyImager(GridderBase):
         weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
         data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+
+
 
     """
 
@@ -547,7 +580,6 @@ class DirtyImager(GridderBase):
         data_re=None,
         data_im=None,
     ):
-
         # check everything should be 2d, expand if not
         # also checks data does not contain Hermitian pairs
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
@@ -672,7 +704,6 @@ class DirtyImager(GridderBase):
         self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
         self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
         self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
-
 
     def _get_dirty_beam(self, C, re_gridded_beam):
         """
