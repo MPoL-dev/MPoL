@@ -141,7 +141,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../../ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -727,7 +727,7 @@ title="Source repository"
         <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
 
     <span class="c1"># carry it forward to the visibilities, which will be (nchan, nvis)</span>
-    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">imageCube</span><span class="o">.</span><span class="n">forward</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">imageCube</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
     <span class="c1"># generate complex noise</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>

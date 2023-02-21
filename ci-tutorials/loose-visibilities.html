@@ -44,7 +44,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Cross validation" href="crossvalidation.html" />
-    <link rel="prev" title="Intro to MPoL Optimization" href="optimization.html" />
+    <link rel="prev" title="Intro to RML with MPoL" href="optimization.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
     
@@ -146,7 +146,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1 current active">
@@ -353,8 +353,14 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#compared-to-the-gridder-object">
-   Compared to the Gridder object
+  <a class="reference internal nav-link" href="#compared-to-the-mpol-gridding-dataaverager-object">
+   Compared to the
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.gridding.DataAverager
+    </span>
+   </code>
+   object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -435,8 +441,14 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#compared-to-the-gridder-object">
-   Compared to the Gridder object
+  <a class="reference internal nav-link" href="#compared-to-the-mpol-gridding-dataaverager-object">
+   Compared to the
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     mpol.gridding.DataAverager
+    </span>
+   </code>
+   object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -607,14 +619,14 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<p>Now let’s put the NuFFT aside for a moment while we initialize the <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.Gridder</span></code></a> object and create an image for use in the forward model.</p>
+<p>Now let’s put the NuFFT aside for a moment while we initialize the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code></a> object and create an image for use in the forward model.</p>
 </section>
-<section id="compared-to-the-gridder-object">
-<h2>Compared to the Gridder object<a class="headerlink" href="#compared-to-the-gridder-object" title="Permalink to this headline">#</a></h2>
+<section id="compared-to-the-mpol-gridding-dataaverager-object">
+<h2>Compared to the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code></a> object<a class="headerlink" href="#compared-to-the-mpol-gridding-dataaverager-object" title="Permalink to this headline">#</a></h2>
 <p>As before, we simply send the visibilities to the object and export a <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">averager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DataAverager</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
     <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
@@ -623,12 +635,12 @@ title="Print to PDF"
     <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">gridded_dset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
+<span class="n">gridded_dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>And we can initialize a :class:<code class="docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube</span></code></p>
+<p>And we can initialize a <a class="reference internal" href="../api.html#mpol.fourier.FourierCube" title="mpol.fourier.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube</span></code></a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flayer</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">FourierCube</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
@@ -674,7 +686,7 @@ title="Print to PDF"
 <p>The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_loose</span> <span class="o">=</span> <span class="n">nufft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">icube</span><span class="o">.</span><span class="n">forward</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_loose</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">icube</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loose model visibilities from the NuFFT have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis_model_loose</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The original loose data visibilities have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 </pre></div>
@@ -687,10 +699,10 @@ The original loose data visibilities have shape (9, 325080)
 </div>
 </div>
 </div>
-<p>By comparison, the <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object puts the visibilities onto a grid and exports a <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the <a class="reference internal" href="../api.html#mpol.fourier.FourierCube" title="mpol.fourier.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> layer</p>
+<p>By comparison, the <code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code> object puts the visibilities onto a grid and exports a <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the <a class="reference internal" href="../api.html#mpol.fourier.FourierCube" title="mpol.fourier.FourierCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourierCube</span></code></a> layer</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_gridded</span> <span class="o">=</span> <span class="n">flayer</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">icube</span><span class="o">.</span><span class="n">forward</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_gridded</span> <span class="o">=</span> <span class="n">flayer</span><span class="p">(</span><span class="n">icube</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gridded model visibilities from FourierCube have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis_model_gridded</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gridded data visibilities have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gridded_dset</span><span class="o">.</span><span class="n">vis_gridded</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 </pre></div>
@@ -819,8 +831,8 @@ Log likelihood tensor(14577405.9755, dtype=torch.float64, grad_fn=&lt;AddBackwar
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Chi squared gridded tensor(83943.1968, dtype=torch.float64, grad_fn=&lt;SumBackward0&gt;)
-Log likelihood gridded tensor(84820.9610, dtype=torch.float64, grad_fn=&lt;AddBackward0&gt;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Chi squared gridded tensor(53094.1556, dtype=torch.float64, grad_fn=&lt;SumBackward0&gt;)
+Log likelihood gridded tensor(57464.8101, dtype=torch.float64, grad_fn=&lt;AddBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -875,7 +887,7 @@ V_i \approx M(u_i, v_i |\,\boldsymbol{\theta})
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Normalized log likelihood gridded tensor(1.8447, dtype=torch.float64, grad_fn=&lt;MulBackward0&gt;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Normalized log likelihood gridded tensor(1.6241, dtype=torch.float64, grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -895,7 +907,7 @@ V_i \approx M(u_i, v_i |\,\boldsymbol{\theta})
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Intro to MPoL Optimization</p>
+            <p class="prev-next-title">Intro to RML with MPoL</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="crossvalidation.html" title="next page">

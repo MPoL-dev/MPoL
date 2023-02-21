@@ -146,7 +146,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -484,21 +484,27 @@ title="Print to PDF"
 <span class="c1"># define the image dimensions, making sure they are big enough to fit all</span>
 <span class="c1"># of the expected emission</span>
 <span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
-<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<span class="n">averager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DataAverager</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span>
 <span class="p">)</span>
 
 <span class="c1"># export to PyTorch dataset</span>
-<span class="n">dset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
+<span class="n">dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>Now, let’s also make a diagnostic dirty image</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show the dirty image</span>
-<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="p">(</span>
+    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Show the dirty image</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">imager</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
@@ -584,12 +590,12 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/8a5284cfe8d931acd43492d3bfa4a297daac6c6d9a9cd25d878e3d4ee0219453.png" src="../_images/8a5284cfe8d931acd43492d3bfa4a297daac6c6d9a9cd25d878e3d4ee0219453.png" />
+<img alt="../_images/0fa482b07f968d29c4b49174f37aad3545daeb68f1eee36a23a1ba42f417f8d1.png" src="../_images/0fa482b07f968d29c4b49174f37aad3545daeb68f1eee36a23a1ba42f417f8d1.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
 <p>It turns out that the missing holes in the real dataset are quite important to image fidelity—if we had complete <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage, we wouldn’t need to be worrying about CLEAN or RML imaging techniques in the first place! When we make a new interferometric observation, it will have it’s own (different) set of missing holes depending on array configuration, observation duration, and hour angle coverage. We would like our cross validation slices to simulate the <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> distribution of possible <em>new datasets</em>, and, at least for ALMA, random sampling doesn’t probe this very well.</p>
-<p>Instead, we suggest an approach where we break the UV plane into radial (<span class="math notranslate nohighlight">\(q=\sqrt{u^2 + v^2}\)</span>) and azimuthal (<span class="math notranslate nohighlight">\(\phi = \mathrm{arctan2}(v,u)\)</span>) cells and cross validate by drawing a <span class="math notranslate nohighlight">\(K\)</span>-fold subselection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.</p>
+<p>Instead, we suggest an approach where we break the UV plane into radial (<span class="math notranslate nohighlight">\(q=\sqrt{u^2 + v^2}\)</span>) and azimuthal (<span class="math notranslate nohighlight">\(\phi = \mathrm{arctan2}(v,u)\)</span>) cells and cross validate by drawing a <span class="math notranslate nohighlight">\(K\)</span>-fold sub-selection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create a radial and azimuthal partition</span>
@@ -610,7 +616,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flayer</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">FourierCube</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
-<span class="n">flayer</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">))</span>
+<span class="n">flayer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -664,7 +670,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/78b4ead4dfd8acb3f7d658061b0f223b6067bb40170cc88c69ee24343a64f7bb.png" src="../_images/78b4ead4dfd8acb3f7d658061b0f223b6067bb40170cc88c69ee24343a64f7bb.png" />
+<img alt="../_images/4bd03cb7fcc6ef2efeccd0bdb31019062d8798f53a5aca01da955531dac28f8e.png" src="../_images/4bd03cb7fcc6ef2efeccd0bdb31019062d8798f53a5aca01da955531dac28f8e.png" />
 </div>
 </div>
 </section>
@@ -685,7 +691,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
         <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
         <span class="c1"># get the predicted model</span>
-        <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
 
         <span class="c1"># get the sky cube too</span>
         <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
@@ -715,7 +721,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dset</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="c1"># evaluate test score</span>
-    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 </pre></div>
@@ -790,13 +796,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 36.804441669976285
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 30.529687738188066
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/8ae5f746e5b76c9fc0e2d3192199215bd91cfa3ec8c3d019d11316230fc9a704.png" src="../_images/8ae5f746e5b76c9fc0e2d3192199215bd91cfa3ec8c3d019d11316230fc9a704.png" />
+<img alt="../_images/5e6f900ac91233c653d70f9f4f81bca549c128330c541f4bc526908d241f0828.png" src="../_images/5e6f900ac91233c653d70f9f4f81bca549c128330c541f4bc526908d241f0828.png" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -809,13 +815,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 14.431674550767076
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 11.518069968232778
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/db35dd886f5b0e32b38076037667336f9062cd0d725d47bcf6e7a0f7f8e70a9f.png" src="../_images/db35dd886f5b0e32b38076037667336f9062cd0d725d47bcf6e7a0f7f8e70a9f.png" />
+<img alt="../_images/85a60bf925894f8c5c4763331d9179f89d967c1427f8b6bd8318dee3f64200b4.png" src="../_images/85a60bf925894f8c5c4763331d9179f89d967c1427f8b6bd8318dee3f64200b4.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -828,13 +834,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.660814250108018
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.307271005693849
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/1de2d2ce3a56b75c3accd0912eab3885e205ef71b308c9d92b7900ffebc963ce.png" src="../_images/1de2d2ce3a56b75c3accd0912eab3885e205ef71b308c9d92b7900ffebc963ce.png" />
+<img alt="../_images/0a09ec5057a73353ad80144b7e1d74758f187d82b08f740d71ad02f2e8932b57.png" src="../_images/0a09ec5057a73353ad80144b7e1d74758f187d82b08f740d71ad02f2e8932b57.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>

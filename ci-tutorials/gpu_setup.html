@@ -144,7 +144,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -553,7 +553,7 @@ step our optimizer.</p>
     <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
     <span class="c1"># forward pass</span>
-    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
 
     <span class="c1"># get skycube from our forward model</span>
     <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>

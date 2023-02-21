@@ -141,7 +141,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../../ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -573,6 +573,7 @@ title="Source repository"
 <div class="viewcode-block" id="Dartboard"><a class="viewcode-back" href="../../api.html#mpol.datasets.Dartboard">[docs]</a><span class="k">class</span> <span class="nc">Dartboard</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
@@ -629,6 +630,7 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dartboard</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Alternative method to instantiate a Dartboard object from cell_size</span>
 <span class="sd">        and npix.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            cell_size (float): the width of a pixel [arcseconds]</span>
 <span class="sd">            npix (int): the number of pixels per image side</span>
@@ -644,9 +646,11 @@ title="Source repository"
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
 <span class="sd">        Data coordinates should include the points for the Hermitian visibilities.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`</span>
 <span class="sd">            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -665,9 +669,11 @@ title="Source repository"
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.</span>
 <span class="sd">        Data coordinates should include the points for the Hermitian visibilities.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`</span>
 <span class="sd">            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            list of cell indices where cell contains at least one datapoint.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -684,8 +690,10 @@ title="Source repository"
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.</span>
+
 <span class="sd">        Returns: (numpy array) 2D boolean mask in packed format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cartesian_qs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>

@@ -141,7 +141,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../../ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -289,57 +289,59 @@ title="Source repository"
                 
   <h1>Source code for mpol.crossval</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">floating</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-
+<span class="kn">from</span> <span class="nn">mpol.datasets</span> <span class="kn">import</span> <span class="n">Dartboard</span><span class="p">,</span> <span class="n">GriddedDataset</span>
 <span class="kn">from</span> <span class="nn">mpol.precomposed</span> <span class="kn">import</span> <span class="n">SimpleNet</span>
 <span class="kn">from</span> <span class="nn">mpol.training</span> <span class="kn">import</span> <span class="n">TrainTest</span>
-<span class="kn">from</span> <span class="nn">mpol.datasets</span> <span class="kn">import</span> <span class="n">Dartboard</span><span class="p">,</span> <span class="n">GriddedDataset</span>
+
 <span class="c1"># from mpol.plot import splitter_diagnostics_fig # TODO</span>
 
 
 <div class="viewcode-block" id="CrossValidate"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate">[docs]</a><span class="k">class</span> <span class="nc">CrossValidate</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utilities to run a cross-validation loop (implicitly running a training</span>
-<span class="sd">    optimization loop), in order to compare MPoL models with different </span>
+<span class="sd">    optimization loop), in order to compare MPoL models with different</span>
 <span class="sd">    hyperparameter values</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    coords : `mpol.coordinates.GridCoords` object</span>
 <span class="sd">        Instance of the `mpol.coordinates.GridCoords` class.</span>
-<span class="sd">    gridder : `mpol.gridding.Gridder` object</span>
-<span class="sd">        Instance of the `mpol.gridding.Gridder` class.</span>
+<span class="sd">    imager : `mpol.gridding.DirtyImager` object</span>
+<span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
 <span class="sd">    kfolds : int, default=5</span>
 <span class="sd">        Number of k-folds to use in cross-validation</span>
 <span class="sd">    split_method : str, default=&#39;random_cell&#39;</span>
 <span class="sd">        Method to split full dataset into train/test subsets</span>
-<span class="sd">    seed : int, default=None </span>
+<span class="sd">    seed : int, default=None</span>
 <span class="sd">        Seed for random number generator used in splitting data</span>
 <span class="sd">    learn_rate : float, default=0.5</span>
 <span class="sd">        Neural network learning rate</span>
 <span class="sd">    epochs : int, default=500</span>
 <span class="sd">        Number of training iterations</span>
 <span class="sd">    convergence_tol : float, default=1e-2</span>
-<span class="sd">        Tolerance for training iteration stopping criterion as assessed by </span>
+<span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
 <span class="sd">        loss function (suggested &lt;= 1e-2)</span>
 <span class="sd">    lambda_guess : list of str, default=None</span>
-<span class="sd">        List of regularizers for which to guess an initial value </span>
+<span class="sd">        List of regularizers for which to guess an initial value</span>
 <span class="sd">    lambda_guess_briggs : list of float, default=[0.0, 0.5]</span>
-<span class="sd">        Briggs robust values for two images used to guess initial regularizer </span>
+<span class="sd">        Briggs robust values for two images used to guess initial regularizer</span>
 <span class="sd">        values (if lambda_guess is not None)</span>
 <span class="sd">    lambda_entropy : float</span>
 <span class="sd">        Relative strength for entropy regularizer</span>
 <span class="sd">    entropy_prior_intensity : float, default=1e-10</span>
 <span class="sd">        Prior value :math:`p` to calculate entropy against (suggested &lt;&lt;1)</span>
-<span class="sd">    lambda_sparsity : float, default=None </span>
+<span class="sd">    lambda_sparsity : float, default=None</span>
 <span class="sd">        Relative strength for sparsity regularizer</span>
 <span class="sd">    lambda_TV : float, default=None</span>
 <span class="sd">        Relative strength for total variation (TV) regularizer</span>
@@ -348,7 +350,7 @@ title="Source repository"
 <span class="sd">    lambda_TSV : float, default=None</span>
 <span class="sd">        Relative strength for total squared variation (TSV) regularizer</span>
 <span class="sd">    train_diag_step : int, default=None</span>
-<span class="sd">        Interval at which training diagnostics are output. If None, no </span>
+<span class="sd">        Interval at which training diagnostics are output. If None, no</span>
 <span class="sd">        diagnostics will be generated.</span>
 <span class="sd">    split_diag_fig : bool, default=False</span>
 <span class="sd">        Whether to generate a diagnostic figure of dataset splitting into</span>
@@ -356,26 +358,42 @@ title="Source repository"
 <span class="sd">    store_cv_diagnostics : bool, default=False</span>
 <span class="sd">        Whether to store diagnostics of the cross-validation loop.</span>
 <span class="sd">    save_prefix : str, default=None</span>
-<span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be </span>
+<span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be</span>
 <span class="sd">        saved</span>
 <span class="sd">    device : torch.device, default=None</span>
 <span class="sd">        Which hardware device to perform operations on (e.g., &#39;cuda:0&#39;).</span>
-<span class="sd">        &#39;None&#39; defaults to current device. </span>
+<span class="sd">        &#39;None&#39; defaults to current device.</span>
 <span class="sd">    verbose : bool, default=True</span>
-<span class="sd">        Whether to print notification messages. </span>
+<span class="sd">        Whether to print notification messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">gridder</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="s1">&#39;random_cell&#39;</span><span class="p">,</span> 
-                <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> 
-                <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> 
-                <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> 
-                <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
-                <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">split_diag_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                <span class="n">store_cv_diagnostics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">,</span>
+        <span class="n">imager</span><span class="p">,</span>
+        <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">split_method</span><span class="o">=</span><span class="s2">&quot;random_cell&quot;</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">learn_rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+        <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+        <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">split_diag_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">store_cv_diagnostics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">coords</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span> <span class="o">=</span> <span class="n">gridder</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span> <span class="o">=</span> <span class="n">imager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">=</span> <span class="n">split_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">seed</span>
@@ -399,7 +417,7 @@ title="Source repository"
 
 <div class="viewcode-block" id="CrossValidate.split_dataset"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate.split_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">split_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Split a dataset into training and test subsets. </span>
+<span class="sd">        Split a dataset into training and test subsets.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -409,34 +427,35 @@ title="Source repository"
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        subsets : iterator returning tuple</span>
-<span class="sd">            Iterator that provides a (train, test) pair of </span>
+<span class="sd">            Iterator that provides a (train, test) pair of</span>
 <span class="sd">            :class:`~mpol.datasets.GriddedDataset` for each k-fold</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s1">&#39;random_cell&#39;</span><span class="p">:</span>
-            <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">RandomCellSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> 
-                                            <span class="n">kfolds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> 
-                                            <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s2">&quot;random_cell&quot;</span><span class="p">:</span>
+            <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">RandomCellSplitGridded</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
+            <span class="p">)</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s1">&#39;dartboard&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s2">&quot;dartboard&quot;</span><span class="p">:</span>
             <span class="c1"># create a radial and azimuthal partition for the dataset</span>
             <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">)</span>
 
             <span class="c1"># use &#39;dartboard&#39; to split full dataset into train/test subsets</span>
-            <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span>
-                                            <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span>
-                                            <span class="n">npseed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+            <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">DartboardSplitGridded</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
+            <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dartboard&#39;</span><span class="p">,</span> <span class="s1">&#39;random_cell&#39;</span><span class="p">]</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;split_method&#39; </span><span class="si">{}</span><span class="s2"> must be one of &quot;</span>
-                            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="p">))</span>
+            <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dartboard&quot;</span><span class="p">,</span> <span class="s2">&quot;random_cell&quot;</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;split_method&#39; </span><span class="si">{}</span><span class="s2"> must be one of &quot;</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">split_iterator</span></div>
 
-
 <div class="viewcode-block" id="CrossValidate.run_crossval"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate.run_crossval">[docs]</a>    <span class="k">def</span> <span class="nf">run_crossval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Run a cross-validation loop for a model obtained with a given set of </span>
+<span class="sd">        Run a cross-validation loop for a model obtained with a given set of</span>
 <span class="sd">        hyperparameters.</span>
 
 <span class="sd">        Parameters</span>
@@ -445,63 +464,67 @@ title="Source repository"
 <span class="sd">            Instance of the `mpol.datasets.GriddedDataset` class</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        cv_score : (float, float) </span>
-<span class="sd">            Tuple of (mean, standard deviation) of cross-validation scores </span>
+<span class="sd">        cv_score : (float, float)</span>
+<span class="sd">            Tuple of (mean, standard deviation) of cross-validation scores</span>
 <span class="sd">            across all k-folds</span>
 <span class="sd">        all_scores : list of float</span>
-<span class="sd">            Individual cross-validation scores for each k-fold </span>
-<span class="sd">        loss_histories : list of float </span>
+<span class="sd">            Individual cross-validation scores for each k-fold</span>
+<span class="sd">        loss_histories : list of float</span>
 <span class="sd">            Loss function values for each training loop</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">all_scores</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
         <span class="n">split_iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">split_iterator</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Cross-validation: k-fold </span><span class="si">{}</span><span class="s2"> of &quot;</span>
-                            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Cross-validation: k-fold </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="c1"># if hasattr(self._device,&#39;type&#39;) and self._device.type == &#39;cuda&#39;: # TODO: confirm which objects need to be passed to gpu</span>
             <span class="c1">#     train_set, test_set = train_set.to(self._device), test_set.to(self._device)</span>
-            
+
             <span class="c1"># create a new model and optimizer for this k_fold</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
             <span class="c1"># if hasattr(self._device,&#39;type&#39;) and self._device.type == &#39;cuda&#39;: # TODO: confirm which objects need to be passed to gpu</span>
             <span class="c1">#     model = model.to(self._device)</span>
 
             <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_learn_rate</span><span class="p">)</span>
 
-            <span class="n">trainer</span> <span class="o">=</span> <span class="n">TrainTest</span><span class="p">(</span><span class="n">gridder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="p">,</span> 
-                                <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span> 
-                                <span class="n">epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">,</span> 
-                                <span class="n">convergence_tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span><span class="p">,</span> 
-                                <span class="n">lambda_guess</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess</span><span class="p">,</span>
-                                <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">,</span> 
-                                <span class="n">lambda_entropy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_entropy</span><span class="p">,</span>
-                                <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_entropy_prior_intensity</span><span class="p">,</span>
-                                <span class="n">lambda_sparsity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_sparsity</span><span class="p">,</span>
-                                <span class="n">lambda_TV</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TV</span><span class="p">,</span> 
-                                <span class="n">TV_epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_TV_epsilon</span><span class="p">,</span>
-                                <span class="n">lambda_TSV</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TSV</span><span class="p">,</span>
-                                <span class="n">train_diag_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span><span class="p">,</span> 
-                                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+            <span class="n">trainer</span> <span class="o">=</span> <span class="n">TrainTest</span><span class="p">(</span>
+                <span class="n">imager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="p">,</span>
+                <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">,</span>
+                <span class="n">convergence_tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span><span class="p">,</span>
+                <span class="n">lambda_guess</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess</span><span class="p">,</span>
+                <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">,</span>
+                <span class="n">lambda_entropy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_entropy</span><span class="p">,</span>
+                <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_entropy_prior_intensity</span><span class="p">,</span>
+                <span class="n">lambda_sparsity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_sparsity</span><span class="p">,</span>
+                <span class="n">lambda_TV</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TV</span><span class="p">,</span>
+                <span class="n">TV_epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_TV_epsilon</span><span class="p">,</span>
+                <span class="n">lambda_TSV</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TSV</span><span class="p">,</span>
+                <span class="n">train_diag_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="n">loss</span><span class="p">,</span> <span class="n">loss_history</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_set</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span><span class="p">[</span><span class="s1">&#39;loss_histories&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss_history</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span><span class="p">[</span><span class="s2">&quot;loss_histories&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss_history</span><span class="p">)</span>
             <span class="n">all_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">))</span>
 
-        <span class="c1"># average individual test scores to get the cross-val metric for chosen </span>
+        <span class="c1"># average individual test scores to get the cross-val metric for chosen</span>
         <span class="c1"># hyperparameters</span>
-        <span class="n">cv_score</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span> 
-                    <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span> 
-                    <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="n">all_scores</span><span class="p">}</span>
+        <span class="n">cv_score</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span>
+            <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span>
+            <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="n">all_scores</span><span class="p">,</span>
+        <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">cv_score</span></div>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cv_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dict containing diagnostics of the cross-validation loop&quot;&quot;&quot;</span>
@@ -510,9 +533,9 @@ title="Source repository"
 
 <div class="viewcode-block" id="RandomCellSplitGridded"><a class="viewcode-back" href="../../api.html#mpol.crossval.RandomCellSplitGridded">[docs]</a><span class="k">class</span> <span class="nc">RandomCellSplitGridded</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Split a GriddedDataset into :math:`k` subsets. Inherit the properties of </span>
-<span class="sd">    the GriddedDataset. This object creates an iterator providing a </span>
-<span class="sd">    (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each </span>
+<span class="sd">    Split a GriddedDataset into :math:`k` subsets. Inherit the properties of</span>
+<span class="sd">    the GriddedDataset. This object creates an iterator providing a</span>
+<span class="sd">    (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each</span>
 <span class="sd">    k-fold.</span>
 
 <span class="sd">    Parameters</span>
@@ -521,10 +544,10 @@ title="Source repository"
 <span class="sd">        Instance of the `mpol.datasets.GriddedDataset` class</span>
 <span class="sd">    kfolds : int, default=5</span>
 <span class="sd">        Number of k-folds (partitions) of `dataset`</span>
-<span class="sd">    seed : int, default=None </span>
+<span class="sd">    seed : int, default=None</span>
 <span class="sd">        Seed for PyTorch random number generator used to shuffle data before</span>
 <span class="sd">        splitting</span>
-<span class="sd">    channel : int, default=0 </span>
+<span class="sd">    channel : int, default=0</span>
 <span class="sd">        Channel of the dataset to use in determining the splits</span>
 
 <span class="sd">    Once initialized, iterate through the datasets like:</span>
@@ -532,7 +555,7 @@ title="Source repository"
 <span class="sd">        &gt;&gt;&gt; for (train, test) in split_iterator: # iterate through `kfolds` datasets</span>
 <span class="sd">        &gt;&gt;&gt; ... # working with the n-th slice of `kfolds` datasets</span>
 <span class="sd">        &gt;&gt;&gt; ... # do operations with train dataset</span>
-<span class="sd">        &gt;&gt;&gt; ... # do operations with test dataset    </span>
+<span class="sd">        &gt;&gt;&gt; ... # do operations with test dataset</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -544,44 +567,57 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
 
-        <span class="c1"># get indices for cells in the top 1% of gridded weight </span>
+        <span class="c1"># get indices for cells in the top 1% of gridded weight</span>
         <span class="c1"># (we&#39;ll want all training sets to have these high SNR points)</span>
         <span class="n">nvis</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">)</span>
         <span class="n">nn</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nvis</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
         <span class="c1"># get the nn-th largest value in weight_indexed</span>
         <span class="n">w_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">,</span> <span class="o">-</span><span class="n">nn</span><span class="p">)[</span><span class="o">-</span><span class="n">nn</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">w_thresh</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">w_thresh</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
         <span class="c1"># mask these indices</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">top_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># use unmasked cells that also have data for splits</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">split_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_mask</span><span class="p">)</span>
-        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">split_mask</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_mask</span>
+        <span class="p">)</span>
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">split_mask</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
         <span class="c1"># shuffle indices to prevent radial/azimuthal patterns in splits</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> 
+            <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">shuffle</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">split_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[:,</span><span class="n">shuffle</span><span class="p">]</span> 
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[:,</span> <span class="n">shuffle</span><span class="p">]</span>
 
         <span class="c1"># split indices into k subsets</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">splits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor_split</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">splits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor_split</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># current k-slice</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="mi">0</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span><span class="p">:</span>
             <span class="n">test_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">]</span>
-            <span class="n">train_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(([</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">))</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="c1"># add the masked (high SNR) points to the current training set </span>
-            <span class="n">train_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">train_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
+            <span class="n">train_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">))</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">]),</span>
+                <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># add the masked (high SNR) points to the current training set</span>
+            <span class="n">train_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">train_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_nn</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-            <span class="n">train_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="n">test_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>            
+            <span class="n">train_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span>
+            <span class="p">)</span>
+            <span class="n">test_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span>
+            <span class="p">)</span>
             <span class="n">train_mask</span><span class="p">[</span><span class="n">train_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">test_mask</span><span class="p">[</span><span class="n">test_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">test_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -590,7 +626,7 @@ title="Source repository"
             <span class="n">test</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
             <span class="c1"># use the masks to limit new datasets to only unmasked cells</span>
-            <span class="n">train</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">train_mask</span><span class="p">)</span> 
+            <span class="n">train</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">train_mask</span><span class="p">)</span>
             <span class="n">test</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span class="n">test_mask</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">+=</span> <span class="mi">1</span>

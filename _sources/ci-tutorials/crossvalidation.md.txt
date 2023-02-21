@@ -71,18 +71,25 @@ data_im = np.imag(data)
 # define the image dimensions, making sure they are big enough to fit all
 # of the expected emission
 coords = coordinates.GridCoords(cell_size=0.03, npix=180)
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
 )
 
 # export to PyTorch dataset
-dset = gridder.to_pytorch_dataset()
+dset = averager.to_pytorch_dataset()
 ```
 
+Now, let's also make a diagnostic dirty image
+
 ```{code-cell}
+imager = gridding.DirtyImager(
+    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
+)
+
+
 # Show the dirty image
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
-kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0)
+kw = {"origin": "lower", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
 ax.imshow(np.squeeze(img), **kw)
 ax.set_title("image")
@@ -159,7 +166,7 @@ As you can see, this training set looks very similar to the full dataset, with t
 
 It turns out that the missing holes in the real dataset are quite important to image fidelity---if we had complete $u$,$v$ coverage, we wouldn't need to be worrying about CLEAN or RML imaging techniques in the first place! When we make a new interferometric observation, it will have it's own (different) set of missing holes depending on array configuration, observation duration, and hour angle coverage. We would like our cross validation slices to simulate the $u$,$v$ distribution of possible *new datasets*, and, at least for ALMA, random sampling doesn't probe this very well.
 
-Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a $K$-fold subselection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.
+Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a $K$-fold sub-selection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.
 
 ```{code-cell}
 # create a radial and azimuthal partition
@@ -177,7 +184,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)
-flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
+flayer(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
 The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities and the "test" visibilities which will be used to evaluate the predictive ability of the model.
@@ -233,7 +240,7 @@ def train(model, dset, config, optimizer, writer=None):
         model.zero_grad()
 
         # get the predicted model
-        vis = model.forward()
+        vis = model()
 
         # get the sky cube too
         sky_cube = model.icube.sky_cube
@@ -261,7 +268,7 @@ We also create a separate "test" function to evaluate the trained model against 
 def test(model, dset):
     model.train(False)
     # evaluate test score
-    vis = model.forward()
+    vis = model()
     loss = losses.nll_gridded(vis, dset)
     return loss.item()
 ```

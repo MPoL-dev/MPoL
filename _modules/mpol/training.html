@@ -141,7 +141,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../../ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -304,8 +304,8 @@ title="Source repository"
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gridder : `mpol.gridding.Gridder` object</span>
-<span class="sd">        Instance of the `mpol.gridding.Gridder` class.</span>
+<span class="sd">    imager : `mpol.gridding.DirtyImager` object</span>
+<span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
 <span class="sd">    optimizer : `torch.optim` object</span>
 <span class="sd">        PyTorch optimizer class for the training loop.</span>
 <span class="sd">    epochs : int, default=500</span>
@@ -340,25 +340,13 @@ title="Source repository"
 <span class="sd">        Whether to print notification messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">gridder</span><span class="p">,</span>
-        <span class="n">optimizer</span><span class="p">,</span>
-        <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
-        <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
-        <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
-        <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
-        <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span> <span class="o">=</span> <span class="n">gridder</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> 
+                <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> 
+                <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entropy_prior_intensity</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
+                <span class="n">lambda_sparsity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_TV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">TV_epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
+                <span class="n">lambda_TSV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span> <span class="o">=</span> <span class="n">imager</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">=</span> <span class="n">convergence_tol</span>
@@ -413,12 +401,10 @@ title="Source repository"
 <span class="sd">            Dictionary containing the names and initial guesses of regularizers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># generate images of the data using two briggs robust values</span>
-        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
-            <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
-            <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> 
+                                                <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> 
+                                                <span class="n">robust</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_guess_briggs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">img1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img1</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">img2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img2</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
@@ -556,7 +542,7 @@ title="Source repository"
 
             <span class="c1"># calculate model visibility cube (corresponding to current pixel</span>
             <span class="c1"># values of mpol.images.BaseCube)</span>
-            <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+            <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
 
             <span class="c1"># get predicted sky cube corresponding to model visibilities</span>
             <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
@@ -619,7 +605,7 @@ title="Source repository"
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
         <span class="c1"># calculate model visibility cube</span>
-        <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
 
         <span class="c1"># calculate loss used for a cross-validation score</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_eval</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>

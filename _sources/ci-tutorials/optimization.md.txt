@@ -18,12 +18,12 @@ kernelspec:
 %run notebook_setup
 ```
 
-# Intro to MPoL Optimization
+# Intro to RML with MPoL
 
 In this tutorial, we'll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We'll continue with the dataset described in the [Gridding and Diagnostic Images](gridder.md) tutorial.
 
 ## Gridding recap
-Let's set up the {class}`~mpol.gridding.Gridder` and {class}`~mpol.coordinates.GridCoords` objects as before
+Let's set up the {class}`~mpol.gridding.DataAverager` and {class}`~mpol.coordinates.GridCoords` objects as before
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
@@ -61,7 +61,7 @@ data_im = np.imag(data)
 ```{code-cell} ipython3
 # define the image dimensions, as in the previous tutorial
 coords = coordinates.GridCoords(cell_size=0.005, npix=800)
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -74,15 +74,15 @@ gridder = gridding.Gridder(
 ## The PyTorch dataset
 
 ```{margin} Cell-averaging
-The visibility averaging step performed by the gridder is a weighted average that is numerically equivalent to "uniform" weighting of the visibilities; this does not mean that MPoL or RML only produces images that have "uniform" weighting, however. The gridder also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL *forward-models* the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or [ungridded](loose-visibilities.md) visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.
+The visibility averaging step performed by the {class}`~mpol.gridding.DataAverager` is a weighted average that is numerically equivalent to "uniform" weighting of the visibilities; this does not mean that MPoL or RML only produces images that have "uniform" weighting, however. The {class}`~mpol.gridding.DataAverager` also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL *forward-models* the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or [ungridded](loose-visibilities.md) visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.
 ```
 
-Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The {meth}`mpol.gridding.Gridder.to_pytorch_dataset` routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the {meth}`~mpol.gridding.Gridder.to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.md).
+Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The {meth}`mpol.gridding.DataAverager.to_pytorch_dataset` routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the {meth}`~mpol.gridding.DataAverager.to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.md).
 
 In the following [tutorial on the NuFFT](loose-visibilities.md), we'll explore an alternate MPoL layer that avoids gridding the visibilities all together. This approach may be more accurate for certain applications, but is usually slower to execute than the gridding approach described in this tutorial. For that reason, we recommend starting with the default gridding approach and only moving to the NuFFT layers once you are reasonably happy with the images you are getting.
 
 ```{code-cell} ipython3
-dset = gridder.to_pytorch_dataset()
+dset = averager.to_pytorch_dataset()
 print("this dataset has {:} channel".format(dset.nchan))
 ```
 
@@ -114,7 +114,7 @@ Our goal for the rest of the tutorial is to set up a loop that will
 We'll start by creating the optimizer
 
 ```{code-cell} ipython3
-optimizer = torch.optim.SGD(rml.parameters(), lr=8000.0)
+optimizer = torch.optim.SGD(rml.parameters(), lr=3e4)
 ```
 
 The role of the optimizer is to advance the parameters (in this case, the pixel values of the {class}`mpol.images.BaseCube` using the gradient of the loss function with respect to those parameters. PyTorch has many different [optimizers](https://pytorch.org/docs/stable/optim.html#module-torch.optim) available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The `lr` parameter is the 'learning rate,' or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.
@@ -172,7 +172,7 @@ rml.zero_grad()
 Most modules in MPoL are designed to work in a "feed forward" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the {class}`mpol.images.BaseCube`.
 
 ```{code-cell} ipython3
-vis = rml.forward()
+vis = rml()
 print(vis)
 ```
 
@@ -251,7 +251,7 @@ for i in range(300):
     rml.zero_grad()
 
     # get the predicted model
-    vis = rml.forward()
+    vis = rml()
 
     # calculate a loss
     loss = losses.nll_gridded(vis, dset)
@@ -292,33 +292,35 @@ im = ax.imshow(
 )
 plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-plt.colorbar(im)
+plt.colorbar(im, label=r"Jy/$\mathrm{arcsec}^2$")
 ```
 
-And there you have it, an image optimized to fit the data. To be honest, the results aren't great---that's because we've used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the {class}`mpol.images.BaseCube` documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it's easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike "uniform"ly weighted images).
+And there you have it, an image optimized to fit the data. To be honest, the results aren't great---that's because we've used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the {class}`mpol.images.BaseCube` documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it's easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike CLEAN images made with "uniform" weighting) and there is high "noise" in the image.
 
 
-## Wrapup and visualizing the residuals
+## Visualizing the residuals
 
-We started this process with a collection of visibility data---the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and then used an optimizer to gradually evolve new models of the sky brightness until the loss function is minimized. At the end of this process, we were left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.
+We started this tutorial with a collection of visibility data---the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We then used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and evolved the model of the sky brightness until the loss function was minimized. At the end of this process, we are left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.
 
-It can be useful to visualize the residuals left at the end of this process, defined as
+It nearly always worthwhile to visualize the residuals, defined as
 
 $$
 \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 $$
 
-For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but we generally instantiate the NuFFT layer like
+For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but basically we instantiate the NuFFT layer relative to some image dimensions and $u,v$ locations 
 
 ```{code-cell} ipython3
-nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan, uu=uu, vv=vv, sparse_matrices=False)
+nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan, uu=uu, vv=vv)
 ```
 
-and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since this returns a Pytorch tensor, we'll need to detach it, convert it to numpy. We'll also remove the channel dimension.
+and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since {meth}`mpol.fourier.NuFFT.forward` returns a Pytorch tensor, we'll need to detach it and convert it to numpy. We'll also remove the channel dimension.
 
 ```{code-cell} ipython3
-# note this expects a "packed image cube"
-vis_model = np.squeeze(nufft(torch.as_tensor(img_cube)).detach().numpy())
+# note the NuFFT expects a "packed image cube," as output from ImageCube.forward()
+vis_model = nufft(rml.icube())
+# convert from Pytorch to numpy, remove channel dimension
+vis_model = np.squeeze(vis_model.detach().numpy())
 ```
 
 and then use these model visibilities to calculate residual visibilities
@@ -375,12 +377,17 @@ for a in ax.flatten():
 fig.subplots_adjust(wspace=0.3)
 ```
 
-If our model is good, we would expect it to fit the signal contained in the data, such that the residuals contain only noise. As far as this plot is concerned, it appears as though we have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, we should examine the calibration of the data (in particular, the calculation of the visibility weights).
+If our model is good, we would expect it to fit the signal contained in the data and the residuals contain only noise. As far as this plot is concerned, it appears as though we might have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, though, we should examine the calibration of the data (in particular, the calculation of the visibility weights).
 
-A more useful diagnostic is to image the residual visibilities. We can do that be treating them as a new "dataset" and using our dirty imaging capabilities. Here we'll choose a Briggs "robust" value of 0.0, but you are free to image the residual visibilities with whatever weighting makes sense for your science application.
+A more useful diagnostic is to image the residual visibilities. We can do that by treating them as a new "dataset" and using the diagnostic imaging capabilities of {class}`mpol.gridding.DirtyImager`. Here we'll choose a Briggs "robust" value of 0.0, but you are free to image the residual visibilities with whatever weighting makes sense for your science application. When doing this type of residual visualization, we recommend specifying the units of the dirty image using `unit="Jy/arcsec^2"`, which are the natural units of MPoL images.
+
+```{margin} Dirty Image Units
+As discussed in the [Diagnostic Images](gridder.md) tutorial, the intensity units of the dirty image are technically undefined. When we specify `unit="Jy/arcsec^2"` the {class}`~mpol.gridding.DirtyImager` tries to estimate the volume of the dirty beam and convert the dirty image into something with well-defined surface brightness units. This operation is inherently ill-defined, but it is still useful. For more details on the ill-defined units of the dirty image (i.e., "Jy/dirty beam"), see footnote 4 of Chapter 3.2 of Daniel Briggs' [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) or the discussion in [Czekala et al. 2021b](https://ui.adsabs.harvard.edu/abs/2021ApJS..257....2C/abstract).
+```
+
 
 ```{code-cell} ipython3
-gridder = gridding.Gridder(
+imager = gridding.DirtyImager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -389,7 +396,7 @@ gridder = gridding.Gridder(
     data_im=np.imag(vis_resid),
 )
 
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
+img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0, unit="Jy/arcsec^2")
 
 fig, ax = plt.subplots(nrows=1)
 im = ax.imshow(
@@ -400,15 +407,9 @@ im = ax.imshow(
 )
 plt.xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
 plt.ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
-plt.colorbar(im);
+plt.colorbar(im, label=r"Jy/$\mathrm{arcsec}^2$");
 ```
 
-We see that there is still some faint emission remaining in the shape of the ALMA logo. This suggests that our model is not yet a good representation to the signal in the data.
-
-In the following tutorials we'll examine how to set up additional regularizer terms that can yield more desireable image characteristics.
+We see that the residual image appears to be mostly noise, though with some low-frequency spatial structure to the image. This suggests that our model has done a reasonable job of capturing the *signal* in the data. But, there is still obvious room for improvement in regularizing some of the noiser features. In the following tutorials we'll examine how to set up additional regularizer terms that will yield more desireable image characteristics.
 
 Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a [GitHub discussion](https://github.com/MPoL-dev/MPoL/discussions). If you spot a bug or have an idea to improve these tutorials, please raise a [GitHub issue](https://github.com/MPoL-dev/MPoL/issues) or better yet submit a pull request.
-
-```{code-cell} ipython3
-
-```

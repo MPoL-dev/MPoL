@@ -72,7 +72,6 @@ print("Dataset has {:} visibilities".format(nvis))
 
 Therefore, understand that the following baseline and visibility scatter plots are showing about a third of a million points.
 
-
 Here, we'll plot the baselines corresponding to the first channel of the dataset by simply marking a point for every spatial frequency coordinate, $u$ and $v$, in the dataset
 
 ```{code-cell}
@@ -114,7 +113,7 @@ ax[3].set_xlabel(r"$q$ [k$\lambda$]");
 There are nearly a third of a million points in each figure, and each is quite noisy, so we can't learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA's [plotms](https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms) tool.
 
 
-## The {class}`mpol.coordinates.GridCoords` object
+## The {class}`~mpol.coordinates.GridCoords` object
 
 Now, lets familiarize ourselves with MPoL's {class}`mpol.coordinates.GridCoords` object.
 
@@ -128,7 +127,7 @@ Two numbers, `cell_size` and `npix`, uniquely define a grid in image space and i
 coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 ```
 
-The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the {py:class}`mpol.coordinates.GridCoords` API documentation. The information you'll most likely want to access are the image dimensions
+The {class}`mpol.coordinates.GridCoords` object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the {py:class}`mpol.coordinates.GridCoords` API documentation. The information you'll most likely want to access are the image dimensions
 
 ```{code-cell}
 coords.img_ext  # [arcsec]
@@ -138,12 +137,14 @@ which are meant to feed into the `extent` parameter of `matplotlib.pyplot.imshow
 
 +++
 
-## The {class}`mpol.gridding.Gridder` object
+## Making images with {class}`~mpol.gridding.DirtyImager`
 
-The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the {class}`~mpol.coordinates.GridCoords` object. We can instantiate a {class}`~mpol.gridding.Gridder` object by
+Those familiar with radio astronomy will be familiar with the idea of "gridding" loose visibilities to a Cartesian $u,v$ grid. MPoL has two classes that "grid" visibilities: {class}`mpol.gridding.DirtyImager` and {class}`mpol.gridding.DataAverager`. Their internals may be similar, but they serve different purposes. First, let's look at how we can use the {class}`mpol.gridding.DirtyImager` to make diagnostic images using the inverse Fast Fourier Transform, frequently called the "dirty image" by radio astronomers.
+
+We can instantiate a {class}`~mpol.gridding.DirtyImager` object by
 
 ```{code-cell}
-gridder = gridding.Gridder(
+imager = gridding.DirtyImager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -153,10 +154,10 @@ gridder = gridding.Gridder(
 )
 ```
 
-Instantiating the {class}`~mpol.gridding.Gridder` object attaches the {class}`~mpol.coordinates.GridCoords`  object and the loose visibilities. There is also a convenience method to create the {class}`~mpol.coordinates.GridCoords` and {class}`~mpol.gridding.Gridder` object in one shot by
+Instantiating the {class}`~mpol.gridding.DirtyImager` object attaches the {class}`~mpol.coordinates.GridCoords`  object and the loose visibilities. There is also a convenience method to create the {class}`~mpol.coordinates.GridCoords` and {class}`~mpol.gridding.DirtyImager` object in one shot by
 
 ```{code-cell}
-gridder = gridding.Gridder.from_image_properties(
+imager = gridding.DirtyImager.from_image_properties(
     cell_size=0.005,  # [arcsec]
     npix=800,
     uu=uu,
@@ -169,18 +170,14 @@ gridder = gridding.Gridder.from_image_properties(
 
 if you don't want to specify your {class}`~mpol.coordinates.GridCoords` object separately.
 
-+++
-
-## Making a diagnostic "dirty image" 
-
 As we saw, the raw visibility dataset is a set of complex-valued Fourier samples. Our objective is to make images of the sky-brightness distribution and do astrophysics. We'll cover how to do this with MPoL and RML techniques in later tutorials, but it is possible to get a rough idea of the sky brightness by calculating the inverse Fourier transform of the visibility values.
 
-To do this, you can call the {meth}`mpol.gridding.Gridder.get_dirty_image` method on your {class}`~mpol.gridding.Gridder` object. This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by {class}`~mpol.coordinates.GridCoords` and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.
+To do this, you can call the {meth}`mpol.gridding.DirtyImager.get_dirty_image` method on your {class}`~mpol.gridding.DirtyImager` object. This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by {class}`~mpol.coordinates.GridCoords` and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.
 
 There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements 'uniform', 'natural', and 'briggs' robust weighting. For more information on the difference between these schemes, see the [CASA documentation](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting) or Chapter 3 of Daniel Briggs' [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/).
 
 ```{code-cell}
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
+img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0)
 ```
 
 Note that these are three dimensional image cubes with the same `nchan` as the input visibility data.
@@ -198,7 +195,7 @@ N.B. that the intensity units of the dirty image are technically undefined. The 
 
 ```{code-cell}
 chan = 4
-kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
 ax[0].imshow(beam[chan], **kw)
 ax[0].set_title("beam")
@@ -212,21 +209,40 @@ fig.subplots_adjust(left=0.14, right=0.90, wspace=0.35, bottom=0.15, top=0.9)
 
 If you were working with this measurement set in CASA, it's a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by `tclean` with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.
 
-+++
+
+## Averaging and exporting data with {class}`~mpol.gridding.DataAverager`
+
+As we saw at the beginning of this tutorial, an ALMA dataset may easily contain 1/3 million or more individual visibility measurements, which can present a computational burden for some imaging routines. Just like many noisy data points can be "binned" into a set of fewer higher signal to noise points (for example, as with a lightcurve of a transiting exoplanet), so too can visibility data points be averaged down. 
+
+To do this, you can instantiate a {class}`~mpol.gridding.DataAverager` object and then call the {meth}`mpol.gridding.DataAverager.to_pytorch_dataset` method. This routine will average, or 'grid', the loose visibilities to the Fourier grid defined by {class}`~mpol.coordinates.GridCoords` and then export the dataset as a {class}`mpol.datasets.GriddedDataset` object.
+
+```{code-cell}
+averager = gridding.DataAverager(
+    coords=coords,
+    uu=uu,
+    vv=vv,
+    weight=weight,
+    data_re=data_re,
+    data_im=data_im,
+)
+
+dset = averager.to_pytorch_dataset()
+```
+
 
 ## Checking data weights
-When working with real data, it is possible that the statistical uncertainties---conveyed by the weights---were [not correctly calibrated by certain CASA versions](https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html). For dirty and CLEAN imaging purposes, it's OK if the weights are not correctly scaled so long as their *relative* scalings are correct (to each other). For forward-modeling and RML imaging, it's important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a ``RuntimeWarning`` if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid---hence why these routines issue a warning instead of an error.
+When working with real data, it is possible that the statistical uncertainties---conveyed by the weights---were [not correctly calibrated by certain CASA versions](https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html). For dirty and CLEAN imaging purposes, it's OK if the weights are not correctly scaled so long as their *relative* scalings are correct (to each other). For forward-modeling and RML imaging, it's important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the routines internal to {class}`~mpol.gridding.DirtyImager` will raise a ``RuntimeWarning`` if the weights are incorrectly scaled. Even though the weights are incorrect, the user image may still want the dirty image---hence why these routines issue a warning instead of an error.
 
 ```
-  img, beam = gridder.get_dirty_image(
+  img, beam = imager.get_dirty_image(
         weighting="uniform", check_visibility_scatter=True, max_scatter=1.2
   )
 ```
 
-However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging, incorrectly scaled weights will raise a ``RuntimeError``. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.
+However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging using {class}`~mpol.gridding.DataAverager`, incorrectly scaled weights will raise a ``RuntimeError``. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.
 
 The sensitivity of the export routines can be adjusted by changing the ``max_scatter`` keyword. Scatter checking can be disabled by setting ``check_visibility_scatter=False``, but is not recommended unless you are trying to debug things.
 
 ```
-  dset = gridder.to_pytorch_dataset(check_visibility_scatter=True, max_scatter=1.2)
+  dset = averager.to_pytorch_dataset(check_visibility_scatter=True, max_scatter=1.2)
 ```

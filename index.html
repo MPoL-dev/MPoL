@@ -143,7 +143,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -406,13 +406,13 @@ title="Print to PDF"
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#importing-data">Importing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#plotting-the-data">Plotting the data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#the-mpol-coordinates-gridcoords-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code> object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#the-mpol-gridding-gridder-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.Gridder</span></code> object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#making-a-diagnostic-dirty-image">Making a diagnostic “dirty image”</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#the-gridcoords-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code> object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#making-images-with-dirtyimager">Making images with <code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#averaging-and-exporting-data-with-dataaverager">Averaging and exporting data with <code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/gridder.html#checking-data-weights">Checking data weights</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Intro to MPoL Optimization</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/optimization.html">Intro to RML with MPoL</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#gridding-recap">Gridding recap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#the-pytorch-dataset">The PyTorch dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#building-an-image-model">Building an image model</a></li>
@@ -421,13 +421,13 @@ title="Print to PDF"
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#gradient-descent">Gradient descent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#iterating-the-training-loop">Iterating the training Loop</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#visualizing-the-image">Visualizing the image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#wrapup-and-visualizing-the-residuals">Wrapup and visualizing the residuals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/optimization.html#visualizing-the-residuals">Visualizing the residuals</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/loose-visibilities.html">Likelihood functions and model visibilities</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#mock-image">Mock image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#the-mpol-fourier-nufft-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code> object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#compared-to-the-gridder-object">Compared to the Gridder object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#compared-to-the-mpol-gridding-dataaverager-object">Compared to the <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code> object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#image-plane-forward-model">Image-plane forward model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#producing-model-visibilities">Producing model visibilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci-tutorials/loose-visibilities.html#evaluating-a-likelihood-function">Evaluating a likelihood function</a></li>
@@ -461,7 +461,7 @@ title="Print to PDF"
 <li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#viewing-the-clean-image">Viewing the CLEAN image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#plotting-the-baselines">Plotting the Baselines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#the-mpol-gridder-object">The MPoL Gridder Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#the-mpol-gridding-dirtyimager-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code> Object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="large-tutorials/HD143006_part_1.html#comparing-dirty-and-cleaned-images">Comparing Dirty and CLEANed Images</a></li>
 </ul>

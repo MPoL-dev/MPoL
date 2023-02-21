@@ -146,7 +146,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="ci-tutorials/optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -592,7 +592,7 @@ V_{u,v} = (\Delta l)(\Delta m) \mathtt{FFT}(I_{l,m})
 \[
 I_{l,m} = U V (\Delta u)(\Delta v) \mathtt{iFFT}({\cal V}_{u,v})
 \]</div>
-<p>For more information on this procedure as implmented in MPoL, see the <a class="reference internal" href="api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> class and the source code of its <a class="reference internal" href="api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_image()</span></code></a> method. When the grid of <span class="math notranslate nohighlight">\({\cal V}_{u,v}\)</span> values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> of Daniel Briggs.</p>
+<p>For more information on this procedure as implmented in MPoL, see the <code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code> class and the source code of its <code class="xref py py-func docutils literal notranslate"><span class="pre">get_dirty_image()</span></code> method. When the grid of <span class="math notranslate nohighlight">\({\cal V}_{u,v}\)</span> values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> of Daniel Briggs.</p>
 </section>
 <section id="image-cube-packing-for-ffts">
 <span id="cube-orientation-label"></span><h3>Image Cube Packing for FFTs<a class="headerlink" href="#image-cube-packing-for-ffts" title="Permalink to this headline">#</a></h3>

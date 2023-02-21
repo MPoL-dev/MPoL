@@ -43,7 +43,7 @@
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Intro to MPoL Optimization" href="optimization.html" />
+    <link rel="next" title="Intro to RML with MPoL" href="optimization.html" />
     <link rel="prev" title="Introduction to PyTorch: Tensors and Gradient Descent" href="PyTorch.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
@@ -146,7 +146,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="optimization.html">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -347,30 +347,34 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-coordinates-gridcoords-object">
+  <a class="reference internal nav-link" href="#the-gridcoords-object">
    The
    <code class="xref py py-class docutils literal notranslate">
     <span class="pre">
-     mpol.coordinates.GridCoords
+     GridCoords
     </span>
    </code>
    object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-gridding-gridder-object">
-   The
+  <a class="reference internal nav-link" href="#making-images-with-dirtyimager">
+   Making images with
    <code class="xref py py-class docutils literal notranslate">
     <span class="pre">
-     mpol.gridding.Gridder
+     DirtyImager
     </span>
    </code>
-   object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#making-a-diagnostic-dirty-image">
-   Making a diagnostic “dirty image”
+  <a class="reference internal nav-link" href="#averaging-and-exporting-data-with-dataaverager">
+   Averaging and exporting data with
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     DataAverager
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -408,30 +412,34 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-coordinates-gridcoords-object">
+  <a class="reference internal nav-link" href="#the-gridcoords-object">
    The
    <code class="xref py py-class docutils literal notranslate">
     <span class="pre">
-     mpol.coordinates.GridCoords
+     GridCoords
     </span>
    </code>
    object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-gridding-gridder-object">
-   The
+  <a class="reference internal nav-link" href="#making-images-with-dirtyimager">
+   Making images with
    <code class="xref py py-class docutils literal notranslate">
     <span class="pre">
-     mpol.gridding.Gridder
+     DirtyImager
     </span>
    </code>
-   object
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#making-a-diagnostic-dirty-image">
-   Making a diagnostic “dirty image”
+  <a class="reference internal nav-link" href="#averaging-and-exporting-data-with-dataaverager">
+   Averaging and exporting data with
+   <code class="xref py py-class docutils literal notranslate">
+    <span class="pre">
+     DataAverager
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -579,8 +587,8 @@ Dataset has 325080 visibilities
 </div>
 <p>There are nearly a third of a million points in each figure, and each is quite noisy, so we can’t learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms">plotms</a> tool.</p>
 </section>
-<section id="the-mpol-coordinates-gridcoords-object">
-<h2>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object<a class="headerlink" href="#the-mpol-coordinates-gridcoords-object" title="Permalink to this headline">#</a></h2>
+<section id="the-gridcoords-object">
+<h2>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object<a class="headerlink" href="#the-gridcoords-object" title="Permalink to this headline">#</a></h2>
 <p>Now, lets familiarize ourselves with MPoL’s <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -597,7 +605,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 </div>
-<p>The GridCoords object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
+<p>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span>  <span class="c1"># [arcsec]</span>
@@ -612,12 +620,13 @@ Dataset has 325080 visibilities
 </div>
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
 </section>
-<section id="the-mpol-gridding-gridder-object">
-<h2>The <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.Gridder</span></code></a> object<a class="headerlink" href="#the-mpol-gridding-gridder-object" title="Permalink to this headline">#</a></h2>
-<p>The purpose of the gridder is to take in loose visibility data (as from an ALMA observation) and average it to cells defined by the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object. We can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object by</p>
+<section id="making-images-with-dirtyimager">
+<h2>Making images with <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a><a class="headerlink" href="#making-images-with-dirtyimager" title="Permalink to this headline">#</a></h2>
+<p>Those familiar with radio astronomy will be familiar with the idea of “gridding” loose visibilities to a Cartesian <span class="math notranslate nohighlight">\(u,v\)</span> grid. MPoL has two classes that “grid” visibilities: <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code></a>. Their internals may be similar, but they serve different purposes. First, let’s look at how we can use the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> to make diagnostic images using the inverse Fast Fourier Transform, frequently called the “dirty image” by radio astronomers.</p>
+<p>We can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object by</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
     <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
@@ -629,10 +638,10 @@ Dataset has 325080 visibilities
 </div>
 </div>
 </div>
-<p>Instantiating the <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object attaches the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>  object and the loose visibilities. There is also a convenience method to create the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object in one shot by</p>
+<p>Instantiating the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object attaches the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>  object and the loose visibilities. There is also a convenience method to create the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object in one shot by</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="o">.</span><span class="n">from_image_properties</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="o">.</span><span class="n">from_image_properties</span><span class="p">(</span>
     <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>  <span class="c1"># [arcsec]</span>
     <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
@@ -646,15 +655,12 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <p>if you don’t want to specify your <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object separately.</p>
-</section>
-<section id="making-a-diagnostic-dirty-image">
-<h2>Making a diagnostic “dirty image”<a class="headerlink" href="#making-a-diagnostic-dirty-image" title="Permalink to this headline">#</a></h2>
 <p>As we saw, the raw visibility dataset is a set of complex-valued Fourier samples. Our objective is to make images of the sky-brightness distribution and do astrophysics. We’ll cover how to do this with MPoL and RML techniques in later tutorials, but it is possible to get a rough idea of the sky brightness by calculating the inverse Fourier transform of the visibility values.</p>
-<p>To do this, you can call the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.get_dirty_image" title="mpol.gridding.Gridder.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.Gridder.get_dirty_image()</span></code></a> method on your <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> object. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.</p>
+<p>To do this, you can call the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager.get_dirty_image" title="mpol.gridding.DirtyImager.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager.get_dirty_image()</span></code></a> method on your <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.</p>
 <p>There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -682,7 +688,7 @@ Dataset has 325080 visibilities
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chan</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">gridder</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="n">imager</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span><span class="p">}</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">beam</span><span class="p">[</span><span class="n">chan</span><span class="p">],</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;beam&quot;</span><span class="p">)</span>
@@ -701,17 +707,38 @@ Dataset has 325080 visibilities
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.</p>
 </section>
+<section id="averaging-and-exporting-data-with-dataaverager">
+<h2>Averaging and exporting data with <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a><a class="headerlink" href="#averaging-and-exporting-data-with-dataaverager" title="Permalink to this headline">#</a></h2>
+<p>As we saw at the beginning of this tutorial, an ALMA dataset may easily contain 1/3 million or more individual visibility measurements, which can present a computational burden for some imaging routines. Just like many noisy data points can be “binned” into a set of fewer higher signal to noise points (for example, as with a lightcurve of a transiting exoplanet), so too can visibility data points be averaged down.</p>
+<p>To do this, you can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> object and then call the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a> method. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then export the dataset as a <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">averager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DataAverager</span><span class="p">(</span>
+    <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
+    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
+    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+    <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span>
+    <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="checking-data-weights">
 <h2>Checking data weights<a class="headerlink" href="#checking-data-weights" title="Permalink to this headline">#</a></h2>
-<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the dirty imaging routines will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the dirty image may still be valid—hence why these routines issue a warning instead of an error.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
+<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the routines internal to <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the user image may still want the dirty image—hence why these routines issue a warning instead of an error.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
         <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span>
   <span class="p">)</span>
 </pre></div>
 </div>
-<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging, incorrectly scaled weights will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
+<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging using <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a>, incorrectly scaled weights will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
 <p>The sensitivity of the export routines can be adjusted by changing the <code class="docutils literal notranslate"><span class="pre">max_scatter</span></code> keyword. Scatter checking can be disabled by setting <code class="docutils literal notranslate"><span class="pre">check_visibility_scatter=False</span></code>, but is not recommended unless you are trying to debug things.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">dset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">(</span><span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">(</span><span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -735,7 +762,7 @@ Dataset has 325080 visibilities
     <a class='right-next' id="next-link" href="optimization.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Intro to MPoL Optimization</p>
+        <p class="prev-next-title">Intro to RML with MPoL</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

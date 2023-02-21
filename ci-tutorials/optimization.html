@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Intro to MPoL Optimization &#8212; MPoL 0.1.13 documentation</title>
+    <title>Intro to RML with MPoL &#8212; MPoL 0.1.13 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -146,7 +146,7 @@
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Intro to MPoL Optimization
+   Intro to RML with MPoL
   </a>
  </li>
  <li class="toctree-l1">
@@ -377,8 +377,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#wrapup-and-visualizing-the-residuals">
-   Wrapup and visualizing the residuals
+  <a class="reference internal nav-link" href="#visualizing-the-residuals">
+   Visualizing the residuals
   </a>
  </li>
 </ul>
@@ -390,7 +390,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Intro to MPoL Optimization</h1>
+                <h1>Intro to RML with MPoL</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -441,8 +441,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#wrapup-and-visualizing-the-residuals">
-   Wrapup and visualizing the residuals
+  <a class="reference internal nav-link" href="#visualizing-the-residuals">
+   Visualizing the residuals
   </a>
  </li>
 </ul>
@@ -468,12 +468,12 @@ title="Print to PDF"
 </div>
 </details>
 </div>
-<section class="tex2jax_ignore mathjax_ignore" id="intro-to-mpol-optimization">
-<h1>Intro to MPoL Optimization<a class="headerlink" href="#intro-to-mpol-optimization" title="Permalink to this headline">#</a></h1>
+<section class="tex2jax_ignore mathjax_ignore" id="intro-to-rml-with-mpol">
+<h1>Intro to RML with MPoL<a class="headerlink" href="#intro-to-rml-with-mpol" title="Permalink to this headline">#</a></h1>
 <p>In this tutorial, we’ll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We’ll continue with the dataset described in the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Gridding and Diagnostic Images</span></a> tutorial.</p>
 <section id="gridding-recap">
 <h2>Gridding recap<a class="headerlink" href="#gridding-recap" title="Permalink to this headline">#</a></h2>
-<p>Let’s set up the <a class="reference internal" href="../api.html#mpol.gridding.Gridder" title="mpol.gridding.Gridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridder</span></code></a> and <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> objects as before</p>
+<p>Let’s set up the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> and <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> objects as before</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -520,7 +520,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the image dimensions, as in the previous tutorial</span>
 <span class="n">coords</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-<span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<span class="n">averager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DataAverager</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
     <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
@@ -537,13 +537,13 @@ title="Print to PDF"
 <h2>The PyTorch dataset<a class="headerlink" href="#the-pytorch-dataset" title="Permalink to this headline">#</a></h2>
 <aside class="margin sidebar">
 <p class="sidebar-title">Cell-averaging</p>
-<p>The visibility averaging step performed by the gridder is a weighted average that is numerically equivalent to “uniform” weighting of the visibilities; this does not mean that MPoL or RML only produces images that have “uniform” weighting, however. The gridder also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL <em>forward-models</em> the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">ungridded</span></a> visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.</p>
+<p>The visibility averaging step performed by the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> is a weighted average that is numerically equivalent to “uniform” weighting of the visibilities; this does not mean that MPoL or RML only produces images that have “uniform” weighting, however. The <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL <em>forward-models</em> the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">ungridded</span></a> visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.</p>
 </aside>
-<p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <a class="reference internal" href="../api.html#mpol.gridding.Gridder.to_pytorch_dataset" title="mpol.gridding.Gridder.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.Gridder.to_pytorch_dataset()</span></code></a> routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the <a class="reference internal" href="../api.html#mpol.gridding.Gridder.to_pytorch_dataset" title="mpol.gridding.Gridder.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_pytorch_dataset()</span></code></a> routine automatically checks the visibility scatter and raises a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Gridding and Diagnostic Images Tutorial</span></a>.</p>
+<p>Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The <a class="reference internal" href="../api.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a> routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_pytorch_dataset()</span></code></a> routine automatically checks the visibility scatter and raises a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Gridding and Diagnostic Images Tutorial</span></a>.</p>
 <p>In the following <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">tutorial on the NuFFT</span></a>, we’ll explore an alternate MPoL layer that avoids gridding the visibilities all together. This approach may be more accurate for certain applications, but is usually slower to execute than the gridding approach described in this tutorial. For that reason, we recommend starting with the default gridding approach and only moving to the NuFFT layers once you are reasonably happy with the images you are getting.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this dataset has </span><span class="si">{:}</span><span class="s2"> channel&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -590,7 +590,7 @@ title="Print to PDF"
 <p>We’ll start by creating the optimizer</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">8000.0</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -669,7 +669,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f67365b4f40&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4c4527c040&gt;
 </pre></div>
 </div>
 <img alt="../_images/9d3b6621118d99039280fa01c0abaa6d67a99794ae82adaa59298c3ec88e0fda.png" src="../_images/9d3b6621118d99039280fa01c0abaa6d67a99794ae82adaa59298c3ec88e0fda.png" />
@@ -687,7 +687,7 @@ title="Print to PDF"
 <p>Most modules in MPoL are designed to work in a “feed forward” manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">vis</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -700,10 +700,10 @@ title="Print to PDF"
          [ 7.1800e-03+2.8196e-05j,  4.4902e-06+3.5266e-08j,
           -4.4899e-06-5.2898e-08j,  ...,
            4.4899e-06-3.5264e-08j, -4.4902e-06+1.7633e-08j,
-           4.4903e-06+4.9217e-19j],
+           4.4903e-06-3.8083e-22j],
          [-7.1797e-03-5.6390e-05j, -4.4899e-06-5.2898e-08j,
            4.4895e-06+7.0527e-08j,  ...,
-          -4.4899e-06+1.7632e-08j,  4.4901e-06-6.4302e-19j,
+          -4.4899e-06+1.7632e-08j,  4.4901e-06+1.1980e-21j,
           -4.4902e-06-1.7633e-08j],
          ...,
          [ 7.1791e-03-8.4581e-05j,  4.4899e-06-3.5264e-08j,
@@ -711,10 +711,10 @@ title="Print to PDF"
            4.4885e-06-1.0578e-07j, -4.4891e-06+8.8154e-08j,
            4.4895e-06-7.0526e-08j],
          [-7.1797e-03+5.6390e-05j, -4.4902e-06+1.7633e-08j,
-           4.4901e-06+6.4011e-19j,  ...,
+           4.4901e-06-1.6480e-21j,  ...,
           -4.4891e-06+8.8154e-08j,  4.4895e-06-7.0527e-08j,
           -4.4899e-06+5.2898e-08j],
-         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-4.9292e-19j,
+         [ 7.1800e-03-2.8196e-05j,  4.4903e-06-1.4745e-21j,
           -4.4902e-06-1.7633e-08j,  ...,
            4.4895e-06-7.0526e-08j, -4.4899e-06+5.2898e-08j,
            4.4902e-06-3.5266e-08j]]], dtype=torch.complex128,
@@ -734,7 +734,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3.124348303800103
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.5873771357650925
 </pre></div>
 </div>
 </div>
@@ -766,10 +766,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f67348919d0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4c4504d970&gt;
 </pre></div>
 </div>
-<img alt="../_images/0829225d113470ecd417b388bd2ca8c9b17e12b907ccd6ab783f87fc98a2116c.png" src="../_images/0829225d113470ecd417b388bd2ca8c9b17e12b907ccd6ab783f87fc98a2116c.png" />
+<img alt="../_images/4f580be09d809cb329e09ae6cf8eb9bb6e2ece862424d676fd78fd0483e35cb0.png" src="../_images/4f580be09d809cb329e09ae6cf8eb9bb6e2ece862424d676fd78fd0483e35cb0.png" />
 </div>
 </div>
 <p>The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient</p>
@@ -789,13 +789,13 @@ title="Print to PDF"
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OrderedDict([(&#39;bcube.base_cube&#39;,
-              tensor([[[0.1532, 0.1587, 0.1637,  ..., 0.1354, 0.1414, 0.1474],
-                       [0.1436, 0.1491, 0.1541,  ..., 0.1257, 0.1318, 0.1378],
-                       [0.1340, 0.1395, 0.1445,  ..., 0.1161, 0.1222, 0.1282],
+              tensor([[[0.3193, 0.3336, 0.3468,  ..., 0.2729, 0.2887, 0.3042],
+                       [0.2943, 0.3086, 0.3217,  ..., 0.2477, 0.2635, 0.2791],
+                       [0.2693, 0.2836, 0.2967,  ..., 0.2226, 0.2385, 0.2541],
                        ...,
-                       [0.1818, 0.1872, 0.1922,  ..., 0.1643, 0.1703, 0.1761],
-                       [0.1723, 0.1778, 0.1828,  ..., 0.1548, 0.1607, 0.1666],
-                       [0.1628, 0.1683, 0.1733,  ..., 0.1451, 0.1511, 0.1570]]],
+                       [0.3939, 0.4080, 0.4212,  ..., 0.3484, 0.3639, 0.3791],
+                       [0.3693, 0.3835, 0.3967,  ..., 0.3235, 0.3390, 0.3544],
+                       [0.3444, 0.3587, 0.3718,  ..., 0.2982, 0.3139, 0.3294]]],
                      dtype=torch.float64)),
              (&#39;conv_layer.m.weight&#39;,
               tensor([[[[0.0625, 0.1250, 0.0625],
@@ -823,10 +823,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f673477eac0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4c44f38850&gt;
 </pre></div>
 </div>
-<img alt="../_images/9f1abb602d2e3725f5258c187e2070d99ab706916d97c07ddddf421593164aba.png" src="../_images/9f1abb602d2e3725f5258c187e2070d99ab706916d97c07ddddf421593164aba.png" />
+<img alt="../_images/d345c50a0c1a34999b1567681caca60b326f6f1a87cffc9ba47b4e358e59a226.png" src="../_images/d345c50a0c1a34999b1567681caca60b326f6f1a87cffc9ba47b4e358e59a226.png" />
 </div>
 </div>
 </section>
@@ -844,7 +844,7 @@ title="Print to PDF"
     <span class="n">rml</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
     <span class="c1"># get the predicted model</span>
-    <span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">rml</span><span class="p">()</span>
 
     <span class="c1"># calculate a loss</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">losses</span><span class="o">.</span><span class="n">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
@@ -860,8 +860,8 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 21.8 s, sys: 4.71 s, total: 26.6 s
-Wall time: 15.4 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 31.5 s, sys: 8.49 s, total: 40 s
+Wall time: 24.4 s
 </pre></div>
 </div>
 </div>
@@ -879,7 +879,7 @@ Wall time: 15.4 s
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;loss&#39;)
 </pre></div>
 </div>
-<img alt="../_images/2ff2c9b56a196d1ecdf83919de18b519d73d704626fcae539dae379e0308480d.png" src="../_images/2ff2c9b56a196d1ecdf83919de18b519d73d704626fcae539dae379e0308480d.png" />
+<img alt="../_images/60b27a614760b29fef73c3a03c61910d73277b0bdede2e96781ba4fc369dba33.png" src="../_images/60b27a614760b29fef73c3a03c61910d73277b0bdede2e96781ba4fc369dba33.png" />
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
@@ -901,40 +901,42 @@ Wall time: 15.4 s
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Jy/$\mathrm</span><span class="si">{arcsec}</span><span class="s2">^2$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f673465d790&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4c44da4310&gt;
 </pre></div>
 </div>
-<img alt="../_images/8cd79b998f8f6f24e37b1953ef06c99ff0e9e8516d5d623fe74bba775445a14a.png" src="../_images/8cd79b998f8f6f24e37b1953ef06c99ff0e9e8516d5d623fe74bba775445a14a.png" />
+<img alt="../_images/efd4687554d2c5ebc577abded9882d18b035ad82c678e84c013f5719d06b5e4c.png" src="../_images/efd4687554d2c5ebc577abded9882d18b035ad82c678e84c013f5719d06b5e4c.png" />
 </div>
 </div>
-<p>And there you have it, an image optimized to fit the data. To be honest, the results aren’t great—that’s because we’ve used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it’s easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike “uniform”ly weighted images).</p>
+<p>And there you have it, an image optimized to fit the data. To be honest, the results aren’t great—that’s because we’ve used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it’s easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike CLEAN images made with “uniform” weighting) and there is high “noise” in the image.</p>
 </section>
-<section id="wrapup-and-visualizing-the-residuals">
-<h2>Wrapup and visualizing the residuals<a class="headerlink" href="#wrapup-and-visualizing-the-residuals" title="Permalink to this headline">#</a></h2>
-<p>We started this process with a collection of visibility data—the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and then used an optimizer to gradually evolve new models of the sky brightness until the loss function is minimized. At the end of this process, we were left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.</p>
-<p>It can be useful to visualize the residuals left at the end of this process, defined as</p>
+<section id="visualizing-the-residuals">
+<h2>Visualizing the residuals<a class="headerlink" href="#visualizing-the-residuals" title="Permalink to this headline">#</a></h2>
+<p>We started this tutorial with a collection of visibility data—the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We then used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and evolved the model of the sky brightness until the loss function was minimized. At the end of this process, we are left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.</p>
+<p>It nearly always worthwhile to visualize the residuals, defined as</p>
 <div class="math notranslate nohighlight">
 \[
 \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 \]</div>
-<p>For speed reasons, the <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.precomposed.SimpleNet</span></code></a> does not work with the original data visibilities directly, but instead uses an averaged version of them. To calculate model visibilities corresponding to the original <span class="math notranslate nohighlight">\(u,v\)</span> points of the dataset, we will need to use the <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> layer. More detail on this object is in the <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">Loose Visibilities tutorial</span></a>, but we generally instantiate the NuFFT layer like</p>
+<p>For speed reasons, the <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.precomposed.SimpleNet</span></code></a> does not work with the original data visibilities directly, but instead uses an averaged version of them in <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. To calculate model visibilities corresponding to the original <span class="math notranslate nohighlight">\(u,v\)</span> points of the dataset, we will need to use the <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> layer. More detail on this object is in the <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">Loose Visibilities tutorial</span></a>, but basically we instantiate the NuFFT layer relative to some image dimensions and <span class="math notranslate nohighlight">\(u,v\)</span> locations</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since this returns a Pytorch tensor, we’ll need to detach it, convert it to numpy. We’ll also remove the channel dimension.</p>
+<p>and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since <a class="reference internal" href="../api.html#mpol.fourier.NuFFT.forward" title="mpol.fourier.NuFFT.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT.forward()</span></code></a> returns a Pytorch tensor, we’ll need to detach it and convert it to numpy. We’ll also remove the channel dimension.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note this expects a &quot;packed image cube&quot;</span>
-<span class="n">vis_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">nufft</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">img_cube</span><span class="p">))</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note the NuFFT expects a &quot;packed image cube,&quot; as output from ImageCube.forward()</span>
+<span class="n">vis_model</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">icube</span><span class="p">())</span>
+<span class="c1"># convert from Pytorch to numpy, remove channel dimension</span>
+<span class="n">vis_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">vis_model</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -997,14 +999,18 @@ Wall time: 15.4 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/5f616c0cd637951ea7d020a55a433a386020273cff7526adda5bca66d1f5d97e.png" src="../_images/5f616c0cd637951ea7d020a55a433a386020273cff7526adda5bca66d1f5d97e.png" />
+<img alt="../_images/a07bf1a61d1342e0041ba439d25ab87191c37e953756a099588717c68fd134d6.png" src="../_images/a07bf1a61d1342e0041ba439d25ab87191c37e953756a099588717c68fd134d6.png" />
 </div>
 </div>
-<p>If our model is good, we would expect it to fit the signal contained in the data, such that the residuals contain only noise. As far as this plot is concerned, it appears as though we have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, we should examine the calibration of the data (in particular, the calculation of the visibility weights).</p>
-<p>A more useful diagnostic is to image the residual visibilities. We can do that be treating them as a new “dataset” and using our dirty imaging capabilities. Here we’ll choose a Briggs “robust” value of 0.0, but you are free to image the residual visibilities with whatever weighting makes sense for your science application.</p>
+<p>If our model is good, we would expect it to fit the signal contained in the data and the residuals contain only noise. As far as this plot is concerned, it appears as though we might have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, though, we should examine the calibration of the data (in particular, the calculation of the visibility weights).</p>
+<p>A more useful diagnostic is to image the residual visibilities. We can do that by treating them as a new “dataset” and using the diagnostic imaging capabilities of <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a>. Here we’ll choose a Briggs “robust” value of 0.0, but you are free to image the residual visibilities with whatever weighting makes sense for your science application. When doing this type of residual visualization, we recommend specifying the units of the dirty image using <code class="docutils literal notranslate"><span class="pre">unit=&quot;Jy/arcsec^2&quot;</span></code>, which are the natural units of MPoL images.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title">Dirty Image Units</p>
+<p>As discussed in the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Diagnostic Images</span></a> tutorial, the intensity units of the dirty image are technically undefined. When we specify <code class="docutils literal notranslate"><span class="pre">unit=&quot;Jy/arcsec^2&quot;</span></code> the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> tries to estimate the volume of the dirty beam and convert the dirty image into something with well-defined surface brightness units. This operation is inherently ill-defined, but it is still useful. For more details on the ill-defined units of the dirty image (i.e., “Jy/dirty beam”), see footnote 4 of Chapter 3.2 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a> or the discussion in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2021ApJS..257....2C/abstract">Czekala et al. 2021b</a>.</p>
+</aside>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gridder</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">Gridder</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="p">(</span>
     <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
     <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
@@ -1013,7 +1019,7 @@ Wall time: 15.4 s
     <span class="n">data_im</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">vis_resid</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">gridder</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
@@ -1024,16 +1030,15 @@ Wall time: 15.4 s
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \alpha \cos \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta \delta$ [$</span><span class="si">{}</span><span class="s2">^{\prime\prime}$]&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Jy/$\mathrm</span><span class="si">{arcsec}</span><span class="s2">^2$&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ae3be006ec5d860bcdb9f6427dec816dfb3a5760e3569dfe40395d53688bb72f.png" src="../_images/ae3be006ec5d860bcdb9f6427dec816dfb3a5760e3569dfe40395d53688bb72f.png" />
+<img alt="../_images/25b4c2985837b04c6ef1447bdd190ffe310d87cb202a576f8cc5ecd46a9eb9b7.png" src="../_images/25b4c2985837b04c6ef1447bdd190ffe310d87cb202a576f8cc5ecd46a9eb9b7.png" />
 </div>
 </div>
-<p>We see that there is still some faint emission remaining in the shape of the ALMA logo. This suggests that our model is not yet a good representation to the signal in the data.</p>
-<p>In the following tutorials we’ll examine how to set up additional regularizer terms that can yield more desireable image characteristics.</p>
+<p>We see that the residual image appears to be mostly noise, though with some low-frequency spatial structure to the image. This suggests that our model has done a reasonable job of capturing the <em>signal</em> in the data. But, there is still obvious room for improvement in regularizing some of the noiser features. In the following tutorials we’ll examine how to set up additional regularizer terms that will yield more desireable image characteristics.</p>
 <p>Hopefully this tutorial has demonstrated the core concepts of synthesizing an image with MPoL. If you have any questions about the process, please feel free to reach out and start a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/discussions">GitHub discussion</a>. If you spot a bug or have an idea to improve these tutorials, please raise a <a class="reference external" href="https://github.com/MPoL-dev/MPoL/issues">GitHub issue</a> or better yet submit a pull request.</p>
 </section>
 </section>
