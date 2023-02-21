@@ -162,7 +162,7 @@ icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.
 
 ```{code-cell}
-vis_model_loose = nufft.forward(icube.forward())
+vis_model_loose = nufft(icube())
 print("Loose model visibilities from the NuFFT have shape {:}".format(vis_model_loose.shape))
 print("The original loose data visibilities have shape {:}".format(data.shape))
 ```
@@ -170,7 +170,7 @@ print("The original loose data visibilities have shape {:}".format(data.shape))
 By comparison, the {class}`~mpol.gridding.Gridder` object puts the visibilities onto a grid and exports a {class}`~mpol.datasets.GriddedDataset` object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the {class}`~mpol.fourier.FourierCube` layer
 
 ```{code-cell}
-vis_model_gridded = flayer.forward(icube.forward())
+vis_model_gridded = flayer(icube())
 print("Gridded model visibilities from FourierCube have shape {:}".format(vis_model_gridded.shape))
 print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded.shape))
 ```

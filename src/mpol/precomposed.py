@@ -63,8 +63,8 @@ class SimpleNet(torch.nn.Module):
 
         Returns: 1D complex torch tensor of model visibilities.
         """
-        x = self.bcube.forward()
+        x = self.bcube()
         x = self.conv_layer(x)
-        x = self.icube.forward(x)
-        vis = self.fcube.forward(x)
+        x = self.icube(x)
+        vis = self.fcube(x)
         return vis

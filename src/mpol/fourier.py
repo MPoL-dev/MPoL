@@ -437,7 +437,7 @@ def make_fake_data(imageCube, uu, vv, weight):
         weight = np.atleast_2d(weight)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
-    vis_noiseless = nufft.forward(imageCube.forward()).detach().numpy()
+    vis_noiseless = nufft(imageCube()).detach().numpy()
 
     # generate complex noise
     sigma = 1 / np.sqrt(weight)

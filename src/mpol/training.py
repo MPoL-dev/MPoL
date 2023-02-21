@@ -252,7 +252,7 @@ class TrainTest:
 
             # calculate model visibility cube (corresponding to current pixel
             # values of mpol.images.BaseCube)
-            vis = model.forward()
+            vis = model()
 
             # get predicted sky cube corresponding to model visibilities
             sky_cube = model.icube.sky_cube
@@ -315,7 +315,7 @@ class TrainTest:
         model.eval()
 
         # calculate model visibility cube
-        vis = model.forward()
+        vis = model()
 
         # calculate loss used for a cross-validation score
         loss = self.loss_eval(vis, dataset)

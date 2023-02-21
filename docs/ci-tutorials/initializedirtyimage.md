@@ -135,7 +135,7 @@ for iteration in range(50):
 
     optimizer.zero_grad()
 
-    rml.forward()
+    rml()
 
     sky_cube = rml.icube.sky_cube
 
