@@ -1,7 +1,7 @@
 import numpy as np 
 
 from mpol.fourier import NuFFT
-from mpol.geometry import deproject_vis, observer_to_flat
+from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
@@ -28,7 +28,12 @@ def get_1d_vis_fit(model, u, v, chan=0):
         Baselines corresponding to `u` and `v`
     Vmod : array, unit=[Jy] 
         Visibility amplitudes at `q`
+
+    Notes
+    -----
+    This routine requires the `frank <https://github.com/discsim/frank>`_ package 
     """
+    from mpol.geometry import deproject_vis
     # deproject_vis(u, v, V, weights, source_geom, inverse, rescale_flux) # TODO
 
     q = np.hypot(u, v)
