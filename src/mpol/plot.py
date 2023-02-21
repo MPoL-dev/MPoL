@@ -231,7 +231,7 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.kfolds, ncols=2, figsize=(4, 10))
+    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(4, 10))
 
     for ii, (train, test) in enumerate(splitter): 
         train_mask = torch2npy(train.ground_mask[channel])

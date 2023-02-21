@@ -142,7 +142,7 @@ class CrossValidate:
         """
         if self._split_method == "random_cell":
             split_iterator = RandomCellSplitGridded(
-                dataset=dataset, kfolds=self._kfolds, seed=self._seed
+                dataset=dataset, k=self._kfolds, seed=self._seed
             )
 
         elif self._split_method == "dartboard":
@@ -151,7 +151,7 @@ class CrossValidate:
 
             # use 'dartboard' to split full dataset into train/test subsets
             split_iterator = DartboardSplitGridded(
-                dataset, k=self._kfolds, dartboard=dartboard, npseed=self._seed
+                dataset, k=self._kfolds, dartboard=dartboard, seed=self._seed
             )
 
         else:
@@ -251,7 +251,7 @@ class RandomCellSplitGridded:
     ----------
     dataset : PyTorch dataset object
         Instance of the `mpol.datasets.GriddedDataset` class
-    kfolds : int, default=5
+    k : int, default=5
         Number of k-folds (partitions) of `dataset`
     seed : int, default=None
         Seed for PyTorch random number generator used to shuffle data before
@@ -260,9 +260,9 @@ class RandomCellSplitGridded:
         Channel of the dataset to use in determining the splits
 
     Once initialized, iterate through the datasets like:
-        >>> split_iterator = crossval.RandomCellSplitGridded(dataset, kfolds)
-        >>> for (train, test) in split_iterator: # iterate through `kfolds` datasets
-        >>> ... # working with the n-th slice of `kfolds` datasets
+        >>> split_iterator = crossval.RandomCellSplitGridded(dataset, k)
+        >>> for (train, test) in split_iterator: # iterate through `k` datasets
+        >>> ... # working with the n-th slice of `k` datasets
         >>> ... # do operations with train dataset
         >>> ... # do operations with test dataset
 
@@ -273,9 +273,9 @@ class RandomCellSplitGridded:
     The splitting doesn't select (preserve) Hermitian pairs of visibilities.
     """
 
-    def __init__(self, dataset, kfolds=5, seed=None, channel=0):
+    def __init__(self, dataset, k=5, seed=None, channel=0):
         self.dataset = dataset
-        self.kfolds = kfolds
+        self.k = k
         self.channel = channel
 
         # get indices for cells in the top 1% of gridded weight
@@ -306,7 +306,7 @@ class RandomCellSplitGridded:
         split_idx = split_idx[:, shuffle]
 
         # split indices into k subsets
-        self.splits = torch.tensor_split(split_idx, self.kfolds, dim=1)
+        self.splits = torch.tensor_split(split_idx, self.k, dim=1)
 
     def __iter__(self):
         # current k-slice
@@ -314,7 +314,7 @@ class RandomCellSplitGridded:
         return self
 
     def __next__(self):
-        if self._n < self.kfolds:
+        if self._n < self.k:
             test_idx = self.splits[self._n]
             train_idx = torch.cat(
                 ([self.splits[x] for x in range(len(self.splits)) if x != self._n]),
@@ -358,7 +358,7 @@ class DartboardSplitGridded:
         dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
 
     Once initialized, iterate through the datasets like
 
@@ -375,7 +375,7 @@ class DartboardSplitGridded:
         gridded_dataset: GriddedDataset,
         k: int,
         dartboard: Dartboard | None = None,
-        npseed: int | None = None,
+        seed: int | None = None,
     ):
         if k <= 0:
             raise ValueError("k must be a positive integer")
@@ -401,8 +401,8 @@ class DartboardSplitGridded:
         # partition the cell_list into k pieces
         # first, randomly permute the sequence to make sure
         # we don't get structured radial/azimuthal patterns
-        if npseed is not None:
-            np.random.seed(npseed)
+        if seed is not None:
+            np.random.seed(seed)
 
         self.k_split_cell_list = np.array_split(
             np.random.permutation(self.cell_list), k
@@ -415,7 +415,7 @@ class DartboardSplitGridded:
         k: int,
         q_edges: NDArray[floating[Any]],
         phi_edges: NDArray[floating[Any]],
-        npseed: int | None = None,
+        seed: int | None = None,
     ) -> DartboardSplitGridded:
         """
         Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.
@@ -425,10 +425,10 @@ class DartboardSplitGridded:
              k (int): the number of subpartitions of the dataset
              q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
              phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+             seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
         """
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
-        return cls(gridded_dataset, k, dartboard, npseed)
+        return cls(gridded_dataset, k, dartboard, seed)
 
     def __iter__(self) -> DartboardSplitGridded:
         self.n = 0  # the current k-slice we're on
