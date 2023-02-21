@@ -231,7 +231,7 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(4, 10))
+    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(4, splitter.k * 2))
 
     for ii, (train, test) in enumerate(splitter): 
         train_mask = torch2npy(train.ground_mask[channel])
@@ -252,7 +252,7 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
         aa.xaxis.set_ticklabels([])
         aa.yaxis.set_ticklabels([])
 
-    fig.subplots_adjust(left=0.15, hspace=0.0, wspace=0.2)
+    fig.subplots_adjust(left=0.1, hspace=0.0, wspace=0.2)
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_splitter_diagnostics_fig.png', dpi=300)
