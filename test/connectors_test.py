@@ -30,7 +30,7 @@ def test_index_vis(coords, dataset):
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
     # produce model visibilities
-    vis = flayer.forward(imagecube.forward(basecube.forward()))
+    vis = flayer(imagecube(basecube()))
 
     # take a basecube, imagecube, and GriddedDataset and predict corresponding visibilities.
     datasets.index_vis(vis, dataset)
@@ -45,7 +45,7 @@ def test_connector_grad(coords, dataset):
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
     # produce model visibilities
-    vis = flayer.forward(imagecube.forward(basecube.forward()))
+    vis = flayer(imagecube(basecube()))
     samples = datasets.index_vis(vis, dataset)
 
     print(samples)

@@ -259,7 +259,7 @@ image = ImageCube.from_image_properties(cell_size=cell_size, npix=npix, nchan=1,
 If you want to double-check that the image was correctly inserted, you can do
 ```
 # double check it went in correctly
-plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image.forward()).detach().numpy()), origin="lower")
+plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image()).detach().numpy()), origin="lower")
 ```
 to see that it's upright and not flipped.
 

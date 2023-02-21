@@ -34,7 +34,7 @@ def test_single_chan():
 
 def test_basecube_grad():
     bcube = images.BaseCube.from_image_properties(npix=800, cell_size=0.015)
-    loss = torch.sum(bcube.forward())
+    loss = torch.sum(bcube())
     loss.backward()
 
 
@@ -44,7 +44,7 @@ def test_imagecube_grad(coords):
     imagecube = images.ImageCube(coords=coords, passthrough=True)
 
     # send things through this layer
-    loss = torch.sum(imagecube.forward(bcube.forward()))
+    loss = torch.sum(imagecube(bcube()))
 
     loss.backward()
 
@@ -58,7 +58,7 @@ def test_imagecube_tofits(coords, tmp_path):
     imagecube = images.ImageCube(coords=coords, passthrough=True)
 
     # sending the basecube through the imagecube
-    imagecube.forward(bcube.forward())
+    imagecube(bcube())
 
     # creating output fits file with name 'test_cube_fits_file39.fits'
     # file will be deleted after testing
@@ -88,7 +88,7 @@ def test_basecube_imagecube(coords, tmp_path):
     basecube = images.BaseCube(coords=coords, nchan=nchan, base_cube=base_cube)
 
     # the default softplus function should map everything to positive values
-    output = basecube.forward()
+    output = basecube()
 
     fig, ax = plt.subplots(ncols=2, nrows=1)
 
@@ -110,7 +110,7 @@ def test_basecube_imagecube(coords, tmp_path):
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
     # send things through this layer
-    imagecube.forward(basecube.forward())
+    imagecube(basecube())
 
     fig, ax = plt.subplots(ncols=1)
     im = ax.imshow(

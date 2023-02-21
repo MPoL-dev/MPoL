@@ -172,7 +172,7 @@ rml.zero_grad()
 Most modules in MPoL are designed to work in a "feed forward" manner, which means base parameters are processed through the network to predict model visibilites for comparison with data. We can calculate the full visibility cube corresponding to the current pixel values of the {class}`mpol.images.BaseCube`.
 
 ```{code-cell} ipython3
-vis = rml.forward()
+vis = rml()
 print(vis)
 ```
 
@@ -251,7 +251,7 @@ for i in range(300):
     rml.zero_grad()
 
     # get the predicted model
-    vis = rml.forward()
+    vis = rml()
 
     # calculate a loss
     loss = losses.nll_gridded(vis, dset)

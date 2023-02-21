@@ -184,7 +184,7 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)
-flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
+flayer(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
 The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities and the "test" visibilities which will be used to evaluate the predictive ability of the model.
@@ -240,7 +240,7 @@ def train(model, dset, config, optimizer, writer=None):
         model.zero_grad()
 
         # get the predicted model
-        vis = model.forward()
+        vis = model()
 
         # get the sky cube too
         sky_cube = model.icube.sky_cube
@@ -268,7 +268,7 @@ We also create a separate "test" function to evaluate the trained model against 
 def test(model, dset):
     model.train(False)
     # evaluate test score
-    vis = model.forward()
+    vis = model()
     loss = losses.nll_gridded(vis, dset)
     return loss.item()
 ```

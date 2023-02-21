@@ -95,5 +95,5 @@ nb_execution_timeout = -1
 nb_execution_raise_on_error = True
 # .ipynb are produced using Makefile on own terms,
 # # both .md and executed .ipynb are kept in git repo
-nb_execution_excludepatterns = ["large-tutorials/*.md", "**.ipynb_checkpoints"]
+nb_execution_excludepatterns = ["large-tutorials/*.md", "large-tutorials/*.ipynb", "**.ipynb_checkpoints"]
 myst_heading_anchors = 3

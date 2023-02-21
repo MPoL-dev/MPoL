@@ -132,7 +132,7 @@ def test_dartboardsplit_iterate_images(crossvalidation_products, tmp_path):
     # visualize dirty images
     # create mock fourier layer
     flayer = FourierCube(coords=coords)
-    flayer.forward(torch.zeros(dataset.nchan, coords.npix, coords.npix))
+    flayer(torch.zeros(dataset.nchan, coords.npix, coords.npix))
 
     # TODO: rewrite with Briggs framework
 
@@ -143,8 +143,8 @@ def test_dartboardsplit_iterate_images(crossvalidation_products, tmp_path):
     #     rtrain = GriddedResidualConnector(flayer, train)
     #     rtest = GriddedResidualConnector(flayer, test)
 
-    #     train_chan = packed_cube_to_sky_cube(rtrain.forward())[chan]
-    #     test_chan = packed_cube_to_sky_cube(rtest.forward())[chan]
+    #     train_chan = packed_cube_to_sky_cube(rtrain())[chan]
+    #     test_chan = packed_cube_to_sky_cube(rtest())[chan]
 
     #     im = ax[k, 0].imshow(
     #         train_chan.real.detach().numpy(), interpolation="none", origin="lower"

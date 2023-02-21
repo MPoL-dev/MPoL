@@ -61,7 +61,7 @@ def test_standalone_init_train(coords, dataset):
     nchan = dataset.nchan
     rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
-    vis = rml.forward()
+    vis = rml()
 
     rml.zero_grad()
 
@@ -88,7 +88,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
         rml.zero_grad()
 
         # get the predicted model
-        vis = rml.forward()
+        vis = rml()
 
         # calculate a loss
         loss = losses.nll_gridded(vis, dataset_cont)
@@ -127,7 +127,7 @@ def test_tensorboard(coords, dataset_cont, tmp_path):
         rml.zero_grad()
 
         # get the predicted model
-        vis = rml.forward()
+        vis = rml()
 
         # calculate a loss
         loss = losses.nll_gridded(vis, dataset_cont)
