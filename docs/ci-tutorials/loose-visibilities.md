@@ -102,7 +102,7 @@ and then use these values to initialize a {class}`mpol.fourier.NuFFT` object
 nufft = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
 ```
 
-Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.Gridder` object and create an image for use in the forward model.
+Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.DataAverager` object and create an image for use in the forward model.
 
 ## Compared to the {class}`mpol.gridding.DataAverager` object
 
