@@ -124,6 +124,8 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
+        self.split_figure = None
+        
     def split_dataset(self, dataset):
         r"""
         Split a dataset into training and test subsets.
@@ -223,6 +225,7 @@ class CrossValidate:
             if self._store_cv_diagnostics:
                 self._cv_diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(model, test_set))
+            self.train_figure = trainer.train_figure 
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters

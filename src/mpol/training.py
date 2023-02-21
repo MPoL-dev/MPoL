@@ -71,6 +71,7 @@ class TrainTest:
         self._save_prefix = save_prefix
         self._verbose = verbose
 
+        self.train_figure = None
 
     def loss_convergence(self, loss):
         r"""
@@ -268,8 +269,8 @@ class TrainTest:
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
                 count == self._epochs - 1) : 
-                train_diagnostics_fig(model, residuals, 
-                                        save_prefix=self._save_prefix)
+                train_fig, train_axes = train_diagnostics_fig(model, save_prefix=self._save_prefix)
+                self.train_figure = (train_fig, train_axes)
 
             # calculate gradients of loss function w.r.t. model parameters
             loss.backward()
@@ -319,3 +320,8 @@ class TrainTest:
 
         # return loss value
         return loss.item()
+
+    @property
+    def train_figure(self):
+        """Dict containing diagnostics of the cross-validation loop"""
+        return self.train_figure

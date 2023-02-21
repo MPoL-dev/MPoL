@@ -264,7 +264,7 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
 def train_diagnostics_fig(model, channel=0, save_prefix=None):
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
-    a given state, generate a figure showing the current: 
+    a given state, plots the current: 
         - model image
         - gradient image
         - Fourier plane residuals
