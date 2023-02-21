@@ -86,7 +86,12 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
         step = np.hypot(model.coords.cell_size, model.coords.cell_size)
         bins = np.arange(0.0, max(rshift), step)
 
-    Is, bin_edges = np.histogram(a=rshift, bins=bins, weights=skycube.flatten())
+    # get number of points in each radial bin
+    bin_counts, bin_edges = np.histogram(a=rshift, bins=bins, weights=None)
+    # get radial brightness
+    Is, _ = np.histogram(a=rshift, bins=bins, weights=skycube.flatten())
+    Is /= bin_counts
+    
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
     return bin_centers, Is

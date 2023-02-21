@@ -193,6 +193,6 @@ def deproject_vis(u, v, V, weights, source_geom, inverse=False, rescale_flux=Tru
     else:
         if rescale_flux:
             Vp, weights_scaled = geom.rescale_total_flux(V, weights)
-         up, vp, Vp = geom.undo_correction(u, v, V)
+        up, vp, Vp = geom.undo_correction(u, v, V)
 
     return up, vp, Vp, weights_scaled
