@@ -204,7 +204,7 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
     return fig, (ax0, ax1, ax2)
 
 
-def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
+def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     r"""
     Generate a figure showing (u,v) coverage in train and test sets split from 
     a parent dataset.
