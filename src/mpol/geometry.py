@@ -131,7 +131,7 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
     return x, y
 
 
-# TODO
+# TODO: check giving correct result 
 def deproject_vis(u, v, V, weights, source_geom, inverse=False, rescale_flux=True): 
     r"""
     Deproject (or reproject) visibilities (and optionally rescale their 
