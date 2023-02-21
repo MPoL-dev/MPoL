@@ -17,6 +17,33 @@ from .constants import *
 from .utils import loglinspace
 
 
+def index_vis(vis, griddedDataset):
+    r"""
+    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is "packed" just like the :class:`~mpol.datasets.GriddedDataset`
+
+    Args:
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
+        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+
+    Returns:
+        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
+    """
+    assert (
+        vis.size()[0] == griddedDataset.mask.size()[0]
+    ), "vis and dataset mask do not have the same number of channels."
+
+    # As of Pytorch 1.7.0, complex numbers are partially supported.
+    # However, masked_select does not yet work (with gradients)
+    # on the complex vis, so hence this awkward step of selecting
+    # the reals and imaginaries separately
+    re = vis.real.masked_select(griddedDataset.mask)
+    im = vis.imag.masked_select(griddedDataset.mask)
+
+    # we had trouble returning things as re + 1.0j * im,
+    # but for some reason torch.complex seems to work OK.
+    return torch.complex(re, im)
+
+
 class GriddedDataset:
     r"""
     Args:
@@ -32,7 +59,7 @@ class GriddedDataset:
     :ivar vis_indexed: 1D complex tensor of visibility data
     :ivar weight_indexd: 1D tensor of weight values
 
-    If you index the output of the Fourier layer in the same manner using ``self.mask`` (as done internally within :class:`~mpol.connectors.DataConnector`), then the model and data visibilities can be directly compared using a loss function.
+    If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.
     """
 
     def __init__(
@@ -256,6 +283,7 @@ class UVDataset(torch_ud.Dataset):
 class Dartboard:
     r"""
     A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
+
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
@@ -312,6 +340,7 @@ class Dartboard:
     ) -> Dartboard:
         """Alternative method to instantiate a Dartboard object from cell_size
         and npix.
+
         Args:
             cell_size (float): the width of a pixel [arcseconds]
             npix (int): the number of pixels per image side
@@ -327,9 +356,11 @@ class Dartboard:
         r"""
         Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
         Data coordinates should include the points for the Hermitian visibilities.
+
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
         Returns:
             2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.
         """
@@ -348,9 +379,11 @@ class Dartboard:
         r"""
         Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
         Data coordinates should include the points for the Hermitian visibilities.
+
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+
         Returns:
             list of cell indices where cell contains at least one datapoint.
         """
@@ -367,8 +400,10 @@ class Dartboard:
     ) -> NDArray[np.bool_]:
         r"""
         Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
+
         Args:
             cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
+
         Returns: (numpy array) 2D boolean mask in packed format.
         """
         mask = np.zeros_like(self.cartesian_qs, dtype="bool")

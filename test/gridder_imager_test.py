@@ -9,12 +9,12 @@ from mpol import coordinates, gridding
 from mpol.constants import *
 
 
-# cache an instantiated gridder for future imaging ops
+# cache an instantiated imager for future imaging ops
 @pytest.fixture
-def gridder(mock_visibility_data):
+def imager(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.Gridder.from_image_properties(
+    return gridding.DirtyImager.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -26,24 +26,24 @@ def gridder(mock_visibility_data):
 
 
 # make sure the peak of the PSF normalizes to 1 for each channel
-def test_beam_normalized(gridder):
+def test_beam_normalized(imager):
     r = -0.5
     for weighting in ["uniform", "natural", "briggs"]:
         if weighting == "briggs":
-            gridder._grid_visibilities(weighting=weighting, robust=r)
+            imager._grid_visibilities(weighting=weighting, robust=r)
         else:
-            gridder._grid_visibilities(weighting=weighting)
-        beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
+            imager._grid_visibilities(weighting=weighting)
+        beam = imager._get_dirty_beam(imager.C, imager.re_gridded_beam)
 
-        for i in range(gridder.nchan):
+        for i in range(imager.nchan):
             assert np.max(beam[i]) == pytest.approx(1.0)
 
 
-def test_beam_null(gridder, tmp_path):
+def test_beam_null(imager, tmp_path):
     r = -0.5
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
-    nulled = gridder._null_dirty_beam()
+    imager._grid_visibilities(weighting="briggs", robust=r)
+    beam = imager._get_dirty_beam(imager.C, imager.re_gridded_beam)
+    nulled = imager._null_dirty_beam()
 
     chan = 4
     fig, ax = plt.subplots(ncols=2)
@@ -56,7 +56,7 @@ def test_beam_null(gridder, tmp_path):
         beam[chan],
         origin="lower",
         interpolation="none",
-        extent=gridder.coords.img_ext,
+        extent=imager.coords.img_ext,
         cmap=cmap,
         norm=norm,
     )
@@ -66,7 +66,7 @@ def test_beam_null(gridder, tmp_path):
         nulled[chan] - 1e-6,
         origin="lower",
         interpolation="none",
-        extent=gridder.coords.img_ext,
+        extent=imager.coords.img_ext,
         cmap=cmap,
         norm=norm,
     )
@@ -76,11 +76,11 @@ def test_beam_null(gridder, tmp_path):
     plt.close("all")
 
 
-def test_beam_null_full(gridder, tmp_path):
+def test_beam_null_full(imager, tmp_path):
     r = -0.5
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    beam = gridder._get_dirty_beam(gridder.C, gridder.re_gridded_beam)
-    nulled = gridder._null_dirty_beam(single_channel_estimate=False)
+    imager._grid_visibilities(weighting="briggs", robust=r)
+    beam = imager._get_dirty_beam(imager.C, imager.re_gridded_beam)
+    nulled = imager._null_dirty_beam(single_channel_estimate=False)
 
     chan = 4
     fig, ax = plt.subplots(ncols=2)
@@ -93,7 +93,7 @@ def test_beam_null_full(gridder, tmp_path):
         beam[chan],
         origin="lower",
         interpolation="none",
-        extent=gridder.coords.img_ext,
+        extent=imager.coords.img_ext,
         cmap=cmap,
         norm=norm,
     )
@@ -103,7 +103,7 @@ def test_beam_null_full(gridder, tmp_path):
         nulled[chan] - 1e-6,
         origin="lower",
         interpolation="none",
-        extent=gridder.coords.img_ext,
+        extent=imager.coords.img_ext,
         cmap=cmap,
         norm=norm,
     )
@@ -113,25 +113,25 @@ def test_beam_null_full(gridder, tmp_path):
     plt.close("all")
 
 
-def test_beam_area_before_beam(gridder):
+def test_beam_area_before_beam(imager):
     r = -0.5
-    gridder._grid_visibilities(weighting="briggs", robust=r)
-    area = gridder.get_dirty_beam_area()
+    imager._grid_visibilities(weighting="briggs", robust=r)
+    area = imager.get_dirty_beam_area()
     print(area)
 
 
 # compare uniform and robust = -2.0
-def test_grid_uniform(gridder, tmp_path):
-    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+def test_grid_uniform(imager, tmp_path):
+    kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
     chan = 4
 
-    img_uniform, beam_uniform = gridder.get_dirty_image(
+    img_uniform, beam_uniform = imager.get_dirty_image(
         weighting="uniform", check_visibility_scatter=False
     )
 
     r = -2
-    img_robust, beam_robust = gridder.get_dirty_image(
+    img_robust, beam_robust = imager.get_dirty_image(
         weighting="briggs", robust=r, check_visibility_scatter=False
     )
 
@@ -163,16 +163,16 @@ def test_grid_uniform(gridder, tmp_path):
 
 
 # compare uniform and robust = -2.0
-def test_grid_uniform_arcsec2(gridder, tmp_path):
-    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+def test_grid_uniform_arcsec2(imager, tmp_path):
+    kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
     chan = 4
-    img_uniform, beam_uniform = gridder.get_dirty_image(
+    img_uniform, beam_uniform = imager.get_dirty_image(
         weighting="uniform", unit="Jy/arcsec^2", check_visibility_scatter=False
     )
 
     r = -2
-    img_robust, beam_robust = gridder.get_dirty_image(
+    img_robust, beam_robust = imager.get_dirty_image(
         weighting="briggs", robust=r, unit="Jy/arcsec^2", check_visibility_scatter=False
     )
 
@@ -205,17 +205,17 @@ def test_grid_uniform_arcsec2(gridder, tmp_path):
     plt.close("all")
 
 
-def test_grid_natural(gridder, tmp_path):
-    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+def test_grid_natural(imager, tmp_path):
+    kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
     chan = 4
 
-    img_natural, beam_natural = gridder.get_dirty_image(
+    img_natural, beam_natural = imager.get_dirty_image(
         weighting="natural", check_visibility_scatter=False
     )
 
     r = 2
-    img_robust, beam_robust = gridder.get_dirty_image(
+    img_robust, beam_robust = imager.get_dirty_image(
         weighting="briggs", robust=r, check_visibility_scatter=False
     )
 
@@ -246,17 +246,17 @@ def test_grid_natural(gridder, tmp_path):
     plt.close("all")
 
 
-def test_grid_natural_arcsec2(gridder, tmp_path):
-    kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+def test_grid_natural_arcsec2(imager, tmp_path):
+    kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
     chan = 4
 
-    img_natural, beam_natural = gridder.get_dirty_image(
+    img_natural, beam_natural = imager.get_dirty_image(
         weighting="natural", unit="Jy/arcsec^2", check_visibility_scatter=False
     )
 
     r = 2
-    img_robust, beam_robust = gridder.get_dirty_image(
+    img_robust, beam_robust = imager.get_dirty_image(
         weighting="briggs", robust=r, unit="Jy/arcsec^2", check_visibility_scatter=False
     )
 
@@ -299,7 +299,7 @@ def test_cell_variance_warning_image(mock_visibility_data):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    gridder = gridding.Gridder(
+    imager = gridding.DirtyImager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -309,4 +309,4 @@ def test_cell_variance_warning_image(mock_visibility_data):
     )
 
     with pytest.warns(RuntimeWarning):
-        gridder.get_dirty_image(weighting="uniform")
+        imager.get_dirty_image(weighting="uniform")

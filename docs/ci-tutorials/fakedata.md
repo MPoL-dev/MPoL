@@ -259,7 +259,7 @@ image = ImageCube.from_image_properties(cell_size=cell_size, npix=npix, nchan=1,
 If you want to double-check that the image was correctly inserted, you can do
 ```
 # double check it went in correctly
-plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image.forward()).detach().numpy()), origin="lower")
+plt.imshow(np.squeeze(utils.packed_cube_to_sky_cube(image()).detach().numpy()), origin="lower")
 ```
 to see that it's upright and not flipped.
 
@@ -335,7 +335,7 @@ from mpol import coordinates, gridding
 # well set the
 coords = coordinates.GridCoords(cell_size=cell_size, npix=npix)
 
-gridder = gridding.Gridder(
+imager = gridding.DirtyImager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -352,12 +352,12 @@ print(noise_estimate, "Jy / dirty beam")
 ```
 
 ```{code-cell} ipython3
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+img, beam = imager.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
 ```
 
 ```{code-cell} ipython3
 chan = 0
-kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=2, figsize=(6.0, 4))
 ax[0].imshow(beam[chan], **kw)
 ax[0].set_title("beam")
@@ -373,7 +373,7 @@ We can even subtract this on a pixel-by-pixel basis and compare to the original 
 
 ```{code-cell} ipython3
 chan = 0
-kw = {"origin": "lower", "interpolation": "none", "extent": gridder.coords.img_ext}
+kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=3, figsize=(6.0, 3))
 
 ax[0].imshow(flux_scaled[chan], **kw)

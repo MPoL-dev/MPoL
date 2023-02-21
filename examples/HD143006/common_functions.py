@@ -39,7 +39,7 @@ def train(
     for iteration in range(config["epochs"]):
 
         optimizer.zero_grad()
-        vis = model.forward()
+        vis = model()
         sky_cube = model.icube.sky_cube
 
         loss = (
@@ -66,7 +66,7 @@ def test(model, dataset, device):
     model = model.to(device)
     model.eval()
     dataset = dataset.to(device)
-    vis = model.forward()
+    vis = model()
     loss = losses.nll_gridded(vis, dataset)
     return loss.item()
 
