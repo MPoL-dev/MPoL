@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
-from mpol.plot import train_diagnostics # TODO
+from mpol.plot import train_diagnostics_fig
 
 
 class TrainTest:
