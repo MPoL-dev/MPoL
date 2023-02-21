@@ -245,8 +245,8 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
 
         axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
 
-    axes[0, 0].set_title("Train - mask")
-    axes[0, 1].set_title("Test - mask")
+    axes[0, 0].set_title("Training set ")
+    axes[0, 1].set_title("Test set")
 
     for aa in axes.flatten():
         aa.xaxis.set_ticklabels([])
@@ -263,9 +263,13 @@ def splitter_diagnostics_fig(splitter, channel=0, save_prefix=None):
 
 def train_diagnostics_fig(model, channel=0, save_prefix=None):
     """
-    For a `model` in a given state, generate a figure showing the model image, 
-    gradient image, Fourier plane model, and dirty image of Fourier plane 
-    residuals.
+    Figure for model diagnostics during an optimization loop. For a `model` in 
+    a given state, generate a figure showing the current: 
+        - model image
+        - gradient image
+        - Fourier plane residuals
+        - dirty image of Fourier plane residuals
+        - loss function
 
     Parameters
     ----------
