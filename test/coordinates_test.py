@@ -84,7 +84,7 @@ def test_grid_coords_neg_cell_size():
         coordinates.GridCoords(cell_size=-0.01, npix=512)
 
 
-# instantiate a Gridder object with mock visibilities
+# instantiate a DataAverager object with mock visibilities
 def test_grid_coords_fit(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 

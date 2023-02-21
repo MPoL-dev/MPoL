@@ -14,8 +14,8 @@ class TrainTest:
 
     Parameters
     ----------
-    gridder : `mpol.gridding.Gridder` object
-        Instance of the `mpol.gridding.Gridder` class.
+    imager : `mpol.gridding.DirtyImager` object
+        Instance of the `mpol.gridding.DirtyImager` class.
     optimizer : `torch.optim` object
         PyTorch optimizer class for the training loop.
     epochs : int, default=500
@@ -50,25 +50,13 @@ class TrainTest:
         Whether to print notification messages
     """
 
-    def __init__(
-        self,
-        gridder,
-        optimizer,
-        epochs=500,
-        convergence_tol=1e-2,
-        lambda_guess=None,
-        lambda_guess_briggs=[0.0, 0.5],
-        lambda_entropy=None,
-        entropy_prior_intensity=1e-10,
-        lambda_sparsity=None,
-        lambda_TV=None,
-        TV_epsilon=1e-10,
-        lambda_TSV=None,
-        train_diag_step=None,
-        save_prefix=None,
-        verbose=True,
-    ):
-        self._gridder = gridder
+    def __init__(self, imager, optimizer, epochs=500, convergence_tol=1e-2, 
+                lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
+                lambda_entropy=None, entropy_prior_intensity=1e-10, 
+                lambda_sparsity=None, lambda_TV=None, TV_epsilon=1e-10, 
+                lambda_TSV=None, train_diag_step=None, 
+                save_prefix=None, verbose=True):
+        self._imager = imager
         self._optimizer = optimizer
         self._epochs = epochs
         self._convergence_tol = convergence_tol
@@ -123,12 +111,10 @@ class TrainTest:
             Dictionary containing the names and initial guesses of regularizers
         """
         # generate images of the data using two briggs robust values
-        img1, _ = self._gridder.get_dirty_image(
-            weighting="briggs", robust=self._lambda_guess_briggs[0]
-        )
-        img2, _ = self._gridder.get_dirty_image(
-            weighting="briggs", robust=self._lambda_guess_briggs[1]
-        )
+        img1, _ = self._imager.get_dirty_image(weighting='briggs', 
+                                                robust=self._lambda_guess_briggs[0])
+        img2, _ = self._imager.get_dirty_image(weighting='briggs', 
+                                                robust=self._lambda_guess_briggs[1])
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
