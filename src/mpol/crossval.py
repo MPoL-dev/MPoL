@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
-from mpol.datasets import Dartboard, GriddedDataset
 from mpol.plot import split_diagnostics_fig
 
 
@@ -184,7 +183,8 @@ class CrossValidate:
 
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
-            split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
+            split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
+            self.split_figure = (split_fig, split_axes)
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
