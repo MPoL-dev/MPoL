@@ -8,13 +8,13 @@ from mpol import coordinates, gridding
 from mpol.constants import *
 
 
-def test_grid_cont(mock_visibility_data_cont):
+def test_average_cont(mock_visibility_data_cont):
     """
     Test that the gridding operation doesn't error.
     """
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
-    gridder = gridding.Gridder.from_image_properties(
+    averager = gridding.DataAverager.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -24,10 +24,10 @@ def test_grid_cont(mock_visibility_data_cont):
         data_im=data_im,
     )
 
-    print(gridder.uu.shape)
-    print(gridder.nchan)
+    print(averager.uu.shape)
+    print(averager.nchan)
 
-    gridder._grid_visibilities(weighting="uniform")
+    averager._grid_visibilities()
 
 
 # test that we're getting the right numbers back for some well defined operations
@@ -44,7 +44,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     data_re = np.ones_like(uu)
     data_im = np.zeros_like(uu)
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -53,19 +53,11 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    # with uniform weighting, the gridded sheet should be uniform and = 1
-    gridder._grid_visibilities(weighting="uniform")
-
-    print(
-        "re",
-        np.mean(gridder.data_re_gridded),
-        np.std(gridder.data_re_gridded),
-        np.min(gridder.data_re_gridded),
-        np.max(gridder.data_re_gridded),
-    )
+    # with uniform weighting, the gridded values should be == 1
+    averager._grid_visibilities()
 
     im = plt.imshow(
-        gridder.ground_cube[4].real, origin="lower", extent=gridder.coords.vis_ext
+        averager.ground_cube[4].real, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
@@ -73,25 +65,22 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.figure()
 
     im2 = plt.imshow(
-        gridder.ground_cube[4].imag, origin="lower", extent=gridder.coords.vis_ext
+        averager.ground_cube[4].imag, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
     )
     plt.colorbar(im2)
     plt.savefig(tmp_path / "gridded_im.png", dpi=300)
 
     plt.close("all")
 
-    # if the gridding worked, we should have real values approximately 1
-    assert np.max(gridder.data_re_gridded) == pytest.approx(1)
-    # except in the cells with no data
-    assert np.min(gridder.data_re_gridded) == pytest.approx(0)
-
-    # make sure all average values are set to 1
-    diff_real = np.abs(1 - gridder.vis_gridded[gridder.mask].real)
-    assert np.all(diff_real < 1e-10)
-
+    # if the gridding worked, 
+    # cells with no data should be 0
+    assert averager.data_re_gridded[~averager.mask] == pytest.approx(0)
+    
+    # and cells with data should have real values approximately 1
+    assert averager.data_re_gridded[averager.mask] == pytest.approx(1)
+    
     # and imaginary values approximately 0 everywhere
-    assert np.min(gridder.data_im_gridded) == pytest.approx(0)
-    assert np.max(gridder.data_im_gridded) == pytest.approx(0)
+    assert averager.data_im_gridded == pytest.approx(0)
 
 
 def test_weight_gridding(mock_visibility_data):
@@ -102,7 +91,7 @@ def test_weight_gridding(mock_visibility_data):
     data_re = np.ones_like(uu)
     data_im = np.ones_like(uu)
 
-    gridder = gridding.Gridder.from_image_properties(
+    averager = gridding.DataAverager.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -112,16 +101,14 @@ def test_weight_gridding(mock_visibility_data):
         data_im=data_im,
     )
 
-    gridder._grid_weights()
+    averager._grid_weights()
 
     print("sum of ungridded weights", np.sum(weight))
 
-    # test that the weights all sum to the same value, modulo Hermitian aspects
-    # should be twice that of the ungridded weights, since Hermitian weights have
-    # been double-counted
-    print("sum of gridded weights", np.sum(gridder.weight_gridded))
+    # test that the weights all sum to the same value
+    print("sum of gridded weights", np.sum(averager.weight_gridded))
 
-    assert np.sum(weight) == pytest.approx(0.5 * np.sum(gridder.weight_gridded))
+    assert np.sum(weight) == pytest.approx(np.sum(averager.weight_gridded))
 
 
 # test the standard deviation estimation routines
@@ -134,7 +121,7 @@ def test_estimate_stddev(mock_visibility_data, tmp_path):
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
     data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -143,17 +130,17 @@ def test_estimate_stddev(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    s_re, s_im = gridder._estimate_cell_standard_deviation()
+    s_re, s_im = averager._estimate_cell_standard_deviation()
 
     chan = 4
 
     fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
 
-    im = ax[0].imshow(s_re[chan], origin="lower", extent=gridder.coords.vis_ext)
+    im = ax[0].imshow(s_re[chan], origin="lower", extent=averager.coords.vis_ext)
     ax[0].set_title(r"$s_{i,j}$ real")
     plt.colorbar(im, ax=ax[0])
 
-    im = ax[1].imshow(s_im[chan], origin="lower", extent=gridder.coords.vis_ext)
+    im = ax[1].imshow(s_im[chan], origin="lower", extent=averager.coords.vis_ext)
     ax[1].set_title(r"$s_{i,j}$ imag")
     plt.colorbar(im, ax=ax[1])
 
@@ -173,7 +160,7 @@ def test_estimate_stddev_large(mock_visibility_data, tmp_path):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -182,17 +169,17 @@ def test_estimate_stddev_large(mock_visibility_data, tmp_path):
         data_im=data_im,
     )
 
-    s_re, s_im = gridder._estimate_cell_standard_deviation()
+    s_re, s_im = averager._estimate_cell_standard_deviation()
 
     chan = 4
 
     fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
 
-    im = ax[0].imshow(s_re[chan], origin="lower", extent=gridder.coords.vis_ext)
+    im = ax[0].imshow(s_re[chan], origin="lower", extent=averager.coords.vis_ext)
     ax[0].set_title(r"$s_{i,j}$ real")
     plt.colorbar(im, ax=ax[0])
 
-    im = ax[1].imshow(s_im[chan], origin="lower", extent=gridder.coords.vis_ext)
+    im = ax[1].imshow(s_im[chan], origin="lower", extent=averager.coords.vis_ext)
     ax[1].set_title(r"$s_{i,j}$ imag")
     plt.colorbar(im, ax=ax[1])
 
@@ -210,7 +197,7 @@ def test_max_scatter_pass(mock_visibility_data):
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
     data_im = np.zeros_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -220,7 +207,7 @@ def test_max_scatter_pass(mock_visibility_data):
     )
 
     # we want this to return an exit code of True, indicating an error
-    d = gridder._check_scatter_error()
+    d = averager._check_scatter_error()
     print(d["median_re"], d["median_im"])
     assert not d["return_status"]
 
@@ -236,7 +223,7 @@ def test_max_scatter_fail(mock_visibility_data):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -246,6 +233,6 @@ def test_max_scatter_fail(mock_visibility_data):
     )
 
     # we want this to return an exit code of True, indicating an error
-    d = gridder._check_scatter_error()
+    d = averager._check_scatter_error()
     print(d["median_re"], d["median_im"])
     assert d["return_status"]

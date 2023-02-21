@@ -28,10 +28,10 @@ def test_hermitian_pairs(mock_visibility_data):
         gridding.verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
 
-def test_gridder_instantiate_cell_npix(mock_visibility_data):
+def test_averager_instantiate_cell_npix(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    gridding.Gridder.from_image_properties(
+    gridding.DataAverager.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -42,12 +42,12 @@ def test_gridder_instantiate_cell_npix(mock_visibility_data):
     )
 
 
-def test_gridder_instantiate_gridCoord(mock_visibility_data):
+def test_averager_instantiate_gridCoord(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
-    gridding.Gridder(
+    gridding.DataAverager(
         coords=mycoords,
         uu=uu,
         vv=vv,
@@ -57,13 +57,13 @@ def test_gridder_instantiate_gridCoord(mock_visibility_data):
     )
 
 
-def test_gridder_instantiate_bounds_fail(mock_visibility_data):
+def test_averager_instantiate_bounds_fail(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
     mycoords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     with pytest.raises(CellSizeError):
-        gridding.Gridder(
+        gridding.DataAverager(
             coords=mycoords,
             uu=uu,
             vv=vv,

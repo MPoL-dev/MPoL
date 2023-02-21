@@ -31,7 +31,7 @@ for iteration in range(500):
 
     optimizer.zero_grad()
 
-    model.forward()
+    model()
     sky_cube = model.icube.sky_cube
 
     loss = loss_fn(sky_cube, dirty_image)

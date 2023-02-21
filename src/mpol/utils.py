@@ -161,7 +161,7 @@ def fftspace(width, N):
 def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
     """
     Check if baseline lengths are sensible for expected code unit of
-    [k\lambda], or if instead they're being supplied in [\lambda].
+    [klambda], or if instead they're being supplied in [lambda].
 
     Parameters
     ----------
@@ -183,16 +183,16 @@ def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
         raise Warning(
             "Maximum baseline of {:.1e} is > maximum expected "
             "value of {:.1e}. Baselines must be in units of "
-            "[k\lambda], but it looks like they're in "
-            "[\lambda].".format(max(q), max_feasible_q)
+            "[klambda], but it looks like they're in "
+            "[lambda].".format(max(q), max_feasible_q)
         )
 
     if min(q) > min_feasible_q * 1e3:
         raise Warning(
             "Minimum baseline of {:.1e} is large for expected "
             "minimum value of {:.1e}. Baselines must be in units of "
-            "[k\lambda], but it looks like they're in "
-            "[\lambda].".format(min(q), min_feasible_q * 1e3)
+            "[klambda], but it looks like they're in "
+            "[lambda].".format(min(q), min_feasible_q * 1e3)
         )
 
 
