@@ -1,11 +1,14 @@
 import logging
+from collections import defaultdict
 
 import numpy as np
 import torch
 
+from mpol.datasets import index_vis
+from mpol.fourier import get_vis_residuals
+from mpol.gridding import DirtyImager
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
-
 
 class TrainTest:
     r"""
@@ -27,7 +30,7 @@ class TrainTest:
     lambda_guess_briggs : list of float, default=[0.0, 0.5]
         Briggs robust values for two images used to guess initial regularizer
         values (if lambda_guess is not None)
-    lambda_entropy : float
+    lambda_entropy : float, default=None
         Relative strength for entropy regularizer
     entropy_prior_intensity : float, default=1e-10
         Prior value :math:`p` to calculate entropy against (suggested <<1)
@@ -71,7 +74,7 @@ class TrainTest:
         self._save_prefix = save_prefix
         self._verbose = verbose
 
-        self.train_figure = None
+        self._train_figure = None
 
     def loss_convergence(self, loss):
         r"""
@@ -206,21 +209,16 @@ class TrainTest:
         -------
         loss.item() : float
             Value of loss function at end of optimization loop
-        losses : list
+        losses : list of float
             Loss value at each iteration (epoch) in the loop
         """
         # set model to training mode
         model.train()
 
-        # if self._train_diag_step is not None:
-            # track model residuals for diagnostics
-            # residuals = GriddedResidualConnector(model.fcube, dataset)
-            # TODO: replace with Briggs residual imaging workflow
-
         count = 0
-        # track loss value over epochs
         losses = []
-        
+        self._train_state = {}
+
         if self._lambda_guess is not None:
             # guess initial regularizer strengths ('lambda's); 
             # update lambda values in 'self'
@@ -266,17 +264,17 @@ class TrainTest:
             loss = self.loss_eval(vis, dataset, sky_cube)
             losses.append(loss.item())
 
-            # generate optional fit diagnostics
-            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or
-                count == self._epochs - 1) : 
-                train_fig, train_axes = train_diagnostics_fig(model, save_prefix=self._save_prefix)
-                self.train_figure = (train_fig, train_axes)
-
             # calculate gradients of loss function w.r.t. model parameters
             loss.backward()
 
             # update model parameters via gradient descent
             self._optimizer.step()
+
+            # store current training parameter values
+            # TODO: store hyperpar values, access in crossval.py
+            self._train_state["learn_rate"] = self._optimizer.state_dict()['param_groups'][0]['lr']
+            self._train_state["epoch"] = count
+            self._train_state["loss"] = loss.item()
 
             count += 1
 
@@ -323,5 +321,8 @@ class TrainTest:
 
     @property
     def train_figure(self):
-        """Dict containing diagnostics of the cross-validation loop"""
-        return self.train_figure
+    
+    @property
+    def train_state(self):
+        """Dict containing parameters of interest in the training loop"""
+        return self._train_state
