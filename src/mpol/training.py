@@ -160,16 +160,16 @@ class TrainTest:
 
         # regularizers
         if sky_cube is not None:
-            if self._lambda_entropy is not None:
-                loss += self._lambda_entropy * entropy(
-                    sky_cube, self._entropy_prior_intensity
-                )
-            if self._lambda_sparsity is not None:
-                loss += self._lambda_sparsity * sparsity(sky_cube)
-            if self._lambda_TV is not None:
-                loss += self._lambda_TV * TV_image(sky_cube, self._TV_epsilon)
-            if self._lambda_TSV is not None:
-                loss += self._lambda_TSV * TSV(sky_cube)
+            if self.regularizers.get('entropy', {}).get('lambda') is not None:
+                loss += self.regularizers['entropy']['lambda'] * entropy(
+                    sky_cube, self.regularizers['entropy']['prior_intensity'])
+            if self.regularizers.get('sparsity', {}).get('lambda') is not None:
+                loss += self.regularizers['sparsity']['lambda'] * sparsity(sky_cube)
+            if self.regularizers.get('TV', {}).get('lambda') is not None:
+                loss += self.regularizers['TV']['lambda'] * TV_image(
+                    sky_cube, self.regularizers['TV']['epsilon'])
+            if self.regularizers.get('TSV', {}).get('lambda') is not None:
+                loss += self.regularizers['TSV']['lambda'] * TSV(sky_cube)
 
         return loss
 
