@@ -371,9 +371,17 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     )
     cbar = plt.colorbar(im, ax=axes[1, 1])
     cbar.set_label('Jy arcsec$^{-2}$')
+    axes[1,1].set_title("Dirty image of Re(V) resid. (robust={})".format(briggs_robust))
+
+
+    # loss function
+    axes[1,2].plot(losses, 'k')
+    axes[1,2].set_xlabel('Epoch')
+    axes[1,2].set_ylabel('Loss')
+    axes[1,2].set_title("Loss function")
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_train_diagnostics_fig.png', dpi=300)
+        fig.savefig(save_prefix + '_train_diag_epoch{:05d}.png'.format(train_state["epoch"]), dpi=300)
         plt.close()
 
     return fig, axes
