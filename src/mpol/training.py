@@ -276,6 +276,11 @@ class TrainTest:
             self._train_state["epoch"] = count
             self._train_state["loss"] = loss.item()
 
+            # generate optional fit diagnostics
+            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs - 1):
+                # model residual visibilities
+                model_vis = index_vis(vis, dataset)
+                vis_resid = dataset.vis_indexed - model_vis
             count += 1
 
         if self._verbose:
@@ -321,6 +326,8 @@ class TrainTest:
 
     @property
     def train_figure(self):
+        """(fig, axes) of figure showing training diagnostics"""
+        return self._train_figure
     
     @property
     def train_state(self):

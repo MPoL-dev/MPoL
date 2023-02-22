@@ -125,7 +125,7 @@ class CrossValidate:
         self._verbose = verbose
 
         self.split_figure = None
-        
+
     def split_dataset(self, dataset):
         r"""
         Split a dataset into training and test subsets.
@@ -225,6 +225,7 @@ class CrossValidate:
             if self._store_cv_diagnostics:
                 self._cv_diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(model, test_set))
+            # store the most recent train figure for diagnostics
             self.train_figure = trainer.train_figure 
 
         # average individual test scores to get the cross-val metric for chosen
@@ -262,6 +263,8 @@ class RandomCellSplitGridded:
     channel : int, default=0
         Channel of the dataset to use in determining the splits
 
+    Notes
+    -----
     Once initialized, iterate through the datasets like:
         >>> split_iterator = crossval.RandomCellSplitGridded(dataset, k)
         >>> for (train, test) in split_iterator: # iterate through `k` datasets
@@ -269,8 +272,6 @@ class RandomCellSplitGridded:
         >>> ... # do operations with train dataset
         >>> ... # do operations with test dataset
 
-    Notes
-    -----
     Treats `dataset` as a single-channel object with all data in `channel`.
 
     The splitting doesn't select (preserve) Hermitian pairs of visibilities.
