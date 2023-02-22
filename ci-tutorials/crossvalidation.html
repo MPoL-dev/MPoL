@@ -590,7 +590,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/0fa482b07f968d29c4b49174f37aad3545daeb68f1eee36a23a1ba42f417f8d1.png" src="../_images/0fa482b07f968d29c4b49174f37aad3545daeb68f1eee36a23a1ba42f417f8d1.png" />
+<img alt="../_images/6f2a45f67efeffda6033abafb0bf7f0114e25b262d8945bea098b5ef08564c30.png" src="../_images/6f2a45f67efeffda6033abafb0bf7f0114e25b262d8945bea098b5ef08564c30.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -603,7 +603,7 @@ title="Print to PDF"
 
 <span class="c1"># create cross validator using this &quot;dartboard&quot;</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
 <span class="c1"># ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.</span>
 <span class="c1"># Because we&#39;ll want to revisit the individual datasets</span>

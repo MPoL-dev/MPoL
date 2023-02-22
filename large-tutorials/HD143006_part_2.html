@@ -847,7 +847,7 @@ title="Print to PDF"
 
 <span class="c1"># create cross validator using this &quot;dartboard&quot;</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">crossval</span><span class="o">.</span><span class="n">DartboardSplitGridded</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
 <span class="c1"># ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.</span>
 <span class="c1"># Because we&#39;ll want to revisit the individual datasets</span>

@@ -303,8 +303,7 @@ title="Source repository"
 <span class="kn">from</span> <span class="nn">mpol.datasets</span> <span class="kn">import</span> <span class="n">Dartboard</span><span class="p">,</span> <span class="n">GriddedDataset</span>
 <span class="kn">from</span> <span class="nn">mpol.precomposed</span> <span class="kn">import</span> <span class="n">SimpleNet</span>
 <span class="kn">from</span> <span class="nn">mpol.training</span> <span class="kn">import</span> <span class="n">TrainTest</span>
-
-<span class="c1"># from mpol.plot import splitter_diagnostics_fig # TODO</span>
+<span class="kn">from</span> <span class="nn">mpol.plot</span> <span class="kn">import</span> <span class="n">split_diagnostics_fig</span>
 
 
 <div class="viewcode-block" id="CrossValidate"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate">[docs]</a><span class="k">class</span> <span class="nc">CrossValidate</span><span class="p">:</span>
@@ -327,11 +326,11 @@ title="Source repository"
 <span class="sd">        Seed for random number generator used in splitting data</span>
 <span class="sd">    learn_rate : float, default=0.5</span>
 <span class="sd">        Neural network learning rate</span>
-<span class="sd">    epochs : int, default=500</span>
+<span class="sd">    epochs : int, default=10000</span>
 <span class="sd">        Number of training iterations</span>
-<span class="sd">    convergence_tol : float, default=1e-2</span>
+<span class="sd">    convergence_tol : float, default=1e-3</span>
 <span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
-<span class="sd">        loss function (suggested &lt;= 1e-2)</span>
+<span class="sd">        loss function (suggested &lt;= 1e-3)</span>
 <span class="sd">    lambda_guess : list of str, default=None</span>
 <span class="sd">        List of regularizers for which to guess an initial value</span>
 <span class="sd">    lambda_guess_briggs : list of float, default=[0.0, 0.5]</span>
@@ -375,8 +374,8 @@ title="Source repository"
         <span class="n">split_method</span><span class="o">=</span><span class="s2">&quot;random_cell&quot;</span><span class="p">,</span>
         <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">learn_rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">epochs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
         <span class="n">lambda_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">lambda_guess_briggs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
         <span class="n">lambda_entropy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -415,6 +414,8 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_figure</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="CrossValidate.split_dataset"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate.split_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">split_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split a dataset into training and test subsets.</span>
@@ -426,13 +427,13 @@ title="Source repository"
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        subsets : iterator returning tuple</span>
-<span class="sd">            Iterator that provides a (train, test) pair of</span>
+<span class="sd">        split_iterator : iterator returning tuple</span>
+<span class="sd">            Iterator that provides a (train, test) pair of </span>
 <span class="sd">            :class:`~mpol.datasets.GriddedDataset` for each k-fold</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s2">&quot;random_cell&quot;</span><span class="p">:</span>
             <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">RandomCellSplitGridded</span><span class="p">(</span>
-                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
             <span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s2">&quot;dartboard&quot;</span><span class="p">:</span>
@@ -441,7 +442,7 @@ title="Source repository"
 
             <span class="c1"># use &#39;dartboard&#39; to split full dataset into train/test subsets</span>
             <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">DartboardSplitGridded</span><span class="p">(</span>
-                <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
+                <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
             <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -464,19 +465,19 @@ title="Source repository"
 <span class="sd">            Instance of the `mpol.datasets.GriddedDataset` class</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        cv_score : (float, float)</span>
-<span class="sd">            Tuple of (mean, standard deviation) of cross-validation scores</span>
-<span class="sd">            across all k-folds</span>
-<span class="sd">        all_scores : list of float</span>
-<span class="sd">            Individual cross-validation scores for each k-fold</span>
-<span class="sd">        loss_histories : list of float</span>
-<span class="sd">            Loss function values for each training loop</span>
+<span class="sd">        cv_score : dict </span>
+<span class="sd">            Dictionary with mean and standard deviation of cross-validation </span>
+<span class="sd">            scores across all k-folds, and all raw scores</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">all_scores</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
         <span class="n">split_iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_diag_fig</span><span class="p">:</span>
+            <span class="n">split_fig</span><span class="p">,</span> <span class="n">split_axes</span> <span class="o">=</span> <span class="n">split_diagnostics_fig</span><span class="p">(</span><span class="n">split_iterator</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_figure</span> <span class="o">=</span> <span class="p">(</span><span class="n">split_fig</span><span class="p">,</span> <span class="n">split_axes</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">split_iterator</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -507,6 +508,8 @@ title="Source repository"
                 <span class="n">TV_epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_TV_epsilon</span><span class="p">,</span>
                 <span class="n">lambda_TSV</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambda_TSV</span><span class="p">,</span>
                 <span class="n">train_diag_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span><span class="p">,</span>
+                <span class="n">kfold</span><span class="o">=</span><span class="n">kk</span><span class="p">,</span>
+                <span class="n">save_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -514,6 +517,8 @@ title="Source repository"
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cv_diagnostics</span><span class="p">[</span><span class="s2">&quot;loss_histories&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss_history</span><span class="p">)</span>
             <span class="n">all_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">))</span>
+            <span class="c1"># store the most recent train figure for diagnostics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_figure</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train_figure</span> 
 
         <span class="c1"># average individual test scores to get the cross-val metric for chosen</span>
         <span class="c1"># hyperparameters</span>
@@ -542,7 +547,7 @@ title="Source repository"
 <span class="sd">    ----------</span>
 <span class="sd">    dataset : PyTorch dataset object</span>
 <span class="sd">        Instance of the `mpol.datasets.GriddedDataset` class</span>
-<span class="sd">    kfolds : int, default=5</span>
+<span class="sd">    k : int, default=5</span>
 <span class="sd">        Number of k-folds (partitions) of `dataset`</span>
 <span class="sd">    seed : int, default=None</span>
 <span class="sd">        Seed for PyTorch random number generator used to shuffle data before</span>
@@ -550,21 +555,23 @@ title="Source repository"
 <span class="sd">    channel : int, default=0</span>
 <span class="sd">        Channel of the dataset to use in determining the splits</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    Once initialized, iterate through the datasets like:</span>
-<span class="sd">        &gt;&gt;&gt; split_iterator = crossval.RandomCellSplitGridded(dataset, kfolds)</span>
-<span class="sd">        &gt;&gt;&gt; for (train, test) in split_iterator: # iterate through `kfolds` datasets</span>
-<span class="sd">        &gt;&gt;&gt; ... # working with the n-th slice of `kfolds` datasets</span>
+<span class="sd">        &gt;&gt;&gt; split_iterator = crossval.RandomCellSplitGridded(dataset, k)</span>
+<span class="sd">        &gt;&gt;&gt; for (train, test) in split_iterator: # iterate through `k` datasets</span>
+<span class="sd">        &gt;&gt;&gt; ... # working with the n-th slice of `k` datasets</span>
 <span class="sd">        &gt;&gt;&gt; ... # do operations with train dataset</span>
 <span class="sd">        &gt;&gt;&gt; ... # do operations with test dataset</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Treats `dataset` as a single-channel object with all data in `channel`</span>
+<span class="sd">    Treats `dataset` as a single-channel object with all data in `channel`.</span>
+
+<span class="sd">    The splitting doesn&#39;t select (preserve) Hermitian pairs of visibilities.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
 
         <span class="c1"># get indices for cells in the top 1% of gridded weight</span>
@@ -595,7 +602,7 @@ title="Source repository"
         <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[:,</span> <span class="n">shuffle</span><span class="p">]</span>
 
         <span class="c1"># split indices into k subsets</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">splits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor_split</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor_split</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># current k-slice</span>
@@ -603,7 +610,7 @@ title="Source repository"
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
             <span class="n">test_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">]</span>
             <span class="n">train_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
                 <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splits</span><span class="p">))</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">]),</span>
@@ -647,7 +654,7 @@ title="Source repository"
 <span class="sd">        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.</span>
 <span class="sd">        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
 <span class="sd">        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
-<span class="sd">        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
+<span class="sd">        seed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
 
 <span class="sd">    Once initialized, iterate through the datasets like</span>
 
@@ -664,7 +671,7 @@ title="Source repository"
         <span class="n">gridded_dataset</span><span class="p">:</span> <span class="n">GriddedDataset</span><span class="p">,</span>
         <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dartboard</span><span class="p">:</span> <span class="n">Dartboard</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;k must be a positive integer&quot;</span><span class="p">)</span>
@@ -690,8 +697,8 @@ title="Source repository"
         <span class="c1"># partition the cell_list into k pieces</span>
         <span class="c1"># first, randomly permute the sequence to make sure</span>
         <span class="c1"># we don&#39;t get structured radial/azimuthal patterns</span>
-        <span class="k">if</span> <span class="n">npseed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">npseed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">),</span> <span class="n">k</span>
@@ -704,7 +711,7 @@ title="Source repository"
         <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">q_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">phi_edges</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">npseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DartboardSplitGridded</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.</span>
@@ -714,10 +721,10 @@ title="Source repository"
 <span class="sd">             k (int): the number of subpartitions of the dataset</span>
 <span class="sd">             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.</span>
 <span class="sd">             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.</span>
-<span class="sd">             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
+<span class="sd">             seed (int): (optional) numpy random seed to use for the permutation, for reproducibility</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="p">,</span> <span class="n">npseed</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DartboardSplitGridded</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the current k-slice we&#39;re on</span>
