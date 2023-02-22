@@ -98,13 +98,9 @@ class TrainTest:
         Set an initial guess for regularizer strengths :math:`\lambda_{x}` by
         comparing images generated with different visibility weighting.
 
-        The guesses update `self._lambda_*` values.
-
-        Returns
-        -------
-        guesses : dict
-            Dictionary containing the names and initial guesses of regularizers
+        The guesses update `lambda` values in `self.regularizers`.
         """
+
         # generate images of the data using two briggs robust values
         img1, _ = self._imager.get_dirty_image(weighting='briggs', 
                                                 robust=self._lambda_guess_briggs[0])
@@ -113,38 +109,34 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        guesses = {}
-
-        if "entropy" in self._lambda_guess:
+        if self.regularizers.get('entropy', {}).get('guess') == True:
             # force negative pixel values to small positive value
             img1_nn = torch.where(img1 < 0, 1e-10, img1)
             img2_nn = torch.where(img2 < 0, 1e-10, img2)
 
-            loss_e1 = entropy(img1_nn, self._entropy_prior_intensity)
-            loss_e2 = entropy(img2_nn, self._entropy_prior_intensity)
+            loss_e1 = entropy(img1_nn, self.regularizers['entropy']['prior_intensity'])
+            loss_e2 = entropy(img2_nn, self.regularizers['entropy']['prior_intensity'])
+            guess_e = 1 / (loss_e2 - loss_e1)
             # update stored value
-            self._lambda_entropy = 1 / (loss_e2 - loss_e1)
-            guesses["lambda_entropy"] = self._lambda_entropy
+            self.regularizers['entropy']['lambda'] = guess_e
 
-        if "sparsity" in self._lambda_guess:
+        if self.regularizers.get('sparsity', {}).get('guess') == True:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
-            self._lambda_sparsity = 1 / (loss_s2 - loss_s1)
-            guesses["lambda_sparsity"] = self._lambda_sparsity
+            guess_s = 1 / (loss_s2 - loss_s1)
+            self.regularizers['sparsity']['lambda'] = guess_s
 
-        if "TV" in self._lambda_guess:
-            loss_TV1 = TV_image(img1, self._TV_epsilon)
-            loss_TV2 = TV_image(img2, self._TV_epsilon)
-            self._lambda_TV = 1 / (loss_TV2 - loss_TV1)
-            guesses["lambda_TV"] = self._lambda_TV
+        if self.regularizers.get('TV', {}).get('guess') == True:
+            loss_TV1 = TV_image(img1, self.regularizers['TV']['epsilon'])
+            loss_TV2 = TV_image(img2, self.regularizers['TV']['epsilon'])
+            guess_TV = 1 / (loss_TV2 - loss_TV1)
+            self.regularizers['TV']['lambda'] = guess_TV
 
-        if "TSV" in self._lambda_guess:
+        if self.regularizers.get('TSV', {}).get('guess') == True:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
-            self._lambda_TSV = 1 / (loss_TSV2 - loss_TSV1)
-            guesses["lambda_TSV"] = self._lambda_TSV
-
-        return guesses
+            guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
+            self.regularizers['TSV']['lambda'] = guess_TSV
 
 
     def loss_eval(self, vis, dataset, sky_cube=None):
