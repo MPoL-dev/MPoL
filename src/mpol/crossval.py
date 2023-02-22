@@ -181,7 +181,7 @@ class CrossValidate:
         """
         all_scores = []
         if self._store_cv_diagnostics:
-            self._cv_diagnostics = defaultdict(list)
+            self._diagnostics = defaultdict(list)
 
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
@@ -225,7 +225,7 @@ class CrossValidate:
 
             loss, loss_history = trainer.train(model, train_set)
             if self._store_cv_diagnostics:
-                self._cv_diagnostics["loss_histories"].append(loss_history)
+                self._diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(model, test_set))
             # store the most recent train figure for diagnostics
             self.train_figure = trainer.train_figure 
@@ -241,9 +241,9 @@ class CrossValidate:
         return cv_score
 
     @property
-    def cv_diagnostics(self):
+    def diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop"""
-        return self._cv_diagnostics
+        return self._diagnostics
 
 
 class RandomCellSplitGridded:
