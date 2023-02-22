@@ -299,11 +299,14 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     axes : Matplotlib `~.axes.Axes` class
         Axes of the generated figure
     """
-    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10, 10))
+    fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
+
+    fig.suptitle(fig_title)
 
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
 
+    # current model image (linear colormap)
     im = axes[0, 0].imshow(
         mod_im,
         origin="lower",
@@ -314,8 +317,23 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     )
     cbar = plt.colorbar(im, ax=axes[0, 0])
     cbar.set_label('Jy arcsec$^{-2}$')
+    axes[0,0].set_title("Model image")
 
+    # current model image (asinh colormap)
     im = axes[0, 1].imshow(
+        mod_im,
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_im, stretch='asinh')
+    )
+    cbar = plt.colorbar(im, ax=axes[0, 1])
+    cbar.set_label('Jy arcsec$^{-2}$')
+    axes[0,1].set_title("Model image (asinh stretch)")
+
+    # current gradient image
+    im = axes[0, 2].imshow(
         mod_grad,
         origin="lower",
         interpolation="none",
@@ -323,7 +341,11 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
         cmap="inferno",
         norm=get_image_cmap_norm(mod_grad)
     )
-    cbar = plt.colorbar(im, ax=axes[0, 1])
+    cbar = plt.colorbar(im, ax=axes[0, 2])
+    cbar.set_label('Jy arcsec$^{-2}$')
+    axes[0,2].set_title("Gradient image")
+
+
     cbar.set_label('Jy arcsec$^{-2}$')
 
     if save_prefix is not None:
