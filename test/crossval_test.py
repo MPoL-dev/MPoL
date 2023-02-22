@@ -8,6 +8,7 @@ from mpol.crossval import (CrossValidate, DartboardSplitGridded,
                            RandomCellSplitGridded)
 from mpol.datasets import Dartboard
 from mpol.fourier import FourierCube
+from mpol.plot import split_diagnostics_fig
 
 
 def test_crossvalclass_split_dartboard(coords, averager, dataset, generic_parameters):
@@ -28,6 +29,18 @@ def test_crossvalclass_split_randomcell(coords, averager, dataset, generic_param
     crossval_pars = generic_parameters["crossval_pars"]
     cross_validator = CrossValidate(coords, averager, **crossval_pars)
     cross_validator.split_dataset(dataset)
+
+
+def test_crossvalclass_split_diagnostics_fig(coords, averager, dataset, generic_parameters, tmp_path):
+    # using the CrossValidate class, split a dataset into train/test subsets 
+    # using 'random_cell' splitter, then generate the split diagnostic figure 
+
+    crossval_pars = generic_parameters["crossval_pars"]
+    cross_validator = CrossValidate(coords, averager, **crossval_pars)
+    split_iterator = cross_validator.split_dataset(dataset)
+    split_fig, split_axes = split_diagnostics_fig(split_iterator)
+    split_fig.savefig(tmp_path / "split_diagnostics_fig.png", dpi=300)
+    plt.close("all")
 
 
 def test_crossvalclass_kfold(coords, averager, dataset, generic_parameters):
