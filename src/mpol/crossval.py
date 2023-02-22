@@ -218,6 +218,8 @@ class CrossValidate:
                 TV_epsilon=self._TV_epsilon,
                 lambda_TSV=self._lambda_TSV,
                 train_diag_step=self._train_diag_step,
+                kfold=kk,
+                save_prefix=self._save_prefix,
                 verbose=self._verbose,
             )
 

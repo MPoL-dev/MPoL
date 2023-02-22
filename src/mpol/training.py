@@ -45,6 +45,8 @@ class TrainTest:
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
+    kfold : int, default=None
+        The k-fold of the current training set (for diagnostics)        
     save_prefix : str, default=None
         Prefix (path) used for saved figure names. If None, figures won't be
         saved
@@ -56,7 +58,7 @@ class TrainTest:
                 lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
                 lambda_entropy=None, entropy_prior_intensity=1e-10, 
                 lambda_sparsity=None, lambda_TV=None, TV_epsilon=1e-10, 
-                lambda_TSV=None, train_diag_step=None, 
+                lambda_TSV=None, train_diag_step=None, kfold=None, 
                 save_prefix=None, verbose=True):
         self._imager = imager
         self._optimizer = optimizer
@@ -72,6 +74,7 @@ class TrainTest:
         self._lambda_TSV = lambda_TSV
         self._train_diag_step = train_diag_step
         self._save_prefix = save_prefix
+        self._kfold = kfold
         self._verbose = verbose
 
         self._train_figure = None
@@ -272,9 +275,9 @@ class TrainTest:
 
             # store current training parameter values
             # TODO: store hyperpar values, access in crossval.py
-            self._train_state["learn_rate"] = self._optimizer.state_dict()['param_groups'][0]['lr']
+            self._train_state["kfold"] = self._kfold 
             self._train_state["epoch"] = count
-            self._train_state["loss"] = loss.item()
+            self._train_state["learn_rate"] = self._optimizer.state_dict()['param_groups'][0]['lr']            
 
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs - 1):
