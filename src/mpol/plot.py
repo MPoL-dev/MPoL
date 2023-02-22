@@ -232,7 +232,7 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(4, splitter.k * 2))
+    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(6, 10))
 
     for ii, (train, test) in enumerate(splitter): 
         train_mask = torch2npy(train.ground_mask[channel])
@@ -249,11 +249,18 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     axes[0, 0].set_title("Training set ")
     axes[0, 1].set_title("Test set")
 
-    for aa in axes.flatten():
+    for aa in axes.flatten()[:-1]:
         aa.xaxis.set_ticklabels([])
         aa.yaxis.set_ticklabels([])
 
-    fig.subplots_adjust(left=0.1, hspace=0.0, wspace=0.2)
+    ax = axes[-1,1]
+    ax.set_xlabel(r'u [k$\lambda$]')
+    ax.set_ylabel(r'v [k$\lambda$]')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_ticks_position("both")
+    ax.yaxis.set_label_position("right")    
+
+    fig.subplots_adjust(left=0.05, hspace=0.0, wspace=0.1, top=0.9, bottom=0.1)
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_split_diag.png', dpi=300)
