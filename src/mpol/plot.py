@@ -199,7 +199,8 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_vis_histogram.png', dpi=300)
-        plt.close()
+    
+    plt.close()
 
     return fig, (ax0, ax1, ax2)
 
@@ -256,37 +257,30 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_split_diag.png', dpi=300)
-        plt.close()
+    
+    plt.close()
 
     return fig, axes
 
 
-def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
-                         losses=[], train_state=None, channel=0, 
+def train_diagnostics_fig(model, losses=[], train_state=None, channel=0, 
                         save_prefix=None):
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
         - model image (both linear and arcsinh colormap normalization)
         - gradient image
-        - Fourier plane residuals
-        - dirty image of Fourier plane residuals
         - loss function
 
     Parameters
     ----------
     model : `torch.nn.Module` object
         A neural network; instance of the `mpol.precomposed.SimpleNet` class.
-    vis_resid : array of complex 
-        Model loose residual visibility amplitudes of the form (Re(V) + 1j * Im(V))
-    imager : `mpol.gridding.DirtyImager` instance 
-        Dirty imager used to image Fourier plane residuals
-    briggs_robust : float, default=0.5
-        Briggs robust value for the dirty image of the Fourier plane residuals        
     losses : list
         Loss value at each epoch in the training loop
     train_state : dict, default=None
-        Dictionary containing current training parameter values       
+        Dictionary containing current training parameter values. Used for 
+        figure title and savefile name.
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure        
     save_prefix : string, default = None
@@ -299,15 +293,16 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     axes : Matplotlib `~.axes.Axes` class
         Axes of the generated figure
     """
-    fig, axes = plt.subplots(ncols=3, nrows=2, figsize=(12, 10))
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8))
 
-    fig.suptitle(fig_title)
+    fig.suptitle(train_state)
 
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
 
-    # current model image (linear colormap)
-    im = axes[0, 0].imshow(
+    # model image (linear colormap)
+    ax = axes[0,0]
+    im = ax.imshow(
         mod_im,
         origin="lower",
         interpolation="none",
@@ -315,12 +310,13 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
         cmap="inferno",
         norm=get_image_cmap_norm(mod_im)
     )
-    cbar = plt.colorbar(im, ax=axes[0, 0])
+    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
     cbar.set_label('Jy arcsec$^{-2}$')
-    axes[0,0].set_title("Model image")
+    ax.set_title("Model image")
 
-    # current model image (asinh colormap)
-    im = axes[0, 1].imshow(
+    # model image (asinh colormap)
+    ax = axes[0,1]
+    im = ax.imshow(
         mod_im,
         origin="lower",
         interpolation="none",
@@ -328,12 +324,15 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
         cmap="inferno",
         norm=get_image_cmap_norm(mod_im, stretch='asinh')
     )
-    cbar = plt.colorbar(im, ax=axes[0, 1])
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
     cbar.set_label('Jy arcsec$^{-2}$')
-    axes[0,1].set_title("Model image (asinh stretch)")
+    ax.set_title("Model image (asinh stretch)")
+    ax.set_xlabel(r"$\Delta \alpha \cos \delta \; [{}^{\prime\prime}]$")
+    ax.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
 
-    # current gradient image
-    im = axes[0, 2].imshow(
+    # gradient image
+    ax = axes[1,0]
+    im = ax.imshow(
         mod_grad,
         origin="lower",
         interpolation="none",
@@ -346,13 +345,17 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     ax.set_title("Gradient image")
 
     # loss function
-    axes[1,2].plot(losses, 'k')
-    axes[1,2].set_xlabel('Epoch')
-    axes[1,2].set_ylabel('Loss')
-    axes[1,2].set_title("Loss function")
+    ax = axes[1,1]
+    ax.semilogy(losses, 'k')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title("Loss function")
+
+    fig.subplots_adjust(wspace=0.25)
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_train_diag_epoch{:05d}.png'.format(train_state["epoch"]), dpi=300)
-        plt.close()
+        fig.savefig(save_prefix + '_train_diag_kfold{}_epoch{:05d}.png'.format(train_state["kfold"], train_state["epoch"]), dpi=300)
+    
+    plt.close()
 
     return fig, axes
