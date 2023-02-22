@@ -58,7 +58,7 @@ EXTRA_REQUIRES = {
 }
 
 EXTRA_REQUIRES["dev"] = (
-    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + EXTRA_REQUIRES["analysis"] + ["pylint", "black", "pre-commit"]
 )
 
 
