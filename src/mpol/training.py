@@ -31,11 +31,8 @@ class TrainTest:
         ('guess', bool), and other quantities needed to compute their loss term.
         Example:
             {"sparsity":{"lambda":1e-3, "guess":False},
-             "entropy": {"lambda":1e-3, "guess":True, "entropy_prior_intensity":1e-10}
+             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
             }
-    lambda_guess_briggs : list of float, default=[0.0, 0.5]
-        Briggs robust values for two images used to guess initial regularizer
-        values
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -49,21 +46,19 @@ class TrainTest:
     """
 
     def __init__(self, imager, optimizer, epochs=10000, convergence_tol=1e-3, 
-                regularizers={}, lambda_guess_briggs=[0.0, 0.5], 
-                train_diag_step=None, kfold=None, 
+                regularizers={}, train_diag_step=None, kfold=None, 
                 save_prefix=None, verbose=True
                 ):
         self._imager = imager
         self._optimizer = optimizer
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._lambda_guess_briggs = lambda_guess_briggs
+        self._regularizers = regularizers
         self._train_diag_step = train_diag_step
         self._save_prefix = save_prefix
         self._kfold = kfold
         self._verbose = verbose
 
-        self.regularizers = regularizers
         self._train_figure = None
 
     def loss_convergence(self, loss):
@@ -102,10 +97,8 @@ class TrainTest:
         """
 
         # generate images of the data using two briggs robust values
-        img1, _ = self._imager.get_dirty_image(weighting='briggs', 
-                                                robust=self._lambda_guess_briggs[0])
-        img2, _ = self._imager.get_dirty_image(weighting='briggs', 
-                                                robust=self._lambda_guess_briggs[1])
+        img1, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.0)
+        img2, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.5)
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
