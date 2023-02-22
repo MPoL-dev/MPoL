@@ -346,6 +346,19 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
     axes[0,2].set_title("Gradient image")
 
 
+    # Fourier plane residuals 
+    im = axes[1, 0].imshow(
+        np.real(vis_resid),
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+        cmap="bwr",
+        norm=get_image_cmap_norm(mod_grad)
+    )
+    cbar = plt.colorbar(im, ax=axes[1,0])
+    cbar.set_label('Re(V) [Jy]')
+    axes[1,0].set_title("Model Re(V) residuals")
+
     cbar.set_label('Jy arcsec$^{-2}$')
 
     if save_prefix is not None:
