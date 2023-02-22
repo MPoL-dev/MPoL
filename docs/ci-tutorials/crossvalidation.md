@@ -174,7 +174,7 @@ dartboard = datasets.Dartboard(coords=coords)
 
 # create cross validator using this "dartboard"
 k = 5
-cv = crossval.DartboardSplitGridded(dset, k, dartboard=dartboard, npseed=42)
+cv = crossval.DartboardSplitGridded(dset, k, dartboard=dartboard, seed=42)
 
 # ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.
 # Because we'll want to revisit the individual datasets

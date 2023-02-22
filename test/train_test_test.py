@@ -5,6 +5,7 @@ import torch.optim
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
+from mpol.plot import train_diagnostics_fig
 from mpol.training import TrainTest
 from mpol.constants import *
 
@@ -15,7 +16,7 @@ def test_traintestclass_training(coords, imager, dataset, generic_parameters):
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
-    # reset a key to bypass TrainTest.loss_lambda_guess
+    # bypass TrainTest.loss_lambda_guess
     train_pars["lambda_guess"] = None
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
@@ -39,6 +40,29 @@ def test_traintestclass_training_guess(coords, imager, dataset, generic_paramete
 
     trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
+
+
+def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_parameters, tmp_path):
+    # using the TrainTest class, run a training loop, 
+    # and generate the train diagnostics figure 
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"]
+    # bypass TrainTest.loss_lambda_guess
+    train_pars["lambda_guess"] = None
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+    train_state = trainer.train_state
+    train_fig, train_axes = train_diagnostics_fig(model, losses=loss_history, train_state=train_state)
+    train_fig.savefig(tmp_path / "train_diagnostics_fig.png", dpi=300)
+    plt.close("all")
 
 
 def test_traintestclass_testing(coords, imager, dataset, generic_parameters):

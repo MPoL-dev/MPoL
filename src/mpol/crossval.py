@@ -13,8 +13,7 @@ from numpy.typing import NDArray
 from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
-
-# from mpol.plot import splitter_diagnostics_fig # TODO
+from mpol.plot import split_diagnostics_fig
 
 
 class CrossValidate:
@@ -37,11 +36,11 @@ class CrossValidate:
         Seed for random number generator used in splitting data
     learn_rate : float, default=0.5
         Neural network learning rate
-    epochs : int, default=500
+    epochs : int, default=10000
         Number of training iterations
-    convergence_tol : float, default=1e-2
+    convergence_tol : float, default=1e-3
         Tolerance for training iteration stopping criterion as assessed by
-        loss function (suggested <= 1e-2)
+        loss function (suggested <= 1e-3)
     lambda_guess : list of str, default=None
         List of regularizers for which to guess an initial value
     lambda_guess_briggs : list of float, default=[0.0, 0.5]
@@ -85,8 +84,8 @@ class CrossValidate:
         split_method="random_cell",
         seed=None,
         learn_rate=0.5,
-        epochs=500,
-        convergence_tol=1e-2,
+        epochs=10000,
+        convergence_tol=1e-3,
         lambda_guess=None,
         lambda_guess_briggs=[0.0, 0.5],
         lambda_entropy=None,
@@ -125,6 +124,8 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
+        self.split_figure = None
+
     def split_dataset(self, dataset):
         r"""
         Split a dataset into training and test subsets.
@@ -136,13 +137,13 @@ class CrossValidate:
 
         Returns
         -------
-        subsets : iterator returning tuple
-            Iterator that provides a (train, test) pair of
+        split_iterator : iterator returning tuple
+            Iterator that provides a (train, test) pair of 
             :class:`~mpol.datasets.GriddedDataset` for each k-fold
         """
         if self._split_method == "random_cell":
             split_iterator = RandomCellSplitGridded(
-                dataset=dataset, kfolds=self._kfolds, seed=self._seed
+                dataset=dataset, k=self._kfolds, seed=self._seed
             )
 
         elif self._split_method == "dartboard":
@@ -151,7 +152,7 @@ class CrossValidate:
 
             # use 'dartboard' to split full dataset into train/test subsets
             split_iterator = DartboardSplitGridded(
-                dataset, k=self._kfolds, dartboard=dartboard, npseed=self._seed
+                dataset, k=self._kfolds, dartboard=dartboard, seed=self._seed
             )
 
         else:
@@ -174,19 +175,19 @@ class CrossValidate:
             Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------
-        cv_score : (float, float)
-            Tuple of (mean, standard deviation) of cross-validation scores
-            across all k-folds
-        all_scores : list of float
-            Individual cross-validation scores for each k-fold
-        loss_histories : list of float
-            Loss function values for each training loop
+        cv_score : dict 
+            Dictionary with mean and standard deviation of cross-validation 
+            scores across all k-folds, and all raw scores
         """
         all_scores = []
         if self._store_cv_diagnostics:
             self._diagnostics = defaultdict(list)
 
         split_iterator = self.split_dataset(dataset)
+        if self._split_diag_fig:
+            split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
+            self.split_figure = (split_fig, split_axes)
+
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
                 logging.info(
@@ -217,6 +218,8 @@ class CrossValidate:
                 TV_epsilon=self._TV_epsilon,
                 lambda_TSV=self._lambda_TSV,
                 train_diag_step=self._train_diag_step,
+                kfold=kk,
+                save_prefix=self._save_prefix,
                 verbose=self._verbose,
             )
 
@@ -224,7 +227,9 @@ class CrossValidate:
             if self._store_cv_diagnostics:
                 self._diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(self.model, test_set))
-
+            # store the most recent train figure for diagnostics
+            self.train_figure = trainer.train_figure 
+            
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
         cv_score = {
@@ -252,7 +257,7 @@ class RandomCellSplitGridded:
     ----------
     dataset : PyTorch dataset object
         Instance of the `mpol.datasets.GriddedDataset` class
-    kfolds : int, default=5
+    k : int, default=5
         Number of k-folds (partitions) of `dataset`
     seed : int, default=None
         Seed for PyTorch random number generator used to shuffle data before
@@ -260,21 +265,23 @@ class RandomCellSplitGridded:
     channel : int, default=0
         Channel of the dataset to use in determining the splits
 
+    Notes
+    -----
     Once initialized, iterate through the datasets like:
-        >>> split_iterator = crossval.RandomCellSplitGridded(dataset, kfolds)
-        >>> for (train, test) in split_iterator: # iterate through `kfolds` datasets
-        >>> ... # working with the n-th slice of `kfolds` datasets
+        >>> split_iterator = crossval.RandomCellSplitGridded(dataset, k)
+        >>> for (train, test) in split_iterator: # iterate through `k` datasets
+        >>> ... # working with the n-th slice of `k` datasets
         >>> ... # do operations with train dataset
         >>> ... # do operations with test dataset
 
-    Notes
-    -----
-    Treats `dataset` as a single-channel object with all data in `channel`
+    Treats `dataset` as a single-channel object with all data in `channel`.
+
+    The splitting doesn't select (preserve) Hermitian pairs of visibilities.
     """
 
-    def __init__(self, dataset, kfolds=5, seed=None, channel=0):
+    def __init__(self, dataset, k=5, seed=None, channel=0):
         self.dataset = dataset
-        self.kfolds = kfolds
+        self.k = k
         self.channel = channel
 
         # get indices for cells in the top 1% of gridded weight
@@ -305,7 +312,7 @@ class RandomCellSplitGridded:
         split_idx = split_idx[:, shuffle]
 
         # split indices into k subsets
-        self.splits = torch.tensor_split(split_idx, self.kfolds, dim=1)
+        self.splits = torch.tensor_split(split_idx, self.k, dim=1)
 
     def __iter__(self):
         # current k-slice
@@ -313,7 +320,7 @@ class RandomCellSplitGridded:
         return self
 
     def __next__(self):
-        if self._n < self.kfolds:
+        if self._n < self.k:
             test_idx = self.splits[self._n]
             train_idx = torch.cat(
                 ([self.splits[x] for x in range(len(self.splits)) if x != self._n]),
@@ -357,7 +364,7 @@ class DartboardSplitGridded:
         dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
         q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
         phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-        npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
 
     Once initialized, iterate through the datasets like
 
@@ -374,7 +381,7 @@ class DartboardSplitGridded:
         gridded_dataset: GriddedDataset,
         k: int,
         dartboard: Dartboard | None = None,
-        npseed: int | None = None,
+        seed: int | None = None,
     ):
         if k <= 0:
             raise ValueError("k must be a positive integer")
@@ -400,8 +407,8 @@ class DartboardSplitGridded:
         # partition the cell_list into k pieces
         # first, randomly permute the sequence to make sure
         # we don't get structured radial/azimuthal patterns
-        if npseed is not None:
-            np.random.seed(npseed)
+        if seed is not None:
+            np.random.seed(seed)
 
         self.k_split_cell_list = np.array_split(
             np.random.permutation(self.cell_list), k
@@ -414,7 +421,7 @@ class DartboardSplitGridded:
         k: int,
         q_edges: NDArray[floating[Any]],
         phi_edges: NDArray[floating[Any]],
-        npseed: int | None = None,
+        seed: int | None = None,
     ) -> DartboardSplitGridded:
         """
         Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.
@@ -424,10 +431,10 @@ class DartboardSplitGridded:
              k (int): the number of subpartitions of the dataset
              q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
              phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-             npseed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+             seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
         """
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
-        return cls(gridded_dataset, k, dartboard, npseed)
+        return cls(gridded_dataset, k, dartboard, seed)
 
     def __iter__(self) -> DartboardSplitGridded:
         self.n = 0  # the current k-slice we're on
