@@ -41,23 +41,17 @@ class CrossValidate:
     convergence_tol : float, default=1e-3
         Tolerance for training iteration stopping criterion as assessed by
         loss function (suggested <= 1e-3)
-    lambda_guess : list of str, default=None
-        List of regularizers for which to guess an initial value
+    regularizers : nested dict, default={}
+        Dictionary of image regularizers to use. For each, a dict of the 
+        strength ('lambda', float), whether to guess an initial value for lambda 
+        ('guess', bool), and other quantities needed to compute their loss term.
+        Example:
+            {"sparsity":{"lambda":1e-3, "guess":False},
+             "entropy": {"lambda":1e-3, "guess":True, "entropy_prior_intensity":1e-10}
+            }
     lambda_guess_briggs : list of float, default=[0.0, 0.5]
         Briggs robust values for two images used to guess initial regularizer
-        values (if lambda_guess is not None)
-    lambda_entropy : float
-        Relative strength for entropy regularizer
-    entropy_prior_intensity : float, default=1e-10
-        Prior value :math:`p` to calculate entropy against (suggested <<1)
-    lambda_sparsity : float, default=None
-        Relative strength for sparsity regularizer
-    lambda_TV : float, default=None
-        Relative strength for total variation (TV) regularizer
-    TV_epsilon : float, default=1e-10
-        Softening parameter for TV regularizer (suggested <<1)
-    lambda_TSV : float, default=None
-        Relative strength for total squared variation (TSV) regularizer
+        values
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -76,31 +70,13 @@ class CrossValidate:
         Whether to print notification messages.
     """
 
-    def __init__(
-        self,
-        coords,
-        imager,
-        kfolds=5,
-        split_method="random_cell",
-        seed=None,
-        learn_rate=0.5,
-        epochs=10000,
-        convergence_tol=1e-3,
-        lambda_guess=None,
-        lambda_guess_briggs=[0.0, 0.5],
-        lambda_entropy=None,
-        entropy_prior_intensity=1e-10,
-        lambda_sparsity=None,
-        lambda_TV=None,
-        TV_epsilon=1e-10,
-        lambda_TSV=None,
-        train_diag_step=None,
-        split_diag_fig=False,
-        store_cv_diagnostics=False,
-        save_prefix=None,
-        device=None,
-        verbose=True,
-    ):
+    def __init__(self, coords, imager, kfolds=5, split_method="random_cell",
+                seed=None, learn_rate=0.5, epochs=10000, convergence_tol=1e-3,
+                regularizers={}, lambda_guess_briggs=[0.0, 0.5], 
+                train_diag_step=None, split_diag_fig=False, 
+                store_cv_diagnostics=False, save_prefix=None, device=None, 
+                verbose=True
+                ):
         self._coords = coords
         self._imager = imager
         self._kfolds = kfolds
@@ -109,14 +85,7 @@ class CrossValidate:
         self._learn_rate = learn_rate
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._lambda_guess = lambda_guess
         self._lambda_guess_briggs = lambda_guess_briggs
-        self._lambda_entropy = lambda_entropy
-        self._entropy_prior_intensity = entropy_prior_intensity
-        self._lambda_sparsity = lambda_sparsity
-        self._lambda_TV = lambda_TV
-        self._TV_epsilon = TV_epsilon
-        self._lambda_TSV = lambda_TSV
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
@@ -124,6 +93,7 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
+        self.regularizers = regularizers
         self.split_figure = None
 
     def split_dataset(self, dataset):
@@ -209,14 +179,8 @@ class CrossValidate:
                 optimizer=optimizer,
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
-                lambda_guess=self._lambda_guess,
+                regularizers=self.regularizers,
                 lambda_guess_briggs=self._lambda_guess_briggs,
-                lambda_entropy=self._lambda_entropy,
-                entropy_prior_intensity=self._entropy_prior_intensity,
-                lambda_sparsity=self._lambda_sparsity,
-                lambda_TV=self._lambda_TV,
-                TV_epsilon=self._TV_epsilon,
-                lambda_TSV=self._lambda_TSV,
                 train_diag_step=self._train_diag_step,
                 kfold=kk,
                 save_prefix=self._save_prefix,
