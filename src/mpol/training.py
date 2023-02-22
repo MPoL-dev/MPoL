@@ -93,7 +93,7 @@ class TrainTest:
         Set an initial guess for regularizer strengths :math:`\lambda_{x}` by
         comparing images generated with different visibility weighting.
 
-        The guesses update `lambda` values in `self.regularizers`.
+        The guesses update `lambda` values in `self._regularizers`.
         """
 
         # generate images of the data using two briggs robust values
@@ -102,34 +102,34 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        if self.regularizers.get('entropy', {}).get('guess') == True:
+        if self._regularizers.get('entropy', {}).get('guess') == True:
             # force negative pixel values to small positive value
             img1_nn = torch.where(img1 < 0, 1e-10, img1)
             img2_nn = torch.where(img2 < 0, 1e-10, img2)
 
-            loss_e1 = entropy(img1_nn, self.regularizers['entropy']['prior_intensity'])
-            loss_e2 = entropy(img2_nn, self.regularizers['entropy']['prior_intensity'])
+            loss_e1 = entropy(img1_nn, self._regularizers['entropy']['prior_intensity'])
+            loss_e2 = entropy(img2_nn, self._regularizers['entropy']['prior_intensity'])
             guess_e = 1 / (loss_e2 - loss_e1)
             # update stored value
-            self.regularizers['entropy']['lambda'] = guess_e
+            self._regularizers['entropy']['lambda'] = guess_e
 
-        if self.regularizers.get('sparsity', {}).get('guess') == True:
+        if self._regularizers.get('sparsity', {}).get('guess') == True:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
             guess_s = 1 / (loss_s2 - loss_s1)
-            self.regularizers['sparsity']['lambda'] = guess_s
+            self._regularizers['sparsity']['lambda'] = guess_s
 
-        if self.regularizers.get('TV', {}).get('guess') == True:
-            loss_TV1 = TV_image(img1, self.regularizers['TV']['epsilon'])
-            loss_TV2 = TV_image(img2, self.regularizers['TV']['epsilon'])
+        if self._regularizers.get('TV', {}).get('guess') == True:
+            loss_TV1 = TV_image(img1, self._regularizers['TV']['epsilon'])
+            loss_TV2 = TV_image(img2, self._regularizers['TV']['epsilon'])
             guess_TV = 1 / (loss_TV2 - loss_TV1)
-            self.regularizers['TV']['lambda'] = guess_TV
+            self._regularizers['TV']['lambda'] = guess_TV
 
-        if self.regularizers.get('TSV', {}).get('guess') == True:
+        if self._regularizers.get('TSV', {}).get('guess') == True:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
             guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
-            self.regularizers['TSV']['lambda'] = guess_TSV
+            self._regularizers['TSV']['lambda'] = guess_TSV
 
 
     def loss_eval(self, vis, dataset, sky_cube=None):
@@ -153,16 +153,16 @@ class TrainTest:
 
         # regularizers
         if sky_cube is not None:
-            if self.regularizers.get('entropy', {}).get('lambda') is not None:
-                loss += self.regularizers['entropy']['lambda'] * entropy(
-                    sky_cube, self.regularizers['entropy']['prior_intensity'])
-            if self.regularizers.get('sparsity', {}).get('lambda') is not None:
-                loss += self.regularizers['sparsity']['lambda'] * sparsity(sky_cube)
-            if self.regularizers.get('TV', {}).get('lambda') is not None:
-                loss += self.regularizers['TV']['lambda'] * TV_image(
-                    sky_cube, self.regularizers['TV']['epsilon'])
-            if self.regularizers.get('TSV', {}).get('lambda') is not None:
-                loss += self.regularizers['TSV']['lambda'] * TSV(sky_cube)
+            if self._regularizers.get('entropy', {}).get('lambda') is not None:
+                loss += self._regularizers['entropy']['lambda'] * entropy(
+                    sky_cube, self._regularizers['entropy']['prior_intensity'])
+            if self._regularizers.get('sparsity', {}).get('lambda') is not None:
+                loss += self._regularizers['sparsity']['lambda'] * sparsity(sky_cube)
+            if self._regularizers.get('TV', {}).get('lambda') is not None:
+                loss += self._regularizers['TV']['lambda'] * TV_image(
+                    sky_cube, self._regularizers['TV']['epsilon'])
+            if self._regularizers.get('TSV', {}).get('lambda') is not None:
+                loss += self._regularizers['TSV']['lambda'] * TSV(sky_cube)
 
         return loss
 
@@ -194,13 +194,13 @@ class TrainTest:
         losses = []
         self._train_state = {}
 
-        # guess initial strengths for regularizers in `self.regularizers`
+        # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
-        # (this updates `self.regularizers`) 
+        # (this updates `self._regularizers`) 
         self.loss_lambda_guess()
 
         if self._verbose:
-            logging.info("    Image regularizers: {}".format(self.regularizers))
+            logging.info("    Image regularizers: {}".format(self._regularizers))
 
         while not self.loss_convergence(np.array(losses)) and count <= self._epochs:
             if self._verbose:
@@ -297,6 +297,11 @@ class TrainTest:
 
         # return loss value
         return loss.item()
+
+    @property
+    def regularizers(self):
+        """Dict containing regularizers used and their strengths"""
+        return self._regularizers
 
     @property
     def train_figure(self):
