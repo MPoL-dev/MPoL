@@ -299,7 +299,6 @@ class TrainTest:
 
         # return loss value    
         return loss.item(), losses
-        # TODO: once have object collecting pipeline outputs, return anything needed here
 
 
     def test(self, model, dataset):
