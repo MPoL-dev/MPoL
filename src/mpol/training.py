@@ -280,10 +280,13 @@ class TrainTest:
             self._train_state["learn_rate"] = self._optimizer.state_dict()['param_groups'][0]['lr']            
 
             # generate optional fit diagnostics
-            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs - 1):
-                # model residual visibilities
-                model_vis = index_vis(vis, dataset)
-                vis_resid = dataset.vis_indexed - model_vis
+            if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs or self.loss_convergence(np.array(losses))):
+                train_fig, train_axes = train_diagnostics_fig(
+                    model, losses=losses, train_state=self._train_state, 
+                    save_prefix=self._save_prefix
+                    )
+                self._train_figure = (train_fig, train_axes)
+
             count += 1
 
         if self._verbose:
