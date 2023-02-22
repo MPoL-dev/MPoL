@@ -261,11 +261,13 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     return fig, axes
 
 
-def train_diagnostics_fig(model, channel=0, save_prefix=None):
+def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
+                         losses=[], train_state=None, channel=0, 
+                        save_prefix=None):
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
-        - model image
+        - model image (both linear and arcsinh colormap normalization)
         - gradient image
         - Fourier plane residuals
         - dirty image of Fourier plane residuals
@@ -275,8 +277,18 @@ def train_diagnostics_fig(model, channel=0, save_prefix=None):
     ----------
     model : `torch.nn.Module` object
         A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    vis_resid : array of complex 
+        Model loose residual visibility amplitudes of the form (Re(V) + 1j * Im(V))
+    imager : `mpol.gridding.DirtyImager` instance 
+        Dirty imager used to image Fourier plane residuals
+    briggs_robust : float, default=0.5
+        Briggs robust value for the dirty image of the Fourier plane residuals        
+    losses : list
+        Loss value at each epoch in the training loop
+    train_state : dict, default=None
+        Dictionary containing current training parameter values       
     channel : int, default=0
-        Channel (of the datasets in `splitter`) to use to generate figure
+        Channel (of the datasets in `splitter`) to use to generate figure        
     save_prefix : string, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
