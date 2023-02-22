@@ -222,7 +222,7 @@ class CrossValidate:
 
             loss, loss_history = trainer.train(self.model, train_set)
             if self._store_cv_diagnostics:
-                self._cv_diagnostics["loss_histories"].append(loss_history)
+                self._diagnostics["loss_histories"].append(loss_history)
             all_scores.append(trainer.test(self.model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen
