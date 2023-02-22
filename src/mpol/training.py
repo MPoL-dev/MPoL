@@ -201,16 +201,13 @@ class TrainTest:
         losses = []
         self._train_state = {}
 
-        if self._lambda_guess is not None:
-            # guess initial regularizer strengths ('lambda's); 
-            # update lambda values in 'self'
-            lambda_guesses = self.loss_lambda_guess()
+        # guess initial strengths for regularizers in `self.regularizers`
+        # that have 'guess':True
+        # (this updates `self.regularizers`) 
+        self.loss_lambda_guess()
 
-            if self._verbose:
-                logging.info(
-                    "    Autonomous guesses applied for the following "
-                    "initial regularizer strengths: {}".format(lambda_guesses)
-                )
+        if self._verbose:
+            logging.info("    Image regularizers: {}".format(self.regularizers))
 
         while not self.loss_convergence(np.array(losses)) and count <= self._epochs:
             if self._verbose:
