@@ -47,11 +47,8 @@ class CrossValidate:
         ('guess', bool), and other quantities needed to compute their loss term.
         Example:
             {"sparsity":{"lambda":1e-3, "guess":False},
-             "entropy": {"lambda":1e-3, "guess":True, "entropy_prior_intensity":1e-10}
+             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
             }
-    lambda_guess_briggs : list of float, default=[0.0, 0.5]
-        Briggs robust values for two images used to guess initial regularizer
-        values
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -72,8 +69,7 @@ class CrossValidate:
 
     def __init__(self, coords, imager, kfolds=5, split_method="random_cell",
                 seed=None, learn_rate=0.5, epochs=10000, convergence_tol=1e-3,
-                regularizers={}, lambda_guess_briggs=[0.0, 0.5], 
-                train_diag_step=None, split_diag_fig=False, 
+                regularizers={}, train_diag_step=None, split_diag_fig=False, 
                 store_cv_diagnostics=False, save_prefix=None, device=None, 
                 verbose=True
                 ):
@@ -85,7 +81,6 @@ class CrossValidate:
         self._learn_rate = learn_rate
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._lambda_guess_briggs = lambda_guess_briggs
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
