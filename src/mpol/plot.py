@@ -198,7 +198,7 @@ def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=Non
                     alpha=0.3)
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_vis_histogram_fig.png', dpi=300)
+        fig.savefig(save_prefix + '_vis_histogram.png', dpi=300)
         plt.close()
 
     return fig, (ax0, ax1, ax2)
@@ -255,7 +255,7 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     fig.subplots_adjust(left=0.1, hspace=0.0, wspace=0.2)
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_splitter_diagnostics_fig.png', dpi=300)
+        fig.savefig(save_prefix + '_split_diag.png', dpi=300)
         plt.close()
 
     return fig, axes
