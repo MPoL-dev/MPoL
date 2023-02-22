@@ -341,38 +341,9 @@ def train_diagnostics_fig(model, vis_resid, imager, briggs_robust=0.5,
         cmap="inferno",
         norm=get_image_cmap_norm(mod_grad)
     )
-    cbar = plt.colorbar(im, ax=axes[0, 2])
+    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
     cbar.set_label('Jy arcsec$^{-2}$')
-    axes[0,2].set_title("Gradient image")
-
-
-    # Fourier plane residuals 
-    im = axes[1, 0].imshow(
-        np.real(vis_resid),
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="bwr",
-        norm=get_image_cmap_norm(mod_grad)
-    )
-    cbar = plt.colorbar(im, ax=axes[1,0])
-    cbar.set_label('Re(V) [Jy]')
-    axes[1,0].set_title("Model Re(V) residuals")
-
-    # dirty image of Fourier plane residuals
-    resid_im, _ = imager.get_dirty_image(weighting="briggs", robust=briggs_robust)
-    im = axes[1, 1].imshow(
-        resid_im,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.vis_ext,
-        cmap="bwr",
-        norm=get_image_cmap_norm(resid_im)
-    )
-    cbar = plt.colorbar(im, ax=axes[1, 1])
-    cbar.set_label('Jy arcsec$^{-2}$')
-    axes[1,1].set_title("Dirty image of Re(V) resid. (robust={})".format(briggs_robust))
-
+    ax.set_title("Gradient image")
 
     # loss function
     axes[1,2].plot(losses, 'k')
