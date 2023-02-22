@@ -5,20 +5,15 @@ from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
-def get_1d_vis_fit(model, u, v, chan=0):
+def get_1d_vis_fit(model, chan=0):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image-domain model. 
 
     Parameters
     ----------
-    # TODO 
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
-    u : array, unit=:math:[`k\lambda`] 
-        u-coordinates at which to sample (e.g., those of the dataset)
-    v : array, unit=:math:[`k\lambda`]
-        v-coordinates at which to sample (e.g., those of the dataset)
     chan : int, default=0
         Channel of `model` to select
 
@@ -31,17 +26,14 @@ def get_1d_vis_fit(model, u, v, chan=0):
 
     Notes
     -----
-    This routine requires the `frank <https://github.com/discsim/frank>`_ package 
+    This routine requires the `frank <https://github.com/discsim/frank>`_ package # TODO
     """
-    from mpol.geometry import deproject_vis
+    # from mpol.geometry import deproject_vis # TODO
     # deproject_vis(u, v, V, weights, source_geom, inverse, rescale_flux) # TODO
 
-    q = np.hypot(u, v)
+    q = model.coords.packed_q_centers_2D.ravel()
+    Vmod = model.fcube.vis.detach()[chan].ravel()
 
-    nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u, vv=v)
-    # get model visibilities 
-    Vmod = nufft(model.icube()).detach()[chan]
-    
     return q, Vmod
 
 
