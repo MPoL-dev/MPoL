@@ -20,11 +20,11 @@ class TrainTest:
         Instance of the `mpol.gridding.DirtyImager` class.
     optimizer : `torch.optim` object
         PyTorch optimizer class for the training loop.
-    epochs : int, default=500
+    epochs : int, default=10000
         Number of training iterations
-    convergence_tol : float, default=1e-2
+    convergence_tol : float, default=1e-3
         Tolerance for training iteration stopping criterion as assessed by
-        loss function (suggested <= 1e-2)
+        loss function (suggested <= 1e-3)
     lambda_guess : list of str, default=None
         List of regularizers for which to guess an initial value
     lambda_guess_briggs : list of float, default=[0.0, 0.5]
@@ -54,7 +54,7 @@ class TrainTest:
         Whether to print notification messages
     """
 
-    def __init__(self, imager, optimizer, epochs=500, convergence_tol=1e-2, 
+    def __init__(self, imager, optimizer, epochs=10000, convergence_tol=1e-3, 
                 lambda_guess=None, lambda_guess_briggs=[0.0, 0.5], 
                 lambda_entropy=None, entropy_prior_intensity=1e-10, 
                 lambda_sparsity=None, lambda_TV=None, TV_epsilon=1e-10, 
