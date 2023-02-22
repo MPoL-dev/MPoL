@@ -56,7 +56,7 @@ dartboard = datasets.Dartboard(coords=coords)
 
 # create cross validator using this "dartboard"
 k = 5
-cv = crossval.DartboardSplitGridded(dataset, k, dartboard=dartboard, npseed=42)
+cv = crossval.DartboardSplitGridded(dataset, k, dartboard=dartboard, seed=42)
 k_fold_datasets = [(train, test) for (train, test) in cv]
 
 # create the model

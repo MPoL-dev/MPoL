@@ -2,13 +2,47 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
 
-from mpol.utils import loglinspace, torch2npy
+from astropy.visualization.mpl_normalize import simple_norm
 
-def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
-    phi_edges=None, q_edges1d=None, show_datapoints=False, savename=None):
+from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
+
+def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
+    """
+    Get a colormap normalization to apply to an image. 
+
+    image : array
+        An image array.
+    stretch : string, default = 'power'
+        Transformation to apply to the colormap. 'power' is a
+        power law stretch; 'asinh' is an arcsinh stretch.
+    gamma : float, default = 1.0
+        Index of power law normalization (see matplotlib.colors.PowerNorm).
+        gamma=1.0 yields a linear colormap.
+    asinh_a : float, default = 0.02
+        Scale parameter for an asinh stretch.
+    """
+    vmax = image.max()
+
+    if stretch == 'power':
+        vmin = 0
+        norm = mco.PowerNorm(gamma, vmin, vmax)    
+    
+    elif stretch == 'asinh':
+        vmin = max(0, image.min())
+        norm = simple_norm(image, stretch='asinh', asinh_a=asinh_a, 
+                        min_cut=vmin, max_cut=vmax)
+
+    else:
+        raise ValueError("'stretch' must be one of 'asinh' or 'power'.")
+    
+    return norm
+
+
+def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
+    phi_edges=None, q_edges1d=None, show_datapoints=False, save_prefix=None):
     r"""
     Generate a figure with 1d and 2d histograms of (u,v)-plane coverage. 
-    Histograms can give raw counts or weighted counts using the dataset weights.
+    Histograms can show different data; see `bin_quantity` parameter.
 
     Parameters
     ----------
@@ -35,8 +69,8 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
     show_datapoints : bool, default = False 
         Whether to overplot the raw visibilities in `dataset` on the 2d 
         histogram.
-    savename : string, default = None
-        If provided, the generated figure will be saved to `savename`.
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
 
     Returns
     -------
@@ -51,9 +85,14 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
     are projected or deprojected.
     """
 
+    # convert dataset pytorch tensors to numpy for convenience
+    mask_npy = torch2npy(dataset.mask)
+    vis_npy = torch2npy(dataset.vis_indexed)
+    weight_npy = torch2npy(dataset.weight_indexed)
+
     # 2D mask for any UV cells that contain visibilities
     # in *any* channel
-    stacked_mask = np.any(torch2npy(dataset.mask), axis=0)
+    stacked_mask = np.any(mask_npy, axis=0)
 
     # get qs, phis from dataset and turn into 1D lists
     qs = dataset.coords.packed_q_centers_2D[stacked_mask]
@@ -68,18 +107,15 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
         hist_lab = 'Count'
         
     elif bin_quantity == 'weight':
-        data_weight = torch2npy(dataset.weight_indexed)
-        weights = np.copy(data_weight)
+        weights = np.copy(weight_npy)
         hist_lab = 'Weight'
 
     elif bin_quantity == 'vis_real':
-        data_vis = torch2npy(dataset.vis_indexed)
-        weights = np.abs(np.real(data_vis))
+        weights = np.abs(np.real(vis_npy))
         hist_lab = '|Re(V)|'
 
     elif bin_quantity == 'vis_imag':
-        data_vis = torch2npy(dataset.vis_indexed)
-        weights = np.abs(np.imag(data_vis))
+        weights = np.abs(np.imag(vis_npy))
         hist_lab = '|Im(V)|'
 
     else:
@@ -161,7 +197,172 @@ def vis_histogram(dataset, bin_quantity='count', bin_label=None, q_edges=None,
         ax2.scatter(phis, qs, s=1.5, rasterized=True, linewidths=0.0, c="k", 
                     alpha=0.3)
 
-    if savename:
-        fig.savefig(savename, dpi=300)
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_vis_histogram.png', dpi=300)
+    
+    plt.close()
 
     return fig, (ax0, ax1, ax2)
+
+
+def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
+    r"""
+    Generate a figure showing (u,v) coverage in train and test sets split from 
+    a parent dataset.
+
+    Parameters
+    ----------
+    splitter : `mpol.crossval.RandomCellSplitGridded` object
+        Iterator that returns a `(train, test)` pair of `GriddedDataset`s 
+        for each iteration.
+    channel : int, default=0
+        Channel (of the datasets in `splitter`) to use to generate figure
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+
+    Notes
+    -----
+    No assumption or correction is made concerning whether the (u,v) distances 
+    are projected or deprojected.
+    """
+    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(6, 10))
+
+    for ii, (train, test) in enumerate(splitter): 
+        train_mask = torch2npy(train.ground_mask[channel])
+        test_mask = torch2npy(test.ground_mask[channel])
+        vis_ext = train.coords.vis_ext
+
+        axes[ii, 0].imshow(train_mask, origin="lower", extent=vis_ext, 
+            cmap="Greys", interpolation="none")        
+        axes[ii, 1].imshow(test_mask, origin="lower", extent=vis_ext, 
+            cmap="Greys", interpolation="none")            
+
+        axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
+
+    axes[0, 0].set_title("Training set ")
+    axes[0, 1].set_title("Test set")
+
+    for aa in axes.flatten()[:-1]:
+        aa.xaxis.set_ticklabels([])
+        aa.yaxis.set_ticklabels([])
+
+    ax = axes[-1,1]
+    ax.set_xlabel(r'u [k$\lambda$]')
+    ax.set_ylabel(r'v [k$\lambda$]')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_ticks_position("both")
+    ax.yaxis.set_label_position("right")    
+
+    fig.subplots_adjust(left=0.05, hspace=0.0, wspace=0.1, top=0.9, bottom=0.1)
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_split_diag.png', dpi=300)
+    
+    plt.close()
+
+    return fig, axes
+
+
+def train_diagnostics_fig(model, losses=[], train_state=None, channel=0, 
+                        save_prefix=None):
+    """
+    Figure for model diagnostics during an optimization loop. For a `model` in 
+    a given state, plots the current: 
+        - model image (both linear and arcsinh colormap normalization)
+        - gradient image
+        - loss function
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    losses : list
+        Loss value at each epoch in the training loop
+    train_state : dict, default=None
+        Dictionary containing current training parameter values. Used for 
+        figure title and savefile name.
+    channel : int, default=0
+        Channel (of the datasets in `splitter`) to use to generate figure        
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+    """
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8))
+
+    fig.suptitle(train_state)
+
+    mod_im = torch2npy(model.icube.sky_cube[channel])
+    mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
+
+    # model image (linear colormap)
+    ax = axes[0,0]
+    im = ax.imshow(
+        mod_im,
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_im)
+    )
+    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
+    cbar.set_label('Jy arcsec$^{-2}$')
+    ax.set_title("Model image")
+
+    # model image (asinh colormap)
+    ax = axes[0,1]
+    im = ax.imshow(
+        mod_im,
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_im, stretch='asinh')
+    )
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
+    cbar.set_label('Jy arcsec$^{-2}$')
+    ax.set_title("Model image (asinh stretch)")
+    ax.set_xlabel(r"$\Delta \alpha \cos \delta \; [{}^{\prime\prime}]$")
+    ax.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
+
+    # gradient image
+    ax = axes[1,0]
+    im = ax.imshow(
+        mod_grad,
+        origin="lower",
+        interpolation="none",
+        extent=model.icube.coords.img_ext,
+        cmap="inferno",
+        norm=get_image_cmap_norm(mod_grad)
+    )
+    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
+    cbar.set_label('Jy arcsec$^{-2}$')
+    ax.set_title("Gradient image")
+
+    # loss function
+    ax = axes[1,1]
+    ax.semilogy(losses, 'k')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title("Loss function")
+
+    fig.subplots_adjust(wspace=0.25)
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_train_diag_kfold{}_epoch{:05d}.png'.format(train_state["kfold"], train_state["epoch"]), dpi=300)
+    
+    plt.close()
+
+    return fig, axes

@@ -449,3 +449,37 @@ def make_fake_data(imageCube, uu, vv, weight):
     vis_noise = vis_noiseless + noise
 
     return vis_noise, vis_noiseless
+
+
+def get_vis_residuals(model, u_true, v_true, V_true, channel=0):
+    r"""
+    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose 
+    (ungridded) data visiblities at data (u, v) coordinates
+    
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        Instance of the `mpol.precomposed.SimpleNet` class. Contains model 
+        visibilities.
+    u_true, v_true : array, unit=[k\lambda]
+        Data u- and v-coordinates
+    V_true : array, unit=[Jy]
+        Data visibility amplitudes 
+    channel : int, default=0
+        Channel (of `model`) to use to calculate residual visibilities
+
+    Returns
+    -------
+    vis_resid : array of complex
+        Model loose residual visibility amplitudes of the form 
+        Re(V) + 1j * Im(V)
+    """
+    nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u_true, vv=v_true)
+
+    vis_model = nufft(model.icube())
+    # convert to numpy, select channel
+    vis_model = vis_model.detach().numpy()[channel]
+
+    vis_resid = V_true - vis_model
+
+    return vis_resid
