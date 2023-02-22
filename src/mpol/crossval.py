@@ -175,19 +175,24 @@ class CrossValidate:
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
                 regularizers=self.regularizers,
-                lambda_guess_briggs=self._lambda_guess_briggs,
                 train_diag_step=self._train_diag_step,
                 kfold=kk,
                 save_prefix=self._save_prefix,
                 verbose=self._verbose,
             )
 
+            # run training 
             loss, loss_history = trainer.train(self.model, train_set)
+
             if self._store_cv_diagnostics:
-                self._diagnostics["loss_histories"].append(loss_history)
-            all_scores.append(trainer.test(self.model, test_set))
+                self._diagnostics["loss_histories"].append(loss_history)   
+            # update regularizer strength values
+            self.regularizers = trainer.regularizers # TODO
             # store the most recent train figure for diagnostics
             self.train_figure = trainer.train_figure 
+            
+            # run testing
+            all_scores.append(trainer.test(self.model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
