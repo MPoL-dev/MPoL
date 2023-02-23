@@ -48,7 +48,7 @@ def test_crossvalclass_kfold(coords, averager, dataset, generic_parameters):
 
     crossval_pars = generic_parameters["crossval_pars"]
     # reset some keys to bypass functionality tested elsewhere and speed up test
-    crossval_pars["lambda_guess"] = None
+    crossval_pars["regularizers"] = {}
     crossval_pars["epochs"] = 11
 
     cross_validator = CrossValidate(coords, averager, **crossval_pars)
