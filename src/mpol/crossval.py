@@ -81,6 +81,7 @@ class CrossValidate:
         self._learn_rate = learn_rate
         self._epochs = epochs
         self._convergence_tol = convergence_tol
+        self._regularizers = regularizers
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
@@ -88,8 +89,10 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
-        self.regularizers = regularizers
-        self.split_figure = None
+        self._model = None
+        self._diagnostics = None
+        self._split_figure = None
+        self._train_figure = None
 
     def split_dataset(self, dataset):
         r"""
@@ -151,7 +154,7 @@ class CrossValidate:
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
-            self.split_figure = (split_fig, split_axes)
+            self._split_figure = (split_fig, split_axes)
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
@@ -163,18 +166,18 @@ class CrossValidate:
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
             # create a new model and optimizer for this k_fold
-            self.model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     self.model = self.model.to(self._device)
+            #     self._model = self._model.to(self._device)
 
-            optimizer = torch.optim.Adam(self.model.parameters(), lr=self._learn_rate)
+            optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learn_rate)
 
             trainer = TrainTest(
                 imager=self._imager,
                 optimizer=optimizer,
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
-                regularizers=self.regularizers,
+                regularizers=self._regularizers,
                 train_diag_step=self._train_diag_step,
                 kfold=kk,
                 save_prefix=self._save_prefix,
@@ -182,17 +185,17 @@ class CrossValidate:
             )
 
             # run training 
-            loss, loss_history = trainer.train(self.model, train_set)
+            loss, loss_history = trainer.train(self._model, train_set)
 
             if self._store_cv_diagnostics:
                 self._diagnostics["loss_histories"].append(loss_history)   
             # update regularizer strength values
-            self.regularizers = trainer.regularizers # TODO
+            self._regularizers = trainer.regularizers
             # store the most recent train figure for diagnostics
-            self.train_figure = trainer.train_figure 
+            self._train_figure = trainer.train_figure 
             
             # run testing
-            all_scores.append(trainer.test(self.model, test_set))
+            all_scores.append(trainer.test(self._model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
@@ -205,9 +208,29 @@ class CrossValidate:
         return cv_score
 
     @property
+    def model(self):
+        """SimpleNet class instance"""
+        return self._model
+
+    @property
+    def regularizers(self):
+        """Dict containing regularizers used and their strengths"""
+        return self._regularizers
+
+    @property
     def diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop"""
         return self._diagnostics
+
+    @property
+    def split_figure(self):
+        """(fig, axes) of train/test splitting diagnostic figure"""
+        return self._split_figure
+
+    @property
+    def train_figure(self):
+        """(fig, axes) of most recent training diagnostic figure"""
+        return self._train_figure
 
 
 class RandomCellSplitGridded:
