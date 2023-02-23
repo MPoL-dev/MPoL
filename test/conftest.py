@@ -146,7 +146,7 @@ def generic_parameters(tmp_path):
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10},
         }
 
-    train_pars = {"epochs":50, "convergence_tol":1e-2, 
+    train_pars = {"epochs":15, "convergence_tol":1e-3, 
                 "regularizers":regularizers, "train_diag_step":None, 
                 "save_prefix":tmp_path, "verbose":True
                 }
