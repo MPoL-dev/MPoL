@@ -2176,7 +2176,7 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 <span id="training-and-testing"></span><h2>Training and testing<a class="headerlink" href="#module-mpol.training" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.training.TrainTest">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.training.</span></span><span class="sig-name descname"><span class="pre">TrainTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess_briggs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_prior_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_sparsity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TV_epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.training.</span></span><span class="sig-name descname"><span class="pre">TrainTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularizers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest" title="Permalink to this definition">#</a></dt>
 <dd><p>Utilities for training and testing an MPoL neural network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2186,15 +2186,18 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 <li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>default=10000</em>) – Number of training iterations</p></li>
 <li><p><strong>convergence_tol</strong> (<em>float</em><em>, </em><em>default=1e-3</em>) – Tolerance for training iteration stopping criterion as assessed by
 loss function (suggested &lt;= 1e-3)</p></li>
-<li><p><strong>lambda_guess</strong> (<em>list of str</em><em>, </em><em>default=None</em>) – List of regularizers for which to guess an initial value</p></li>
-<li><p><strong>lambda_guess_briggs</strong> (<em>list of float</em><em>, </em><em>default=</em><em>[</em><em>0.0</em><em>, </em><em>0.5</em><em>]</em>) – Briggs robust values for two images used to guess initial regularizer
-values (if lambda_guess is not None)</p></li>
-<li><p><strong>lambda_entropy</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for entropy regularizer</p></li>
-<li><p><strong>entropy_prior_intensity</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against (suggested &lt;&lt;1)</p></li>
-<li><p><strong>lambda_sparsity</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for sparsity regularizer</p></li>
-<li><p><strong>lambda_TV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total variation (TV) regularizer</p></li>
-<li><p><strong>TV_epsilon</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Softening parameter for TV regularizer (suggested &lt;&lt;1)</p></li>
-<li><p><strong>lambda_TSV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total squared variation (TSV) regularizer</p></li>
+<li><p><strong>regularizers</strong> (<em>nested dict</em><em>, </em><em>default={}</em>) – <p>Dictionary of image regularizers to use. For each, a dict of the
+strength (‘lambda’, float), whether to guess an initial value for lambda
+(‘guess’, bool), and other quantities needed to compute their loss term.
+Example:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{“sparsity”:{“lambda”:1e-3, “guess”:False},</dt><dd><p>”entropy”: {“lambda”:1e-3, “guess”:True, “prior_intensity”:1e-10}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+</p></li>
 <li><p><strong>train_diag_step</strong> (<em>int</em><em>, </em><em>default=None</em>) – Interval at which training diagnostics are output. If None, no
 diagnostics will be generated.</p></li>
 <li><p><strong>kfold</strong> (<em>int</em><em>, </em><em>default=None</em>) – The k-fold of the current training set (for diagnostics)</p></li>
@@ -2226,15 +2229,7 @@ cannot be adequately assessed.</p>
 <span class="sig-name descname"><span class="pre">loss_lambda_guess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/training.html#TrainTest.loss_lambda_guess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.training.TrainTest.loss_lambda_guess" title="Permalink to this definition">#</a></dt>
 <dd><p>Set an initial guess for regularizer strengths <span class="math notranslate nohighlight">\(\lambda_{x}\)</span> by
 comparing images generated with different visibility weighting.</p>
-<p>The guesses update <cite>self._lambda_*</cite> values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>guesses</strong> – Dictionary containing the names and initial guesses of regularizers</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
+<p>The guesses update <cite>lambda</cite> values in <cite>self._regularizers</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2301,6 +2296,12 @@ PyTorch with gradient descent.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="mpol.training.TrainTest.regularizers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">regularizers</span></span><a class="headerlink" href="#mpol.training.TrainTest.regularizers" title="Permalink to this definition">#</a></dt>
+<dd><p>Dict containing regularizers used and their strengths</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="mpol.training.TrainTest.train_figure">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.training.TrainTest.train_figure" title="Permalink to this definition">#</a></dt>
 <dd><p>(fig, axes) of figure showing training diagnostics</p>
@@ -2319,7 +2320,7 @@ PyTorch with gradient descent.</p>
 <span id="cross-validation"></span><h2>Cross-validation<a class="headerlink" href="#module-mpol.crossval" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.crossval.CrossValidate">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.crossval.</span></span><span class="sig-name descname"><span class="pre">CrossValidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_cell'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_guess_briggs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_prior_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_sparsity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TV_epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_TSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_diag_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_cv_diagnostics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#CrossValidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.CrossValidate" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.crossval.</span></span><span class="sig-name descname"><span class="pre">CrossValidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_cell'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularizers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_diag_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_diag_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_cv_diagnostics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/crossval.html#CrossValidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.crossval.CrossValidate" title="Permalink to this definition">#</a></dt>
 <dd><p>Utilities to run a cross-validation loop (implicitly running a training
 optimization loop), in order to compare MPoL models with different
 hyperparameter values</p>
@@ -2335,15 +2336,18 @@ hyperparameter values</p>
 <li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>default=10000</em>) – Number of training iterations</p></li>
 <li><p><strong>convergence_tol</strong> (<em>float</em><em>, </em><em>default=1e-3</em>) – Tolerance for training iteration stopping criterion as assessed by
 loss function (suggested &lt;= 1e-3)</p></li>
-<li><p><strong>lambda_guess</strong> (<em>list of str</em><em>, </em><em>default=None</em>) – List of regularizers for which to guess an initial value</p></li>
-<li><p><strong>lambda_guess_briggs</strong> (<em>list of float</em><em>, </em><em>default=</em><em>[</em><em>0.0</em><em>, </em><em>0.5</em><em>]</em>) – Briggs robust values for two images used to guess initial regularizer
-values (if lambda_guess is not None)</p></li>
-<li><p><strong>lambda_entropy</strong> (<em>float</em>) – Relative strength for entropy regularizer</p></li>
-<li><p><strong>entropy_prior_intensity</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against (suggested &lt;&lt;1)</p></li>
-<li><p><strong>lambda_sparsity</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for sparsity regularizer</p></li>
-<li><p><strong>lambda_TV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total variation (TV) regularizer</p></li>
-<li><p><strong>TV_epsilon</strong> (<em>float</em><em>, </em><em>default=1e-10</em>) – Softening parameter for TV regularizer (suggested &lt;&lt;1)</p></li>
-<li><p><strong>lambda_TSV</strong> (<em>float</em><em>, </em><em>default=None</em>) – Relative strength for total squared variation (TSV) regularizer</p></li>
+<li><p><strong>regularizers</strong> (<em>nested dict</em><em>, </em><em>default={}</em>) – <p>Dictionary of image regularizers to use. For each, a dict of the
+strength (‘lambda’, float), whether to guess an initial value for lambda
+(‘guess’, bool), and other quantities needed to compute their loss term.
+Example:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{“sparsity”:{“lambda”:1e-3, “guess”:False},</dt><dd><p>”entropy”: {“lambda”:1e-3, “guess”:True, “prior_intensity”:1e-10}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+</p></li>
 <li><p><strong>train_diag_step</strong> (<em>int</em><em>, </em><em>default=None</em>) – Interval at which training diagnostics are output. If None, no
 diagnostics will be generated.</p></li>
 <li><p><strong>split_diag_fig</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to generate a diagnostic figure of dataset splitting into
@@ -2395,9 +2399,33 @@ scores across all k-folds, and all raw scores</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.cv_diagnostics">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cv_diagnostics</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.cv_diagnostics" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.model" title="Permalink to this definition">#</a></dt>
+<dd><p>SimpleNet class instance</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.regularizers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">regularizers</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.regularizers" title="Permalink to this definition">#</a></dt>
+<dd><p>Dict containing regularizers used and their strengths</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.diagnostics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagnostics</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.diagnostics" title="Permalink to this definition">#</a></dt>
 <dd><p>Dict containing diagnostics of the cross-validation loop</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.split_figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">split_figure</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.split_figure" title="Permalink to this definition">#</a></dt>
+<dd><p>(fig, axes) of train/test splitting diagnostic figure</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.train_figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.train_figure" title="Permalink to this definition">#</a></dt>
+<dd><p>(fig, axes) of most recent training diagnostic figure</p>
 </dd></dl>
 
 </dd></dl>
