@@ -1,12 +1,7 @@
 import logging
-from collections import defaultdict
-
 import numpy as np
 import torch
 
-from mpol.datasets import index_vis
-from mpol.fourier import get_vis_residuals
-from mpol.gridding import DirtyImager
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
 
