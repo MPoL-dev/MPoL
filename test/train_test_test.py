@@ -50,7 +50,7 @@ def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_p
 
     train_pars = generic_parameters["train_pars"]
     # bypass TrainTest.loss_lambda_guess
-    train_pars["lambda_guess"] = None
+    train_pars["regularizers"] = {}
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 

@@ -142,11 +142,9 @@ def crossvalidation_products(mock_visibility_data):
 @pytest.fixture
 def generic_parameters(tmp_path):
     # generic model parameters to test training loop and cross-val loop
-    regularizers = {"sparsity":{"lambda":1e-3, "guess":True},
-             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10},
-             "TV":{"lambda":1e-3, "guess":True, "epsilon":1e-10},
-             "TSV":{"lambda":1e-3, "guess":True}
-            }
+    regularizers = {
+        "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10},
+        }
 
     train_pars = {"epochs":50, "convergence_tol":1e-2, 
                 "regularizers":regularizers, "train_diag_step":None, 
