@@ -111,25 +111,25 @@ class TrainTest:
             loss_e2 = entropy(img2_nn, self._regularizers['entropy']['prior_intensity'])
             guess_e = 1 / (loss_e2 - loss_e1)
             # update stored value
-            self._regularizers['entropy']['lambda'] = guess_e
+            self._regularizers['entropy']['lambda'] = guess_e.numpy().item()
 
         if self._regularizers.get('sparsity', {}).get('guess') == True:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
             guess_s = 1 / (loss_s2 - loss_s1)
-            self._regularizers['sparsity']['lambda'] = guess_s
+            self._regularizers['sparsity']['lambda'] = guess_s.numpy().item()
 
         if self._regularizers.get('TV', {}).get('guess') == True:
             loss_TV1 = TV_image(img1, self._regularizers['TV']['epsilon'])
             loss_TV2 = TV_image(img2, self._regularizers['TV']['epsilon'])
             guess_TV = 1 / (loss_TV2 - loss_TV1)
-            self._regularizers['TV']['lambda'] = guess_TV
+            self._regularizers['TV']['lambda'] = guess_TV.numpy().item()
 
         if self._regularizers.get('TSV', {}).get('guess') == True:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
             guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
-            self._regularizers['TSV']['lambda'] = guess_TSV
+            self._regularizers['TSV']['lambda'] = guess_TSV.numpy().item()
 
 
     def loss_eval(self, vis, dataset, sky_cube=None):
