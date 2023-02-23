@@ -11,13 +11,13 @@ from mpol.constants import *
 
 
 def test_traintestclass_training(coords, imager, dataset, generic_parameters):
-    # using the TrainTest class, run a training loop
+    # using the TrainTest class, run a training loop without regularizers
     nchan = dataset.nchan
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
     # bypass TrainTest.loss_lambda_guess
-    train_pars["lambda_guess"] = None
+    train_pars["regularizers"] = {}
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 
@@ -28,7 +28,7 @@ def test_traintestclass_training(coords, imager, dataset, generic_parameters):
 
 
 def test_traintestclass_training_guess(coords, imager, dataset, generic_parameters):
-    # using the TrainTest class, run a training loop,
+    # using the TrainTest class, run a training loop with regularizers,
     # with a call to the regularizer strength guesser
     nchan = dataset.nchan
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
