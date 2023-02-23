@@ -41,23 +41,14 @@ class CrossValidate:
     convergence_tol : float, default=1e-3
         Tolerance for training iteration stopping criterion as assessed by
         loss function (suggested <= 1e-3)
-    lambda_guess : list of str, default=None
-        List of regularizers for which to guess an initial value
-    lambda_guess_briggs : list of float, default=[0.0, 0.5]
-        Briggs robust values for two images used to guess initial regularizer
-        values (if lambda_guess is not None)
-    lambda_entropy : float
-        Relative strength for entropy regularizer
-    entropy_prior_intensity : float, default=1e-10
-        Prior value :math:`p` to calculate entropy against (suggested <<1)
-    lambda_sparsity : float, default=None
-        Relative strength for sparsity regularizer
-    lambda_TV : float, default=None
-        Relative strength for total variation (TV) regularizer
-    TV_epsilon : float, default=1e-10
-        Softening parameter for TV regularizer (suggested <<1)
-    lambda_TSV : float, default=None
-        Relative strength for total squared variation (TSV) regularizer
+    regularizers : nested dict, default={}
+        Dictionary of image regularizers to use. For each, a dict of the 
+        strength ('lambda', float), whether to guess an initial value for lambda 
+        ('guess', bool), and other quantities needed to compute their loss term.
+        Example:
+            {"sparsity":{"lambda":1e-3, "guess":False},
+             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
+            }
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -76,31 +67,12 @@ class CrossValidate:
         Whether to print notification messages.
     """
 
-    def __init__(
-        self,
-        coords,
-        imager,
-        kfolds=5,
-        split_method="random_cell",
-        seed=None,
-        learn_rate=0.5,
-        epochs=10000,
-        convergence_tol=1e-3,
-        lambda_guess=None,
-        lambda_guess_briggs=[0.0, 0.5],
-        lambda_entropy=None,
-        entropy_prior_intensity=1e-10,
-        lambda_sparsity=None,
-        lambda_TV=None,
-        TV_epsilon=1e-10,
-        lambda_TSV=None,
-        train_diag_step=None,
-        split_diag_fig=False,
-        store_cv_diagnostics=False,
-        save_prefix=None,
-        device=None,
-        verbose=True,
-    ):
+    def __init__(self, coords, imager, kfolds=5, split_method="random_cell",
+                seed=None, learn_rate=0.5, epochs=10000, convergence_tol=1e-3,
+                regularizers={}, train_diag_step=None, split_diag_fig=False, 
+                store_cv_diagnostics=False, save_prefix=None, device=None, 
+                verbose=True
+                ):
         self._coords = coords
         self._imager = imager
         self._kfolds = kfolds
@@ -109,14 +81,7 @@ class CrossValidate:
         self._learn_rate = learn_rate
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._lambda_guess = lambda_guess
-        self._lambda_guess_briggs = lambda_guess_briggs
-        self._lambda_entropy = lambda_entropy
-        self._entropy_prior_intensity = entropy_prior_intensity
-        self._lambda_sparsity = lambda_sparsity
-        self._lambda_TV = lambda_TV
-        self._TV_epsilon = TV_epsilon
-        self._lambda_TSV = lambda_TSV
+        self._regularizers = regularizers
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
@@ -124,7 +89,10 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
-        self.split_figure = None
+        self._model = None
+        self._diagnostics = None
+        self._split_figure = None
+        self._train_figure = None
 
     def split_dataset(self, dataset):
         r"""
@@ -181,12 +149,12 @@ class CrossValidate:
         """
         all_scores = []
         if self._store_cv_diagnostics:
-            self._cv_diagnostics = defaultdict(list)
+            self._diagnostics = defaultdict(list)
 
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
-            self.split_figure = (split_fig, split_axes)
+            self._split_figure = (split_fig, split_axes)
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
@@ -198,37 +166,36 @@ class CrossValidate:
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
             # create a new model and optimizer for this k_fold
-            model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     model = model.to(self._device)
+            #     self._model = self._model.to(self._device)
 
-            optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
+            optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learn_rate)
 
             trainer = TrainTest(
                 imager=self._imager,
                 optimizer=optimizer,
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
-                lambda_guess=self._lambda_guess,
-                lambda_guess_briggs=self._lambda_guess_briggs,
-                lambda_entropy=self._lambda_entropy,
-                entropy_prior_intensity=self._entropy_prior_intensity,
-                lambda_sparsity=self._lambda_sparsity,
-                lambda_TV=self._lambda_TV,
-                TV_epsilon=self._TV_epsilon,
-                lambda_TSV=self._lambda_TSV,
+                regularizers=self._regularizers,
                 train_diag_step=self._train_diag_step,
                 kfold=kk,
                 save_prefix=self._save_prefix,
                 verbose=self._verbose,
             )
 
-            loss, loss_history = trainer.train(model, train_set)
+            # run training 
+            loss, loss_history = trainer.train(self._model, train_set)
+
             if self._store_cv_diagnostics:
-                self._cv_diagnostics["loss_histories"].append(loss_history)
-            all_scores.append(trainer.test(model, test_set))
+                self._diagnostics["loss_histories"].append(loss_history)   
+            # update regularizer strength values
+            self._regularizers = trainer.regularizers
             # store the most recent train figure for diagnostics
-            self.train_figure = trainer.train_figure 
+            self._train_figure = trainer.train_figure 
+            
+            # run testing
+            all_scores.append(trainer.test(self._model, test_set))
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
@@ -241,9 +208,29 @@ class CrossValidate:
         return cv_score
 
     @property
-    def cv_diagnostics(self):
+    def model(self):
+        """SimpleNet class instance"""
+        return self._model
+
+    @property
+    def regularizers(self):
+        """Dict containing regularizers used and their strengths"""
+        return self._regularizers
+
+    @property
+    def diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop"""
-        return self._cv_diagnostics
+        return self._diagnostics
+
+    @property
+    def split_figure(self):
+        """(fig, axes) of train/test splitting diagnostic figure"""
+        return self._split_figure
+
+    @property
+    def train_figure(self):
+        """(fig, axes) of most recent training diagnostic figure"""
+        return self._train_figure
 
 
 class RandomCellSplitGridded:
