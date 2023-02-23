@@ -11,39 +11,39 @@ from mpol.fourier import FourierCube
 from mpol.plot import split_diagnostics_fig
 
 
-def test_crossvalclass_split_dartboard(coords, averager, dataset, generic_parameters):
+def test_crossvalclass_split_dartboard(coords, imager, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'dartboard' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
     crossval_pars["split_method"] = "dartboard"
 
-    cross_validator = CrossValidate(coords, averager, **crossval_pars)
+    cross_validator = CrossValidate(coords, imager, **crossval_pars)
     cross_validator.split_dataset(dataset)
 
 
-def test_crossvalclass_split_randomcell(coords, averager, dataset, generic_parameters):
+def test_crossvalclass_split_randomcell(coords, imager, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'random_cell' splitter
 
     crossval_pars = generic_parameters["crossval_pars"]
-    cross_validator = CrossValidate(coords, averager, **crossval_pars)
+    cross_validator = CrossValidate(coords, imager, **crossval_pars)
     cross_validator.split_dataset(dataset)
 
 
-def test_crossvalclass_split_diagnostics_fig(coords, averager, dataset, generic_parameters, tmp_path):
+def test_crossvalclass_split_diagnostics_fig(coords, imager, dataset, generic_parameters, tmp_path):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'random_cell' splitter, then generate the split diagnostic figure 
 
     crossval_pars = generic_parameters["crossval_pars"]
-    cross_validator = CrossValidate(coords, averager, **crossval_pars)
+    cross_validator = CrossValidate(coords, imager, **crossval_pars)
     split_iterator = cross_validator.split_dataset(dataset)
     split_fig, split_axes = split_diagnostics_fig(split_iterator)
     split_fig.savefig(tmp_path / "split_diagnostics_fig.png", dpi=300)
     plt.close("all")
 
 
-def test_crossvalclass_kfold(coords, averager, dataset, generic_parameters):
+def test_crossvalclass_kfold(coords, imager, dataset, generic_parameters):
     # using the CrossValidate class, perform k-fold cross-validation
 
     crossval_pars = generic_parameters["crossval_pars"]
@@ -51,7 +51,7 @@ def test_crossvalclass_kfold(coords, averager, dataset, generic_parameters):
     crossval_pars["regularizers"] = {}
     crossval_pars["epochs"] = 11
 
-    cross_validator = CrossValidate(coords, averager, **crossval_pars)
+    cross_validator = CrossValidate(coords, imager, **crossval_pars)
     cross_validator.run_crossval(dataset)
 
 

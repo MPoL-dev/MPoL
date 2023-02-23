@@ -34,6 +34,7 @@ def test_traintestclass_training_guess(coords, imager, dataset, generic_paramete
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"] 
+
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
