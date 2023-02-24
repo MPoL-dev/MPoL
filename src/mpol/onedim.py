@@ -64,7 +64,22 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     up /= 1e3
     vp /= 1e3
 
-    return q, Vmod
+    # baselines
+    qq = np.hypot(up, vp) 
+
+    if bins is None:
+        step = np.hypot(model.coords.du, model.coords.dv)
+        bins = np.arange(0.0, max(qq), step)
+
+    # get number of points in each radial bin
+    bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
+    # get radial brightness
+    Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
+    Vs /= bin_counts
+    
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    return bin_centers, Vs
 
 
 def get_radial_profile(model, geom, bins=None, chan=0):
