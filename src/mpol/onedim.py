@@ -63,7 +63,11 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
         Azimuthally averaged pixel brightness at `rs`
 
     """
-    # observer_to_flat(X, Y, omega, incl, Omega) # TODO
+
+    # convert to radian
+    incl = geom["incl"] * np.pi/180
+    Omega = geom["Omega"] * np.pi/180
+    omega = geom["omega"] * np.pi/180
 
     skycube = torch2npy(model.icube.sky_cube)[chan]
 
