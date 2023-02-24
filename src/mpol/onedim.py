@@ -37,18 +37,26 @@ def get_1d_vis_fit(model, chan=0):
     return q, Vmod
 
 
-def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
+def get_radial_profile(model, geom, bins=None, chan=0):
     r"""
     Obtain a 1D (radial) brightness profile I(r) from an MPoL model.
 
     Parameters
     ----------
-    # TODO
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
-    center : 2-tuple of float, default=(0.0, 0.0), unit=[arcsec]
-        Offset (RA, Dec) of source in image. Postive RA offset is west of
-        north. If None, the source is assumed to be at the image center pixel
+    geom : dict 
+        Dictionary of source geometry. Keys:
+            "incl" : float, unit=[deg]
+                Inclination 
+            "Omega" : float, unit=[deg]
+                Position angle of the ascending node # TODO: convention?
+            "omega" : float, unit=[deg]
+                Argument of periastron
+            "dRA" : float, unit=[arcsec]
+                Phase center offset in right ascension. Positive is west of north. # TODO: convention?
+            "dDec" : float, unit=[arcsec]
+                Phase center offset in declination.
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r). If None, bins will span 
         the full image, with widths equal to the hypotenuse of the pixels
@@ -69,12 +77,14 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
     Omega = geom["Omega"] * np.pi/180
     omega = geom["omega"] * np.pi/180
 
+    # model pixel values
     skycube = torch2npy(model.icube.sky_cube)[chan]
 
     # Cartesian pixel coordinates [arcsec]
     xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D
     # shift image center
-    xshift, yshift = xx - center[0], yy - center[1]
+    xshift, yshift = xx - geom["dRA"], yy - geom["dDec"]
+
     # radial pixel coordinates
     rshift = np.hypot(xshift, yshift) 
     rshift = rshift.flatten()
