@@ -47,11 +47,12 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
-    # from mpol.geometry import deproject_vis # TODO
-    # deproject_vis(u, v, V, weights, source_geom, inverse, rescale_flux) # TODO
+    # model visibility amplitudes
+    Vmod = torch2npy(model.fcube.ground_vis)[chan] # TODO: or is it model.fcube.vis?
 
-    q = model.coords.packed_q_centers_2D.ravel()
-    Vmod = model.fcube.vis.detach()[chan].ravel()
+    # model (u,v) coordinates [k\lambda]
+    uu, vv = model.coords.sky_u_centers_2D, model.coords.sky_v_centers_2D
+
 
     return q, Vmod
 
