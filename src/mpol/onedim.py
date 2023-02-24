@@ -50,9 +50,10 @@ def get_radial_profile(model, center=(0.0, 0.0), bins=None, chan=0):
         Offset (RA, Dec) of source in image. Postive RA offset is west of
         north. If None, the source is assumed to be at the image center pixel
     bins : array, default=None, unit=[arcsec]
-        Radial bin edges to use in calculating I(r)
+        Radial bin edges to use in calculating I(r). If None, bins will span 
+        the full image, with widths equal to the hypotenuse of the pixels
     chan : int, default=0
-        Channel of `model` to select
+        Channel of `model` to use
 
     Returns
     -------

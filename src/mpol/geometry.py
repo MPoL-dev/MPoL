@@ -1,4 +1,4 @@
-"""The geometry package provides routines for projecting and de-projecting sky images and visibilities.
+"""The geometry package provides routines for projecting and de-projecting sky images.
 """
 
 import numpy as np
