@@ -79,24 +79,28 @@ def get_radial_profile(model, geom, bins=None, chan=0):
 
     # model pixel values
     skycube = torch2npy(model.icube.sky_cube)[chan]
+    # TODO: scale (multiply) brightness by inclination? if so, add arg
 
     # Cartesian pixel coordinates [arcsec]
     xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D
     # shift image center
     xshift, yshift = xx - geom["dRA"], yy - geom["dDec"]
 
+    # deproject and rotate image 
+    xdep, ydep = observer_to_flat(xshift, yshift, omega=omega, incl=incl, Omega=Omega) # TODO: omega
+
     # radial pixel coordinates
-    rshift = np.hypot(xshift, yshift) 
-    rshift = rshift.flatten()
+    rr = np.hypot(xdep, ydep) 
+    rr = rr.flatten()
 
     if bins is None:
         step = np.hypot(model.coords.cell_size, model.coords.cell_size)
-        bins = np.arange(0.0, max(rshift), step)
+        bins = np.arange(0.0, max(rr), step)
 
     # get number of points in each radial bin
-    bin_counts, bin_edges = np.histogram(a=rshift, bins=bins, weights=None)
+    bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
     # get radial brightness
-    Is, _ = np.histogram(a=rshift, bins=bins, weights=skycube.flatten())
+    Is, _ = np.histogram(a=rr, bins=bins, weights=skycube.flatten())
     Is /= bin_counts
     
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
