@@ -5,7 +5,7 @@ from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
-def get_1d_vis_fit(model, chan=0):
+def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image-domain model. 
@@ -14,6 +14,25 @@ def get_1d_vis_fit(model, chan=0):
     ----------
     model : `torch.nn.Module` object
         Instance of the `mpol.precomposed.SimpleNet` class
+    geom : dict 
+        Dictionary of source geometry. Keys:
+            "incl" : float, unit=[deg]
+                Inclination 
+            "Omega" : float, unit=[deg]
+                Position angle of the ascending node # TODO: convention?
+            "omega" : float, unit=[deg]
+                Argument of periastron
+            "dRA" : float, unit=[arcsec]
+                Phase center offset in right ascension. Positive is west of north. # TODO: convention?
+            "dDec" : float, unit=[arcsec]
+                Phase center offset in declination
+    rescale_flux : bool, default=True # TODO
+        If True, the visibility amplitudes and weights are rescaled to account 
+        for the difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit.                
     chan : int, default=0
         Channel of `model` to select
 
@@ -26,7 +45,7 @@ def get_1d_vis_fit(model, chan=0):
 
     Notes
     -----
-    This routine requires the `frank <https://github.com/discsim/frank>`_ package # TODO
+    This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
     # from mpol.geometry import deproject_vis # TODO
     # deproject_vis(u, v, V, weights, source_geom, inverse, rescale_flux) # TODO
