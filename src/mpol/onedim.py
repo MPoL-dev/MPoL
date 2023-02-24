@@ -47,8 +47,6 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
-    from frank.geometry import FixedGeometry
-    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])    
 
     # model visibility amplitudes
     Vmod = torch2npy(model.fcube.ground_vis)[chan] # TODO: or is it model.fcube.vis?
@@ -56,6 +54,8 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     # model (u,v) coordinates [k\lambda]
     uu, vv = model.coords.sky_u_centers_2D, model.coords.sky_v_centers_2D
 
+    from frank.geometry import FixedGeometry
+    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])    
     # phase-shift the model visibilities and deproject the model (u,v) points
     up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, Vmod.ravel())
     # if rescale_flux: # TODO: be consistent w/ get_radial_profile
@@ -73,7 +73,7 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
 
     # get number of points in each radial bin
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
-    # get radial brightness
+    # get radial vis amplitude
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
     Vs /= bin_counts
     
@@ -117,11 +117,6 @@ def get_radial_profile(model, geom, bins=None, chan=0):
 
     """
 
-    # convert to radian
-    incl = geom["incl"] * np.pi/180
-    Omega = geom["Omega"] * np.pi/180
-    omega = geom["omega"] * np.pi/180
-
     # model pixel values
     skycube = torch2npy(model.icube.sky_cube)[chan]
     # TODO: scale (multiply) brightness by inclination? if so, add arg
@@ -132,7 +127,10 @@ def get_radial_profile(model, geom, bins=None, chan=0):
     xshift, yshift = xx - geom["dRA"], yy - geom["dDec"]
 
     # deproject and rotate image 
-    xdep, ydep = observer_to_flat(xshift, yshift, omega=omega, incl=incl, Omega=Omega) # TODO: omega
+    xdep, ydep = observer_to_flat(xshift, yshift,
+        omega=geom["omega"] * np.pi / 180, # TODO: omega
+        incl=geom["incl"] * np.pi / 180,
+        Omega=geom["Omega"] * np.pi / 180)
 
     # radial pixel coordinates
     rr = np.hypot(xdep, ydep) 
