@@ -47,12 +47,22 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
+    from frank.geometry import FixedGeometry
+    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])    
+
     # model visibility amplitudes
     Vmod = torch2npy(model.fcube.ground_vis)[chan] # TODO: or is it model.fcube.vis?
 
     # model (u,v) coordinates [k\lambda]
     uu, vv = model.coords.sky_u_centers_2D, model.coords.sky_v_centers_2D
 
+    # phase-shift the model visibilities and deproject the model (u,v) points
+    up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, Vmod.ravel())
+    # if rescale_flux: # TODO: be consistent w/ get_radial_profile
+    #     Vp, weights_scaled = geom_frank.rescale_total_flux(Vp, weights)
+    # convert back to [k\lambda]
+    up /= 1e3
+    vp /= 1e3
 
     return q, Vmod
 
