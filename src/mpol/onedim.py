@@ -133,8 +133,7 @@ def get_radial_profile(model, geom, bins=None, chan=0):
         Omega=geom["Omega"] * np.pi / 180)
 
     # radial pixel coordinates
-    rr = np.hypot(xdep, ydep) 
-    rr = rr.flatten()
+    rr = np.ravel(np.hypot(xdep, ydep))
 
     if bins is None:
         step = np.hypot(model.coords.cell_size, model.coords.cell_size)
@@ -143,7 +142,7 @@ def get_radial_profile(model, geom, bins=None, chan=0):
     # get number of points in each radial bin
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
     # get radial brightness
-    Is, _ = np.histogram(a=rr, bins=bins, weights=skycube.flatten())
+    Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(skycube))
     Is /= bin_counts
     
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
