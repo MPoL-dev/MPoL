@@ -17,34 +17,40 @@ class FourierCube(nn.Module):
     This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g., :class:`mpol.datasets.GriddedDataset`).
 
     Args:
-        cell_size (float): the width of an image-plane pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        coords (GridCoords): an object already instantiated from the GridCoords class.
         persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
     """
 
-    def __init__(self, cell_size=None, npix=None, coords=None, persistent_vis=False):
+    def __init__(self, coords: GridCoords, persistent_vis: bool = False):
         super().__init__()
 
+        # TODO: Is this comment relevant? There was no nchan instantiation
+        # before
+        # ---
         # we don't want to bother with the nchan argument here, so
         # we don't use the convenience method _setup_coords
         # and just do it manually
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
 
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+        self.coords = coords
 
         self.register_buffer("vis", None, persistent=persistent_vis)
+        self.vis: torch.Tensor
 
-    def forward(self, cube):
+    @classmethod
+    def from_image_properties(
+        cls, cell_size: float, npix: int, persistent_vis: bool = False
+    ) -> FourierCube:
+        r"""Alternative method for instantiating a FourierCube from ``cell_size``
+         and ``npix``
+        Args:
+            cell_size (float): the width of an image-plane pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
+        """
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, persistent_vis)
+
+    def forward(self, cube: torch.Tensor) -> torch.Tensor:
         """
         Perform the FFT of the image cube on each channel.
 
@@ -66,7 +72,7 @@ class FourierCube(nn.Module):
         return self.vis
 
     @property
-    def ground_vis(self):
+    def ground_vis(self) -> torch.Tensor:
         r"""
         The visibility cube in ground format cube fftshifted for plotting with ``imshow``.
 
@@ -77,7 +83,7 @@ class FourierCube(nn.Module):
         return utils.packed_cube_to_ground_cube(self.vis)
 
     @property
-    def ground_amp(self):
+    def ground_amp(self) -> torch.Tensor:
         r"""
         The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
@@ -87,7 +93,7 @@ class FourierCube(nn.Module):
         return torch.abs(self.ground_vis)
 
     @property
-    def ground_phase(self):
+    def ground_phase(self) -> torch.Tensor:
         r"""
         The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
@@ -453,25 +459,25 @@ def make_fake_data(imageCube, uu, vv, weight):
 
 def get_vis_residuals(model, u_true, v_true, V_true, channel=0):
     r"""
-    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose 
+    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
     (ungridded) data visiblities at data (u, v) coordinates
-    
+
     Parameters
     ----------
     model : `torch.nn.Module` object
-        Instance of the `mpol.precomposed.SimpleNet` class. Contains model 
+        Instance of the `mpol.precomposed.SimpleNet` class. Contains model
         visibilities.
     u_true, v_true : array, unit=[k\lambda]
         Data u- and v-coordinates
     V_true : array, unit=[Jy]
-        Data visibility amplitudes 
+        Data visibility amplitudes
     channel : int, default=0
         Channel (of `model`) to use to calculate residual visibilities
 
     Returns
     -------
     vis_resid : array of complex
-        Model loose residual visibility amplitudes of the form 
+        Model loose residual visibility amplitudes of the form
         Re(V) + 1j * Im(V)
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u_true, vv=v_true)
