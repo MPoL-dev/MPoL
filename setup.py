@@ -70,6 +70,7 @@ setuptools.setup(
     url="https://github.com/iancze/MPoL",
     install_requires=[
         "numpy",
+        "fast-histogram",
         "scipy",
         "torch>=1.8.0",
         "torchvision",
