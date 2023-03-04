@@ -2,10 +2,14 @@ r"""The ``fourier`` module provides the core functionality of MPoL via :class:`m
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
+from numpy import floating, integer
+from numpy.typing import ArrayLike, NDArray
 from torch import nn
 
 from . import utils
@@ -103,7 +107,13 @@ class FourierCube(nn.Module):
         return torch.angle(self.ground_vis)
 
 
-def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
+def safe_baseline_constant_meters(
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    freqs: NDArray[floating[Any]],
+    coords: GridCoords,
+    uv_cell_frac: float = 0.05,
+) -> bool:
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.
 
@@ -151,7 +161,12 @@ def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
     return max_diff < delta_uv
 
 
-def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
+def safe_baseline_constant_kilolambda(
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    coords: GridCoords,
+    uv_cell_frac: float = 0.05,
+) -> bool:
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.
 
