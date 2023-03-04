@@ -159,7 +159,7 @@ def safe_baseline_constant_meters(
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = uv_diff.max()
+    max_diff: float = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
@@ -202,7 +202,7 @@ def safe_baseline_constant_kilolambda(
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = uv_diff.max()
+    max_diff: float = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
@@ -434,7 +434,7 @@ class NuFFT(nn.Module):
         expanded = complexed.unsqueeze(altered_dimension)
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
-        output = self.coords.cell_size**2 * self.nufft_ob(
+        output: torch.Tensor = self.coords.cell_size**2 * self.nufft_ob(
             expanded,
             self.k_traj,
             interp_mats=(
@@ -455,7 +455,7 @@ def make_fake_data(
     uu: NDArray[floating[Any]],
     vv: NDArray[floating[Any]],
     weight: NDArray[floating[Any]],
-) -> tuple[NDArray[floating[Any]], ...]:
+) -> tuple[NDArray[complexfloating[Any, Any]], ...]:
     r"""
     Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
 
@@ -482,6 +482,7 @@ def make_fake_data(
         weight = np.atleast_2d(weight)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
+    vis_noiseless: NDArray[complexfloating[Any, Any]]
     vis_noiseless = nufft(image_cube()).detach().numpy()
 
     # generate complex noise
@@ -531,6 +532,7 @@ def get_vis_residuals(
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 
+    vis_resid: NDArray[complexfloating[Any, Any]]
     vis_resid = V_true - vis_model
 
     return vis_resid
