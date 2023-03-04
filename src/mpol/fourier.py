@@ -239,54 +239,59 @@ class NuFFT(nn.Module):
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        uu=None,
-        vv=None,
-        sparse_matrices=True,
+        coords: GridCoords,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
     ):
         super().__init__()
 
+        if not (same_uv := uu.ndim == 1 and vv.ndim == 1):
+            import warnings
+
+            warnings.warn(
+                "Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).",
+                category=RuntimeWarning,
+            )
+            sparse_matrices = False
+            self.interp_mat = None
+
         self.coords = coords
         self.nchan = nchan
+        self.sparse_matrices = sparse_matrices
+        self.same_uv = same_uv
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
             im_size=(self.coords.npix, self.coords.npix)
         )
 
-        if (uu is not None) and (vv is not None):
-            self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
-        else:
-            raise ValueError("uu and vv are required arguments.")
-
-        self.sparse_matrices = sparse_matrices
+        self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
+        self.k_traj: torch.Tensor
 
         if self.sparse_matrices:
-            if self.same_uv:
-                # precompute the sparse interpolation matrices
-                real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
-                    self.k_traj, im_size=(self.coords.npix, self.coords.npix)
-                )
-                self.register_buffer("real_interp_mat", real_interp_mat)
-                self.register_buffer("imag_interp_mat", imag_interp_mat)
-
-            else:
-                import warnings
-
-                warnings.warn(
-                    "Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).",
-                    category=RuntimeWarning,
-                )
-                self.interp_mats = None
-                self.sparse_matrices = False
+            # precompute the sparse interpolation matrices
+            real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
+                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
+            )
+            self.register_buffer("real_interp_mat", real_interp_mat)
+            self.register_buffer("imag_interp_mat", imag_interp_mat)
+            self.real_interp_mat: torch.Tensor
+            self.imag_interp_mat: torch.Tensor
 
     @classmethod
     def from_image_properties(
-        cls, cell_size, npix, nchan=1, uu=None, vv=None, sparse_matrices=True
+        cls,
+        cell_size: float,
+        npix: int,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
     ) -> NuFFT:
         coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, uu, vv, sparse_matrices)
+        return cls(coords, uu, vv, nchan, sparse_matrices)
 
     def _klambda_to_radpix(self, klambda):
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
@@ -339,8 +344,6 @@ class NuFFT(nn.Module):
 
         # if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.
         # otherwise, we assume that we will parallelize across the batch dimension.
-        self.same_uv = len(uu.shape) == 1
-
         if self.same_uv:
             # k-trajectory needs to be packed the way the image is packed (y,x), so
             # the trajectory needs to be packed (v, u)
@@ -374,7 +377,7 @@ class NuFFT(nn.Module):
 
         return k_traj
 
-    def forward(self, cube):
+    def forward(self, cube: torch.Tensor) -> torch.Tensor:
         r"""
         Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.
 
