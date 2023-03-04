@@ -12,6 +12,7 @@ from numpy import complexfloating, floating
 from numpy.typing import NDArray
 from torch import nn
 
+from mpol.exceptions import DimensionMismatchError
 from mpol.images import ImageCube
 from mpol.protocols import MPoLModel
 
@@ -361,29 +362,28 @@ class NuFFT(nn.Module):
             # that the k-traj is the same for all coils/channels.
             # interim convert to numpy array because of torch warning about speed
             k_traj = torch.tensor(np.array([vv_radpix, uu_radpix]))
+            return k_traj
 
-        else:
-            # in this case, we are given two tensors of shape (nchan, nvis)
-            # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
-            # then, concatenate the tensors along the axis=1 dimension.
+        # in this case, we are given two tensors of shape (nchan, nvis)
+        # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
+        # then, concatenate the tensors along the axis=1 dimension.
 
-            assert (
-                uu_radpix.shape[0] == self.nchan
-            ), "nchan of uu ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
-                uu_radpix.shape[0], self.nchan
-            )
-            assert (
-                vv_radpix.shape[0] == self.nchan
-            ), "nchan of vv ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
-                vv_radpix.shape[0], self.nchan
+        if uu_radpix.shape[0] != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of uu ({uu_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
             )
 
-            uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
-            vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+        if vv_radpix.shape[0] != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of vv ({vv_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
+            )
 
-            # interim convert to numpy array because of torch warning about speed
-            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
-            # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
+        uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
+        vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+
+        # interim convert to numpy array because of torch warning about speed
+        k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
+        # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
 
