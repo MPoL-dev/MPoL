@@ -251,11 +251,15 @@ class NuFFT(nn.Module):
     ):
         super().__init__()
 
-        if not (same_uv := uu.ndim == 1 and vv.ndim == 1):
+        if not (same_uv := uu.ndim == 1 and vv.ndim == 1) and sparse_matrices:
             import warnings
 
             warnings.warn(
-                "Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).",
+                "Provided uu and vv arrays are multi-dimensional, suggesting an "
+                "intent to parallelize using the 'batch' dimension. This feature "
+                "is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix "
+                "interpolation (sparse_matrices=True), therefore we are proceeding "
+                "with table interpolation (sparse_matrices=False).",
                 category=RuntimeWarning,
             )
             sparse_matrices = False
