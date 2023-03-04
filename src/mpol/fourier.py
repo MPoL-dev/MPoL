@@ -8,9 +8,12 @@ import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
-from numpy import floating, integer
-from numpy.typing import ArrayLike, NDArray
+from numpy import complexfloating, floating
+from numpy.typing import NDArray
 from torch import nn
+
+from mpol.images import ImageCube
+from mpol.protocols import MPoLModel
 
 from . import utils
 from .coordinates import GridCoords
@@ -293,7 +296,9 @@ class NuFFT(nn.Module):
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, nchan, sparse_matrices)
 
-    def _klambda_to_radpix(self, klambda):
+    def _klambda_to_radpix(
+        self, klambda: float | NDArray[floating[Any]]
+    ) -> float | NDArray[floating[Any]]:
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
 
         These concepts can be a little confusing because there are two angular measures at play.
@@ -324,7 +329,9 @@ class NuFFT(nn.Module):
 
         return u_rad_per_pix
 
-    def _assemble_ktraj(self, uu, vv):
+    def _assemble_ktraj(
+        self, uu: NDArray[floating[Any]], vv: NDArray[floating[Any]]
+    ) -> torch.Tensor:
         r"""
         This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.
 
@@ -341,6 +348,9 @@ class NuFFT(nn.Module):
 
         uu_radpix = self._klambda_to_radpix(uu)
         vv_radpix = self._klambda_to_radpix(vv)
+
+        assert isinstance(uu_radpix, np.ndarray)
+        assert isinstance(vv_radpix, np.ndarray)
 
         # if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.
         # otherwise, we assume that we will parallelize across the batch dimension.
@@ -372,7 +382,7 @@ class NuFFT(nn.Module):
             vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
 
             # interim convert to numpy array because of torch warning about speed
-            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], axis=1)
+            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
             # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
@@ -434,7 +444,12 @@ class NuFFT(nn.Module):
         return output
 
 
-def make_fake_data(imageCube, uu, vv, weight):
+def make_fake_data(
+    image_cube: ImageCube,
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    weight: NDArray[floating[Any]],
+) -> tuple[NDArray[floating[Any]], ...]:
     r"""
     Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
 
@@ -452,7 +467,7 @@ def make_fake_data(imageCube, uu, vv, weight):
 
     # instantiate a NuFFT object based on the ImageCube
     # OK if uu shape (nvis,)
-    nufft = NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
+    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan, uu=uu, vv=vv)
 
     # make into a multi-channel dataset, even if only a single-channel provided
     if uu.ndim == 1:
@@ -461,7 +476,7 @@ def make_fake_data(imageCube, uu, vv, weight):
         weight = np.atleast_2d(weight)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
-    vis_noiseless = nufft(imageCube()).detach().numpy()
+    vis_noiseless = nufft(image_cube()).detach().numpy()
 
     # generate complex noise
     sigma = 1 / np.sqrt(weight)
@@ -475,7 +490,13 @@ def make_fake_data(imageCube, uu, vv, weight):
     return vis_noise, vis_noiseless
 
 
-def get_vis_residuals(model, u_true, v_true, V_true, channel=0):
+def get_vis_residuals(
+    model: MPoLModel,
+    u_true: NDArray[floating[Any]],
+    v_true: NDArray[floating[Any]],
+    V_true: NDArray[complexfloating[Any, Any]],
+    channel: int = 0,
+) -> NDArray[complexfloating[Any, Any]]:
     r"""
     Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
     (ungridded) data visiblities at data (u, v) coordinates
