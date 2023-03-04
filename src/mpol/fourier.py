@@ -398,12 +398,12 @@ class NuFFT(nn.Module):
             torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.
         """
 
-        # make sure that the nchan assumptions for the ImageCube and the NuFFT setup are the same
-        assert (
-            cube.shape[0] == self.nchan
-        ), "nchan of ImageCube ({:}) is different than that used to initialize NuFFT layer ({:})".format(
-            cube.shape[0], self.nchan
-        )
+        # make sure that the nchan assumptions for the ImageCube and the NuFFT
+        # setup are the same
+        if cube.size(0) != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+            )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
@@ -412,9 +412,14 @@ class NuFFT(nn.Module):
         # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted.type(torch.complex128)
 
-        # Consider how the similarity of the spatial frequency samples should be treated. We already took care of this on the k_traj side, since we set the shapes. But this also needs to be taken care of on the image side.
-        #   * If we plan to parallelize using the batch dimension, then we need an image with shape (nchan, 1, npix, npix).
-        #   * If we plan to parallelize with the coil dimension, then we need an image with shape (1, nchan, npix, npix).
+        # Consider how the similarity of the spatial frequency samples should be
+        # treated. We already took care of this on the k_traj side, since we set
+        # the shapes. But this also needs to be taken care of on the image side.
+        #   * If we plan to parallelize using the batch dimension, then we need
+        #     an image with shape (nchan, 1, npix, npix).
+        #   * If we plan to parallelize with the coil dimension, then we need an
+        #     image with shape (1, nchan, npix, npix).
+
         if self.same_uv:
             # expand the cube to include a batch dimension
             expanded = complexed.unsqueeze(0)
@@ -424,14 +429,15 @@ class NuFFT(nn.Module):
             # now [nchan, 1, npix, npix] shape
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
-        if self.sparse_matrices:
-            output = self.coords.cell_size**2 * self.nufft_ob(
-                expanded,
-                self.k_traj,
-                interp_mats=(self.real_interp_mat, self.imag_interp_mat),
-            )
-        else:
-            output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)
+        output = self.coords.cell_size**2 * self.nufft_ob(
+            expanded,
+            self.k_traj,
+            interp_mats=(
+                (self.real_interp_mat, self.imag_interp_mat)
+                if self.sparse_matrices
+                else None
+            ),
+        )
 
         if self.same_uv:
             # nchan took on the ncoil position, so remove the nbatch dimension
