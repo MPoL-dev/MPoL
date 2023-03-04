@@ -415,18 +415,23 @@ class NuFFT(nn.Module):
         # Consider how the similarity of the spatial frequency samples should be
         # treated. We already took care of this on the k_traj side, since we set
         # the shapes. But this also needs to be taken care of on the image side.
-        #   * If we plan to parallelize using the batch dimension, then we need
-        #     an image with shape (nchan, 1, npix, npix).
         #   * If we plan to parallelize with the coil dimension, then we need an
         #     image with shape (1, nchan, npix, npix).
+        #   * If we plan to parallelize using the batch dimension, then we need
+        #     an image with shape (nchan, 1, npix, npix).
 
         if self.same_uv:
-            # expand the cube to include a batch dimension
-            expanded = complexed.unsqueeze(0)
-            # now [1, nchan, npix, npix] shape
+            # we want to unsqueeze/squeeze at dim=0 to parallelize over the coil
+            # dimension
+            # unsquezee shape: [1, nchan, npix, npix]
+            altered_dimension = 0
         else:
-            expanded = complexed.unsqueeze(1)
-            # now [nchan, 1, npix, npix] shape
+            # we want to unsqueeze/squeeze at dim=1 to parallelize over the
+            # batch dimension
+            # unsquezee shape: [nchan, 1, npix, npix]
+            altered_dimension = 1
+
+        expanded = complexed.unsqueeze(altered_dimension)
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         output = self.coords.cell_size**2 * self.nufft_ob(
@@ -439,13 +444,8 @@ class NuFFT(nn.Module):
             ),
         )
 
-        if self.same_uv:
-            # nchan took on the ncoil position, so remove the nbatch dimension
-            output = torch.squeeze(output, dim=0)
-
-        else:
-            # nchan took on the nbatch position, so remove the ncoil dimension
-            output = torch.squeeze(output, dim=1)
+        # squeezed shape: [nchan, npix, npix]
+        output = torch.squeeze(output, dim=altered_dimension)
 
         return output
 
