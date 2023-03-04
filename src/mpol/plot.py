@@ -234,19 +234,24 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     """
     fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(6, 10))
 
-    for ii, (train, test) in enumerate(splitter): 
+    for ii, (train, test) in enumerate(splitter):
         train_mask = torch2npy(train.ground_mask[channel])
         test_mask = torch2npy(test.ground_mask[channel])
         vis_ext = train.coords.vis_ext
 
+        cmap_train = mco.ListedColormap(['none', 'black'])
+        cmap_test = mco.ListedColormap(['none', 'red'])
+
         axes[ii, 0].imshow(train_mask, origin="lower", extent=vis_ext, 
-            cmap="Greys", interpolation="none")        
+            cmap=cmap_train, interpolation="none")      
+        axes[ii, 0].imshow(test_mask, origin="lower", extent=vis_ext, 
+            cmap=cmap_test, interpolation="none")     
         axes[ii, 1].imshow(test_mask, origin="lower", extent=vis_ext, 
-            cmap="Greys", interpolation="none")            
+            cmap=cmap_test, interpolation="none")            
 
         axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
 
-    axes[0, 0].set_title("Training set ")
+    axes[0, 0].set_title("Training set (black)\nTest set (red)")
     axes[0, 1].set_title("Test set")
 
     for aa in axes.flatten()[:-1]:
