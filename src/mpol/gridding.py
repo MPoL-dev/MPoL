@@ -246,11 +246,12 @@ class GridderBase:
             A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.
         """
 
+        bin_range = self.coords.vis_ext[:2]
         result = fast_hist.histogram2d(
             vv,
             uu,
             bins=self.coords.ncell_u,
-            range=np.reshape(self.coords.vis_ext, (2, 2)),
+            range=[bin_range, bin_range],
             weights=values,
         )
 
