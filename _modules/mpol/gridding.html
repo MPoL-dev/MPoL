@@ -296,10 +296,10 @@ title="Source repository"
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">fast_histogram</span> <span class="kn">import</span> <span class="n">histogram</span> <span class="k">as</span> <span class="n">fast_hist</span>
 
 <span class="kn">from</span> <span class="nn">mpol.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span>
-<span class="kn">from</span> <span class="nn">mpol.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataError</span><span class="p">,</span> <span class="n">ThresholdExceededError</span><span class="p">,</span>
-                             <span class="n">WrongDimensionError</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mpol.exceptions</span> <span class="kn">import</span> <span class="n">DataError</span><span class="p">,</span> <span class="n">ThresholdExceededError</span><span class="p">,</span> <span class="n">WrongDimensionError</span>
 
 <span class="kn">from</span> <span class="nn">.datasets</span> <span class="kn">import</span> <span class="n">GriddedDataset</span>
 
@@ -536,15 +536,19 @@ title="Source repository"
 <span class="sd">            A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fast_hist</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
             <span class="n">vv</span><span class="p">,</span>
             <span class="n">uu</span><span class="p">,</span>
-            <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">v_edges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">u_edges</span><span class="p">],</span>
+            <span class="n">bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">ncell_u</span><span class="p">,</span>
+            <span class="nb">range</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">v_bin_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">v_bin_max</span><span class="p">],</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">u_bin_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">u_bin_max</span><span class="p">],</span>
+            <span class="p">],</span>
             <span class="n">weights</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># only return the &quot;H&quot; value</span>
-        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_sum_cell_values_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>

@@ -549,7 +549,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f35e4d33f35b01a1a5f5a5d502682382744eee2cdac3668104c0745559e1beae.png" src="../_images/f35e4d33f35b01a1a5f5a5d502682382744eee2cdac3668104c0745559e1beae.png" />
+<img alt="../_images/718e9367287cf36142d034bbf0363ee526d73082c14ca6629d5d87b8fd043543.png" src="../_images/718e9367287cf36142d034bbf0363ee526d73082c14ca6629d5d87b8fd043543.png" />
 </div>
 </div>
 <p>The fact that visibility data has two spatial frequency coordinates sometimes makes plotting representations of the data values a little challenging. To simplify things, let’s define a 1D “radial” visibility coordinate as <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span>, and plot the real, imaginary, amplitude, and phase values of the visibilities against this.</p>
@@ -582,7 +582,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3bea648047c6bc248a234c9e341227758abfbf78b57ba1dc049a623c26943c3d.png" src="../_images/3bea648047c6bc248a234c9e341227758abfbf78b57ba1dc049a623c26943c3d.png" />
+<img alt="../_images/50df55b89deeb620c3e1ca20678aa7a09e27e0956a88f223fa68eaf964526ce4.png" src="../_images/50df55b89deeb620c3e1ca20678aa7a09e27e0956a88f223fa68eaf964526ce4.png" />
 </div>
 </div>
 <p>There are nearly a third of a million points in each figure, and each is quite noisy, so we can’t learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms">plotms</a> tool.</p>
@@ -702,7 +702,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/5976b97b03f53758af9b6e02ec1ac876656567b74877165710237874970a4d21.png" src="../_images/5976b97b03f53758af9b6e02ec1ac876656567b74877165710237874970a4d21.png" />
+<img alt="../_images/135da03f618d7a01f895dd6945737cfdd580ecdcd6bcbbab4c32be6205d91631.png" src="../_images/135da03f618d7a01f895dd6945737cfdd580ecdcd6bcbbab4c32be6205d91631.png" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.</p>

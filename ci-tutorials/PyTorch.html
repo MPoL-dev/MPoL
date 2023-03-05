@@ -580,7 +580,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7cd8bd1146544a3e62e41ff55a4934727a3534d18071232beebbc57649c16cd7.png" src="../_images/7cd8bd1146544a3e62e41ff55a4934727a3534d18071232beebbc57649c16cd7.png" />
+<img alt="../_images/edab3ca174159e90f1d1086450ebf838fca5e75996271ba5623711d8fc75aee1.png" src="../_images/edab3ca174159e90f1d1086450ebf838fca5e75996271ba5623711d8fc75aee1.png" />
 </div>
 </div>
 <p>We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will be a vector pointing in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by:</p>
@@ -644,7 +644,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7ed8a2325eb3bcd97c83556ce4b48eb2a2bbd78230fc89ba992ea4cfbfb84b6e.png" src="../_images/7ed8a2325eb3bcd97c83556ce4b48eb2a2bbd78230fc89ba992ea4cfbfb84b6e.png" />
+<img alt="../_images/8c55ce5fd94edff607ad28401b549f4610508f2e8c5a099a6f4ee20c34299bea.png" src="../_images/8c55ce5fd94edff607ad28401b549f4610508f2e8c5a099a6f4ee20c34299bea.png" />
 </div>
 </div>
 <p>The gradient at our new point (shown in orange) is still not close to zero, meaning we haven’t reached the minimum. We’ll continue this process of checking if the gradient is nearly zero, and take a step in the direction of steepest descent until we reach the bottom of the valley. We’ll say we’ve reached the bottom of the valley when the absolute value of the gradient is <span class="math notranslate nohighlight">\(&lt;0.1\)</span>:</p>
@@ -691,7 +691,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/aa10b6d251cf68ed611e0cc3e4e8780670cf94e04ff04b161b941877ed63c79a.png" src="../_images/aa10b6d251cf68ed611e0cc3e4e8780670cf94e04ff04b161b941877ed63c79a.png" />
+<img alt="../_images/7afc6b5ab24ee4f71cbca0f8dce47faf3166610cb22e0156b2337a3abdc5323b.png" src="../_images/7afc6b5ab24ee4f71cbca0f8dce47faf3166610cb22e0156b2337a3abdc5323b.png" />
 </div>
 </div>
 <p>This works, but it takes a long time since we have several small steps.</p>
@@ -744,7 +744,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/4f2941070d20b8eae07a78a0fb000674b273711a6ed816b46563ed1342f98f8e.png" src="../_images/4f2941070d20b8eae07a78a0fb000674b273711a6ed816b46563ed1342f98f8e.png" />
+<img alt="../_images/03507cfedf12a44d611a8d154f2826c860b51a2438ffbd10054023085b3a891c.png" src="../_images/03507cfedf12a44d611a8d154f2826c860b51a2438ffbd10054023085b3a891c.png" />
 </div>
 </div>
 <p><em>Note the change in scale!</em> With only one step, we already see that we stepped <em>right over</em> the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we’d find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be <code class="docutils literal notranslate"><span class="pre">step</span> <span class="pre">size</span> <span class="pre">=</span> <span class="pre">0.6</span></code>, which would have reached pretty close to the minimum after only 3 steps.</p>
