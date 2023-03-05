@@ -6,10 +6,10 @@ from __future__ import annotations
 import warnings
 
 import numpy as np
+from fast_histogram import histogram as fast_hist
 
 from mpol.coordinates import GridCoords
-from mpol.exceptions import (DataError, ThresholdExceededError,
-                             WrongDimensionError)
+from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
 
 from .datasets import GriddedDataset
 
@@ -246,15 +246,19 @@ class GridderBase:
             A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.
         """
 
-        result = np.histogram2d(
+        result = fast_hist.histogram2d(
             vv,
             uu,
-            bins=[self.coords.v_edges, self.coords.u_edges],
+            bins=self.coords.ncell_u,
+            range=[
+                [self.coords.v_bin_min, self.coords.v_bin_max],
+                [self.coords.u_bin_min, self.coords.u_bin_max],
+            ],
             weights=values,
         )
 
         # only return the "H" value
-        return result[0]
+        return result
 
     def _sum_cell_values_cube(self, values=None):
         r"""
