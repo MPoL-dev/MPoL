@@ -125,12 +125,9 @@ def get_radial_profile(model, geom, bins=None, rescale_flux=True, chan=0):
         Radial coordinates of image at center of `bins`
     Is : array, unit=[Jy / arcsec^2]
         Azimuthally averaged pixel brightness at `rs`
-
     """
-
     # model pixel values
     skycube = torch2npy(model.icube.sky_cube)[chan]
-    # TODO: scale (multiply) brightness by inclination? if so, add arg
 
     # Cartesian pixel coordinates [arcsec]
     xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D

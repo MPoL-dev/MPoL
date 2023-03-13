@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 
-def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
+def flat_to_observer(x, y, omega=None, incl=None, Omega=None, opt_thick=True):
     """Rotate the frame to convert a point in the flat (x,y,z) frame to observer frame (X,Y,Z).
 
     It is assumed that the +Z axis points *towards* the observer. It is assumed that the model is flat in the (x,y) frame (like a flat disk), and so the operations involving ``z`` are neglected. But the model lives in 3D Cartesian space.
@@ -24,10 +24,13 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
         omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.
         incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.
         Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0
+        opt_thick (bool): Whether the source is optically thick. If True, brightness in the observer frame is scaled (multiplied) by cos(incl). If False, 'incl' will be ignored. Default True
 
     Returns:
         Two tensors representing ``(X, Y)`` in the observer frame.
     """
+    if not opt_thick:
+        incl = None 
 
     # Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.
     # For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.
@@ -69,7 +72,7 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
     return X, Y
 
 
-def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
+def observer_to_flat(X, Y, omega=None, incl=None, Omega=None, opt_thick=True):
     """Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.
 
     It is assumed that the +Z axis points *towards* the observer. The rotation operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.
@@ -88,10 +91,13 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
         omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.
         incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.
         Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0
+        opt_thick (bool): Whether the source is optically thick. If True, brightness in the flat frame is scaled (divided) by cos(incl). If False, 'incl' will be ignored. Default True
 
     Returns:
         Two tensors representing ``(x, y)`` in the flat frame.
     """
+    if not opt_thick:
+        incl = None 
 
     # Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.
     # For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.
