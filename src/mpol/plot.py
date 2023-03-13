@@ -11,7 +11,7 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
     Get a colormap normalization to apply to an image. 
 
     image : array
-        An image array.
+        2D image array.
     stretch : string, default = 'power'
         Transformation to apply to the colormap. 'power' is a
         power law stretch; 'asinh' is an arcsinh stretch.
@@ -36,6 +36,64 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
         raise ValueError("'stretch' must be one of 'asinh' or 'power'.")
     
     return norm
+
+
+def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
+               clab=r"Jy arcsec$^{-2}$",
+               xlab="RA offset [arcsec]",
+               ylab="Dec offset [arcsec]",
+               ):
+    r""" 
+    Wrapper for plt.imshow, with colorbar and colormap normalization.
+
+    Parameters
+    ----------
+    image : array
+        2D image array.
+    extent : 
+    cmap : str, default="inferno
+        Matplotlib colormap.
+    norm : Matplotlib colormap normalization, default=None
+        Image colormap norm. If None, a linear normalization is generated with
+        mpol.plot.get_image_cmap_norm
+    ax : Matplotlib axis instance, default=None
+        Axis on which to plot the image. If None, a new figure is created.
+    clab : str, default=r"Jy arcsec$^{-2}$"
+        Colorbar axis label
+    xlab : str, default="RA offset [arcsec]"
+        Image x-axis label.
+    ylab : str, default="Dec offset [arcsec]"
+        Image y-axis label.
+
+    Returns
+    -------
+    im : Matplotlib imshow instance
+        The plotted image.
+    cbar : Matplotlib colorbar instance
+        Colorbar for the image.
+    """
+    if norm is None:
+        norm = get_image_cmap_norm(image)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    im = ax.imshow(
+        image,
+        origin="lower",
+        interpolation="none",
+        extent=extent,
+        cmap=cmap,
+        norm=norm,
+    )
+
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
+    cbar.set_label(clab)
+
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    
+    return im, cbar
 
 
 def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
