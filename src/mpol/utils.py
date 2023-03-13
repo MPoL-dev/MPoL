@@ -324,6 +324,9 @@ def get_optimal_image_properties(image_width, u, v):
     if npix % 2 == 1:
         npix += 1
 
+    # should never occur 
+    assert(get_max_spatial_freq(cell_size, npix) >= max_freq), "error in get_optimal_image_properties"
+
     return cell_size, npix
 
 
