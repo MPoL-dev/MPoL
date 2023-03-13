@@ -281,24 +281,19 @@ def get_maximum_cell_size(uu_vv_point):
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
 
 
-def get_optimal_image_properties(image_width, q, percentile=100):
+def get_optimal_image_properties(image_width, u, v):
     r"""
     For an image of desired width, determine the maximum pixel size that
-    ensures Nyquist sampling of the provided baseline (or baseline
-    distribution, out to a chosen percentile), and the number of pixels
-    (given this pixel size) to obtain the desired image width.
+    ensures Nyquist sampling of the provided spatial frequency points, and the 
+    corresponding number of pixels to obtain the desired image width.
 
     Parameters
     ----------
     image_width : float, unit = arcsec
-        Desired width of the image (i.e., image will be a
-        image_width :math:`\times` image_width square).
-    q : float or array, unit = :math:`k\lambda`
-        Baseline distribution (all values must be non-negative). If a single
-        value, 'percentile' has no effect.
-    percentile : int, default = 100
-        Percentile of the baseline distribution (between 0 - 100) out to which
-        the desired image will Nyquist sample.
+        Desired width of the image (for a square image of size
+        `image_width` :math:`\times` `image_width`).
+    u, v : float or array, unit = :math:`k\lambda`
+        `u` and `v` spatial frequency points. 
 
     Returns
     -------
@@ -310,12 +305,12 @@ def get_optimal_image_properties(image_width, q, percentile=100):
 
     Notes
     -----
-    To obtain the image properties for a single baseline distance, pass 'q' as
-    a float. In this case, 'percentile' has no effect.
-
-    No assumption or correction is made concerning whether the baseline
-    (distribution) is projected or deprojected.
+    No assumption or correction is made concerning whether the spatial 
+    frequency points are projected or deprojected.
     """
+    max_freq = max(max(abs(u)), max(abs(v)))
+
+    cell_size = get_maximum_cell_size(max_freq)
 
     assert np.all(q >= 0), "All baselines should be >=0."
 
