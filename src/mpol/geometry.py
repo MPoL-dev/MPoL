@@ -24,14 +24,10 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None, opt_thick=True):
         omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.
         incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.
         Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0
-        opt_thick (bool): Whether the source is optically thick. If True, brightness in the observer frame is scaled (multiplied) by cos(incl). If False, 'incl' will be ignored. Default True
 
     Returns:
         Two tensors representing ``(X, Y)`` in the observer frame.
     """
-    if not opt_thick:
-        incl = None 
-
     # Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.
     # For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.
     # A vector in the coordinate system will appear as though it has been rotated counter-clockwise.
@@ -91,14 +87,10 @@ def observer_to_flat(X, Y, omega=None, incl=None, Omega=None, opt_thick=True):
         omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.
         incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.
         Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0
-        opt_thick (bool): Whether the source is optically thick. If True, brightness in the flat frame is scaled (divided) by cos(incl). If False, 'incl' will be ignored. Default True
 
     Returns:
         Two tensors representing ``(x, y)`` in the flat frame.
     """
-    if not opt_thick:
-        incl = None 
-
     # Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.
     # For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.
     # A vector in the coordinate system will appear as though it has been rotated counter-clockwise.
