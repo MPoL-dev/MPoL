@@ -374,17 +374,17 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
 
     # model image (linear colormap)
     ax = axes[0,0]
-    plot_image(mod_im, extent, ax, xlab='', ylab='')
+    plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
     ax.set_title("Model image")
 
     # model image (asinh colormap)
     ax = axes[0,1]
-    plot_image(mod_im, extent, ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
+    plot_image(mod_im, extent, ax=ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
     ax.set_title("Model image (asinh stretch)")
 
     # gradient image
     ax = axes[1,0]
-    plot_image(mod_grad, extent, ax, xlab='', ylab='')
+    plot_image(mod_grad, extent, ax=ax, xlab='', ylab='')
     ax.set_title("Gradient image")
 
     # loss function
