@@ -128,3 +128,16 @@ def test_loglinspace():
     print(array)
     print(np.diff(array))
     assert len(array) == 5 + 3
+
+
+def test_get_optimal_image_properties(mock_visibility_data_cont):
+    # test that get_optimal_image_properties returns sensible cell_size, npix
+    image_width = 5.0 # [arcsec]
+
+    u, v, *_ = mock_visibility_data_cont
+
+    cell_size, npix = utils.get_optimal_image_properties(image_width, u, v)
+
+    max_data_freq = max(abs(u).max(), abs(v).max())
+
+    assert(utils.get_max_spatial_freq(cell_size, npix) >= max_data_freq)
