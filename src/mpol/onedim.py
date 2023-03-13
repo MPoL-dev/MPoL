@@ -1,11 +1,10 @@
 import numpy as np 
 
-from mpol.fourier import NuFFT
 from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
-def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
+def get_1d_vis_fit(model, geom, rescale_flux=True, bins=None, chan=0):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image-domain model. 
@@ -26,13 +25,17 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
                 Phase center offset in right ascension. Positive is west of north. # TODO: convention?
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination
-    rescale_flux : bool, default=True # TODO
+    rescale_flux : bool, default=True 
         If True, the visibility amplitudes and weights are rescaled to account 
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
         The source's integrated (2D) flux is assumed to be:
             :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
-        No rescaling would be appropriate in the optically thin limit.                
+        No rescaling would be appropriate in the optically thin limit. 
+    bins : array, default=None, unit=[k\lambda]
+        Baseline bin edges to use in calculating V(q). If None, bins will span 
+        the model baseline distribution, with widths equal to the hypotenuse of 
+        the (u, v) coordinates                       
     chan : int, default=0
         Channel of `model` to select
 
@@ -47,19 +50,20 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
-
     # model visibility amplitudes
-    Vmod = torch2npy(model.fcube.ground_vis)[chan] # TODO: or is it model.fcube.vis?
+    Vmod = torch2npy(model.fcube.ground_vis)[chan]
 
     # model (u,v) coordinates [k\lambda]
     uu, vv = model.coords.sky_u_centers_2D, model.coords.sky_v_centers_2D
 
     from frank.geometry import FixedGeometry
-    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])    
+    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])   # TODO: right signs?
     # phase-shift the model visibilities and deproject the model (u,v) points
     up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, Vmod.ravel())
-    # if rescale_flux: # TODO: be consistent w/ get_radial_profile
-    #     Vp, weights_scaled = geom_frank.rescale_total_flux(Vp, weights)
+
+    # if the source is optically thick, rescale the deprojected Re(V)
+    if rescale_flux: 
+        Vp.real /= np.cos(geom["incl"] * np.pi / 180)
     # convert back to [k\lambda]
     up /= 1e3
     vp /= 1e3
@@ -82,7 +86,7 @@ def get_1d_vis_fit(model, geom, bins=None, rescale_flux=True, chan=0):
     return bin_centers, Vs
 
 
-def get_radial_profile(model, geom, bins=None, chan=0):
+def get_radial_profile(model, geom, bins=None, rescale_flux=True, chan=0): 
     r"""
     Obtain a 1D (radial) brightness profile I(r) from an MPoL model.
 
@@ -102,6 +106,13 @@ def get_radial_profile(model, geom, bins=None, chan=0):
                 Phase center offset in right ascension. Positive is west of north. # TODO: convention?
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination.
+    rescale_flux : bool, default=True 
+        If True, the brightness values are rescaled to account for the 
+        difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit. 
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r). If None, bins will span 
         the full image, with widths equal to the hypotenuse of the pixels
@@ -130,7 +141,9 @@ def get_radial_profile(model, geom, bins=None, chan=0):
     xdep, ydep = observer_to_flat(xshift, yshift,
         omega=geom["omega"] * np.pi / 180, # TODO: omega
         incl=geom["incl"] * np.pi / 180,
-        Omega=geom["Omega"] * np.pi / 180)
+        Omega=geom["Omega"] * np.pi / 180,
+        opt_thick=rescale_flux,
+        )
 
     # radial pixel coordinates
     rr = np.ravel(np.hypot(xdep, ydep))
@@ -144,7 +157,7 @@ def get_radial_profile(model, geom, bins=None, chan=0):
     # get radial brightness
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(skycube))
     Is /= bin_counts
-    
+
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
     return bin_centers, Is
