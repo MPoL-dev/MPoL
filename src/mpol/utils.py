@@ -312,16 +312,20 @@ def get_optimal_image_properties(image_width, u, v):
 
     cell_size = get_maximum_cell_size(max_freq)
 
-    assert np.all(q >= 0), "All baselines should be >=0."
-
-    q_optimal = np.percentile(q, percentile)
-    cell_size = get_maximum_cell_size(q_optimal)
-
-    # round the desired number of pixels up to the nearest integer
+    # round npix up to nearest integer
     npix = math.ceil(image_width / cell_size)
+
+    # account for Nyquist of proposed cell_size, npix
+    cell_size *= cell_size / get_maximum_cell_size(get_max_spatial_freq(cell_size, npix))
+
+    npix = math.ceil(image_width / cell_size)
+    
     # enforce that npix be even
     if npix % 2 == 1:
         npix += 1
+
+    # should never occur 
+    assert(get_max_spatial_freq(cell_size, npix) >= max_freq), "error in get_optimal_image_properties"
 
     return cell_size, npix
 
