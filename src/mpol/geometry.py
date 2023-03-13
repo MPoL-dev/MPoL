@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 
-def flat_to_observer(x, y, omega=None, incl=None, Omega=None, opt_thick=True):
+def flat_to_observer(x, y, omega=None, incl=None, Omega=None):
     """Rotate the frame to convert a point in the flat (x,y,z) frame to observer frame (X,Y,Z).
 
     It is assumed that the +Z axis points *towards* the observer. It is assumed that the model is flat in the (x,y) frame (like a flat disk), and so the operations involving ``z`` are neglected. But the model lives in 3D Cartesian space.
@@ -68,7 +68,7 @@ def flat_to_observer(x, y, omega=None, incl=None, Omega=None, opt_thick=True):
     return X, Y
 
 
-def observer_to_flat(X, Y, omega=None, incl=None, Omega=None, opt_thick=True):
+def observer_to_flat(X, Y, omega=None, incl=None, Omega=None):
     """Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.
 
     It is assumed that the +Z axis points *towards* the observer. The rotation operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.
