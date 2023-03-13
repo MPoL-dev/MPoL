@@ -381,8 +381,6 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
     ax = axes[0,1]
     plot_image(mod_im, extent, ax=ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
     ax.set_title("Model image (asinh stretch)")
-    ax.set_xlabel(r"RA offset")
-    ax.set_ylabel(r"Dec offset")
 
     # gradient image
     ax = axes[1,0]
