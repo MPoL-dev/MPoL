@@ -34,10 +34,9 @@ Before we discuss the specifics of the parametric disk model, let's take a momen
 ### Non-parametric models 
 Let's start by considering the architecture of the simplest possible skeleton non-parametric RML model
 
-````{code-cell} ipython3
-```{mermaid} ../_static/mmd/src/ImageModel.mmd
+
+```{mermaid} ../_static/mmd/src/ImageCube.mmd
 ```
-````
 
 When we say that a model is non-parametric we generally mean that the number of parameters of the model is vast (potentially infinite) and can grow to encapsulate more detail if needed. A classic example is something like a spline or a Gaussian process, but in our case we are using a large number of discrete pixel fluxes to represent an image.
 
@@ -59,10 +58,9 @@ The `nn.Parameter` call tells Pytorch that the `cube` tensor should be varied du
 
 We can consider the architecture of the {class}`mpol.precomposed.SimpleNet` as a more practical extension 
 
-````{code-cell} ipython3
+
 ```{mermaid} ../_static/mmd/src/SimpleNet.mmd
 ```
-````
 
 The functionality of the {class}`mpol.precomposed.SimpleNet` is similar to the skeleton model, but we've shifted the base parameterization from the {class}`mpol.images.ImageCube` to the {class}`mpol.images.BaseCube` (so that pixel flux values are non-negative) and we've included a small convolution kernel (through {class}`mpol.images.HannConvCube`) so that high-spatial-frequency noise is supressed. In this framework, the `nn.Parameter`s are instantiated on the {class}`~mpol.images.BaseCube` and the {class}`~mpol.images.ImageCube` becomes a pass-through layer.
 
@@ -70,12 +68,10 @@ In both of these cases, the key functionality provided by the MPoL package is th
 
 ### Parametric models
 
-By contrast to a non-parametric model, a *parametric* model is one that has a (finite) set of parameters (generally decoupled from the size of the data) and can be easily used to make future predictions of the data, usually in a functional form. For example, a cubic function and its coefficients would be considered a parametric model. For a radio astronomy example, you can think of the {class}`~mpol.images.BaseCube` and {class}`mpol.images.HannConvCube` layers as being replaced by a parametric model. This parametric model would specify pixel brightness as a function of position based upon model parameters, and would feed directly into the {class}`~mpol.images.ImageCube` pass-through layer.
+By contrast to a non-parametric model, a *parametric* model is one that has a (finite) set of parameters (generally decoupled from the size of the data) and can be easily used to make future predictions of the data, usually in a functional form. For example, a cubic function and its coefficients would be considered a parametric model. For a radio astronomy example, you can think of the {class}`~mpol.images.BaseCube` and {class}`mpol.images.HannConvCube` layers as being replaced by a parametric disk model, which we'll call `DiskModel`. This parametric model would specify pixel brightness as a function of position based upon model parameters, and would feed directly into the {class}`~mpol.images.ImageCube` pass-through layer.
 
-````{code-cell} ipython3
 ```{mermaid} ../_static/mmd/src/Parametric.mmd
 ```
-````
 
 Before ALMA, it was common in the protoplanetary disk field to fit parametric models (e.g., elliptical Gaussians, one or two axisymmetric rings, etc...) to interferometric observations to derive source properties like size and inclination. The spatial resolution afforded by the ALMA long-baseline campaign rendered many of these simple parametric models inadequate. Suddenly, rich substructure in the forms of rings, gaps, and spirals was visible in dust continuum images and, except for a few exceptions we'll discuss in a second, these morphologies were too complex to neatly capture with simple model parameterizations.
 
