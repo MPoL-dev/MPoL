@@ -70,7 +70,7 @@ class GriddedDataset:
         weight_gridded: torch.Tensor,
         mask: torch.Tensor,
         nchan: int = 1,
-        device: torch.device = torch.device("cpu"),
+        device: torch.device | str | None = None,
     ) -> None:
         self.coords = coords
         self.nchan = nchan
@@ -95,7 +95,7 @@ class GriddedDataset:
         weight_gridded: torch.Tensor,
         mask: torch.Tensor,
         nchan: int = 1,
-        device: torch.device = torch.device("cpu"),
+        device: torch.device | str | None = None,
     ):
         """Alternative method to instantiate a GriddedDataset object from cell_size and npix.
 
@@ -118,7 +118,9 @@ class GriddedDataset:
         )
 
     def add_mask(
-        self, mask: ArrayLike, device: torch.device = torch.device("cpu")
+        self,
+        mask: ArrayLike,
+        device: torch.device | str | None = None,
     ) -> None:
         r"""
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
@@ -158,7 +160,7 @@ class GriddedDataset:
         """
         return utils.packed_cube_to_ground_cube(self.mask)
 
-    def to(self, device: torch.device = torch.device("cpu")) -> GriddedDataset:
+    def to(self, device: torch.device | str | None = None) -> GriddedDataset:
         """
         Moves the tensors of the dataset to specified device.
 
@@ -210,7 +212,7 @@ class UVDataset(torch_ud.Dataset):
         data_im: NDArray[floating[Any]],
         cell_size: float | None = None,
         npix: int | None = None,
-        device: torch.device = torch.device("cpu"),
+        device: torch.device | str | None = None,
         **kwargs,
     ):
         # ensure that all vectors are the same shape
