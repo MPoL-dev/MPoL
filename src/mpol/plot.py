@@ -369,49 +369,21 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
 
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
+    extent = model.icube.coords.img_ext
 
     # model image (linear colormap)
     ax = axes[0,0]
-    im = ax.imshow(
-        mod_im,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_im)
-    )
-    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_im, extent, ax, xlab='', ylab='')
     ax.set_title("Model image")
 
     # model image (asinh colormap)
     ax = axes[0,1]
-    im = ax.imshow(
-        mod_im,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_im, stretch='asinh')
-    )
-    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_im, extent, ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
     ax.set_title("Model image (asinh stretch)")
-    ax.set_xlabel(r"$\Delta \alpha \cos \delta \; [{}^{\prime\prime}]$")
-    ax.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
 
     # gradient image
     ax = axes[1,0]
-    im = ax.imshow(
-        mod_grad,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_grad)
-    )
-    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_grad, extent, ax, xlab='', ylab='')
     ax.set_title("Gradient image")
 
     # loss function
