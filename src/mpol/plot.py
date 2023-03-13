@@ -50,7 +50,8 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
     ----------
     image : array
         2D image array.
-    extent : 
+    extent : list, len=4
+        x- and y-extents of image: [x-min, x-max, y-min, y-max] (see plt.imshow)
     cmap : str, default="inferno
         Matplotlib colormap.
     norm : Matplotlib colormap normalization, default=None
