@@ -58,7 +58,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_book_theme"
 html_theme_options = {
-    "analytics_id": "UA-5472810-8",
     "repository_url": "https://github.com/MPoL-dev/MPoL",
     "use_repository_button": True,
 }
