@@ -92,7 +92,24 @@ This point of this tutorial isn't to say that actually everyone should switch ba
 
 For this tutorial we'll use the ALMA DSHARP dust continuum observations of the AS 209 protoplanetary disk. The data reduction is described in [Andrews et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract) and the primary analysis is described in [Guzmán et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..48G/abstract).
 
-The original measurement sets from the DSHARP program are available in measurement set format from the ALMA project pages (e.g., [NRAO](https://bulk.cv.nrao.edu/almadata/lp/DSHARP/)). To save some boilerplate code and computation time for the purposes of this tutorial, we have extracted the visibilities from this measurement set, performed a few averaging and weight scaling steps, and uploaded the processed dataset to Zenodo. It can be downloaded here. The full set of pre-processing commands are available in the mpoldatasets package. 
+The original measurement sets from the DSHARP program are available in measurement set format from the ALMA project pages (e.g., [NRAO](https://bulk.cv.nrao.edu/almadata/lp/DSHARP/)). To save some boilerplate code and computation time for the purposes of this tutorial, we have extracted the visibilities from this measurement set, performed a few averaging and weight scaling steps, and uploaded the processed dataset to Zenodo. It can be downloaded here. The full set of pre-processing commands are available in the mpoldatasets package.
+
+```{code-cell} ipython3
+fname = download_file(
+    "https://zenodo.org/record/7732834/files/AS209_continuum_averaged.asdf",
+    cache=True,
+    pkgname="mpol",
+)
+```
+
+```{code-cell} ipython3
+# load extracted visibilities from npz file
+d = np.load(fname)
+uu = d["uu"]
+vv = d["vv"]
+weight = d["weight"]
+data = d["data"]
+```
 
 Let's make some diagnostic images, to make sure we've loaded the data correctly.
 
@@ -133,8 +150,182 @@ If you are new to Bayesian analysis in general, we recommend that you put this t
 
 There are many ways to build a Pyro model. In this tutorial we will take a class-based approach and use the [PyroModule](http://pyro.ai/examples/modules.html) construct, but models can just as easily be built using function definitions (for [example](http://pyro.ai/examples/intro_long.html#Models-in-Pyro)).
 
+```{code-cell} ipython3
+def plot_1D_profile(rs, Is):
+    fig, ax = plt.subplots(nrows=1, figsize=(4,4))
+    ax.plot(rs, Is)
+    ax.set_xlabel("r [au]")
+    ax.set_ylabel(r"I [Jy/$\mathrm{arcsec}^2$]")
+    fig.subplots_adjust(left=0.2, right=0.8)
+
+    return fig
+```
+
+```{code-cell} ipython3
+def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
+
+    # convert to numpy 
+    model_real = model_real.detach().numpy()
+    model_imag = model_imag.detach().numpy()
+
+    data_real = np.real(loaddata.data)
+    data_imag = np.imag(loaddata.data)
+    resid_real = data_real - model_real 
+    resid_imag = data_imag - model_imag
+
+    img_dirty, _ = make_dirty_image(data_real, data_imag)
+    img_model, _ = make_dirty_image(model_real, model_imag)
+    img_resid, _ = make_dirty_image(resid_real, resid_imag)
+
+    # determine the plot dimensions
+    xx = 12 # in
+    cax_width = 0.2 # in 
+    cax_sep = 0.1 # in
+    mmargin = 1.2
+    lmargin = 0.7
+    rmargin = 0.7
+    tmargin = 0.3
+    bmargin = 0.5
+    
+    npanels = 4
+    # the size of image axes + cax_sep + cax_width
+    block_width = (xx - lmargin - rmargin - mmargin * (npanels - 1) )/npanels
+    ax_width = block_width - cax_width - cax_sep
+    ax_height = ax_width 
+    yy = bmargin + ax_height + tmargin
+
+    fig = plt.figure(figsize=(xx, yy))
+    ax = []
+    cax = []
+    for i in range(npanels):
+        ax.append(fig.add_axes([(lmargin + i * (block_width + mmargin))/xx, bmargin/yy, ax_width/xx, ax_height/yy]))
+        cax.append(fig.add_axes([(lmargin + i * (block_width + mmargin) + ax_width + cax_sep)/xx, bmargin/yy, cax_width/xx, ax_height/yy]))
+
+    chan = 0
+
+    im = ax[0].imshow(img_dirty[chan], **kw)
+    ax[0].set_title("dirty image")
+    cbar = plt.colorbar(im, cax=cax[0])
+    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    
+    im = ax[1].imshow(sky_cube[chan], **kw)
+    ax[1].set_title("model image")
+    cbar = plt.colorbar(im, cax=cax[1])
+    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    
+    im = ax[2].imshow(img_model[chan], **kw)
+    ax[2].set_title("model vis imaged")
+    cbar = plt.colorbar(im, cax=cax[2])
+    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    
+    im = ax[3].imshow(img_resid[chan], **kw)
+    ax[3].set_title("residual vis imaged")
+    cbar = plt.colorbar(im, cax=cax[3])
+    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    
+    for a in ax:
+        a.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+        a.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+    
+    return fig 
+```
+
+```{code-cell} ipython3
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt 
+import matplotlib.ticker as ticker
+from matplotlib.animation import FFMpegWriter
+from tqdm import tqdm
+import loaddata
+
+from mpol import coordinates, gridding
+
+# use MPoL to make a dirty image 
+coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+kw = {"origin": "lower", "interpolation": "none", "extent": coords.img_ext}
+
+def get_pm(tensor, log10=False):
+    t = tensor.detach().numpy()
+    if log10:
+        t = np.power(10.0, t)
+
+    median, low, high = t
+
+    minus = median - low
+    plus = high - median
+
+    return [median, plus, minus]
 
 
+def pprint_quantiles(guide):
+    """
+    Get quantiles from a guide and pretty print output to compare to Guzman.
+    """
+
+    quantiles = guide.quantiles([0.5, 0.16, 0.84])
+
+    A_0 = "A_0: {0:.2f} +/- {1:.2f}/{2:.2f} Jy/arcsec^2".format(
+        *get_pm(quantiles["disk.log_A_0"], log10=True)
+    )
+    sigma_0 = "sigma_0: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(
+        *get_pm(quantiles["disk.log_sigma_0"], log10=True)
+    )
+
+    return_list = [A_0, sigma_0]
+
+    ring_names = ["B15", "B27", "B41", "B74", "B92", "B120", "B140"]
+
+    nrings = len(quantiles["disk.log_ring_amplitudes"][0])
+
+    lra = get_pm(quantiles["disk.log_ring_amplitudes"] - quantiles["disk.log_A_0"][0], log10=True)
+    lrm = get_pm(quantiles["disk.ring_means"])
+    lrs = get_pm(quantiles["disk.log_ring_sigmas"], log10=True)
+
+    for i in range(nrings):
+        s = []
+        s.append("\nRing {}".format(ring_names[i]))
+        s.append(
+            "A normed: {0:.3f} +/- {1:.3f}/{2:.3f} Jy/arcsec^2".format(
+                lra[0][i], lra[1][i], lra[2][i]
+            )
+        )
+        s.append(
+            "mu: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(lrm[0][i], lrm[1][i], lrm[2][i])
+        )
+        s.append(
+            "sigma: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(
+                lrs[0][i], lrs[1][i], lrs[2][i]
+            )
+        )
+
+        return_list += s
+
+    return_list.append("x_centroid: {0:.4f} +/- {1:0.4f}/{2:0.4f} arcsec".format(*get_pm(quantiles["disk.x_centroid"])))
+    return_list.append("y_centroid: {0:.4f} +/- {1:0.4f}/{2:0.4f} arcsec".format(*get_pm(quantiles["disk.y_centroid"])))
+
+
+    print("\n".join(return_list))
+
+
+
+def make_dirty_image(data_real, data_imag, robust=-0.5):
+    """
+    Make a plot of the dirty beam and dirty image (in units of Jy/arcsec^2).
+    """
+
+    imager = gridding.DirtyImager(
+        coords=coords,
+        uu=loaddata.uu,
+        vv=loaddata.vv,
+        weight=loaddata.weight,
+        data_re=data_real,
+        data_im=data_imag,
+    )
+
+    return imager.get_dirty_image(weighting="briggs", robust=robust, unit="Jy/arcsec^2")
+```
 
 build and heavily comment the disk model, including MPoL geometry routines, deterministic statements
 
