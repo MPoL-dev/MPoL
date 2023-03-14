@@ -51,6 +51,8 @@ EXTRA_REQUIRES = {
         "myst-nb",
         "jupyter-cache",
         "Pillow",
+        "asdf",
+        "pyro-ppl"
     ],
 }
 
