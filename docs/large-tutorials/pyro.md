@@ -250,7 +250,6 @@ from mpol.datasets import index_vis
 
 import pyro
 import pyro.distributions as dist
-from torch.distributions import constraints
 from pyro.nn import PyroModule, PyroParam, PyroSample, pyro_method
 ```
 
@@ -398,7 +397,6 @@ class PyroDisk(PyroModule):
 
         # packed image with extra channel dimension
         return II
-
 ```
 
 We've gone ahead and defined many of our model parameters as latent random variables using `PyroSample`. We define the prior distribution on these parameters is defined by the `dist...`. For example, with the 
@@ -424,9 +422,6 @@ When starting out building a new model, we recomend starting out by introducing 
 
 Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with our model. For example, one design flaw we spotted with an earlier iteration was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
 
-
-
-
 ```{code-cell} ipython3
 # parameters from Guzman     
 distance = 121.0  # pc
@@ -448,7 +443,7 @@ prior_predictive = Predictive(disk_pyro, num_samples=10)
 output = prior_predictive()
 ```
 
-Now let's examine the dictionary of output 
+Now let's examine the dictionary of output
 
 ```{code-cell} ipython3
 output.keys()
@@ -507,7 +502,7 @@ fig, ax = plt.subplots(nrows=1)
 ax.imshow(output["sky_cube"][0][chan], origin="lower", extent=coords.img_ext);
 ```
 
-Once you have the prior predictive and posterior predictive routines working smoothly, and you are relatively sure you've ironed out any bugs in your model composition, then it makes sense to expand the number of latent random variables.
+And we see that this looks much more like the AS 209 disk. Once you have the prior predictive and posterior predictive routines working smoothly, and you are relatively sure you've ironed out any bugs in your model composition, then it makes sense to expand the number of latent random variables.
 
 +++
 
@@ -590,10 +585,6 @@ class GriddedVisibilityModel(PyroModule):
 
         disk_packed_image_cube = self.disk()  # use the PyroDisk to create an ImageCube
         img = self.icube(disk_packed_image_cube)  # identity operation for completeness
-        full_vis = self.flayer(img)
-
-        # extract the model visibilities
-        vis = index_vis(full_vis, self.dataset).flatten()
 
         if predictive:
             # use the NuFFT to produce and store samples
@@ -602,8 +593,16 @@ class GriddedVisibilityModel(PyroModule):
             pyro.deterministic("vis_real", torch.real(vis_nufft))
             pyro.deterministic("vis_imag", torch.imag(vis_nufft))
 
-        # evaluate the likelihood
+
         else:
+            # evaluate the likelihood
+            
+            # use the FourierCube layer to get a gridded model
+            full_vis = self.flayer(img)
+
+            # extract the model visibilities corresponding to the gridded data
+            vis = index_vis(full_vis, self.dataset).flatten()
+
             with pyro.plate("data", len(self.data_re)):
                 # condition on the real and imaginaries of the data independently
                 pyro.sample(
@@ -614,18 +613,72 @@ class GriddedVisibilityModel(PyroModule):
                 )
 ```
 
+We can also do a prior predictive check with the `GriddedVisibilityModel`, just like we did with the `PyroDisk`. The `forward` method of `GriddedVisibilityModel` is a bit more complex than a `forward` routine you might find in your average Pyro module. This is because we want to have the best of both worlds when it comes to producing model visibilities and (optionally) evaluating them against data. 
+
+As we described in the [NuFFT](../ci-tutorials/loose-visibilities.md) tutorial, the {class}`mpol.fourier.NuFFT` layer is designed to take an image and produce individual model visibilities corresponding to the $u$ and $v$ sampling locations of the dataset. However, with the large number of visibilities present in your average ALMA dataset ($> 10^5$), computational time can start to be a burden. For many repetitive, computationally heavy tasks like evaluating the likelihood function, we will first grid the visibilities using the {class}`mpol.gridder.DataAverager` and evaluate the likelihood function off of those.
+
+When visualizing model or residual visibility values, it is often far more useful to work with the loose visibility values produced from the NuFFT. This is because the loose visibilities can be gridded using a weighting scheme like Briggs robust weighting, which can dramatically increase the sensitivity of the resulting image. So that is why our `GriddedVisibilityModel` uses a {class}`~mpol.fourier.NuFFT` layer to produce model visibilities when working in a predictive mode but otherwise uses a more efficient {class}`~mpol.fourier.FourierCube` layer to produce model visibilities when working in a likelihood evaluation loop.
+
+Now we'll do a predictive check with the `GriddedVisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU, if the device is available.
+
+```{code-cell} ipython3
+if torch.cuda.is_available():     
+    device = torch.device('cuda') 
+else:                             
+    device = torch.device('cpu') 
+    
+gridded_pyro = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+```
+
+Because we've added the `PyroDisk` module as an attribute of the `GriddedVisibilityModel`, that means that the names of the latent random variables in the `PyroDisk` have changed. We can see that by doing a simple prior predictive check (not conditional)
+
+```{code-cell} ipython3
+p_check = Predictive(gridded_pyro, num_samples=1)
+output = p_check()
+output.keys()
+```
+
+This means that we'll need to update the names of some of the parameters in the `guzman_values` dictionary.
+
+```{code-cell} ipython3
+guzman_gridded_values = guzman_values.copy()
+for key in guzman_values:
+    guzman_gridded_values["disk." + key] = guzman_gridded_values.pop(key)
+```
+
+```{code-cell} ipython3
+guzman_gridded_values
+```
+
+```{code-cell} ipython3
+# initialize a Predictive object, condition on the Guzman "posterior sample"
+prior_predictive_conditional_vis = Predictive(gridded_pyro, posterior_samples=guzman_gridded_values, num_samples=1)
+output = prior_predictive_conditional_vis()
+```
+
+We now see that we have `vis_real` and `vis_imag` values in the output samples. These are the "loose" model visibilities produced by the NuFFT layer.
+
+```{code-cell} ipython3
+output.keys()
+```
+
+To finalize this prior predictive check, we'll grid and image these model and residual visibilities using the same Briggs weighting that we used for the data visibilities. We've written the following function that should help us visualize these quantities, since we'll want to repeat this plot once we've explored the posteriors on our own.
+
 ```{code-cell} ipython3
 def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
 
-    # convert to numpy 
+    # convert PyTorch tensors to numpy 
     model_real = model_real.detach().numpy()
     model_imag = model_imag.detach().numpy()
 
-    data_real = np.real(loaddata.data)
-    data_imag = np.imag(loaddata.data)
+    data_real = np.real(data)
+    data_imag = np.imag(data)
+    
+    # calculate the residual visibilities
     resid_real = data_real - model_real 
     resid_imag = data_imag - model_imag
 
+    # use the dirty imager to make images
     img_dirty, _ = make_dirty_image(data_real, data_imag)
     img_model, _ = make_dirty_image(model_real, model_imag)
     img_resid, _ = make_dirty_image(resid_real, resid_imag)
@@ -682,6 +735,100 @@ def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
     
     return fig 
 ```
+
+```{code-cell} ipython3
+fig = compare_dirty_model_resid(output["vis_real"][0], output["vis_imag"][0], output["sky_cube"][0]);
+```
+
+Ok, there is still some structure in the residuals, but at least we can be reasonably confident that the Pyro model is producing images that have the right flux and orientation and that the Fourier layers are producing reasonable model visibilities. In the next sections we will do Bayesian inference of the model parameters and hopefully this will deliver us a set that will further reduce the scale of the residuals.
+
++++
+
+## Parameter inference with Stochastic Variational Inference (SVI)
+
+Now we'll use Stochastic Variational Inference (SVI) to run the inference loop.
+
+
+
+
+run SVI inference loop on GPU
+analyze samples
+explore MultiNormal fits to see if posterior changes
+
+```{code-cell} ipython3
+from pyro.infer import SVI, Trace_ELBO
+from pyro.infer.autoguide import AutoNormal
+from pyro.infer.autoguide.initialization import init_to_sample
+
+from astropy.io import ascii
+from astropy.table import Table
+```
+
+```{code-cell} ipython3
+gridded_pyro.to(device)
+
+# define SVI guide
+guide = AutoNormal(gridded_pyro, init_loc_fn=init_to_sample)
+
+adam = pyro.optim.Adam({"lr": 0.05})
+# scheduler = pyro.optim.ExponentialLR({'optimizer': adam, 'optim_args': {'lr': 0.05}, 'gamma': 0.1})
+svi = SVI(gridded_pyro, guide, adam, loss=Trace_ELBO())
+
+num_iterations = 20000
+pyro.clear_param_store()
+loss_tracker = np.empty(num_iterations)
+for j in range(num_iterations):
+    # calculate the loss and take a gradient step
+    loss_tracker[j] = svi.step(predictive=False)
+    if j % 100 == 0:
+        print(j)
+
+# write loss to file 
+data = Table()
+data["loss"] = np.array(loss_tracker)
+ascii.write(data, "loss.csv", overwrite=True)
+```
+
+Note that, because we are in a Jupyter notebook tutorial, we don't need to save and then load the output from a run, it's just stored in memory. In a normal workflow, though, you might wish to have one script that runs the optimization loop (perhaps via a batch submission script on a cluster) and then a separate script that plots the results. In that case, you'll want to save the parameter values of the guide after optimization. Here is one way to save them 
+
+```
+param_store = pyro.get_param_store()
+param_store.save("param_store")
+
+# view items
+for key, value in param_store.items():
+    print(key, value)
+```
+
+And then in your plotting script, you'll want to re-initialize the model and the guide, and then you can load the parameter store into them. For example,
+
+```
+# define SVI guide
+guide = AutoNormal(gridded_pyro, init_loc_fn=init_to_mean)
+
+param_store = pyro.get_param_store()
+param_store.load("param_store")
+
+# need to run the guide step after, otherwise "no stochastic sites"
+guide()
+```
+
+```{code-cell} ipython3
+table = ascii.read("loss.csv")
+# subtract the minimum value 
+loss = table["loss"]
+loss -= np.min(loss)
+
+# plot loss
+fig, ax = plt.subplots(nrows=1)
+ax.semilogy(loss)
+ax.set_xlabel("iteration")
+ax.set_ylabel("loss");
+```
+
+We can visualize the posteriors in multiple ways. Since we used an AutoNormal guide, this means that, by construction, the posteriors will be 1D Gaussians on each parameter, with no covariance between them. (This may be physically unrealistic, which we'll address in a moment). So, one way of reporting the posteriors is simply to report the mean and standard deviation of each of the guide Gaussians. There is a convenience routine for this guide, `guide.quantiles()` that will report the quantiles of the Gaussian distribution. 
+
+We wrote the following routine to pretty-print many of these quantile properties.
 
 ```{code-cell} ipython3
 def get_pm(tensor, log10=False):
@@ -747,12 +894,16 @@ def pprint_quantiles(guide):
     print("\n".join(return_list))
 ```
 
-build and heavily comment the disk model, including MPoL geometry routines, deterministic statements
+An alternative way to report posteriors is to draw random samples from the guide posterior and then use a corner plotting package to visualize them using histograms. Though more computationally involved than the `quantiles` approach, this has the benefit of generalizing to other distributions, so we'll use that here.
 
-## Parameter inference with Stochastic Variational Inference (SVI)
-run SVI inference loop on GPU
-analyze samples
-explore MultiNormal fits to see if posterior changes
+* make triangle plots of key variables (doesn't need to be everything)
+* convert units of samples as needed
+* choose variables that might be correlated
+* expand inference using multinormal
+
++++
+
+
 
 ## Parameter inference with MCMC and Hamiltonian Monte Carlo
 run HMC loop on GPU and analyze samples
