@@ -40,8 +40,8 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
 
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
                clab=r"Jy arcsec$^{-2}$",
-               xlab="RA offset [arcsec]",
-               ylab="Dec offset [arcsec]",
+               xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
+               ylab="$\Delta \delta$ [${}^{\prime\prime}$]",
                ):
     r""" 
     Wrapper for plt.imshow, with colorbar and colormap normalization.
