@@ -307,7 +307,7 @@ class PyroDisk(PyroModule):
         self.distance = torch.as_tensor(distance)  # pc
 
         # Define a 1D radial grid for evaluating the 1D intensity profile
-        self.R = torch.linspace(0.0, torch.max(torch.concat([XX, YY])), steps=200) * self.distance
+        self.R = torch.linspace(0.0, torch.max(torch.concat([XX, YY])), steps=400) * self.distance
 
         self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
         self.log_sigma_0 = PyroSample(dist.Normal(0.7, 0.1))
@@ -602,6 +602,8 @@ class GriddedVisibilityModel(PyroModule):
 
             # extract the model visibilities corresponding to the gridded data
             vis = index_vis(full_vis, self.dataset).flatten()
+            
+            print(full_vis.device, self.dataset.mask.device, vis.device, self.data_re.device, self.data_im.device, self.sigma.device)
 
             with pyro.plate("data", len(self.data_re)):
                 # condition on the real and imaginaries of the data independently
@@ -611,6 +613,12 @@ class GriddedVisibilityModel(PyroModule):
                 pyro.sample(
                     "obs_imag", dist.Normal(torch.imag(vis), self.sigma), obs=self.data_im
                 )
+```
+
+```{code-cell} ipython3
+model = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+model.to(device)
+model(predictive=False)
 ```
 
 We can also do a prior predictive check with the `GriddedVisibilityModel`, just like we did with the `PyroDisk`. The `forward` method of `GriddedVisibilityModel` is a bit more complex than a `forward` routine you might find in your average Pyro module. This is because we want to have the best of both worlds when it comes to producing model visibilities and (optionally) evaluating them against data. 
@@ -668,8 +676,8 @@ To finalize this prior predictive check, we'll grid and image these model and re
 def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
 
     # convert PyTorch tensors to numpy 
-    model_real = model_real.detach().numpy()
-    model_imag = model_imag.detach().numpy()
+    model_real = model_real.cpu().detach().numpy()
+    model_imag = model_imag.cpu().detach().numpy()
 
     data_real = np.real(data)
     data_imag = np.imag(data)
@@ -714,7 +722,7 @@ def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
     cbar = plt.colorbar(im, cax=cax[0])
     cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
     
-    im = ax[1].imshow(sky_cube[chan], **kw)
+    im = ax[1].imshow(sky_cube.cpu().detach().numpy()[chan], **kw)
     ax[1].set_title("model image")
     cbar = plt.colorbar(im, cax=cax[1])
     cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
@@ -784,9 +792,9 @@ for j in range(num_iterations):
         print(j)
 
 # write loss to file 
-data = Table()
-data["loss"] = np.array(loss_tracker)
-ascii.write(data, "loss.csv", overwrite=True)
+table = Table()
+table["loss"] = np.array(loss_tracker)
+ascii.write(table, "loss.csv", overwrite=True)
 ```
 
 Note that, because we are in a Jupyter notebook tutorial, we don't need to save and then load the output from a run, it's just stored in memory. In a normal workflow, though, you might wish to have one script that runs the optimization loop (perhaps via a batch submission script on a cluster) and then a separate script that plots the results. In that case, you'll want to save the parameter values of the guide after optimization. Here is one way to save them 
@@ -830,68 +838,161 @@ We can visualize the posteriors in multiple ways. Since we used an AutoNormal gu
 
 We wrote the following routine to pretty-print many of these quantile properties.
 
++++
+
+As before, we'll use the `Predictive` routine to generate samples. This time, though, we'll pass in the `guide`, which stores the variational distribution that is approximated to the posterior distribution. And, we'll start just by visualizing a subset of the parameters using the `return_sites` argument.
+
+We can generate samples from the approximate posterior as follows
+
 ```{code-cell} ipython3
-def get_pm(tensor, log10=False):
-    t = tensor.detach().numpy()
-    if log10:
-        t = np.power(10.0, t)
+samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.Omega', "disk.incl"], num_samples=1000)(predictive=True)
+for k, v in samples.items():
+    print(f"{k}: {v.shape}")
+```
 
-    median, low, high = t
+```{code-cell} ipython3
+dict_samples = {k: np.expand_dims(v.detach().numpy(), 0) for k, v in samples.items()}
+# convert from radians to degrees
+for key in ["disk.incl", "disk.Omega"]:
+    dict_samples[key] /= deg
+```
 
-    minus = median - low
-    plus = high - median
+```{code-cell} ipython3
+import arviz as az
+```
 
-    return [median, plus, minus]
+```{code-cell} ipython3
+dataset = az.convert_to_inference_data(dict_samples)
+```
+
+```{code-cell} ipython3
+dataset
+```
+
+```{code-cell} ipython3
+az.plot_posterior(dataset)
+```
+
+```{code-cell} ipython3
+az.plot_pair(dataset)
+```
+
+```{code-cell} ipython3
+samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
+for k, v in samples.items():
+    print(f"{k}: {v.shape}")
+```
+
+```{code-cell} ipython3
+# extract samples from the Pyro Predictive object and convert units for convenience
+dict_samples = {k: np.expand_dims(v.detach().numpy(), 0) for k, v in samples.items()}
+# convert from radians to degrees
+for key in ["disk.incl", "disk.Omega"]:
+    dict_samples[key] /= deg
+    
+# convert to actual value
+for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "disk.log_ring_sigmas"]:
+    new_key = key.replace("log_", "")
+    dict_samples[new_key] = 10**dict_samples.pop(key)    
+    
+dataset = az.convert_to_inference_data(dict_samples)
+```
+
+```{code-cell} ipython3
+az.plot_posterior(dataset)
+```
+
+```{code-cell} ipython3
+az.plot_pair(dataset)
+```
+
+```{code-cell} ipython3
+samples = Predictive(gridded_pyro, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
 
 
-def pprint_quantiles(guide):
-    """
-    Get quantiles from a guide and pretty print output to compare to Guzman.
-    """
+fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
+```
 
-    quantiles = guide.quantiles([0.5, 0.16, 0.84])
+```{code-cell} ipython3
+# plot samples of the 1D intensity profile
 
-    A_0 = "A_0: {0:.2f} +/- {1:.2f}/{2:.2f} Jy/arcsec^2".format(
-        *get_pm(quantiles["disk.log_A_0"], log10=True)
-    )
-    sigma_0 = "sigma_0: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(
-        *get_pm(quantiles["disk.log_sigma_0"], log10=True)
-    )
+samples = Predictive(gridded_pyro, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
 
-    return_list = [A_0, sigma_0]
+fig, ax = plt.subplots(nrows=1)
 
-    ring_names = ["B15", "B27", "B41", "B74", "B92", "B120", "B140"]
+for profile in samples["iprofile1D"]:
+    ax.plot(gridded_pyro.disk.R, profile, color="k", lw=0.2, alpha=0.2)
+    
+ax.set_xlabel("radius [au]")
+ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
+```
 
-    nrings = len(quantiles["disk.log_ring_amplitudes"][0])
+## SVI with a MultiDiagonal Model
 
-    lra = get_pm(quantiles["disk.log_ring_amplitudes"] - quantiles["disk.log_A_0"][0], log10=True)
-    lrm = get_pm(quantiles["disk.ring_means"])
-    lrs = get_pm(quantiles["disk.log_ring_sigmas"], log10=True)
+```{code-cell} ipython3
+from pyro.infer.autoguide import AutoMultivariateNormal, init_to_mean
+```
 
-    for i in range(nrings):
-        s = []
-        s.append("\nRing {}".format(ring_names[i]))
-        s.append(
-            "A normed: {0:.3f} +/- {1:.3f}/{2:.3f} Jy/arcsec^2".format(
-                lra[0][i], lra[1][i], lra[2][i]
-            )
-        )
-        s.append(
-            "mu: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(lrm[0][i], lrm[1][i], lrm[2][i])
-        )
-        s.append(
-            "sigma: {0:.2f} +/- {1:.2f}/{2:.2f} au".format(
-                lrs[0][i], lrs[1][i], lrs[2][i]
-            )
-        )
+```{code-cell} ipython3
+gridded_pyro.to(device)
 
-        return_list += s
+# define SVI guide
+guide = AutoMultivariateNormal(gridded_pyro, init_loc_fn=init_to_mean)
 
-    return_list.append("x_centroid: {0:.4f} +/- {1:0.4f}/{2:0.4f} arcsec".format(*get_pm(quantiles["disk.x_centroid"])))
-    return_list.append("y_centroid: {0:.4f} +/- {1:0.4f}/{2:0.4f} arcsec".format(*get_pm(quantiles["disk.y_centroid"])))
+adam = pyro.optim.Adam({"lr": 0.05})
+svi = SVI(gridded_pyro, guide, adam, loss=Trace_ELBO())
 
+num_iterations = 20000
+pyro.clear_param_store()
+loss_tracker = np.empty(num_iterations)
+for j in range(num_iterations):
+    # calculate the loss and take a gradient step
+    loss_tracker[j] = svi.step(predictive=False)
+    if j % 100 == 0:
+        print(j)
 
-    print("\n".join(return_list))
+# write loss to file 
+table = Table()
+table["loss"] = np.array(loss_tracker)
+ascii.write(table, "loss.csv", overwrite=True)
+```
+
+```{code-cell} ipython3
+table = ascii.read("loss.csv")
+# subtract the minimum value 
+loss = table["loss"]
+loss -= np.min(loss)
+
+# plot loss
+fig, ax = plt.subplots(nrows=1)
+ax.semilogy(loss)
+ax.set_xlabel("iteration")
+ax.set_ylabel("loss");
+```
+
+```{code-cell} ipython3
+samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
+for k, v in samples.items():
+    print(f"{k}: {v.shape}")
+```
+
+```{code-cell} ipython3
+# extract samples from the Pyro Predictive object and convert units for convenience
+dict_samples = {k: np.expand_dims(v.detach().numpy(), 0) for k, v in samples.items()}
+# convert from radians to degrees
+for key in ["disk.incl", "disk.Omega"]:
+    dict_samples[key] /= deg
+    
+# convert to actual value
+for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "disk.log_ring_sigmas"]:
+    new_key = key.replace("log_", "")
+    dict_samples[new_key] = 10**dict_samples.pop(key)    
+    
+dataset = az.convert_to_inference_data(dict_samples)
+```
+
+```{code-cell} ipython3
+az.plot_pair(dataset)
 ```
 
 An alternative way to report posteriors is to draw random samples from the guide posterior and then use a corner plotting package to visualize them using histograms. Though more computationally involved than the `quantiles` approach, this has the benefit of generalizing to other distributions, so we'll use that here.
@@ -903,12 +1004,26 @@ An alternative way to report posteriors is to draw random samples from the guide
 
 +++
 
-
-
 ## Parameter inference with MCMC and Hamiltonian Monte Carlo
 run HMC loop on GPU and analyze samples
 show scatter in 1D profile as draws or movie
 
 ```{code-cell} ipython3
+from pyro.infer import MCMC, NUTS
+```
 
+```{code-cell} ipython3
+model = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+model.to(device)
+nuts_kernel = NUTS(model)
+
+mcmc = MCMC(nuts_kernel, num_samples=1000, warmup_steps=200)
+
+mcmc.run(predictive=False)
+
+samples = mcmc.get_samples()
+```
+
+```{code-cell} ipython3
+pyro_data = az.from_pyro(mcmc)
 ```

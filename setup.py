@@ -52,7 +52,8 @@ EXTRA_REQUIRES = {
         "jupyter-cache",
         "Pillow",
         "asdf",
-        "pyro-ppl"
+        "pyro-ppl",
+        "arviz[all]"
     ],
 }
 
