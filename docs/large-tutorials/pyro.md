@@ -754,13 +754,6 @@ Ok, there is still some structure in the residuals, but at least we can be reaso
 
 Now we'll use Stochastic Variational Inference (SVI) to run the inference loop.
 
-
-
-
-run SVI inference loop on GPU
-analyze samples
-explore MultiNormal fits to see if posterior changes
-
 ```{code-cell} ipython3
 from pyro.infer import SVI, Trace_ELBO
 from pyro.infer.autoguide import AutoNormal
@@ -786,8 +779,8 @@ loss_tracker = np.empty(num_iterations)
 for j in range(num_iterations):
     # calculate the loss and take a gradient step
     loss_tracker[j] = svi.step(predictive=False)
-    if j % 100 == 0:
-        print(j)
+    if j % 1000 == 0:
+        print(j, end=" ")
 
 # write loss to file 
 table = Table()
@@ -819,6 +812,8 @@ param_store.load("param_store")
 guide()
 ```
 
+Now, let's plot the loss values to see how we converged.
+
 ```{code-cell} ipython3
 table = ascii.read("loss.csv")
 # subtract the minimum value 
@@ -832,88 +827,66 @@ ax.set_xlabel("iteration")
 ax.set_ylabel("loss");
 ```
 
-We can visualize the posteriors in multiple ways. Since we used an AutoNormal guide, this means that, by construction, the posteriors will be 1D Gaussians on each parameter, with no covariance between them. (This may be physically unrealistic, which we'll address in a moment). So, one way of reporting the posteriors is simply to report the mean and standard deviation of each of the guide Gaussians. There is a convenience routine for this guide, `guide.quantiles()` that will report the quantiles of the Gaussian distribution. 
-
-We wrote the following routine to pretty-print many of these quantile properties.
-
 +++
 
-As before, we'll use the `Predictive` routine to generate samples. This time, though, we'll pass in the `guide`, which stores the variational distribution that is approximated to the posterior distribution. And, we'll start just by visualizing a subset of the parameters using the `return_sites` argument.
+### Visualization of samples
+
+We can visualize the posteriors in multiple ways. Since we used an [AutoNormal](https://docs.pyro.ai/en/stable/infer.autoguide.html#autonormal) guide, this means that, by construction, the posteriors will be 1D Gaussians on each parameter, with no covariance between them. (This may be physically unrealistic, which we'll address in a moment). So, one way of reporting the posteriors is simply to report the mean and standard deviation of each of the guide Gaussians. There is a convenience routine, `guide.quantiles()`, that will report the quantiles of the Gaussian distribution for this guide. 
+
+Let's go a step further and examine the posteriors using some visualization routines provided by the [ArviZ](https://python.arviz.org/en/stable/) package. To start, we want to generate samples from the posterior distributions.
+
+As before, we'll use the `Predictive` routine to generate samples. This time, though, we'll pass in the `guide`, which stores the variational distribution that is approximated to the posterior distribution. And, we'll start just by visualizing a subset of the parameters using the `return_sites` argument. 
 
 We can generate samples from the approximate posterior as follows
 
 ```{code-cell} ipython3
-samples = Predictive(model, guide=guide, return_sites=['disk.Omega', "disk.incl"], num_samples=1000)(predictive=True)
-for k, v in samples.items():
-    print(f"{k}: {v.shape}")
-```
-
-```{code-cell} ipython3
-dict_samples = {k: np.expand_dims(v.detach().numpy(), 0) for k, v in samples.items()}
-# convert from radians to degrees
-for key in ["disk.incl", "disk.Omega"]:
-    dict_samples[key] /= deg
-```
-
-```{code-cell} ipython3
-import arviz as az
-```
-
-```{code-cell} ipython3
-dataset = az.convert_to_inference_data(dict_samples)
-```
-
-```{code-cell} ipython3
-dataset
-```
-
-```{code-cell} ipython3
-az.plot_posterior(dataset)
-```
-
-```{code-cell} ipython3
-az.plot_pair(dataset)
-```
-
-```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
-for k, v in samples.items():
-    print(f"{k}: {v.shape}")
-```
 
-```{code-cell} ipython3
 # extract samples from the Pyro Predictive object and convert units for convenience
 dict_samples = {k: np.expand_dims(v.detach().numpy(), 0) for k, v in samples.items()}
+
 # convert from radians to degrees
 for key in ["disk.incl", "disk.Omega"]:
     dict_samples[key] /= deg
     
-# convert to actual value
+# convert from log values
 for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "disk.log_ring_sigmas"]:
     new_key = key.replace("log_", "")
     dict_samples[new_key] = 10**dict_samples.pop(key)    
-    
+```
+
+and then convert these samples to an ArviZ InferenceData object
+```{code-cell} ipython3
+import arviz as az
 dataset = az.convert_to_inference_data(dict_samples)
+dataset
 ```
 
-```{code-cell} ipython3
-az.plot_posterior(dataset)
-```
+Then, it is easy to use the ArviZ plotting routines to make many diagnostic plots. To start, let's visualize the 1D marginal posteriors
+
 
 ```{code-cell} ipython3
-az.plot_pair(dataset)
+az.plot_posterior(dataset, var_names=["disk.Omega", "disk.incl", "disk.A_0", "disk.sigma_0"])
 ```
+
+And, we can also visualize the pairwise 2D marginal distributions (often called a "triangle" or "corner" plot)
+
+```{code-cell} ipython3
+az.plot_pair(dataset, var_names=["disk.ring_means"])
+```
+
+As we mentioned, the lack of correlation between any parameters is *imposed* by the simple SVI guide that we used. This could be an issue if there were strong correlations between parameters. We'll address this limitiation in the next section by using a guide that incorporates correlations between parameters. 
+
+But first, let's see what the model and residuals look like for this optimized posterior distribution.
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
-
-
 fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
 ```
 
-```{code-cell} ipython3
-# plot samples of the 1D intensity profile
+And the 1D profile
 
+```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
 
 fig, ax = plt.subplots(nrows=1)
@@ -946,8 +919,8 @@ loss_tracker = np.empty(num_iterations)
 for j in range(num_iterations):
     # calculate the loss and take a gradient step
     loss_tracker[j] = svi.step(predictive=False)
-    if j % 100 == 0:
-        print(j)
+    if j % 1000 == 0:
+        print(j, sep=" ")
 
 # write loss to file 
 table = Table()
@@ -989,16 +962,43 @@ for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "dis
 dataset = az.convert_to_inference_data(dict_samples)
 ```
 
+Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise plots of a subset of the variables at a time.
+
 ```{code-cell} ipython3
-az.plot_pair(dataset)
+az.plot_pair(dataset, var_names=["disk.ring_means"])
 ```
 
-An alternative way to report posteriors is to draw random samples from the guide posterior and then use a corner plotting package to visualize them using histograms. Though more computationally involved than the `quantiles` approach, this has the benefit of generalizing to other distributions, so we'll use that here.
+```{code-cell} ipython3
+az.plot_pair(dataset, var_names=["disk.ring_sigmas"])
+```
 
-* make triangle plots of key variables (doesn't need to be everything)
-* convert units of samples as needed
-* choose variables that might be correlated
-* expand inference using multinormal
+```{code-cell} ipython3
+az.plot_pair(dataset, var_names=["disk.ring_amplitudes"])
+```
+
+With the more flexible guide, the correlations between parameters can be more accurately captured.
+
+And, now let's see what the model and residuals look like for this optimized posterior distribution.
+
+```{code-cell} ipython3
+samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
+fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
+```
+
+And the 1D profile
+
+```{code-cell} ipython3
+samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
+
+fig, ax = plt.subplots(nrows=1)
+
+for profile in samples["iprofile1D"]:
+    ax.plot(model.disk.R, profile, color="k", lw=0.2, alpha=0.2)
+    
+ax.set_xlabel("radius [au]")
+ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
+```
+
 
 +++
 
@@ -1026,3 +1026,5 @@ self.log_A_0 = PyroSample(dist.Normal(torch.tensor(0.0, device=device), 0.3))
 ```
 
 This is necessary to place these sample objects on the GPU for use in MCMC (see also this [Pyro issue](https://forum.pyro.ai/t/pyrosample-and-cuda-gpu/4328)) so that you don't get conflicts that some tensors are on the CPU while others are on the GPU. It's not clear to us why this change is necessary for MCMC but not for the SVI algorithms.
+
+Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide.
