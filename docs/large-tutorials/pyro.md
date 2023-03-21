@@ -770,11 +770,10 @@ model.to(device)
 # define SVI guide
 guide = AutoNormal(model, init_loc_fn=init_to_sample)
 
-adam = pyro.optim.Adam({"lr": 0.05})
-# scheduler = pyro.optim.ExponentialLR({'optimizer': adam, 'optim_args': {'lr': 0.05}, 'gamma': 0.1})
+adam = pyro.optim.Adam({"lr": 0.02})
 svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
-num_iterations = 20000
+num_iterations = 15000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
 
@@ -869,13 +868,13 @@ Then, it is easy to use the ArviZ plotting routines to make many diagnostic plot
 
 
 ```{code-cell} ipython3
-az.plot_posterior(dataset, var_names=["disk.Omega", "disk.incl", "disk.A_0", "disk.sigma_0"])
+az.plot_posterior(dataset, var_names=["disk.Omega", "disk.incl", "disk.A_0", "disk.sigma_0"]);
 ```
 
 And, we can also visualize the pairwise 2D marginal distributions (often called a "triangle" or "corner" plot)
 
 ```{code-cell} ipython3
-az.plot_pair(dataset, var_names=["disk.ring_means"])
+az.plot_pair(dataset, var_names=["disk.ring_means"]);
 ```
 
 As we mentioned, the lack of correlation between any parameters is *imposed* by the simple SVI guide that we used. This could be an issue if there were strong correlations between parameters. We'll address this limitiation in the next section by using a guide that incorporates correlations between parameters. 
@@ -913,10 +912,10 @@ model.to(device)
 # define SVI guide
 guide = AutoMultivariateNormal(model, init_loc_fn=init_to_mean)
 
-adam = pyro.optim.Adam({"lr": 0.05})
+adam = pyro.optim.Adam({"lr": 0.02})
 svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
-num_iterations = 20000
+num_iterations = 15000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
 
@@ -1041,4 +1040,4 @@ self.log_A_0 = PyroSample(dist.Normal(torch.tensor(0.0, device=device), 0.3))
 
 This is necessary to place these sample objects on the GPU for use in MCMC (see also this [Pyro issue](https://forum.pyro.ai/t/pyrosample-and-cuda-gpu/4328)) so that you don't get conflicts that some tensors are on the CPU while others are on the GPU. It's not clear to us why this change is necessary for MCMC but not for the SVI algorithms.
 
-Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide. We found that the MCMC NUTS run took about a 1.5 hours to run two independent chains on a GPU. This is still tractable but notably slower than the time it took with SVI to find the posterior distributions in this tutorial.
+Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide. We found that the MCMC NUTS run took about a 1.5 hours to run two independent chains on a GPU. This is still tractable but notably slower than the roughly 5 minutes it took with SVI to find the posterior distributions in this tutorial.
