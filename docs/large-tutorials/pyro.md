@@ -761,6 +761,7 @@ from pyro.infer.autoguide.initialization import init_to_sample
 
 from astropy.io import ascii
 from astropy.table import Table
+import time
 ```
 
 ```{code-cell} ipython3
@@ -776,11 +777,13 @@ svi = SVI(model, guide, adam, loss=Trace_ELBO())
 num_iterations = 20000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
+
+t0 = time.time()
 for j in range(num_iterations):
     # calculate the loss and take a gradient step
     loss_tracker[j] = svi.step(predictive=False)
-    if j % 1000 == 0:
-        print(j, end=" ")
+    
+print("Optimization took {:}s".format(time.time() - t0))
 
 # write loss to file 
 table = Table()
@@ -916,11 +919,13 @@ svi = SVI(model, guide, adam, loss=Trace_ELBO())
 num_iterations = 20000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
+
+t0 = time.time()
 for j in range(num_iterations):
     # calculate the loss and take a gradient step
     loss_tracker[j] = svi.step(predictive=False)
-    if j % 1000 == 0:
-        print(j, sep=" ")
+    
+print("Optimization took {:}s".format(time.time() - t0))
 
 # write loss to file 
 table = Table()
@@ -940,6 +945,10 @@ ax.semilogy(loss)
 ax.set_xlabel("iteration")
 ax.set_ylabel("loss");
 ```
+
+### Visualization of samples
+
+We'll follow a similar procedure as with the `AutoNormal` guide.
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
@@ -965,27 +974,27 @@ dataset = az.convert_to_inference_data(dict_samples)
 Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise plots of a subset of the variables at a time.
 
 ```{code-cell} ipython3
-az.plot_pair(dataset, var_names=["disk.ring_means"])
+az.plot_pair(dataset, var_names=["disk.ring_means"]);
 ```
 
 ```{code-cell} ipython3
-az.plot_pair(dataset, var_names=["disk.ring_sigmas"])
+az.plot_pair(dataset, var_names=["disk.ring_sigmas"]);
 ```
 
 ```{code-cell} ipython3
-az.plot_pair(dataset, var_names=["disk.ring_amplitudes"])
+az.plot_pair(dataset, var_names=["disk.ring_amplitudes"]);
 ```
 
-With the more flexible guide, the correlations between parameters can be more accurately captured.
-
-And, now let's see what the model and residuals look like for this optimized posterior distribution.
+With the more flexible guide, the correlations between parameters are more accurately captured. Now let's see what the model and residuals look like for this optimized posterior distribution.
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
 fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
 ```
 
-And the 1D profile
+It's hard to tell much of a difference with the model and residual images.
+
+However, when we plot many draws from the 1D profile
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
@@ -999,10 +1008,15 @@ ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
 ```
 
+We see that there is a slightly larger scatter in the draws compared to the `AutoNormal` guide, especially around 40 au. This is because the `MultiDiagonal` guide captured more of the covariance between parameters, resulting in a greater dispersion of draws. 
 
 +++
 
 ## Parameter inference with MCMC
+
+In our opinion, SVI is a very useful inference technique because of its speed and scalability. There is the risk, though, that your guide distribution does not fully capture complex covariances of your posterior distributions. This risk can be hard to assess from SVI fits alone, though there are steps you can take by trying out more [complex guides](https://docs.pyro.ai/en/stable/infer.autoguide.html#) or [writing your own](https://pyro.ai/examples/svi_part_i.html#Guide), parameterized around anticipated covariances. 
+
+If those approaches are unsatisfactory and accurately measuring parameter uncertainties and covariances is critical to your science problem, it may make sense to switch to a more accurate inference algorithm like Markov Chain Monte Carlo (MCMC). With gradient-enabled samplers like Hamiltonian Monte Carlo (HMC) and the No U-Turn Sampler (NUTS), MCMC sampling can still be quite fast compared to traditional MCMC algorithms like Metropolis-Hastings.
 
 To sample this model using MCMC and NUTS, the following steps are required
 
@@ -1027,4 +1041,4 @@ self.log_A_0 = PyroSample(dist.Normal(torch.tensor(0.0, device=device), 0.3))
 
 This is necessary to place these sample objects on the GPU for use in MCMC (see also this [Pyro issue](https://forum.pyro.ai/t/pyrosample-and-cuda-gpu/4328)) so that you don't get conflicts that some tensors are on the CPU while others are on the GPU. It's not clear to us why this change is necessary for MCMC but not for the SVI algorithms.
 
-Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide.
+Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide. We found that the MCMC NUTS run took about a 1.5 hours to run two independent chains on a GPU. This is still tractable but notably slower than the time it took with SVI to find the posterior distributions in this tutorial.
