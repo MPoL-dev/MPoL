@@ -21,19 +21,20 @@ kernelspec:
 
 # Parametric Inference with Pyro
 
-In all of the tutorials thus far, we have used MPoL to optimize non-parametric image plane models, i.e., collections of pixels. However, there may be instances where the astrophysical source morphology is simple enough at the resolution of the data such that an investigator might wish to fit a parametric model to the data. In the protoplanetary disk field, there is a long history of parametric model fits to data. The simplest example of this would be an elliptcial Gaussian fit through CASA's [uvmodelfit](https://casadocs.readthedocs.io/en/stable/api/tt/casatasks.manipulation.uvmodelfit.html), while a more complex example might be the [Galario](https://mtazzari.github.io/galario/) package. While non-paramtetric models tend to get all of the attention in this era of Big Data, well-constructed parametric models can still prove useful thanks to their interpretability and role in Bayesian inference.
+In all of the tutorials thus far, we have used MPoL to optimize non-parametric image plane models, i.e., collections of pixels. However, there may be instances where the astrophysical source morphology is simple enough at the resolution of the data such that an investigator might wish to fit a parametric model to the data. In the protoplanetary disk field, there is a long history of parametric model fits to data. The simplest example of this would be an elliptical Gaussian fit through CASA's [uvmodelfit](https://casadocs.readthedocs.io/en/stable/api/tt/casatasks.manipulation.uvmodelfit.html), while a more complex example might be the [Galario](https://mtazzari.github.io/galario/) package. While non-parametric models tend to get all of the attention in this era of Big Data, well-constructed parametric models can still prove useful thanks to their interpretability and role in Bayesian inference.
 
 In this tutorial, we will explore how we can use MPoL with a probabilistic programming language called [Pyro](https://pyro.ai/) to perform parametric model fitting with a continuum protoplanetary disk dataset and derive posterior probability distributions of the model parameters. One major advantage of using MPoL + Pyro to do parametric model fitting compared to existing packages is that posterior gradient information is naturally provided by PyTorch's autodifferentiation capabilities. This, coupled with the industry-grade inference algorithms provided by Pyro, makes it computationally efficient to explore posterior probability distributions with dozens or even hundreds of parameters--something that would be impractical using classical MCMC algorithms.
+
+In this tutorial, we will use [Stochastic Variational Inference](http://pyro.ai/examples/svi_part_i.html) algorithms to obtain the posterior distribution of the model parameters. These algorithms are quick to implement in Pyro and--important for this tutorial--quick to run. Pyro also has full support for MCMC algorithms like Hamiltonian Monte Carlo and the No U-Turn Sampler (NUTS) ([for example](http://pyro.ai/examples/bayesian_regression_ii.html#HMC)) that are relatively straightforward to use in an extension from this model. However, because their run times are significantly longer than SVI algorithms, more computational resources are needed beyond the scope of this tutorial.
 
 +++
 
 ## MPoL and models
 
-Before we discuss the specifics of the parametric disk model, let's take a high-level look at what makes up an MPoL model 
+Before we discuss the specifics of the parametric disk model, let's take a high-level look at what makes up an MPoL model.
 
 ### Non-parametric models 
 Let's start by considering the architecture of the simplest possible skeleton non-parametric RML model
-
 
 ```{mermaid} ../_static/mmd/src/ImageCube.mmd
 ```
@@ -58,11 +59,10 @@ The `nn.Parameter` call tells Pytorch that the `cube` tensor containing the imag
 
 We can consider the architecture of the {class}`mpol.precomposed.SimpleNet` as a more practical extension 
 
-
 ```{mermaid} ../_static/mmd/src/SimpleNet.mmd
 ```
 
-The functionality of the {class}`mpol.precomposed.SimpleNet` is similar to the skeleton model, but we've shifted the base parameterization from the {class}`mpol.images.ImageCube` to the {class}`mpol.images.BaseCube` (so that pixel flux values are non-negative) and we've included a small convolution kernel (through {class}`mpol.images.HannConvCube`) so that high-spatial-frequency noise is supressed. In this framework, the `nn.Parameter`s are instantiated on the {class}`~mpol.images.BaseCube` and the {class}`~mpol.images.ImageCube` becomes a pass-through layer.
+The functionality of the {class}`mpol.precomposed.SimpleNet` is similar to the skeleton model, but we've shifted the base parameterization from the {class}`mpol.images.ImageCube` to the {class}`mpol.images.BaseCube` (so that pixel flux values are non-negative) and we've included a small convolution kernel (through {class}`mpol.images.HannConvCube`) so that high-spatial-frequency noise is suppressed. In this framework, the `nn.Parameter`s are instantiated on the {class}`~mpol.images.BaseCube` and the {class}`~mpol.images.ImageCube` becomes a pass-through layer.
 
 In both of these cases, the key functionality provided by the MPoL package is the {class}`mpol.fourier.FourierCube` layer that translates a model image into the visibility plane. From the perspective of the {class}`~mpol.fourier.FourierCube`, it doesn't care how the model image was produced, it will happily translate image pixels into visibility values using the FFT.
 
@@ -84,7 +84,7 @@ In our opinion, the two (linked) reasons that parametric model fitting has falle
 
 As we hinted at, the MPoL + Pyro + PyTorch framework will help us out on point #2, such that we might be able to explore more detailed models with larger numbers of parameters.
 
-This point of this tutorial isn't to say that actually everyone should switch back to using parametric models. But rather, that, with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
+This point of this tutorial isn't to say that everyone should switch back to using parametric models. But rather, that, with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
 
 +++
 
@@ -209,7 +209,7 @@ $$
 I(r) = \sum_{i=0}^N A_i \exp \left (- \frac{(r - r_i)^2}{2 \sigma_i^2} \right).
 $$
 
-The axisymmetry of the model allowed them to use the Hankel transform to compute the visibility function $\mathcal{V}$ corresponding to a given $I(r)$. The Hankel transform also plays a key role in non-parametric 1D methods like `frank`. Guzmán et al. 2018 evaluated the probability of the data given the model visibilities using a likelihood function and assigned prior probability distributions to their model parameters. They used the [emcee](https://emcee.readthedocs.io/) MCMC ensemble sampler to sample the posterior distribution of the parameters and thus infer the surface brightness profile $I(r)$. 
+The axisymmetry of the model allowed them to use the Hankel transform to compute the visibility function $\mathcal{V}$ corresponding to a given $I(r)$. The Hankel transform also plays a key role in non-parametric 1D methods like  [frank](https://discsim.github.io/frank/). Guzmán et al. 2018 evaluated the probability of the data given the model visibilities using a likelihood function and assigned prior probability distributions to their model parameters. They used the [emcee](https://emcee.readthedocs.io/) MCMC ensemble sampler to sample the posterior distribution of the parameters and thus infer the surface brightness profile $I(r)$. 
 
 In what follows we will use Pyro and the MPoL framework to implement the same concentric Gaussian ring model as Guzmán et al. 2018 and (hopefully) verify that we obtain the same result. But, we should note that because MPoL uses the 2D FFT to perform the Fourier Transform, we do not need to assume an axisymmetric model. This may be beneficial when fitting disk morphologies that are not purely axisymmetric.
 
@@ -233,7 +233,9 @@ The Pyro [examples](http://pyro.ai/examples/index.html) page and [documentation]
 
 We also recommend reading Gelman et al. 2020's paper on [Bayesian Workflow](https://arxiv.org/abs/2011.01808). It contains very useful advice on structuring a large and complex Bayesian data analysis problem and will no doubt save you time when constructing your own models.
 
+```{margin} New to Bayes
 If you are new to Bayesian analysis in general, we recommend that you put this tutorial aside for a moment and review some introductory resources like [Eadie et al. 2023](https://ui.adsabs.harvard.edu/abs/2023arXiv230204703E/abstract) and references therein.
+```
 
 +++
 
@@ -508,10 +510,10 @@ And we see that this looks much more like the AS 209 disk. Once you have the pri
 
 ### Incorporating the data 
 
-Next, we'll define another class called `GriddedVisibilityModel`. This class has an instance of `PyroDisk` as an attribute and takes the image produced by that all the way to the data and evaluates the likelihood function. We could have incorporated all of the functionality inside a single class, but we thought it was cleaner to separate the functionality this way: `PyroDisk` contains the functionality specific to producing images from the Guzmán et al. 2018 model while `GriddedVisibilityModel` contains the functionality for producing and evaluating model visibilities.
+Next, we'll define another class called `VisibilityModel`. This class has an instance of `PyroDisk` as an attribute and takes the image produced by that all the way to the data and evaluates the likelihood function. We could have incorporated all of the functionality inside a single class, but we thought it was cleaner to separate the functionality this way: `PyroDisk` contains the functionality specific to producing images from the Guzmán et al. 2018 model while `VisibilityModel` contains the functionality for producing and evaluating model visibilities.
 
 ```{code-cell} ipython3
-class GriddedVisibilityModel(PyroModule):
+class VisibilityModel(PyroModule):
     """
     This bigger inherits from the PyroDisk model, which provided Bayesian parameters for the disk model, and extends it to carry the comparison all the way to the data, and evaluates a likelihood.
 
@@ -616,18 +618,23 @@ class GriddedVisibilityModel(PyroModule):
 ```
 
 ```{code-cell} ipython3
-model = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+if torch.cuda.is_available():
+    device = torch.device('cuda')                   
+else:                                                       
+    device = torch.device('cpu')   
+
+model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
 model.to(device)
 model(predictive=False)
 ```
 
-We can also do a prior predictive check with the `GriddedVisibilityModel`, just like we did with the `PyroDisk`. The `forward` method of `GriddedVisibilityModel` is a bit more complex than a `forward` routine you might find in your average Pyro module. This is because we want to have the best of both worlds when it comes to producing model visibilities and (optionally) evaluating them against data. 
+We can also do a prior predictive check with the `VisibilityModel`, just like we did with the `PyroDisk`. The `forward` method of `VisibilityModel` is a bit more complex than a `forward` routine you might find in your average Pyro module. This is because we want to have the best of both worlds when it comes to producing model visibilities and (optionally) evaluating them against data. 
 
 As we described in the [NuFFT](../ci-tutorials/loose-visibilities.md) tutorial, the {class}`mpol.fourier.NuFFT` layer is designed to take an image and produce individual model visibilities corresponding to the $u$ and $v$ sampling locations of the dataset. However, with the large number of visibilities present in your average ALMA dataset ($> 10^5$), computational time can start to be a burden. For many repetitive, computationally heavy tasks like evaluating the likelihood function, we will first grid the visibilities using the {class}`mpol.gridder.DataAverager` and evaluate the likelihood function off of those.
 
-When visualizing model or residual visibility values, it is often far more useful to work with the loose visibility values produced from the NuFFT. This is because the loose visibilities can be gridded using a weighting scheme like Briggs robust weighting, which can dramatically increase the sensitivity of the resulting image. So that is why our `GriddedVisibilityModel` uses a {class}`~mpol.fourier.NuFFT` layer to produce model visibilities when working in a predictive mode but otherwise uses a more efficient {class}`~mpol.fourier.FourierCube` layer to produce model visibilities when working in a likelihood evaluation loop.
+When visualizing model or residual visibility values, it is often far more useful to work with the loose visibility values produced from the NuFFT. This is because the loose visibilities can be gridded using a weighting scheme like Briggs robust weighting, which can dramatically increase the sensitivity of the resulting image. So that is why our `VisibilityModel` uses a {class}`~mpol.fourier.NuFFT` layer to produce model visibilities when working in a predictive mode but otherwise uses a more efficient {class}`~mpol.fourier.FourierCube` layer to produce model visibilities when working in a likelihood evaluation loop.
 
-Now we'll do a predictive check with the `GriddedVisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU, if the device is available.
+Now we'll do a predictive check with the `VisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU, if the device is available.
 
 ```{code-cell} ipython3
 if torch.cuda.is_available():     
@@ -635,10 +642,10 @@ if torch.cuda.is_available():
 else:                             
     device = torch.device('cpu') 
     
-gridded_pyro = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+gridded_pyro = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
 ```
 
-Because we've added the `PyroDisk` module as an attribute of the `GriddedVisibilityModel`, that means that the names of the latent random variables in the `PyroDisk` have changed. We can see that by doing a simple prior predictive check (not conditional)
+Because we've added the `PyroDisk` module as an attribute of the `VisibilityModel`, that means that the names of the latent random variables in the `PyroDisk` have changed. We can see that by doing a simple prior predictive check (not conditional)
 
 ```{code-cell} ipython3
 p_check = Predictive(gridded_pyro, num_samples=1)
@@ -1004,26 +1011,27 @@ An alternative way to report posteriors is to draw random samples from the guide
 
 +++
 
-## Parameter inference with MCMC and Hamiltonian Monte Carlo
-run HMC loop on GPU and analyze samples
-show scatter in 1D profile as draws or movie
+## Parameter inference with MCMC
 
-```{code-cell} ipython3
-from pyro.infer import MCMC, NUTS
+To sample this model using MCMC and NUTS, the following steps are required
+
 ```
+from pyro.infer import MCMC, NUTS
+from pyro.infer.autoguide.initialization import init_to_sample
 
-```{code-cell} ipython3
-model = GriddedVisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
 model.to(device)
-nuts_kernel = NUTS(model)
+kernel = NUTS(model, init_strategy=init_to_sample)
 
-mcmc = MCMC(nuts_kernel, num_samples=1000, warmup_steps=200)
-
+mcmc = MCMC(kernel, num_samples=600, warmup_steps=200)
 mcmc.run(predictive=False)
-
 samples = mcmc.get_samples()
 ```
 
-```{code-cell} ipython3
-pyro_data = az.from_pyro(mcmc)
+If you will be running this on the GPU (at least as of Pyro 1.8.4), you will also need to change latent variable definitions in `PyroDisk` such that they are instantiated from torch tensors on the GPU, like so
+
 ```
+self.log_A_0 = PyroSample(dist.Normal(torch.tensor(0.0, device=device), 0.3))
+```
+
+This is necessary to place these sample objects on the GPU for use in MCMC (see also this [Pyro issue](https://forum.pyro.ai/t/pyrosample-and-cuda-gpu/4328)) so that you don't get conflicts that some tensors are on the CPU while others are on the GPU. It's not clear to us why this change is necessary for MCMC but not for the SVI algorithms.
