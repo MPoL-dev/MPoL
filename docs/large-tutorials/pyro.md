@@ -231,11 +231,11 @@ Simply put, PPLs are frameworks that help users build statistical models and the
 
 The Pyro [examples](http://pyro.ai/examples/index.html) page and [documentation](https://docs.pyro.ai/en/stable/) have much more information that can help you get started.
 
-We also recommend reading Gelman et al. 2020's paper on [Bayesian Workflow](https://arxiv.org/abs/2011.01808). It contains very useful advice on structuring a large and complex Bayesian data analysis problem and will no doubt save you time when constructing your own models.
-
 ```{margin} New to Bayes
 If you are new to Bayesian analysis in general, we recommend that you put this tutorial aside for a moment and review some introductory resources like [Eadie et al. 2023](https://ui.adsabs.harvard.edu/abs/2023arXiv230204703E/abstract) and references therein.
 ```
+
+We also recommend reading Gelman et al. 2020's paper on [Bayesian Workflow](https://arxiv.org/abs/2011.01808). It contains very useful advice on structuring a large and complex Bayesian data analysis problem and will no doubt save you time when constructing your own models.
 
 +++
 
@@ -303,6 +303,8 @@ class PyroDisk(PyroModule):
         # self.x_centroid = torch.as_tensor(x_centroid)  # arcsec
         # self.y_centroid = torch.as_tensor(y_centroid)  # arcsec
 
+        # otherwise, define latent random variables using PyroSample
+        # and a distribution object
         self.x_centroid = PyroSample(dist.Normal(0.0, 3e-3)) # arcsec
         self.y_centroid = PyroSample(dist.Normal(0.0, 3e-3)) # arcsec
 
@@ -406,7 +408,7 @@ We've gone ahead and defined many of our model parameters as latent random varia
 ```
 self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
 ```
-line we've defined the prior on the `log_A_0` parameter to be a Normal distribution with mean 0.0 and standard deviation of 0.3. 
+line we've defined the prior on the `log_A_0` parameter to be a Normal distribution with mean $\mu = 0.0$ and standard deviation of $\sigma = 0.3$. 
 
 We have also used multivariate parameters to describe the features of the rings. For example, 
 
@@ -415,21 +417,21 @@ self.log_ring_sigmas = PyroSample(
     dist.Normal(0.8, 0.3).expand([self.nrings]).to_event(1)
 )
 ```
-has set the prior distribution on each of the (logarithm of the) ring widths to be a Normal distribution with mean of 0.8 and standard deviation of 0.3. Not including the central Gaussian blob, we have 7 rings in this model. The `.expand()` call turns a Normal distribution with a shape of `1` into a distribution with a *batch* shape of 7. This isn't quite what we want in this application, so the `to_event()` call converts the *batch* shape into the *event* shape. For more details on Pyro tensor shapes, we recommend reading the [Tensor shapes in Pyro tutorial](https://pyro.ai/examples/tensor_shapes.html).
+has set the prior distribution on each of the (logarithm of the) ring widths to be a Normal distribution with mean of $\mu=0.8$ and standard deviation of $\sigma=0.3$. Not including the central Gaussian blob, we have 7 rings in this model. The `.expand()` call turns a Normal distribution with a shape of `1` into a distribution with a *batch* shape of 7. This isn't quite what we want in this application, so the `to_event()` call converts the *batch* shape into the *event* shape. For more details on Pyro tensor shapes, we recommend reading the [Tensor shapes in Pyro tutorial](https://pyro.ai/examples/tensor_shapes.html).
 
 
 When starting out building a new model, we recomend starting out by introducing a set of latent random variables with `PyroSample` one by a few and fixing most parameters (by simply defining them as torch tensors, as noted in the comments in the above code). 
 
 ### Prior predictive check
 
-Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with our model. For example, one design flaw we spotted with an earlier iteration was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
+Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with our model. For example, one design flaw we spotted with an earlier iteration of our code was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
 
 ```{code-cell} ipython3
 # parameters from Guzman     
 distance = 121.0  # pc
 
 # initialize the model 
-disk_pyro = PyroDisk(coords=coords, distance=distance)
+image_model = PyroDisk(coords=coords, distance=distance)
 ```
 
 To generate samples from the prior we'll use Pyro's [predictive](https://docs.pyro.ai/en/stable/inference_algos.html#module-pyro.infer.predictive) tool
@@ -440,7 +442,7 @@ from pyro.infer import Predictive
 
 ```{code-cell} ipython3
 # initialize a Predictive object, do not condition on any posterior_samples
-prior_predictive = Predictive(disk_pyro, num_samples=10)
+prior_predictive = Predictive(image_model, num_samples=10)
 # call the object to get prior predictive samples
 output = prior_predictive()
 ```
@@ -472,13 +474,13 @@ output["iprofile1D"].shape
 fig, ax = plt.subplots(nrows=1)
 
 for profile in output["iprofile1D"]:
-    ax.plot(disk_pyro.R, profile, color="0.2")
+    ax.plot(image_model.R, profile, color="0.2")
     
 ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
 ```
 
-Obviously these look nothing like the actual AS 209 disk, and that's OK, these are just samples from the prior distribution. The model hasn't touched any data yet! What is reassuring is that the posterior predictions look like *plausible* disks. For example, they are in roughly the center of the field, there are no negative flux values, inclination and position angle $\Omega$ behave as they should, etc.
+Obviously these do not look exactly like the actual AS 209 disk, and that's OK! These are just samples from the prior distribution; the model hasn't touched any data yet. What is reassuring is that the posterior predictions look like *plausible* disks. For example, they are in roughly the center of the field, there are no negative flux values, inclination and position angle $\Omega$ behave as they should, etc.
 
 Before we move on, though, it would be good to check that we can reproduce a disk that does look like the AS 209 disk using the posterior distributions inferred by Guzmán et al. 2018. To do this we'll use `Predictive` conditioned on a "sample" from the posterior. In reality, we'll just take the maximum a posteriori (MAP) values reported by Guzmán et al. 2018 and treat this as a single sample. Samples are generally reported from the `Predictive` routine as a dictionary of PyTorch tensor arrays, each with length `nsamples`. So we'll need to mimic this structure when providing the Guzmán values to the `posterior_samples` argument.
 
@@ -495,7 +497,7 @@ guzman_values = {'x_centroid': torch.tensor([1.70e-3]),
                }
 
 # initialize a Predictive object, condition on the Guzman "posterior sample"
-prior_predictive_conditional = Predictive(disk_pyro, posterior_samples=guzman_values, num_samples=1)
+prior_predictive_conditional = Predictive(image_model, posterior_samples=guzman_values, num_samples=1)
 output = prior_predictive_conditional()
 ```
 
@@ -504,7 +506,7 @@ fig, ax = plt.subplots(nrows=1)
 ax.imshow(output["sky_cube"][0][chan], origin="lower", extent=coords.img_ext);
 ```
 
-And we see that this looks much more like the AS 209 disk. Once you have the prior predictive and posterior predictive routines working smoothly, and you are relatively sure you've ironed out any bugs in your model composition, then it makes sense to expand the number of latent random variables.
+And we see that this looks much more like the AS 209 disk. 
 
 +++
 
@@ -604,8 +606,6 @@ class VisibilityModel(PyroModule):
 
             # extract the model visibilities corresponding to the gridded data
             vis = index_vis(full_vis, self.dataset).flatten()
-            
-            print(full_vis.device, self.dataset.mask.device, vis.device, self.data_re.device, self.data_im.device, self.sigma.device)
 
             with pyro.plate("data", len(self.data_re)):
                 # condition on the real and imaginaries of the data independently
@@ -617,17 +617,6 @@ class VisibilityModel(PyroModule):
                 )
 ```
 
-```{code-cell} ipython3
-if torch.cuda.is_available():
-    device = torch.device('cuda')                   
-else:                                                       
-    device = torch.device('cpu')   
-
-model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
-model.to(device)
-model(predictive=False)
-```
-
 We can also do a prior predictive check with the `VisibilityModel`, just like we did with the `PyroDisk`. The `forward` method of `VisibilityModel` is a bit more complex than a `forward` routine you might find in your average Pyro module. This is because we want to have the best of both worlds when it comes to producing model visibilities and (optionally) evaluating them against data. 
 
 As we described in the [NuFFT](../ci-tutorials/loose-visibilities.md) tutorial, the {class}`mpol.fourier.NuFFT` layer is designed to take an image and produce individual model visibilities corresponding to the $u$ and $v$ sampling locations of the dataset. However, with the large number of visibilities present in your average ALMA dataset ($> 10^5$), computational time can start to be a burden. For many repetitive, computationally heavy tasks like evaluating the likelihood function, we will first grid the visibilities using the {class}`mpol.gridder.DataAverager` and evaluate the likelihood function off of those.
@@ -637,18 +626,20 @@ When visualizing model or residual visibility values, it is often far more usefu
 Now we'll do a predictive check with the `VisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU, if the device is available.
 
 ```{code-cell} ipython3
-if torch.cuda.is_available():     
-    device = torch.device('cuda') 
-else:                             
-    device = torch.device('cpu') 
-    
-gridded_pyro = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+if torch.cuda.is_available():
+    device = torch.device('cuda')                   
+else:                                                       
+    device = torch.device('cpu')   
+
+# we will use this object throghout the rest of the tutorial, so we'll just call it 'model'
+model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
+model.to(device)
 ```
 
 Because we've added the `PyroDisk` module as an attribute of the `VisibilityModel`, that means that the names of the latent random variables in the `PyroDisk` have changed. We can see that by doing a simple prior predictive check (not conditional)
 
 ```{code-cell} ipython3
-p_check = Predictive(gridded_pyro, num_samples=1)
+p_check = Predictive(model, num_samples=1)
 output = p_check()
 output.keys()
 ```
@@ -656,18 +647,18 @@ output.keys()
 This means that we'll need to update the names of some of the parameters in the `guzman_values` dictionary.
 
 ```{code-cell} ipython3
-guzman_gridded_values = guzman_values.copy()
+guzman_disk_values = guzman_values.copy()
 for key in guzman_values:
-    guzman_gridded_values["disk." + key] = guzman_gridded_values.pop(key)
+    guzman_disk_values["disk." + key] = guzman_disk_values.pop(key)
 ```
 
 ```{code-cell} ipython3
-guzman_gridded_values
+guzman_disk_values
 ```
 
 ```{code-cell} ipython3
 # initialize a Predictive object, condition on the Guzman "posterior sample"
-prior_predictive_conditional_vis = Predictive(gridded_pyro, posterior_samples=guzman_gridded_values, num_samples=1)
+prior_predictive_conditional_vis = Predictive(model, posterior_samples=guzman_disk_values, num_samples=1)
 output = prior_predictive_conditional_vis()
 ```
 
@@ -780,14 +771,14 @@ from astropy.table import Table
 ```
 
 ```{code-cell} ipython3
-gridded_pyro.to(device)
+model.to(device)
 
 # define SVI guide
-guide = AutoNormal(gridded_pyro, init_loc_fn=init_to_sample)
+guide = AutoNormal(model, init_loc_fn=init_to_sample)
 
 adam = pyro.optim.Adam({"lr": 0.05})
 # scheduler = pyro.optim.ExponentialLR({'optimizer': adam, 'optim_args': {'lr': 0.05}, 'gamma': 0.1})
-svi = SVI(gridded_pyro, guide, adam, loss=Trace_ELBO())
+svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
 num_iterations = 20000
 pyro.clear_param_store()
@@ -819,7 +810,7 @@ And then in your plotting script, you'll want to re-initialize the model and the
 
 ```
 # define SVI guide
-guide = AutoNormal(gridded_pyro, init_loc_fn=init_to_mean)
+guide = AutoNormal(model, init_loc_fn=init_to_mean)
 
 param_store = pyro.get_param_store()
 param_store.load("param_store")
@@ -852,7 +843,7 @@ As before, we'll use the `Predictive` routine to generate samples. This time, th
 We can generate samples from the approximate posterior as follows
 
 ```{code-cell} ipython3
-samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.Omega', "disk.incl"], num_samples=1000)(predictive=True)
+samples = Predictive(model, guide=guide, return_sites=['disk.Omega', "disk.incl"], num_samples=1000)(predictive=True)
 for k, v in samples.items():
     print(f"{k}: {v.shape}")
 ```
@@ -885,7 +876,7 @@ az.plot_pair(dataset)
 ```
 
 ```{code-cell} ipython3
-samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
+samples = Predictive(model, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
 for k, v in samples.items():
     print(f"{k}: {v.shape}")
 ```
@@ -914,7 +905,7 @@ az.plot_pair(dataset)
 ```
 
 ```{code-cell} ipython3
-samples = Predictive(gridded_pyro, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
+samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', 'sky_cube'], num_samples=1)(predictive=True)
 
 
 fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
@@ -923,12 +914,12 @@ fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], 
 ```{code-cell} ipython3
 # plot samples of the 1D intensity profile
 
-samples = Predictive(gridded_pyro, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
+samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
 
 fig, ax = plt.subplots(nrows=1)
 
 for profile in samples["iprofile1D"]:
-    ax.plot(gridded_pyro.disk.R, profile, color="k", lw=0.2, alpha=0.2)
+    ax.plot(model.disk.R, profile, color="k", lw=0.2, alpha=0.2)
     
 ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
@@ -941,13 +932,13 @@ from pyro.infer.autoguide import AutoMultivariateNormal, init_to_mean
 ```
 
 ```{code-cell} ipython3
-gridded_pyro.to(device)
+model.to(device)
 
 # define SVI guide
-guide = AutoMultivariateNormal(gridded_pyro, init_loc_fn=init_to_mean)
+guide = AutoMultivariateNormal(model, init_loc_fn=init_to_mean)
 
 adam = pyro.optim.Adam({"lr": 0.05})
-svi = SVI(gridded_pyro, guide, adam, loss=Trace_ELBO())
+svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
 num_iterations = 20000
 pyro.clear_param_store()
@@ -978,7 +969,7 @@ ax.set_ylabel("loss");
 ```
 
 ```{code-cell} ipython3
-samples = Predictive(gridded_pyro, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
+samples = Predictive(model, guide=guide, return_sites=['disk.incl', 'disk.Omega', 'disk.x_centroid', 'disk.y_centroid', 'disk.log_A_0', 'disk.log_sigma_0', 'disk.log_ring_amplitudes', 'disk.ring_means', 'disk.log_ring_sigmas'], num_samples=2000)(True)
 for k, v in samples.items():
     print(f"{k}: {v.shape}")
 ```
