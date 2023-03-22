@@ -65,7 +65,7 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
         Image x-axis label.
     ylab : str, default="Dec offset [arcsec]"
         Image y-axis label.
-
+        
     Returns
     -------
     im : Matplotlib imshow instance
