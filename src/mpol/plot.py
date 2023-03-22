@@ -11,7 +11,7 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
     Get a colormap normalization to apply to an image. 
 
     image : array
-        An image array.
+        2D image array.
     stretch : string, default = 'power'
         Transformation to apply to the colormap. 'power' is a
         power law stretch; 'asinh' is an arcsinh stretch.
@@ -36,6 +36,65 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
         raise ValueError("'stretch' must be one of 'asinh' or 'power'.")
     
     return norm
+
+
+def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
+               clab=r"Jy arcsec$^{-2}$",
+               xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
+               ylab="$\Delta \delta$ [${}^{\prime\prime}$]",
+               ):
+    r""" 
+    Wrapper for plt.imshow, with colorbar and colormap normalization.
+
+    Parameters
+    ----------
+    image : array
+        2D image array.
+    extent : list, len=4
+        x- and y-extents of image: [x-min, x-max, y-min, y-max] (see plt.imshow)
+    cmap : str, default="inferno
+        Matplotlib colormap.
+    norm : Matplotlib colormap normalization, default=None
+        Image colormap norm. If None, a linear normalization is generated with
+        mpol.plot.get_image_cmap_norm
+    ax : Matplotlib axis instance, default=None
+        Axis on which to plot the image. If None, a new figure is created.
+    clab : str, default=r"Jy arcsec$^{-2}$"
+        Colorbar axis label
+    xlab : str, default="RA offset [arcsec]"
+        Image x-axis label.
+    ylab : str, default="Dec offset [arcsec]"
+        Image y-axis label.
+
+    Returns
+    -------
+    im : Matplotlib imshow instance
+        The plotted image.
+    cbar : Matplotlib colorbar instance
+        Colorbar for the image.
+    """
+    if norm is None:
+        norm = get_image_cmap_norm(image)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    im = ax.imshow(
+        image,
+        origin="lower",
+        interpolation="none",
+        extent=extent,
+        cmap=cmap,
+        norm=norm,
+    )
+
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
+    cbar.set_label(clab)
+
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    
+    return im, cbar
 
 
 def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
@@ -311,49 +370,21 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
 
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
+    extent = model.icube.coords.img_ext
 
     # model image (linear colormap)
     ax = axes[0,0]
-    im = ax.imshow(
-        mod_im,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_im)
-    )
-    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
     ax.set_title("Model image")
 
     # model image (asinh colormap)
     ax = axes[0,1]
-    im = ax.imshow(
-        mod_im,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_im, stretch='asinh')
-    )
-    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_im, extent, ax=ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
     ax.set_title("Model image (asinh stretch)")
-    ax.set_xlabel(r"$\Delta \alpha \cos \delta \; [{}^{\prime\prime}]$")
-    ax.set_ylabel(r"$\Delta \delta\; [{}^{\prime\prime}]$")
 
     # gradient image
     ax = axes[1,0]
-    im = ax.imshow(
-        mod_grad,
-        origin="lower",
-        interpolation="none",
-        extent=model.icube.coords.img_ext,
-        cmap="inferno",
-        norm=get_image_cmap_norm(mod_grad)
-    )
-    cbar = plt.colorbar(im, ax=ax, location="left", pad=0.1)
-    cbar.set_label('Jy arcsec$^{-2}$')
+    plot_image(mod_grad, extent, ax=ax, xlab='', ylab='')
     ax.set_title("Gradient image")
 
     # loss function
