@@ -62,37 +62,7 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
 
     return uu, vv, weight, data_re, data_im, freq
 
-def _check_freq_1d(freq=None):
-    """
-    Check that the frequency input array contains only positive floats.
-
-    If the user supplied a float, convert to a 1D array. If no frequency array
-    was supplied, simply skip.
-
-<<<<<<< HEAD
 def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
-=======
-    """
-    if freq is None:
-        return freq
-    
-    assert (
-        np.isscalar(freq) or freq.ndim == 1
-    ), "Input data vectors should be either None, scalar, or 1D array."
-
-    assert np.all(freq > 0.0), "Not all frequencies are positive, check inputs."
-    
-    if np.isscalar(freq):
-        freq = np.atleast_1d(freq)
-    
-    assert (freq.dtype == np.single) or (
-        freq.dtype == np.double
-    ), "freq should be type single or double"
-
-    return freq
-    
-class Gridder:
->>>>>>> 3065dc66f549d11c0666a1bac34cb9aa61b12d7b
     r"""
     Check that the dataset does not contain Hermitian pairs. Because the sky brightness :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian, meaning that
 
