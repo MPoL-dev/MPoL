@@ -127,7 +127,7 @@ from mpol import coordinates, gridding
 
 # settle on an image size that we'll use throughout the tutorial
 coords = coordinates.GridCoords(cell_size=0.005, npix=800)
-kw = {"origin": "lower", "interpolation": "none", "extent": coords.img_ext}
+kw = {"origin": "lower", "interpolation": "none", "extent": coords.img_ext, "cmap":"inferno"}
 
 
 def make_dirty_image(data_real, data_imag, robust=-0.5):
@@ -460,7 +460,7 @@ We see that we now have a dictionary with a list of 10 random samples from the p
 fig, ax = plt.subplots(nrows=2, ncols=2)
 
 for i, a in enumerate(ax.flatten()):
-    a.imshow(output["sky_cube"][i][chan], origin="lower", extent=coords.img_ext)
+    a.imshow(output["sky_cube"][i][chan], origin="lower", extent=coords.img_ext, cmap="inferno")
     
 plt.tight_layout()
 ```
@@ -504,10 +504,10 @@ output = prior_predictive_conditional()
 
 ```{code-cell} ipython3
 fig, ax = plt.subplots(nrows=1)
-ax.imshow(output["sky_cube"][0][chan], origin="lower", extent=coords.img_ext);
+ax.imshow(output["sky_cube"][0][chan], origin="lower", extent=coords.img_ext, cmap="inferno");
 ```
 
-And we see that this looks much more like the AS 209 disk. 
+And we see that this looks much more like the AS 209 disk.
 
 +++
 
@@ -636,7 +636,7 @@ else:
 
 # we will use this object throghout the rest of the tutorial, so we'll just call it 'model'
 model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
-model.to(device)
+model.to(device);
 ```
 
 Because we've added the `PyroDisk` module as an attribute of the `VisibilityModel`, that means that the names of the latent random variables in the `PyroDisk` have changed. We can see that by doing a simple prior predictive check (not conditional)
@@ -691,56 +691,82 @@ def compare_dirty_model_resid(model_real, model_imag, sky_cube, robust=0.0):
     img_dirty, _ = make_dirty_image(data_real, data_imag)
     img_model, _ = make_dirty_image(model_real, model_imag)
     img_resid, _ = make_dirty_image(resid_real, resid_imag)
-
+    
     # determine the plot dimensions
-    xx = 12 # in
+    xx = 8 # in
     cax_width = 0.2 # in 
     cax_sep = 0.1 # in
+    hmargin = 0.8
     mmargin = 1.2
-    lmargin = 0.7
-    rmargin = 0.7
+    lmargin = 0.9
+    rmargin = 0.9
     tmargin = 0.3
     bmargin = 0.5
     
-    npanels = 4
+    ncol = 2
+    nrow = 2
     # the size of image axes + cax_sep + cax_width
-    block_width = (xx - lmargin - rmargin - mmargin * (npanels - 1) )/npanels
+    block_width = (xx - lmargin - rmargin - mmargin * (ncol - 1) )/ncol
     ax_width = block_width - cax_width - cax_sep
     ax_height = ax_width 
-    yy = bmargin + ax_height + tmargin
+    yy = bmargin + nrow * ax_height + (nrow - 1) * hmargin + tmargin
 
+    
     fig = plt.figure(figsize=(xx, yy))
+        
     ax = []
     cax = []
-    for i in range(npanels):
-        ax.append(fig.add_axes([(lmargin + i * (block_width + mmargin))/xx, bmargin/yy, ax_width/xx, ax_height/yy]))
-        cax.append(fig.add_axes([(lmargin + i * (block_width + mmargin) + ax_width + cax_sep)/xx, bmargin/yy, cax_width/xx, ax_height/yy]))
+    for j in range(ncol):
+        a = []
+        ca = []
+        for i in range(nrow):
+            a.append(fig.add_axes([(lmargin + i * (block_width + mmargin))/xx, (bmargin + (ax_height + hmargin) * j)/yy, ax_width/xx, ax_height/yy]))
+            ca.append(fig.add_axes([(lmargin + i * (block_width + mmargin) + ax_width + cax_sep)/xx, (bmargin + (ax_height + hmargin) * j)/yy, cax_width/xx, ax_height/yy]))
+        
+        # prepend to list to get order correct
+        ax = a + ax
+        cax = ca + cax
 
+    cbars = []    
     chan = 0
 
-    im = ax[0].imshow(img_dirty[chan], **kw)
+    comb_img = np.concatenate([img_dirty[chan], img_model[chan]])
+    scale_min = np.min(comb_img)
+    scale_max = np.max(comb_img)
+    
+    im_dirty = ax[0].imshow(img_dirty[chan], **kw, vmin=scale_min, vmax=scale_max)
     ax[0].set_title("dirty image")
-    cbar = plt.colorbar(im, cax=cax[0])
-    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    cbars.append(plt.colorbar(im_dirty, cax=cax[0]))
     
-    im = ax[1].imshow(sky_cube.cpu().detach().numpy()[chan], **kw)
+    im_model = ax[1].imshow(sky_cube.cpu().detach().numpy()[chan], **kw)
     ax[1].set_title("model image")
-    cbar = plt.colorbar(im, cax=cax[1])
-    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    cbars.append(plt.colorbar(im_model, cax=cax[1]))
     
-    im = ax[2].imshow(img_model[chan], **kw)
+    im_model_vis = ax[2].imshow(img_model[chan], **kw, vmin=scale_min, vmax=scale_max)
     ax[2].set_title("model vis imaged")
-    cbar = plt.colorbar(im, cax=cax[2])
-    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+    cbars.append(plt.colorbar(im_model_vis, cax=cax[2]))
     
-    im = ax[3].imshow(img_resid[chan], **kw)
+    rkw = kw.copy()
+    rkw["cmap"] = "bwr_r"
+    vvmax = np.max(np.abs(img_resid[chan]))
+    im_resid = ax[3].imshow(img_resid[chan], **rkw, vmin=-vvmax, vmax=vvmax)
     ax[3].set_title("residual vis imaged")
-    cbar = plt.colorbar(im, cax=cax[3])
-    cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
-    
+    cbars.append(plt.colorbar(im_resid, cax=cax[3]))
+
     for a in ax:
-        a.set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
-        a.set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+        a.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        a.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+    for cbar in cbars:
+        cbar.set_label(r"Jy/$\mathrm{arcsec}^2$")
+
+    ax[0].set_xlabel(r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]")
+    ax[0].set_ylabel(r"$\Delta \delta$ [${}^{\prime\prime}$]")
+
+    for a in ax[1:]:
+        a.xaxis.set_ticklabels([])
+        a.yaxis.set_ticklabels([])    
+        
     
     return fig 
 ```
@@ -832,8 +858,6 @@ ax.set_xlabel("iteration")
 ax.set_ylabel("loss");
 ```
 
-+++
-
 ### Visualization of samples
 
 We can visualize the posteriors in multiple ways. Since we used an [AutoNormal](https://docs.pyro.ai/en/stable/infer.autoguide.html#autonormal) guide, this means that, by construction, the posteriors will be 1D Gaussians on each parameter, with no covariance between them. (This may be physically unrealistic, which we'll address in a moment). So, one way of reporting the posteriors is simply to report the mean and standard deviation of each of the guide Gaussians. There is a convenience routine, `guide.quantiles()`, that will report the quantiles of the Gaussian distribution for this guide. 
@@ -861,6 +885,7 @@ for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "dis
 ```
 
 and then convert these samples to an ArviZ InferenceData object
+
 ```{code-cell} ipython3
 import arviz as az
 dataset = az.convert_to_inference_data(dict_samples)
@@ -868,7 +893,6 @@ dataset
 ```
 
 Then, it is easy to use the ArviZ plotting routines to make many diagnostic plots. To start, let's visualize the 1D marginal posteriors
-
 
 ```{code-cell} ipython3
 az.plot_posterior(dataset, var_names=["disk.Omega", "disk.incl", "disk.A_0", "disk.sigma_0"]);
@@ -903,7 +927,15 @@ ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
 ```
 
-## SVI with a MultiDiagonal Model
+We see that there is very little dispersion in these draws from the posterior. This is a feature of the high signal to noise of the dataset but could also be from the parameterization of our model (e.g., not flexible enough, more Gaussian rings required, rings of different shapes, etc...) or the restrictions placed by the `AutoNormal` guide (parameters are uncorrelated). We would expect some of the ring parameters to be correlated with each other (especially those at or below the resolution of the observations), so we'll explore this in the next section.
+
++++
+
+## SVI with a AutoMultivariateNormal Model
+
+Our first attempt at inference with SVI using the AutoNormal guide seemed to go pretty well. But it's probably unrealistic to assume that there is no correlation between parameters in the model. To address this, we can use a more sophisticated variational guide to approximate the true posterior. 
+
+The next logical step would be to use a guide that still used a Normal distribution to approximate the posterior, but also allowed for correlations between parameters. Fortunately, Pyro provides an `AutoMultivariateNormal` guide that does just this. Let's repeat the SVI process and see what, if anything, changes with our inferred posteriors.
 
 ```{code-cell} ipython3
 from pyro.infer.autoguide import AutoMultivariateNormal, init_to_mean
@@ -1010,15 +1042,20 @@ ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
 ```
 
-We see that there is a slightly larger scatter in the draws compared to the `AutoNormal` guide, especially around 40 au. This is because the `MultiDiagonal` guide captured more of the covariance between parameters, resulting in a greater dispersion of draws. 
+We see that there is a slightly larger scatter in the draws compared to the `AutoNormal` guide, especially around 40 au. This is because the `AutoMultivariateNormal` guide captured more of the covariance between parameters, resulting in a greater dispersion of draws.
+
+Encouragingly, both our image and 1D profile results compare favorably with those found by [Guzmán et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..48G/abstract) (compare their Figures 2 & 4). 
+
+The true uncertainty in the radial profile may still be underestimated. As we discussed, one source could be the parameterization of the model. In reality, the disk rings are not perfect Gaussian shapes, and so, as currently implemented, our model could never capture the true intensity profile. 
+
+
+In our opinion, SVI is a very useful inference technique because of its speed and scalability. There is the risk, though, that your guide distribution does not fully capture complex covariances of your posterior distributions. Perhaps some parameter posteriors are significantly non-Gaussian or banana-shaped, and therefore not able to be captured by the multivariate Normal guide. This risk can be hard to assess from SVI fits alone, though there are steps you can take by trying out more [complex guides](https://docs.pyro.ai/en/stable/infer.autoguide.html#) or [writing your own](https://pyro.ai/examples/svi_part_i.html#Guide), parameterized around anticipated covariances. 
 
 +++
 
 ## Parameter inference with MCMC
 
-In our opinion, SVI is a very useful inference technique because of its speed and scalability. There is the risk, though, that your guide distribution does not fully capture complex covariances of your posterior distributions. This risk can be hard to assess from SVI fits alone, though there are steps you can take by trying out more [complex guides](https://docs.pyro.ai/en/stable/infer.autoguide.html#) or [writing your own](https://pyro.ai/examples/svi_part_i.html#Guide), parameterized around anticipated covariances. 
-
-If those approaches are unsatisfactory and accurately measuring parameter uncertainties and covariances is critical to your science problem, it may make sense to switch to a more accurate inference algorithm like Markov Chain Monte Carlo (MCMC). With gradient-enabled samplers like Hamiltonian Monte Carlo (HMC) and the No U-Turn Sampler (NUTS), MCMC sampling can still be quite fast compared to traditional MCMC algorithms like Metropolis-Hastings.
+If these expanded SVI approaches are unsatisfactory and accurately measuring parameter uncertainties and covariances is critical to your science problem, it may make sense to switch to a more accurate inference algorithm like Markov Chain Monte Carlo (MCMC). With gradient-enabled samplers like Hamiltonian Monte Carlo (HMC) and the No U-Turn Sampler (NUTS), MCMC sampling can still be quite fast compared to traditional MCMC algorithms like Metropolis-Hastings.
 
 To sample this model using MCMC and NUTS, the following steps are required
 
@@ -1044,3 +1081,7 @@ self.log_A_0 = PyroSample(dist.Normal(torch.tensor(0.0, device=device), 0.3))
 This is necessary to place these sample objects on the GPU for use in MCMC (see also this [Pyro issue](https://forum.pyro.ai/t/pyrosample-and-cuda-gpu/4328)) so that you don't get conflicts that some tensors are on the CPU while others are on the GPU. It's not clear to us why this change is necessary for MCMC but not for the SVI algorithms.
 
 Reassuringly, we found that the parameter constraints provided by MCMC were comparable to those provided by SVI with the MultiDiagonal guide. We found that the MCMC NUTS run took about a 1.5 hours to run two independent chains on a GPU. This is still tractable but notably slower than the roughly 5 minutes it took with SVI to find the posterior distributions in this tutorial.
+
+```{code-cell} ipython3
+
+```
