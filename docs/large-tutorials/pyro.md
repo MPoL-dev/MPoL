@@ -313,6 +313,7 @@ class PyroDisk(PyroModule):
         # Define a 1D radial grid for evaluating the 1D intensity profile
         self.R = torch.linspace(0.0, torch.max(torch.concat([XX, YY])), steps=400) * self.distance
 
+       # central Gaussian envelope
         self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
         self.log_sigma_0 = PyroSample(dist.Normal(0.7, 0.1))
     
