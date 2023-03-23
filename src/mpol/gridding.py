@@ -212,7 +212,8 @@ class GridderBase:
         chan_freq = _check_freq_1d(chan_freq)
         
         # check everything should be 2d, expand if not
-        # also checks data does not contain Hermitian pairsuu, vv, weight, data_re, data_im, chan_freq = _check_data_inputs_2d(
+        # also checks data does not contain Hermitian pairs
+        uu, vv, weight, data_re, data_im, chan_freq = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im, chan_freq
         )
         
