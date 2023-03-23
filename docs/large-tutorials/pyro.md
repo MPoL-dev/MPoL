@@ -84,7 +84,7 @@ In our opinion, the two (linked) reasons that parametric model fitting has falle
 
 As we hinted at, the MPoL + Pyro + PyTorch framework will help us out on point #2, such that we might be able to explore more detailed models with larger numbers of parameters.
 
-This point of this tutorial isn't to say that everyone should switch back to using parametric models. But rather, that, with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
+The point of this tutorial isn't to say that everyone should switch back to using parametric models. But rather that with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
 
 +++
 
