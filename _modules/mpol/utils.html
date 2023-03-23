@@ -179,6 +179,11 @@
    Making a Mock Dataset
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../large-tutorials/pyro.html">
+   Parametric Inference with Pyro
+  </a>
+ </li>
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -571,24 +576,19 @@ title="Source repository"
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">uu_vv_point</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="n">arcsec</span></div>
 
 
-<div class="viewcode-block" id="get_optimal_image_properties"><a class="viewcode-back" href="../../api.html#mpol.utils.get_optimal_image_properties">[docs]</a><span class="k">def</span> <span class="nf">get_optimal_image_properties</span><span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<div class="viewcode-block" id="get_optimal_image_properties"><a class="viewcode-back" href="../../api.html#mpol.utils.get_optimal_image_properties">[docs]</a><span class="k">def</span> <span class="nf">get_optimal_image_properties</span><span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For an image of desired width, determine the maximum pixel size that</span>
-<span class="sd">    ensures Nyquist sampling of the provided baseline (or baseline</span>
-<span class="sd">    distribution, out to a chosen percentile), and the number of pixels</span>
-<span class="sd">    (given this pixel size) to obtain the desired image width.</span>
+<span class="sd">    ensures Nyquist sampling of the provided spatial frequency points, and the </span>
+<span class="sd">    corresponding number of pixels to obtain the desired image width.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    image_width : float, unit = arcsec</span>
-<span class="sd">        Desired width of the image (i.e., image will be a</span>
-<span class="sd">        image_width :math:`\times` image_width square).</span>
-<span class="sd">    q : float or array, unit = :math:`k\lambda`</span>
-<span class="sd">        Baseline distribution (all values must be non-negative). If a single</span>
-<span class="sd">        value, &#39;percentile&#39; has no effect.</span>
-<span class="sd">    percentile : int, default = 100</span>
-<span class="sd">        Percentile of the baseline distribution (between 0 - 100) out to which</span>
-<span class="sd">        the desired image will Nyquist sample.</span>
+<span class="sd">        Desired width of the image (for a square image of size</span>
+<span class="sd">        `image_width` :math:`\times` `image_width`).</span>
+<span class="sd">    u, v : float or array, unit = :math:`k\lambda`</span>
+<span class="sd">        `u` and `v` spatial frequency points. </span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -600,23 +600,27 @@ title="Source repository"
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    To obtain the image properties for a single baseline distance, pass &#39;q&#39; as</span>
-<span class="sd">    a float. In this case, &#39;percentile&#39; has no effect.</span>
-
-<span class="sd">    No assumption or correction is made concerning whether the baseline</span>
-<span class="sd">    (distribution) is projected or deprojected.</span>
+<span class="sd">    No assumption or correction is made concerning whether the spatial </span>
+<span class="sd">    frequency points are projected or deprojected.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_freq</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
 
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;All baselines should be &gt;=0.&quot;</span>
+    <span class="n">cell_size</span> <span class="o">=</span> <span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">max_freq</span><span class="p">)</span>
 
-    <span class="n">q_optimal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">percentile</span><span class="p">)</span>
-    <span class="n">cell_size</span> <span class="o">=</span> <span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">q_optimal</span><span class="p">)</span>
-
-    <span class="c1"># round the desired number of pixels up to the nearest integer</span>
+    <span class="c1"># round npix up to nearest integer</span>
     <span class="n">npix</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">image_width</span> <span class="o">/</span> <span class="n">cell_size</span><span class="p">)</span>
+
+    <span class="c1"># account for Nyquist of proposed cell_size, npix</span>
+    <span class="n">cell_size</span> <span class="o">*=</span> <span class="n">cell_size</span> <span class="o">/</span> <span class="n">get_maximum_cell_size</span><span class="p">(</span><span class="n">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">))</span>
+
+    <span class="n">npix</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">image_width</span> <span class="o">/</span> <span class="n">cell_size</span><span class="p">)</span>
+    
     <span class="c1"># enforce that npix be even</span>
     <span class="k">if</span> <span class="n">npix</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">npix</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># should never occur </span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_freq</span><span class="p">),</span> <span class="s2">&quot;error in get_optimal_image_properties&quot;</span>
 
     <span class="k">return</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span></div>
 

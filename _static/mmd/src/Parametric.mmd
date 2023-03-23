@@ -1,0 +1,5 @@
+graph TD
+pm(DiskModel) --> ImageCube
+ImageCube --> FourierLayer
+FourierLayer --> il([Loss])
+ad[[Dataset]] --> il([Loss])

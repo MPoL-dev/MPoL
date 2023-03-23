@@ -184,6 +184,11 @@
    Making a Mock Dataset
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="large-tutorials/pyro.html">
+   Parametric Inference with Pyro
+  </a>
+ </li>
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -729,20 +734,17 @@ antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.utils.get_optimal_image_properties">
-<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_optimal_image_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_optimal_image_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_optimal_image_properties" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_optimal_image_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/utils.html#get_optimal_image_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_optimal_image_properties" title="Permalink to this definition">#</a></dt>
 <dd><p>For an image of desired width, determine the maximum pixel size that
-ensures Nyquist sampling of the provided baseline (or baseline
-distribution, out to a chosen percentile), and the number of pixels
-(given this pixel size) to obtain the desired image width.</p>
+ensures Nyquist sampling of the provided spatial frequency points, and the
+corresponding number of pixels to obtain the desired image width.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_width</strong> (<em>float</em><em>, </em><em>unit = arcsec</em>) – Desired width of the image (i.e., image will be a
-image_width <span class="math notranslate nohighlight">\(\times\)</span> image_width square).</p></li>
-<li><p><strong>q</strong> (float or array, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>) – Baseline distribution (all values must be non-negative). If a single
-value, ‘percentile’ has no effect.</p></li>
-<li><p><strong>percentile</strong> (<em>int</em><em>, </em><em>default = 100</em>) – Percentile of the baseline distribution (between 0 - 100) out to which
-the desired image will Nyquist sample.</p></li>
+<li><p><strong>image_width</strong> (<em>float</em><em>, </em><em>unit = arcsec</em>) – Desired width of the image (for a square image of size
+<cite>image_width</cite> <span class="math notranslate nohighlight">\(\times\)</span> <cite>image_width</cite>).</p></li>
+<li><p><strong>u</strong> (float or array, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>) – <cite>u</cite> and <cite>v</cite> spatial frequency points.</p></li>
+<li><p><strong>v</strong> (float or array, unit = <span class="math notranslate nohighlight">\(k\lambda\)</span>) – <cite>u</cite> and <cite>v</cite> spatial frequency points.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -755,10 +757,8 @@ width (npix will be rounded up and enforced as even).</p></li>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>To obtain the image properties for a single baseline distance, pass ‘q’ as
-a float. In this case, ‘percentile’ has no effect.</p>
-<p>No assumption or correction is made concerning whether the baseline
-(distribution) is projected or deprojected.</p>
+<p>No assumption or correction is made concerning whether the spatial
+frequency points are projected or deprojected.</p>
 </dd></dl>
 
 <dl class="py function">

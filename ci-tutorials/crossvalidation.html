@@ -184,6 +184,11 @@
    Making a Mock Dataset
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../large-tutorials/pyro.html">
+   Parametric Inference with Pyro
+  </a>
+ </li>
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -590,7 +595,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/17b664dcc3435f2e6e186922f049626ede8f79d46fcc13a70ec7ffd48bbb7c4b.png" src="../_images/17b664dcc3435f2e6e186922f049626ede8f79d46fcc13a70ec7ffd48bbb7c4b.png" />
+<img alt="../_images/a439d586a11b688fe28e456c0f0261b1e50ee52cf761b873be548847a6ea9bc5.png" src="../_images/a439d586a11b688fe28e456c0f0261b1e50ee52cf761b873be548847a6ea9bc5.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -796,7 +801,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 30.529687875271534
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 30.529687767119373
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
@@ -815,13 +820,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 11.518086449949939
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 11.518084924455199
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/cd1a6d2aa9f24208994ad5ffbd07c50959601b2287fc5bc74bff46387d2d5811.png" src="../_images/cd1a6d2aa9f24208994ad5ffbd07c50959601b2287fc5bc74bff46387d2d5811.png" />
+<img alt="../_images/dab685006e4b28b14500b2e138fe41f38bc6e6c273e6ea47b1bc998949a75e47.png" src="../_images/dab685006e4b28b14500b2e138fe41f38bc6e6c273e6ea47b1bc998949a75e47.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -834,13 +839,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.306552066720836
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.306894904074458
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/8a01ace4c2092a077b4839382840695308a528d4c808b892cd2d00693d8002a3.png" src="../_images/8a01ace4c2092a077b4839382840695308a528d4c808b892cd2d00693d8002a3.png" />
+<img alt="../_images/95a4ab486788b3b6d95242c6ca59ec4003415bccd1316a34a9e803364a863e40.png" src="../_images/95a4ab486788b3b6d95242c6ca59ec4003415bccd1316a34a9e803364a863e40.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
