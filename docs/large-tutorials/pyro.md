@@ -75,7 +75,7 @@ By contrast to a non-parametric model, a *parametric* model is one that has a (f
 
 Before ALMA, it was common in the protoplanetary disk field to fit parametric models (e.g., elliptical Gaussians, one or two axisymmetric rings, etc...) to interferometric observations to derive source properties like size and inclination. The spatial resolution afforded by the ALMA long-baseline campaign rendered many of these simple parametric models inadequate. Suddenly, rich substructure in the forms of rings, gaps, and spirals was visible in dust continuum images and, except for a few exceptions we'll discuss in a second, these morphologies were too complex to neatly capture with simple model parameterizations.
 
-This spurred a major shift from parametric, visibility-based analyses to image-based analysis (including our own MPoL efforts). For axisymmetric sources, visibility-based analysis is still viable thanks to the development of novel non-parametric 1D models like [frank](https://discsim.github.io/frank/), which are capable of super-resolution compared to image-based methods like CLEAN.
+This spurred a major shift from parametric, visibility-based analyses to image-based analysis (including our own MPoL efforts). Visibility-based analysis is still viable, but with modern datasets it must often be more sophisticated. For example, non-parametric 1D models like [frank](https://discsim.github.io/frank/) are capable of super-resolution compared to image-based methods like CLEAN for axisymmetric sources.
 
 In our opinion, the two (linked) reasons that parametric model fitting has fallen out of favor in the protoplanetary disk field are 
 
