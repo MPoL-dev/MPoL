@@ -518,7 +518,7 @@ Next, we'll define another class called `VisibilityModel`. This class has an ins
 ```{code-cell} ipython3
 class VisibilityModel(PyroModule):
     """
-    This bigger inherits from the PyroDisk model, which provided Bayesian parameters for the disk model, and extends it to carry the comparison all the way to the data, and evaluates a likelihood.
+    This inherits from the PyroDisk model (which provided Bayesian parameters for the disk model) and extends it to carry the comparison all the way to the data, evaluating a likelihood.
 
     This will hold the dataset and weights, as well.
     """
