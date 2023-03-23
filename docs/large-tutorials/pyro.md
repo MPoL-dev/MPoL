@@ -75,7 +75,7 @@ By contrast to a non-parametric model, a *parametric* model is one that has a (f
 
 Before ALMA, it was common in the protoplanetary disk field to fit parametric models (e.g., elliptical Gaussians, one or two axisymmetric rings, etc...) to interferometric observations to derive source properties like size and inclination. The spatial resolution afforded by the ALMA long-baseline campaign rendered many of these simple parametric models inadequate. Suddenly, rich substructure in the forms of rings, gaps, and spirals was visible in dust continuum images and, except for a few exceptions we'll discuss in a second, these morphologies were too complex to neatly capture with simple model parameterizations.
 
-This spurred a major shift from parametric, visibility-based analyses to image-based analysis (including our own MPoL efforts). For axisymmetric sources, visibility-based analysis is still viable thanks to the development of novel non-parametric 1D models like [frank](https://discsim.github.io/frank/), which are capable of super-resolution compared to image-based methods like CLEAN.
+This spurred a major shift from parametric, visibility-based analyses to image-based analysis (including our own MPoL efforts). Visibility-based analysis is still viable, but with modern datasets it must often be more sophisticated. For example, non-parametric 1D models like [frank](https://discsim.github.io/frank/) are capable of super-resolution compared to image-based methods like CLEAN for axisymmetric sources.
 
 In our opinion, the two (linked) reasons that parametric model fitting has fallen out of favor in the protoplanetary disk field are 
 
@@ -84,7 +84,7 @@ In our opinion, the two (linked) reasons that parametric model fitting has falle
 
 As we hinted at, the MPoL + Pyro + PyTorch framework will help us out on point #2, such that we might be able to explore more detailed models with larger numbers of parameters.
 
-This point of this tutorial isn't to say that everyone should switch back to using parametric models. But rather, that, with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
+The point of this tutorial isn't to say that everyone should switch back to using parametric models. But rather that with the industry-grade machinery of probabilistic programming languages and autodifferentiation, there may be situations where parametric models are still useful.
 
 +++
 
@@ -298,7 +298,7 @@ class PyroDisk(PyroModule):
         self.incl = PyroSample(dist.Normal(35. * deg, 5. * deg))
         self.Omega = PyroSample(dist.Normal(85.0 * deg, 10.0 * deg))
         
-        # to treat parameters as fixed, simply asign them as torch tensors
+        # to treat parameters as fixed, simply assign them as torch tensors
         # for example,
         # self.x_centroid = torch.as_tensor(x_centroid)  # arcsec
         # self.y_centroid = torch.as_tensor(y_centroid)  # arcsec
@@ -313,6 +313,7 @@ class PyroDisk(PyroModule):
         # Define a 1D radial grid for evaluating the 1D intensity profile
         self.R = torch.linspace(0.0, torch.max(torch.concat([XX, YY])), steps=400) * self.distance
 
+       # central Gaussian envelope
         self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
         self.log_sigma_0 = PyroSample(dist.Normal(0.7, 0.1))
     
@@ -403,7 +404,7 @@ class PyroDisk(PyroModule):
         return II
 ```
 
-We've gone ahead and defined many of our model parameters as latent random variables using `PyroSample`. We define the prior distribution on these parameters is defined by the `dist...`. For example, with the 
+We've gone ahead and defined many of our model parameters as latent random variables using `PyroSample`. The prior distribution on these parameters is defined by the `dist...`. For example, with the 
 
 ```
 self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
@@ -417,14 +418,14 @@ self.log_ring_sigmas = PyroSample(
     dist.Normal(0.8, 0.3).expand([self.nrings]).to_event(1)
 )
 ```
-has set the prior distribution on each of the (logarithm of the) ring widths to be a Normal distribution with mean of $\mu=0.8$ and standard deviation of $\sigma=0.3$. Not including the central Gaussian blob, we have 7 rings in this model. The `.expand()` call turns a Normal distribution with a shape of `1` into a distribution with a *batch* shape of 7. This isn't quite what we want in this application, so the `to_event()` call converts the *batch* shape into the *event* shape. For more details on Pyro tensor shapes, we recommend reading the [Tensor shapes in Pyro tutorial](https://pyro.ai/examples/tensor_shapes.html).
+has set the prior distribution on each of the (logarithm of the) ring widths to be a Normal distribution with mean of $\mu=0.8$ and standard deviation of $\sigma=0.3$. Not including the central Gaussian envelope, we have 7 rings in this model. The `.expand()` call turns a Normal distribution with a shape of `1` into a distribution with a *batch* shape of 7. This isn't quite what we want in this application, so the `to_event()` call converts the *batch* shape into the *event* shape. For more details on Pyro tensor shapes, we recommend reading the [Tensor shapes in Pyro tutorial](https://pyro.ai/examples/tensor_shapes.html).
 
 
-When starting out building a new model, we recomend starting out by introducing a set of latent random variables with `PyroSample` one by a few and fixing most parameters (by simply defining them as torch tensors, as noted in the comments in the above code). 
+When building a new model, we recommend starting out by introducing a set of latent random variables with `PyroSample` and fixing most parameters (by simply defining them as torch tensors, as noted in the comments in the above code). 
 
 ### Prior predictive check
 
-Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with our model. For example, one design flaw we spotted with an earlier iteration of our code was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
+Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with your model. For example, one design flaw we spotted with an earlier iteration of our code was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
 
 ```{code-cell} ipython3
 # parameters from Guzman     
@@ -517,9 +518,11 @@ Next, we'll define another class called `VisibilityModel`. This class has an ins
 ```{code-cell} ipython3
 class VisibilityModel(PyroModule):
     """
-    This bigger inherits from the PyroDisk model, which provided Bayesian parameters for the disk model, and extends it to carry the comparison all the way to the data, and evaluates a likelihood.
+    This inherits from the PyroDisk model (which provided Bayesian parameters for the disk model) and extends it to carry the comparison all the way to the data, evaluating a likelihood.
 
     This will hold the dataset and weights, as well.
+    
+    The 'device' arg will be used to optionally run our inference on the GPU.
     """
 
     def __init__(
@@ -886,7 +889,7 @@ samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', '
 fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
 ```
 
-And the 1D profile
+And the 1D profile -- here we'll overplot 50 draws.
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
@@ -970,7 +973,7 @@ for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "dis
 dataset = az.convert_to_inference_data(dict_samples)
 ```
 
-Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise plots of a subset of the variables at a time.
+Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise a subset of the variables at a time.
 
 ```{code-cell} ipython3
 az.plot_pair(dataset, var_names=["disk.ring_means"]);
