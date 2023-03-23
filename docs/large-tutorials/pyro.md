@@ -521,6 +521,8 @@ class VisibilityModel(PyroModule):
     This inherits from the PyroDisk model (which provided Bayesian parameters for the disk model) and extends it to carry the comparison all the way to the data, evaluating a likelihood.
 
     This will hold the dataset and weights, as well.
+    
+    The 'device' arg will be used to optionally run our inference on the GPU.
     """
 
     def __init__(
