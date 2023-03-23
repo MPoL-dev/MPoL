@@ -45,12 +45,15 @@ EXTRA_REQUIRES = {
         "jupyter",
         "nbconvert",
         "matplotlib",
-        "sphinxcontrib-mermaid",
+        "sphinxcontrib-mermaid>=0.8.1",
         "astropy",
         "tensorboard",
         "myst-nb",
         "jupyter-cache",
         "Pillow",
+        "asdf",
+        "pyro-ppl",
+        "arviz[all]"
     ],
 }
 
