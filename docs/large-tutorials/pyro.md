@@ -298,7 +298,7 @@ class PyroDisk(PyroModule):
         self.incl = PyroSample(dist.Normal(35. * deg, 5. * deg))
         self.Omega = PyroSample(dist.Normal(85.0 * deg, 10.0 * deg))
         
-        # to treat parameters as fixed, simply asign them as torch tensors
+        # to treat parameters as fixed, simply assign them as torch tensors
         # for example,
         # self.x_centroid = torch.as_tensor(x_centroid)  # arcsec
         # self.y_centroid = torch.as_tensor(y_centroid)  # arcsec
