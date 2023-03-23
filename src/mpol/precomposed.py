@@ -55,6 +55,7 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
+
         self.pbcube = images.PrimaryBeamCube(
             coords = self.coords,
             nchan=self.nchan,
@@ -83,5 +84,5 @@ class SimpleNet(torch.nn.Module):
         x = self.icube(x)
         x = self.pbcube(x)
         vis = self.fcube(x)
-
+        
         return vis
