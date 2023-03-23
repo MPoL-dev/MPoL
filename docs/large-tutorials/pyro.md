@@ -971,7 +971,7 @@ for key in ["disk.log_A_0", "disk.log_sigma_0", "disk.log_ring_amplitudes", "dis
 dataset = az.convert_to_inference_data(dict_samples)
 ```
 
-Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise plots of a subset of the variables at a time.
+Because it is hard to visualize the posteriors for all 27 parameters in a single plot, we will plot pairwise a subset of the variables at a time.
 
 ```{code-cell} ipython3
 az.plot_pair(dataset, var_names=["disk.ring_means"]);
