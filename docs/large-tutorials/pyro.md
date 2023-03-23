@@ -421,7 +421,7 @@ self.log_ring_sigmas = PyroSample(
 has set the prior distribution on each of the (logarithm of the) ring widths to be a Normal distribution with mean of $\mu=0.8$ and standard deviation of $\sigma=0.3$. Not including the central Gaussian envelope, we have 7 rings in this model. The `.expand()` call turns a Normal distribution with a shape of `1` into a distribution with a *batch* shape of 7. This isn't quite what we want in this application, so the `to_event()` call converts the *batch* shape into the *event* shape. For more details on Pyro tensor shapes, we recommend reading the [Tensor shapes in Pyro tutorial](https://pyro.ai/examples/tensor_shapes.html).
 
 
-When starting out building a new model, we recomend starting out by introducing a set of latent random variables with `PyroSample` one by a few and fixing most parameters (by simply defining them as torch tensors, as noted in the comments in the above code). 
+When building a new model, we recommend starting out by introducing a set of latent random variables with `PyroSample` and fixing most parameters (by simply defining them as torch tensors, as noted in the comments in the above code). 
 
 ### Prior predictive check
 
