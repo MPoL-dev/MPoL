@@ -425,7 +425,7 @@ When building a new model, we recommend starting out by introducing a set of lat
 
 ### Prior predictive check
 
-Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with our model. For example, one design flaw we spotted with an earlier iteration of our code was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
+Following the advice in [Bayesian Workflow](https://arxiv.org/abs/2011.01808), we'll first test out this model using a *prior predictive check*. This is where we generate random samples from each of the prior distributions and use them to produce versions of the model, in this case, random images of disks with 7 rings. This step is very useful because it helps you identify obvious implementation errors with your model. For example, one design flaw we spotted with an earlier iteration of our code was when we used Normal priors on the ring amplitudes and widths. Both of these values should be positive-valued, which motivated our shift to using Normal priors on the logarithm of the ring amplitudes and widths.
 
 ```{code-cell} ipython3
 # parameters from Guzman     
