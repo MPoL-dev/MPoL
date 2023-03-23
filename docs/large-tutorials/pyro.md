@@ -404,7 +404,7 @@ class PyroDisk(PyroModule):
         return II
 ```
 
-We've gone ahead and defined many of our model parameters as latent random variables using `PyroSample`. We define the prior distribution on these parameters is defined by the `dist...`. For example, with the 
+We've gone ahead and defined many of our model parameters as latent random variables using `PyroSample`. The prior distribution on these parameters is defined by the `dist...`. For example, with the 
 
 ```
 self.log_A_0 = PyroSample(dist.Normal(0.0, 0.3))
