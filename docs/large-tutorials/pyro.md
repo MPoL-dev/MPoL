@@ -889,7 +889,7 @@ samples = Predictive(model, guide=guide, return_sites=['vis_real', 'vis_imag', '
 fig = compare_dirty_model_resid(samples["vis_real"][0], samples["vis_imag"][0], samples["sky_cube"][0]);
 ```
 
-And the 1D profile
+And the 1D profile -- here we'll overplot 50 draws.
 
 ```{code-cell} ipython3
 samples = Predictive(model, guide=guide, return_sites=['iprofile1D'], num_samples=50)(predictive=True)
