@@ -326,10 +326,8 @@ class PrimaryBeamCube(nn.Module):
     """
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
-        coords=None,
-        nchan=None,
+        coords,
+        nchan=1,
         chan_freqs=None,
         dish_type=None,
         dish_radius=None,
@@ -360,7 +358,15 @@ class PrimaryBeamCube(nn.Module):
         elif dish_type == "obscured":
             self.pb_mask = self.obscured_mask(chan_freqs, dish_radius, **dish_kwargs)
 
-
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan=1,
+        chan_freqs=None, dish_type=None,
+        dish_radius=None, **dish_kwargs
+    ) -> ImageCube:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, chan_freqs, dish_type, dish_radius, **dish_kwargs)
+    
     def forward(self, cube):
         r"""Args:
             cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
