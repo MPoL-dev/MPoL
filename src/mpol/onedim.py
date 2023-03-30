@@ -86,22 +86,24 @@ def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
 
 def get_1d_image_profile(image, coords, geom, bins=None, rescale_flux=True): 
     r"""
-    Obtain a 1D (radial) brightness profile I(r) from an MPoL model.
+    Obtain a 1D (radial) brightness profile I(r) from an image.
 
     Parameters
     ----------
-    model : `torch.nn.Module` object
-        Instance of the `mpol.precomposed.SimpleNet` class
+    image : array
+        2D image array 
+    coords : `mpol.coordinates.GridCoords` object
+        Instance of the `mpol.coordinates.GridCoords` class
     geom : dict 
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
                 Inclination 
             "Omega" : float, unit=[deg]
-                Position angle of the ascending node # TODO: convention?
+                Position angle of the ascending node 
             "omega" : float, unit=[deg]
                 Argument of periastron
             "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north. # TODO: convention?
+                Phase center offset in right ascension. Positive is west of north.
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination.
     rescale_flux : bool, default=True 
@@ -114,43 +116,38 @@ def get_1d_image_profile(image, coords, geom, bins=None, rescale_flux=True):
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r). If None, bins will span 
         the full image, with widths equal to the hypotenuse of the pixels
-    chan : int, default=0
-        Channel of `model` to use
 
     Returns
     -------
     bin_centers : array, unit=[arcsec]
         Radial coordinates of image at center of `bins`
-    Is : array, unit=[Jy / arcsec^2]
+    Is : array, unit=[Jy / arcsec^2] (if `image` has these units)
         Azimuthally averaged pixel brightness at `rs`
     """
-    # model pixel values
-    skycube = torch2npy(model.icube.sky_cube)[chan]
 
     # Cartesian pixel coordinates [arcsec]
-    xx, yy = model.coords.sky_x_centers_2D, model.coords.sky_y_centers_2D
+    xx, yy = coords.sky_x_centers_2D, coords.sky_y_centers_2D
     # shift image center
     xshift, yshift = xx - geom["dRA"], yy - geom["dDec"]
 
     # deproject and rotate image 
     xdep, ydep = observer_to_flat(xshift, yshift,
-        omega=geom["omega"] * np.pi / 180, # TODO: omega
+        omega=geom["omega"] * np.pi / 180, 
         incl=geom["incl"] * np.pi / 180,
         Omega=geom["Omega"] * np.pi / 180,
-        opt_thick=rescale_flux,
         )
-
+    
     # radial pixel coordinates
     rr = np.ravel(np.hypot(xdep, ydep))
 
     if bins is None:
-        step = np.hypot(model.coords.cell_size, model.coords.cell_size)
+        step = np.hypot(coords.cell_size, coords.cell_size)
         bins = np.arange(0.0, max(rr), step)
 
     # get number of points in each radial bin
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
     # get radial brightness
-    Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(skycube))
+    Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
     Is /= bin_counts
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
