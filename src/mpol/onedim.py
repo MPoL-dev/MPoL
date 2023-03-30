@@ -4,7 +4,7 @@ from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
-def get_1d_vis_fit(V, coords, geom, rescale_flux=True, bins=None):
+def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image-domain model. 
