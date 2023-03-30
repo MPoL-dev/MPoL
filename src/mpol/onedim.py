@@ -150,6 +150,9 @@ def get_1d_image_profile(image, coords, geom, bins=None, rescale_flux=True):
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
     Is /= bin_counts
 
+    if rescale_flux: # TODO
+        Is *= np.cos(geom["incl"] * np.pi / 180)
+
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
     return bin_centers, Is
