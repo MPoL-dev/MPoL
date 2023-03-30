@@ -4,25 +4,27 @@ from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
 
-def get_1d_vis_fit(model, geom, rescale_flux=True, bins=None, chan=0):
+def get_1d_vis_fit(V, coords, geom, rescale_flux=True, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image-domain model. 
 
     Parameters
     ----------
-    model : `torch.nn.Module` object
-        Instance of the `mpol.precomposed.SimpleNet` class
+    V : array
+        2D visibility amplitudes
+    coords : `mpol.coordinates.GridCoords` object
+        Instance of the `mpol.coordinates.GridCoords` class
     geom : dict 
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
                 Inclination 
             "Omega" : float, unit=[deg]
-                Position angle of the ascending node # TODO: convention?
+                Position angle of the ascending node 
             "omega" : float, unit=[deg]
                 Argument of periastron
             "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north. # TODO: convention?
+                Phase center offset in right ascension. Positive is west of north. 
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination
     rescale_flux : bool, default=True 
@@ -35,49 +37,45 @@ def get_1d_vis_fit(model, geom, rescale_flux=True, bins=None, chan=0):
     bins : array, default=None, unit=[k\lambda]
         Baseline bin edges to use in calculating V(q). If None, bins will span 
         the model baseline distribution, with widths equal to the hypotenuse of 
-        the (u, v) coordinates                       
-    chan : int, default=0
-        Channel of `model` to select
+        the (u, v) coordinates
 
     Returns
     -------
     q : array, unit=:math:[`k\lambda`]
         Baselines corresponding to `u` and `v`
-    Vmod : array, unit=[Jy] 
+    Vs : array, unit=[Jy] 
         Visibility amplitudes at `q`
 
     Notes
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
-    # model visibility amplitudes
-    Vmod = torch2npy(model.fcube.ground_vis)[chan]
 
     # model (u,v) coordinates [k\lambda]
-    uu, vv = model.coords.sky_u_centers_2D, model.coords.sky_v_centers_2D
+    uu, vv = coords.sky_u_centers_2D, coords.sky_v_centers_2D
 
     from frank.geometry import FixedGeometry
-    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])   # TODO: right signs?
+    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])  # TODO: signs
     # phase-shift the model visibilities and deproject the model (u,v) points
-    up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, Vmod.ravel())
+    up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, V.ravel())
 
     # if the source is optically thick, rescale the deprojected Re(V)
     if rescale_flux: 
         Vp.real /= np.cos(geom["incl"] * np.pi / 180)
+
     # convert back to [k\lambda]
     up /= 1e3
     vp /= 1e3
-
-    # baselines
+    
     qq = np.hypot(up, vp) 
 
     if bins is None:
-        step = np.hypot(model.coords.du, model.coords.dv)
+        step = np.hypot(coords.du, coords.dv)
         bins = np.arange(0.0, max(qq), step)
 
     # get number of points in each radial bin
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
-    # get radial vis amplitude
+    # get radial vis amplitudes
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
     Vs /= bin_counts
     
