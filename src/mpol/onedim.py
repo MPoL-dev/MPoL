@@ -66,7 +66,7 @@ def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
     # convert back to [k\lambda]
     up /= 1e3
     vp /= 1e3
-    
+
     qq = np.hypot(up, vp) 
 
     if bins is None:
@@ -84,7 +84,7 @@ def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
     return bin_centers, Vs
 
 
-def get_radial_profile(model, geom, bins=None, rescale_flux=True, chan=0): 
+def get_1d_image_profile(image, coords, geom, bins=None, rescale_flux=True): 
     r"""
     Obtain a 1D (radial) brightness profile I(r) from an MPoL model.
 
