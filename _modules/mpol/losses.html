@@ -454,7 +454,7 @@ title="Source repository"
     <span class="k">return</span> <span class="n">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">,</span> <span class="n">tot_flux</span><span class="p">):</span>
+<div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">,</span> <span class="n">tot_flux</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
 
