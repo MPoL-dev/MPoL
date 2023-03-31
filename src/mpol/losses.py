@@ -159,13 +159,14 @@ def nll_gridded(vis, datasetGridded):
     return nll(model_vis, datasetGridded.vis_indexed, datasetGridded.weight_indexed)
 
 
-def entropy(cube, prior_intensity):
+def entropy(cube, prior_intensity, tot_flux):
     r"""
     Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
     Args:
         cube (any tensor): pixel values must be positive :math:`I_i > 0` for all :math:`i`
         prior_intensity (any tensor): the prior value :math:`p` to calculate entropy against. Could be a single constant or an array the same shape as image.
+        tot_flux (float): a fixed normalization factor; the user-defined target total flux density
 
     Returns:
         torch.double: entropy loss
@@ -174,14 +175,14 @@ def entropy(cube, prior_intensity):
 
     .. math::
 
-        L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}
+        L = \frac{1}{\zeta} \sum_i I_i \; \ln \frac{I_i}{p_i}
     """
     # check to make sure image is positive, otherwise raise an error
     assert (cube >= 0.0).all(), "image cube contained negative pixel values"
     assert prior_intensity > 0, "image prior intensity must be positive"
+    assert tot_flux > 0, "target total flux must be positive"
 
-    tot = torch.sum(cube)
-    return (1 / tot) * torch.sum(cube * torch.log(cube / prior_intensity))
+    return (1 / tot_flux) * torch.sum(cube * torch.log(cube / prior_intensity))
 
 
 def TV_image(sky_cube, epsilon=1e-10):
