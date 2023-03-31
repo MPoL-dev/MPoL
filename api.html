@@ -1999,13 +1999,14 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.losses.entropy">
-<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.entropy" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_flux</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.entropy" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate the entropy loss of a set of pixels following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cube</strong> (<em>any tensor</em>) – pixel values must be positive <span class="math notranslate nohighlight">\(I_i &gt; 0\)</span> for all <span class="math notranslate nohighlight">\(i\)</span></p></li>
 <li><p><strong>prior_intensity</strong> (<em>any tensor</em>) – the prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against. Could be a single constant or an array the same shape as image.</p></li>
+<li><p><strong>tot_flux</strong> (<em>float</em>) – a fixed normalization factor; the user-defined target total flux density</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2017,7 +2018,7 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 </dl>
 <p>The entropy loss is calculated as</p>
 <div class="math notranslate nohighlight">
-\[L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}\]</div>
+\[L = \frac{1}{\zeta} \sum_i I_i \; \ln \frac{I_i}{p_i}\]</div>
 </dd></dl>
 
 <dl class="py function">

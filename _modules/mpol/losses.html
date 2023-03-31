@@ -454,13 +454,14 @@ title="Source repository"
     <span class="k">return</span> <span class="n">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">):</span>
+<div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">,</span> <span class="n">tot_flux</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cube (any tensor): pixel values must be positive :math:`I_i &gt; 0` for all :math:`i`</span>
 <span class="sd">        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy against. Could be a single constant or an array the same shape as image.</span>
+<span class="sd">        tot_flux (float): a fixed normalization factor; the user-defined target total flux density</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: entropy loss</span>
@@ -469,14 +470,14 @@ title="Source repository"
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        L = \frac{1}{\sum_i I_i} \sum_i I_i \; \ln \frac{I_i}{p_i}</span>
+<span class="sd">        L = \frac{1}{\zeta} \sum_i I_i \; \ln \frac{I_i}{p_i}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check to make sure image is positive, otherwise raise an error</span>
     <span class="k">assert</span> <span class="p">(</span><span class="n">cube</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;image cube contained negative pixel values&quot;</span>
     <span class="k">assert</span> <span class="n">prior_intensity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;image prior intensity must be positive&quot;</span>
+    <span class="k">assert</span> <span class="n">tot_flux</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;target total flux must be positive&quot;</span>
 
-    <span class="n">tot</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">tot</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cube</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cube</span> <span class="o">/</span> <span class="n">prior_intensity</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">tot_flux</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cube</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cube</span> <span class="o">/</span> <span class="n">prior_intensity</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="TV_image"><a class="viewcode-back" href="../../api.html#mpol.losses.TV_image">[docs]</a><span class="k">def</span> <span class="nf">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
