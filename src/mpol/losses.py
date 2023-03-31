@@ -159,7 +159,7 @@ def nll_gridded(vis, datasetGridded):
     return nll(model_vis, datasetGridded.vis_indexed, datasetGridded.weight_indexed)
 
 
-def entropy(cube, prior_intensity, tot_flux):
+def entropy(cube, prior_intensity, tot_flux=10):
     r"""
     Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
