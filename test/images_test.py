@@ -188,3 +188,8 @@ def test_multi_chan_conv(coords, tmp_path):
     conv_layer = images.HannConvCube(nchan=nchan)
 
     conv_layer(test_cube)
+
+def test_image_flux(coords):
+    nchan = 20
+    im = images.ImageCube(coords=coords, nchan=nchan)    
+    assert im.flux.size()[0] == nchan
