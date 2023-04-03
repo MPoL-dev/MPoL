@@ -556,6 +556,19 @@ title="Source repository"
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The spatially-integrated flux of the image. Returns a &#39;spectrum&#39; with the flux in each channel in units of Jy.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.double: a 1D tensor of length ``(nchan)`` </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># convert from Jy/arcsec^2 to Jy/pixel using area of a pixel</span>
+        <span class="c1"># multiply by arcsec^2/pixel</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
 <div class="viewcode-block" id="ImageCube.to_FITS"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.to_FITS">[docs]</a>    <span class="k">def</span> <span class="nf">to_FITS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;cube.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export the image cube to a FITS file.</span>

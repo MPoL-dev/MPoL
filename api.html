@@ -1559,6 +1559,20 @@ Data coordinates should include the points for the Hermitian visibilities.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.images.ImageCube.flux">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flux</span></span><a class="headerlink" href="#mpol.images.ImageCube.flux" title="Permalink to this definition">#</a></dt>
+<dd><p>The spatially-integrated flux of the image. Returns a ‘spectrum’ with the flux in each channel in units of Jy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a 1D tensor of length <code class="docutils literal notranslate"><span class="pre">(nchan)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.images.ImageCube.to_FITS">
 <span class="sig-name descname"><span class="pre">to_FITS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cube.fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/images.html#ImageCube.to_FITS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.images.ImageCube.to_FITS" title="Permalink to this definition">#</a></dt>
