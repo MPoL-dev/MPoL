@@ -115,6 +115,8 @@ def chi_squared_gridded(vis, griddedDataset):
     # griddedDataset.vis_indexed and griddedDataset.weight_indexed
     model_vis = datasets.index_vis(vis, griddedDataset)
 
+    model_vis = griddedDataset(vis)
+
     return chi_squared(
         model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
     )
