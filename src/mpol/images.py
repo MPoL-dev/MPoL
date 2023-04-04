@@ -261,6 +261,19 @@ class ImageCube(nn.Module):
         """
         return utils.packed_cube_to_sky_cube(self.cube)
 
+    @property
+    def flux(self):
+        """
+        The spatially-integrated flux of the image. Returns a 'spectrum' with the flux in each channel in units of Jy.
+
+        Returns:
+            torch.double: a 1D tensor of length ``(nchan)`` 
+        """
+
+        # convert from Jy/arcsec^2 to Jy/pixel using area of a pixel
+        # multiply by arcsec^2/pixel
+        return self.coords.cell_size**2 * torch.sum(self.cube, dim=(1,2))
+
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
         Export the image cube to a FITS file.
