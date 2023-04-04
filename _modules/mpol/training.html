@@ -304,35 +304,23 @@ title="Source repository"
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utilities for training and testing an MPoL neural network.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    imager : `mpol.gridding.DirtyImager` object</span>
-<span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
-<span class="sd">    optimizer : `torch.optim` object</span>
-<span class="sd">        PyTorch optimizer class for the training loop.</span>
-<span class="sd">    epochs : int, default=10000</span>
-<span class="sd">        Number of training iterations</span>
-<span class="sd">    convergence_tol : float, default=1e-3</span>
-<span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
-<span class="sd">        loss function (suggested &lt;= 1e-3)</span>
-<span class="sd">    regularizers : nested dict, default={}</span>
-<span class="sd">        Dictionary of image regularizers to use. For each, a dict of the </span>
-<span class="sd">        strength (&#39;lambda&#39;, float), whether to guess an initial value for lambda </span>
-<span class="sd">        (&#39;guess&#39;, bool), and other quantities needed to compute their loss term.</span>
-<span class="sd">        Example:</span>
-<span class="sd">            {&quot;sparsity&quot;:{&quot;lambda&quot;:1e-3, &quot;guess&quot;:False},</span>
-<span class="sd">             &quot;entropy&quot;: {&quot;lambda&quot;:1e-3, &quot;guess&quot;:True, &quot;prior_intensity&quot;:1e-10}</span>
-<span class="sd">            }</span>
-<span class="sd">    train_diag_step : int, default=None</span>
-<span class="sd">        Interval at which training diagnostics are output. If None, no</span>
-<span class="sd">        diagnostics will be generated.</span>
-<span class="sd">    kfold : int, default=None</span>
-<span class="sd">        The k-fold of the current training set (for diagnostics)        </span>
-<span class="sd">    save_prefix : str, default=None</span>
-<span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be</span>
-<span class="sd">        saved</span>
-<span class="sd">    verbose : bool, default=True</span>
-<span class="sd">        Whether to print notification messages</span>
+<span class="sd">    Args:</span>
+<span class="sd">        imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.</span>
+<span class="sd">        optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.</span>
+<span class="sd">        epochs (int): Number of training iterations, default=10000</span>
+<span class="sd">        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by</span>
+<span class="sd">            loss function (suggested &lt;= 1e-3)</span>
+<span class="sd">        regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength (&#39;lambda&#39;, float), whether to guess an initial value for lambda (&#39;guess&#39;, bool), and other quantities needed to compute their loss term.</span>
+<span class="sd">            </span>
+<span class="sd">            Example:</span>
+<span class="sd">                ``{&quot;sparsity&quot;:{&quot;lambda&quot;:1e-3, &quot;guess&quot;:False},</span>
+<span class="sd">                &quot;entropy&quot;: {&quot;lambda&quot;:1e-3, &quot;guess&quot;:True, &quot;prior_intensity&quot;:1e-10}</span>
+<span class="sd">                }``</span>
+
+<span class="sd">        train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.</span>
+<span class="sd">        kfold (int): The k-fold of the current training set (for diagnostics)        </span>
+<span class="sd">        save_prefix (str): Prefix (path) used for saved figure names. If None, figures won&#39;t be saved</span>
+<span class="sd">        verbose (bool): Whether to print notification messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> 

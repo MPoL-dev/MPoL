@@ -2196,29 +2196,21 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>imager</strong> (<cite>mpol.gridding.DirtyImager</cite> object) – Instance of the <cite>mpol.gridding.DirtyImager</cite> class.</p></li>
-<li><p><strong>optimizer</strong> (<cite>torch.optim</cite> object) – PyTorch optimizer class for the training loop.</p></li>
-<li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>default=10000</em>) – Number of training iterations</p></li>
-<li><p><strong>convergence_tol</strong> (<em>float</em><em>, </em><em>default=1e-3</em>) – Tolerance for training iteration stopping criterion as assessed by
+<li><p><strong>imager</strong> (<a class="reference internal" href="#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> object) – Instance of the <cite>mpol.gridding.DirtyImager</cite> class.</p></li>
+<li><p><strong>optimizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim</span></code> object) – PyTorch optimizer class for the training loop.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em>) – Number of training iterations, default=10000</p></li>
+<li><p><strong>convergence_tol</strong> (<em>float</em>) – Tolerance for training iteration stopping criterion as assessed by
 loss function (suggested &lt;= 1e-3)</p></li>
-<li><p><strong>regularizers</strong> (<em>nested dict</em><em>, </em><em>default={}</em>) – <p>Dictionary of image regularizers to use. For each, a dict of the
-strength (‘lambda’, float), whether to guess an initial value for lambda
-(‘guess’, bool), and other quantities needed to compute their loss term.
-Example:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>{“sparsity”:{“lambda”:1e-3, “guess”:False},</dt><dd><p>”entropy”: {“lambda”:1e-3, “guess”:True, “prior_intensity”:1e-10}</p>
-</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
+<li><p><strong>regularizers</strong> (<em>nested dict</em>) – <p>Dictionary of image regularizers to use. For each, a dict of the strength (‘lambda’, float), whether to guess an initial value for lambda (‘guess’, bool), and other quantities needed to compute their loss term.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal notranslate"><span class="pre">{&quot;sparsity&quot;:{&quot;lambda&quot;:1e-3,</span> <span class="pre">&quot;guess&quot;:False},</span>
+<span class="pre">&quot;entropy&quot;:</span> <span class="pre">{&quot;lambda&quot;:1e-3,</span> <span class="pre">&quot;guess&quot;:True,</span> <span class="pre">&quot;prior_intensity&quot;:1e-10}</span>
+<span class="pre">}</span></code></p>
 </p></li>
-<li><p><strong>train_diag_step</strong> (<em>int</em><em>, </em><em>default=None</em>) – Interval at which training diagnostics are output. If None, no
-diagnostics will be generated.</p></li>
-<li><p><strong>kfold</strong> (<em>int</em><em>, </em><em>default=None</em>) – The k-fold of the current training set (for diagnostics)</p></li>
-<li><p><strong>save_prefix</strong> (<em>str</em><em>, </em><em>default=None</em>) – Prefix (path) used for saved figure names. If None, figures won’t be
-saved</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to print notification messages</p></li>
+<li><p><strong>train_diag_step</strong> (<em>int</em>) – Interval at which training diagnostics are output. If None, no diagnostics will be generated.</p></li>
+<li><p><strong>kfold</strong> (<em>int</em>) – The k-fold of the current training set (for diagnostics)</p></li>
+<li><p><strong>save_prefix</strong> (<em>str</em>) – Prefix (path) used for saved figure names. If None, figures won’t be saved</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print notification messages</p></li>
 </ul>
 </dd>
 </dl>
