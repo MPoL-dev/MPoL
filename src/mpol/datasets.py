@@ -120,17 +120,15 @@ class GriddedDataset(torch.nn.Module):
     def add_mask(
         self,
         mask: ArrayLike,
-        device: torch.device | str | None = None,
     ) -> None:
         r"""
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
 
         Args:
             mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels. 
-            device (torch.device) : the desired device of the dataset. If ``None``, defaults to current device.
         """
 
-        new_2D_mask = torch.Tensor(mask).detach().to(device)
+        new_2D_mask = torch.Tensor(mask).detach()
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
 
         # update mask via an AND operation, meaning we will only keep visibilities that are
@@ -148,6 +146,30 @@ class GriddedDataset(torch.nn.Module):
         # update pre-indexed values
         self.vis_indexed = self.vis_gridded[self.mask]
         self.weight_indexed = self.weight_gridded[self.mask]
+
+    def forward(self, modelVisibilityCube):
+        """
+        Args:
+            modelVisibilityCube (complex torch.tensor): with shape ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in output from :meth:`mpol.fourier.FourierCube.forward()`
+
+        Returns: 
+            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions. 
+        """
+
+        assert (
+                modelVisibilityCube.size()[0] == self.mask.size()[0]
+            ), "vis and dataset mask do not have the same number of channels."
+
+        # As of Pytorch 1.7.0, complex numbers are partially supported.
+        # However, masked_select does not yet work (with gradients)
+        # on the complex vis, so hence this awkward step of selecting
+        # the reals and imaginaries separately
+        re = modelVisibilityCube.real.masked_select(self.mask)
+        im = modelVisibilityCube.imag.masked_select(self.mask)
+
+        # we had trouble returning things as re + 1.0j * im,
+        # but for some reason torch.complex seems to work OK.
+        return torch.complex(re, im)
 
     @property
     def ground_mask(self) -> torch.Tensor:
