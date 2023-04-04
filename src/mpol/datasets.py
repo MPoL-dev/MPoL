@@ -17,34 +17,7 @@ from .constants import *
 from .utils import loglinspace
 
 
-def index_vis(vis, griddedDataset):
-    r"""
-    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is "packed" just like the :class:`~mpol.datasets.GriddedDataset`
-
-    Args:
-        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed."
-        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
-
-    Returns:
-        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`
-    """
-    assert (
-        vis.size()[0] == griddedDataset.mask.size()[0]
-    ), "vis and dataset mask do not have the same number of channels."
-
-    # As of Pytorch 1.7.0, complex numbers are partially supported.
-    # However, masked_select does not yet work (with gradients)
-    # on the complex vis, so hence this awkward step of selecting
-    # the reals and imaginaries separately
-    re = vis.real.masked_select(griddedDataset.mask)
-    im = vis.imag.masked_select(griddedDataset.mask)
-
-    # we had trouble returning things as re + 1.0j * im,
-    # but for some reason torch.complex seems to work OK.
-    return torch.complex(re, im)
-
-
-class GriddedDataset:
+class GriddedDataset(torch.nn.Module):
     r"""
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
@@ -52,12 +25,12 @@ class GriddedDataset:
         weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
         mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
         nchan (int): the number of channels in the image (default = 1).
-        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
+        device (torch.device) : the desired device of the dataset. If ``None``, defaults to current device.
 
     After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.
 
     :ivar vis_indexed: 1D complex tensor of visibility data
-    :ivar weight_indexd: 1D tensor of weight values
+    :ivar weight_indexed: 1D tensor of weight values
 
     If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.
     """
@@ -70,20 +43,27 @@ class GriddedDataset:
         weight_gridded: torch.Tensor,
         mask: torch.Tensor,
         nchan: int = 1,
-        device: torch.device | str | None = None,
     ) -> None:
+        super().__init__()
+
         self.coords = coords
         self.nchan = nchan
 
-        self.vis_gridded = torch.tensor(vis_gridded, device=device)
-        self.weight_gridded = torch.tensor(weight_gridded, device=device)
-        self.mask = torch.tensor(mask, device=device)
+        # store variables as buffers of the module
+        self.register_buffer("vis_gridded", torch.tensor(vis_gridded))
+        self.register_buffer("weight_gridded", torch.tensor(weight_gridded))
+        self.register_buffer("mask", torch.tensor(mask))
+        self.vis_gridded: torch.Tensor
+        self.weight_gridded: torch.Tensor
+        self.mask: torch.Tensor
 
         # pre-index the values
         # note that these are *collapsed* across all channels
         # 1D array
-        self.vis_indexed = self.vis_gridded[self.mask]
-        self.weight_indexed = self.weight_gridded[self.mask]
+        self.register_buffer("vis_indexed", self.vis_gridded[self.mask])
+        self.register_buffer("weight_indexed", self.weight_gridded[self.mask])
+        self.vis_indexed: torch.Tensor
+        self.weight_indexed: torch.Tensor
 
     @classmethod
     def from_image_properties(
@@ -106,7 +86,6 @@ class GriddedDataset:
             weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
             mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
             nchan (int): the number of channels in the image (default = 1).
-            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
         """
         return cls(
             coords=GridCoords(cell_size, npix),
@@ -114,23 +93,20 @@ class GriddedDataset:
             weight_gridded=weight_gridded,
             mask=mask,
             nchan=nchan,
-            device=device,
         )
 
     def add_mask(
         self,
         mask: ArrayLike,
-        device: torch.device | str | None = None,
     ) -> None:
         r"""
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
 
         Args:
-            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels. Mask must be Hermitian, like the visibilities themselves.
-            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.
+            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels.
         """
 
-        new_2D_mask = torch.Tensor(mask).detach().to(device)
+        new_2D_mask = torch.Tensor(mask).detach()
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
 
         # update mask via an AND operation, meaning we will only keep visibilities that are
@@ -149,6 +125,30 @@ class GriddedDataset:
         self.vis_indexed = self.vis_gridded[self.mask]
         self.weight_indexed = self.weight_gridded[self.mask]
 
+    def forward(self, modelVisibilityCube):
+        """
+        Args:
+            modelVisibilityCube (complex torch.tensor): with shape ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in output from :meth:`mpol.fourier.FourierCube.forward()`
+
+        Returns:
+            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions.
+        """
+
+        assert (
+            modelVisibilityCube.size()[0] == self.mask.size()[0]
+        ), "vis and dataset mask do not have the same number of channels."
+
+        # As of Pytorch 1.7.0, complex numbers are partially supported.
+        # However, masked_select does not yet work (with gradients)
+        # on the complex vis, so hence this awkward step of selecting
+        # the reals and imaginaries separately
+        re = modelVisibilityCube.real.masked_select(self.mask)
+        im = modelVisibilityCube.imag.masked_select(self.mask)
+
+        # we had trouble returning things as re + 1.0j * im,
+        # but for some reason torch.complex seems to work OK.
+        return torch.complex(re, im)
+
     @property
     def ground_mask(self) -> torch.Tensor:
         r"""
@@ -159,28 +159,6 @@ class GriddedDataset:
 
         """
         return utils.packed_cube_to_ground_cube(self.mask)
-
-    def to(self, device: torch.device | str | None = None) -> GriddedDataset:
-        """
-        Moves the tensors of the dataset to specified device.
-
-        Args:
-            device (torch.device): the desired device
-
-        Returns:
-            copy of the GriddedDataset instance on the new device
-        """
-        self.vis_gridded = self.vis_gridded.to(device)
-        self.weight_gridded = self.weight_gridded.to(device)
-        self.mask = self.mask.to(device)
-
-        # pre-index the values
-        # note that these are *collapsed* across all channels
-        # 1D array
-        self.vis_indexed = self.vis_indexed.to(device)
-        self.weight_indexed = self.weight_indexed.to(device)
-
-        return self
 
 
 # custom dataset loader
