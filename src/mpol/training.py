@@ -9,35 +9,23 @@ class TrainTest:
     r"""
     Utilities for training and testing an MPoL neural network.
 
-    Parameters
-    ----------
-    imager : `mpol.gridding.DirtyImager` object
-        Instance of the `mpol.gridding.DirtyImager` class.
-    optimizer : `torch.optim` object
-        PyTorch optimizer class for the training loop.
-    epochs : int, default=10000
-        Number of training iterations
-    convergence_tol : float, default=1e-3
-        Tolerance for training iteration stopping criterion as assessed by
-        loss function (suggested <= 1e-3)
-    regularizers : nested dict, default={}
-        Dictionary of image regularizers to use. For each, a dict of the 
-        strength ('lambda', float), whether to guess an initial value for lambda 
-        ('guess', bool), and other quantities needed to compute their loss term.
-        Example:
-            {"sparsity":{"lambda":1e-3, "guess":False},
-             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
-            }
-    train_diag_step : int, default=None
-        Interval at which training diagnostics are output. If None, no
-        diagnostics will be generated.
-    kfold : int, default=None
-        The k-fold of the current training set (for diagnostics)        
-    save_prefix : str, default=None
-        Prefix (path) used for saved figure names. If None, figures won't be
-        saved
-    verbose : bool, default=True
-        Whether to print notification messages
+    Args:
+        imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.
+        optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.
+        epochs (int): Number of training iterations, default=10000
+        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by
+            loss function (suggested <= 1e-3)
+        regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength ('lambda', float), whether to guess an initial value for lambda ('guess', bool), and other quantities needed to compute their loss term.
+            
+            Example:
+                ``{"sparsity":{"lambda":1e-3, "guess":False},
+                "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
+                }``
+
+        train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.
+        kfold (int): The k-fold of the current training set (for diagnostics)        
+        save_prefix (str): Prefix (path) used for saved figure names. If None, figures won't be saved
+        verbose (bool): Whether to print notification messages
     """
 
     def __init__(self, imager, optimizer, epochs=10000, convergence_tol=1e-3, 
