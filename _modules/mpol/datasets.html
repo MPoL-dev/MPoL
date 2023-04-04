@@ -312,34 +312,7 @@ title="Source repository"
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">loglinspace</span>
 
 
-<div class="viewcode-block" id="index_vis"><a class="viewcode-back" href="../../api.html#mpol.datasets.index_vis">[docs]</a><span class="k">def</span> <span class="nf">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Index model visibilities to same locations as a :class:`~mpol.datasets.GriddedDataset`. Assumes that vis is &quot;packed&quot; just like the :class:`~mpol.datasets.GriddedDataset`</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed.&quot;</span>
-<span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        torch complex tensor:  1d torch tensor of model samples collapsed across cube dimensions like ``vis_indexed`` and ``weight_indexed`` of :class:`~mpol.datasets.GriddedDataset`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">vis</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
-
-    <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
-    <span class="c1"># However, masked_select does not yet work (with gradients)</span>
-    <span class="c1"># on the complex vis, so hence this awkward step of selecting</span>
-    <span class="c1"># the reals and imaginaries separately</span>
-    <span class="n">re</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="n">griddedDataset</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-
-    <span class="c1"># we had trouble returning things as re + 1.0j * im,</span>
-    <span class="c1"># but for some reason torch.complex seems to work OK.</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="GriddedDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset">[docs]</a><span class="k">class</span> <span class="nc">GriddedDataset</span><span class="p">:</span>
+<div class="viewcode-block" id="GriddedDataset"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset">[docs]</a><span class="k">class</span> <span class="nc">GriddedDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
@@ -347,12 +320,12 @@ title="Source repository"
 <span class="sd">        weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format</span>
 <span class="sd">        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.</span>
 <span class="sd">        nchan (int): the number of channels in the image (default = 1).</span>
-<span class="sd">        device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
+<span class="sd">        device (torch.device) : the desired device of the dataset. If ``None``, defaults to current device.</span>
 
 <span class="sd">    After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.</span>
 
 <span class="sd">    :ivar vis_indexed: 1D complex tensor of visibility data</span>
-<span class="sd">    :ivar weight_indexd: 1D tensor of weight values</span>
+<span class="sd">    :ivar weight_indexed: 1D tensor of weight values</span>
 
 <span class="sd">    If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -365,20 +338,27 @@ title="Source repository"
         <span class="n">weight_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vis_gridded</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">weight_gridded</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># store variables as buffers of the module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;vis_gridded&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vis_gridded</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;weight_gridded&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">weight_gridded</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
         <span class="c1"># pre-index the values</span>
         <span class="c1"># note that these are *collapsed* across all channels</span>
         <span class="c1"># 1D array</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;vis_indexed&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;weight_indexed&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
 <div class="viewcode-block" id="GriddedDataset.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
@@ -401,7 +381,6 @@ title="Source repository"
 <span class="sd">            weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format</span>
 <span class="sd">            mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.</span>
 <span class="sd">            nchan (int): the number of channels in the image (default = 1).</span>
-<span class="sd">            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">coords</span><span class="o">=</span><span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">),</span>
@@ -409,23 +388,20 @@ title="Source repository"
             <span class="n">weight_gridded</span><span class="o">=</span><span class="n">weight_gridded</span><span class="p">,</span>
             <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
             <span class="n">nchan</span><span class="o">=</span><span class="n">nchan</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GriddedDataset.add_mask"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.add_mask">[docs]</a>    <span class="k">def</span> <span class="nf">add_mask</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mask</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels. Mask must be Hermitian, like the visibilities themselves.</span>
-<span class="sd">            device (torch.device) : the desired device of the dataset. If ``None``, defalts to current device.</span>
+<span class="sd">            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">new_2D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">new_2D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
         <span class="n">new_3D_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">new_2D_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 
         <span class="c1"># update mask via an AND operation, meaning we will only keep visibilities that are</span>
@@ -444,6 +420,30 @@ title="Source repository"
         <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span></div>
 
+<div class="viewcode-block" id="GriddedDataset.forward"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelVisibilityCube</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            modelVisibilityCube (complex torch.tensor): with shape ``(nchan, npix, npix)`` to be indexed. In &quot;pre-packed&quot; format, as in output from :meth:`mpol.fourier.FourierCube.forward()`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">modelVisibilityCube</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
+
+        <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
+        <span class="c1"># However, masked_select does not yet work (with gradients)</span>
+        <span class="c1"># on the complex vis, so hence this awkward step of selecting</span>
+        <span class="c1"># the reals and imaginaries separately</span>
+        <span class="n">re</span> <span class="o">=</span> <span class="n">modelVisibilityCube</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">modelVisibilityCube</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">masked_select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+
+        <span class="c1"># we had trouble returning things as re + 1.0j * im,</span>
+        <span class="c1"># but for some reason torch.complex seems to work OK.</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -453,29 +453,7 @@ title="Source repository"
 <span class="sd">            torch.boolean : 3D mask cube of shape ``(nchan, npix, npix)``</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-
-<div class="viewcode-block" id="GriddedDataset.to"><a class="viewcode-back" href="../../api.html#mpol.datasets.GriddedDataset.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GriddedDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Moves the tensors of the dataset to specified device.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            device (torch.device): the desired device</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            copy of the GriddedDataset instance on the new device</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_gridded</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_gridded</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="c1"># pre-index the values</span>
-        <span class="c1"># note that these are *collapsed* across all channels</span>
-        <span class="c1"># 1D array</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis_indexed</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_indexed</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span></div></div>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span></div>
 
 
 <span class="c1"># custom dataset loader</span>

@@ -1233,29 +1233,9 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </section>
 <section id="module-mpol.datasets">
 <span id="datasets"></span><h2>Datasets<a class="headerlink" href="#module-mpol.datasets" title="Permalink to this headline">#</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="mpol.datasets.index_vis">
-<span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">index_vis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#index_vis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.index_vis" title="Permalink to this definition">#</a></dt>
-<dd><p>Index model visibilities to same locations as a <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes that vis is “packed” just like the <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed.”</p></li>
-<li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>1d torch tensor of model samples collapsed across cube dimensions like <code class="docutils literal notranslate"><span class="pre">vis_indexed</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_indexed</span></code> of <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch complex tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="mpol.datasets.GriddedDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">GriddedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_gridded</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_gridded</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">GriddedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1264,7 +1244,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>weight_gridded</strong> (<em>torch double</em>) – the weights corresponding to the gridded visibility data, also in a packed format</p></li>
 <li><p><strong>mask</strong> (<em>torch boolean</em>) – a boolean mask to index the non-zero locations of <code class="docutils literal notranslate"><span class="pre">vis_gridded</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_gridded</span></code> in their packed format.</p></li>
 <li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the image (default = 1).</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to current device.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1273,7 +1253,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <dt class="field-odd">Variables</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>vis_indexed</strong> – 1D complex tensor of visibility data</p></li>
-<li><p><strong>weight_indexd</strong> – 1D tensor of weight values</p></li>
+<li><p><strong>weight_indexed</strong> – 1D tensor of weight values</p></li>
 </ul>
 </dd>
 </dl>
@@ -1291,7 +1271,6 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <li><p><strong>weight_gridded</strong> (<em>torch double</em>) – the weights corresponding to the gridded visibility data, also in a packed format</p></li>
 <li><p><strong>mask</strong> (<em>torch boolean</em>) – a boolean mask to index the non-zero locations of <code class="docutils literal notranslate"><span class="pre">vis_gridded</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_gridded</span></code> in their packed format.</p></li>
 <li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the image (default = 1).</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1299,14 +1278,27 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mpol.datasets.GriddedDataset.add_mask">
-<span class="sig-name descname"><span class="pre">add_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset.add_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset.add_mask" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy._typing._array_like._SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.dtype</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy._typing._nested_sequence._NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy._typing._array_like._SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.dtype</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">complex</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy._typing._nested_sequence._NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">complex</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset.add_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset.add_mask" title="Permalink to this definition">#</a></dt>
 <dd><p>Apply an additional mask to the data. Only works as a data limiting operation (i.e., <code class="docutils literal notranslate"><span class="pre">mask</span></code> is more restrictive than the mask already attached to the dataset).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<em>2D numpy</em><em> or </em><em>PyTorch tensor</em>) – boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels. Mask must be Hermitian, like the visibilities themselves.</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>mask</strong> (<em>2D numpy</em><em> or </em><em>PyTorch tensor</em>) – boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.datasets.GriddedDataset.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset.forward" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>modelVisibilityCube</strong> (<em>complex torch.tensor</em>) – with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed. In “pre-packed” format, as in output from <a class="reference internal" href="#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1d torch tensor of indexed model samples collapsed across cube dimensions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch complex tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1321,20 +1313,6 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>torch.boolean</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mpol.datasets.GriddedDataset.to">
-<span class="sig-name descname"><span class="pre">to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></span><a class="reference internal" href="_modules/mpol/datasets.html#GriddedDataset.to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.GriddedDataset.to" title="Permalink to this definition">#</a></dt>
-<dd><p>Moves the tensors of the dataset to specified device.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>device</strong> (<em>torch.device</em>) – the desired device</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>copy of the GriddedDataset instance on the new device</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1969,12 +1947,12 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.losses.chi_squared_gridded">
-<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">chi_squared_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#chi_squared_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.chi_squared_gridded" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">chi_squared_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#chi_squared_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.chi_squared_gridded" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate the <span class="math notranslate nohighlight">\(\chi^2\)</span> (corresponding to <a class="reference internal" href="#mpol.losses.chi_squared" title="mpol.losses.chi_squared"><code class="xref py py-func docutils literal notranslate"><span class="pre">chi_squared()</span></code></a>) using gridded data and model visibilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed,” as in output from <a class="reference internal" href="#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
+<li><p><strong>modelVisibilityCube</strong> (<em>torch complex tensor</em>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed,” as in output from <a class="reference internal" href="#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
 <li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
 </ul>
 </dd>
@@ -1989,12 +1967,12 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.losses.log_likelihood_gridded">
-<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">log_likelihood_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#log_likelihood_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.log_likelihood_gridded" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">log_likelihood_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#log_likelihood_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.log_likelihood_gridded" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate the log likelihood function <span class="math notranslate nohighlight">\(\ln\mathcal{L}\)</span> (corresponding to <a class="reference internal" href="#mpol.losses.log_likelihood" title="mpol.losses.log_likelihood"><code class="xref py py-func docutils literal notranslate"><span class="pre">log_likelihood()</span></code></a>) using gridded data and model visibilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vis</strong> (<em>torch complex tensor</em>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed,” as in output from <a class="reference internal" href="#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
+<li><p><strong>modelVisibilityCube</strong> (<em>torch complex tensor</em>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the <code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is “pre-packed,” as in output from <a class="reference internal" href="#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
 <li><p><strong>griddedDataset</strong> – instantiated <a class="reference internal" href="#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object</p></li>
 </ul>
 </dd>
@@ -2009,7 +1987,7 @@ a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.losses.nll_gridded">
-<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">nll_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasetGridded</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#nll_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.nll_gridded" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">nll_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/losses.html#nll_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.nll_gridded" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate a normalized “negative log likelihood” (corresponding to <a class="reference internal" href="#mpol.losses.nll" title="mpol.losses.nll"><code class="xref py py-func docutils literal notranslate"><span class="pre">nll()</span></code></a>) using gridded data and model visibilities. Function will return the same value regardless of whether Hermitian pairs are included.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2262,7 +2240,7 @@ comparing images generated with different visibility weighting.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>vis</strong> (<em>torch.complex tensor</em>) – Model visibility cube (see <cite>mpol.fourier.FourierCube.forward</cite>)</p></li>
-<li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
+<li><p><strong>dataset</strong> (<em>dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
 <li><p><strong>sky_cube</strong> (<em>torch.double</em>) – MPoL Ground Cube (see <cite>mpol.utils.packed_cube_to_ground_cube</cite>)</p></li>
 </ul>
 </dd>
@@ -2409,7 +2387,7 @@ saved</p></li>
 hyperparameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class</p>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>cv_score</strong> – Dictionary with mean and standard deviation of cross-validation

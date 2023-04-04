@@ -392,12 +392,12 @@ title="Source repository"
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">chi_squared</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="chi_squared_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared_gridded">[docs]</a><span class="k">def</span> <span class="nf">chi_squared_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="chi_squared_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared_gridded">[docs]</a><span class="k">def</span> <span class="nf">chi_squared_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) using gridded data and model visibilities.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
 <span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
@@ -405,22 +405,23 @@ title="Source repository"
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
+    <span class="c1"># get the model_visibilities from the dataset</span>
     <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
     <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+    
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">chi_squared</span><span class="p">(</span>
         <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_likelihood_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood_gridded">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="log_likelihood_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood_gridded">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
 <span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
@@ -428,17 +429,17 @@ title="Source repository"
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># use the index connector to get the model_visibilities from the dataset</span>
+    <span class="c1"># get the model_visibilities from the dataset</span>
     <span class="c1"># 1D torch tensor collapsed across cube dimensions, like</span>
     <span class="c1"># griddedDataset.vis_indexed and griddedDataset.weight_indexed</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">)</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span>
         <span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">):</span>
+<div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; (corresponding to :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will return the same value regardless of whether Hermitian pairs are included.</span>
 
@@ -449,9 +450,9 @@ title="Source repository"
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: the normalized negative log likelihood likelihood loss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">index_vis</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="p">)</span>
+    <span class="n">model_vis</span> <span class="o">=</span> <span class="n">griddedDataset</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">datasetGridded</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">vis_indexed</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="o">.</span><span class="n">weight_indexed</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">,</span> <span class="n">tot_flux</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
