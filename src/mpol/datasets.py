@@ -16,6 +16,7 @@ from . import spheroidal_gridding, utils
 from .constants import *
 from .utils import loglinspace
 
+
 class GriddedDataset(torch.nn.Module):
     r"""
     Args:
@@ -41,23 +42,28 @@ class GriddedDataset(torch.nn.Module):
         vis_gridded: torch.Tensor,
         weight_gridded: torch.Tensor,
         mask: torch.Tensor,
-        nchan: int = 1
+        nchan: int = 1,
     ) -> None:
         super().__init__()
 
         self.coords = coords
         self.nchan = nchan
 
-        # store variables as buffers of the module 
+        # store variables as buffers of the module
         self.register_buffer("vis_gridded", torch.tensor(vis_gridded))
         self.register_buffer("weight_gridded", torch.tensor(weight_gridded))
         self.register_buffer("mask", torch.tensor(mask))
+        self.vis_gridded: torch.Tensor
+        self.weight_gridded: torch.Tensor
+        self.mask: torch.Tensor
 
         # pre-index the values
         # note that these are *collapsed* across all channels
         # 1D array
-        self.register_buffer("vis_indexed" , self.vis_gridded[self.mask])
+        self.register_buffer("vis_indexed", self.vis_gridded[self.mask])
         self.register_buffer("weight_indexed", self.weight_gridded[self.mask])
+        self.vis_indexed: torch.Tensor
+        self.weight_indexed: torch.Tensor
 
     @classmethod
     def from_image_properties(
@@ -86,7 +92,7 @@ class GriddedDataset(torch.nn.Module):
             vis_gridded=vis_gridded,
             weight_gridded=weight_gridded,
             mask=mask,
-            nchan=nchan
+            nchan=nchan,
         )
 
     def add_mask(
@@ -97,7 +103,7 @@ class GriddedDataset(torch.nn.Module):
         Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
 
         Args:
-            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels. 
+            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels.
         """
 
         new_2D_mask = torch.Tensor(mask).detach()
@@ -124,13 +130,13 @@ class GriddedDataset(torch.nn.Module):
         Args:
             modelVisibilityCube (complex torch.tensor): with shape ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in output from :meth:`mpol.fourier.FourierCube.forward()`
 
-        Returns: 
-            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions. 
+        Returns:
+            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions.
         """
 
         assert (
-                modelVisibilityCube.size()[0] == self.mask.size()[0]
-            ), "vis and dataset mask do not have the same number of channels."
+            modelVisibilityCube.size()[0] == self.mask.size()[0]
+        ), "vis and dataset mask do not have the same number of channels."
 
         # As of Pytorch 1.7.0, complex numbers are partially supported.
         # However, masked_select does not yet work (with gradients)
