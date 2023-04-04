@@ -121,7 +121,7 @@ class TrainTest:
         ----------
         vis : torch.complex tensor
             Model visibility cube (see `mpol.fourier.FourierCube.forward`)
-        dataset : PyTorch dataset object
+        dataset : dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
         sky_cube : torch.double
             MPoL Ground Cube (see `mpol.utils.packed_cube_to_ground_cube`)
