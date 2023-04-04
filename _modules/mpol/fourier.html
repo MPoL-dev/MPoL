@@ -297,11 +297,19 @@ title="Source repository"
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.fft</span>  <span class="c1"># to avoid conflicts with old torch.fft *function*</span>
 <span class="kn">import</span> <span class="nn">torchkbnufft</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">complexfloating</span><span class="p">,</span> <span class="n">floating</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="kn">from</span> <span class="nn">mpol.exceptions</span> <span class="kn">import</span> <span class="n">DimensionMismatchError</span>
+<span class="kn">from</span> <span class="nn">mpol.images</span> <span class="kn">import</span> <span class="n">ImageCube</span>
+<span class="kn">from</span> <span class="nn">mpol.protocols</span> <span class="kn">import</span> <span class="n">MPoLModel</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">GridCoords</span>
@@ -312,34 +320,40 @@ title="Source repository"
 <span class="sd">    This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g., :class:`mpol.datasets.GriddedDataset`).</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        cell_size (float): the width of an image-plane pixel [arcseconds]</span>
-<span class="sd">        npix (int): the number of pixels per image side</span>
-<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class.</span>
 <span class="sd">        persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">persistent_vis</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span> <span class="n">persistent_vis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+        <span class="c1"># TODO: Is this comment relevant? There was no nchan instantiation</span>
+        <span class="c1"># before</span>
+        <span class="c1"># ---</span>
         <span class="c1"># we don&#39;t want to bother with the nchan argument here, so</span>
         <span class="c1"># we don&#39;t use the convenience method _setup_coords</span>
         <span class="c1"># and just do it manually</span>
-        <span class="k">if</span> <span class="n">coords</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="n">npix</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cell_size</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="p">),</span> <span class="s2">&quot;npix and cell_size must be empty if precomputed GridCoords are supplied.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
 
-        <span class="k">elif</span> <span class="n">npix</span> <span class="ow">or</span> <span class="n">cell_size</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="n">coords</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="p">),</span> <span class="s2">&quot;GridCoords must be empty if npix and cell_size are supplied.&quot;</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="o">=</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;vis&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="n">persistent_vis</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
-<div class="viewcode-block" id="FourierCube.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
+<div class="viewcode-block" id="FourierCube.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">persistent_vis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FourierCube</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alternative method for instantiating a FourierCube from ``cell_size``</span>
+<span class="sd">         and ``npix``</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cell_size (float): the width of an image-plane pixel [arcseconds]</span>
+<span class="sd">            npix (int): the number of pixels per image side</span>
+<span class="sd">            persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">persistent_vis</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FourierCube.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.FourierCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the FFT of the image cube on each channel.</span>
 
@@ -361,7 +375,7 @@ title="Source repository"
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vis</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ground_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_vis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The visibility cube in ground format cube fftshifted for plotting with ``imshow``.</span>
 
@@ -372,7 +386,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_ground_cube</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vis</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ground_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
@@ -382,7 +396,7 @@ title="Source repository"
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ground_vis</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ground_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ground_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.</span>
 
@@ -392,7 +406,13 @@ title="Source repository"
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ground_vis</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="safe_baseline_constant_meters"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_meters">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_meters</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<div class="viewcode-block" id="safe_baseline_constant_meters"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_meters">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_meters</span><span class="p">(</span>
+    <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">freqs</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+    <span class="n">uv_cell_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.</span>
 
@@ -434,13 +454,18 @@ title="Source repository"
     <span class="n">uv_diff</span> <span class="o">=</span> <span class="n">uv_max</span> <span class="o">-</span> <span class="n">uv_min</span>
 
     <span class="c1"># find maximum of that</span>
-    <span class="n">max_diff</span> <span class="o">=</span> <span class="n">uv_diff</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">max_diff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uv_diff</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
     <span class="c1"># compare to uv_cell_frac</span>
     <span class="k">return</span> <span class="n">max_diff</span> <span class="o">&lt;</span> <span class="n">delta_uv</span></div>
 
 
-<div class="viewcode-block" id="safe_baseline_constant_kilolambda"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_kilolambda">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_kilolambda</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">uv_cell_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<div class="viewcode-block" id="safe_baseline_constant_kilolambda"><a class="viewcode-back" href="../../api.html#mpol.fourier.safe_baseline_constant_kilolambda">[docs]</a><span class="k">def</span> <span class="nf">safe_baseline_constant_kilolambda</span><span class="p">(</span>
+    <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+    <span class="n">uv_cell_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.</span>
 
@@ -472,7 +497,7 @@ title="Source repository"
     <span class="n">uv_diff</span> <span class="o">=</span> <span class="n">uv_max</span> <span class="o">-</span> <span class="n">uv_min</span>
 
     <span class="c1"># find maximum of that</span>
-    <span class="n">max_diff</span> <span class="o">=</span> <span class="n">uv_diff</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">max_diff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uv_diff</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
     <span class="c1"># compare to uv_cell_frac</span>
     <span class="k">return</span> <span class="n">max_diff</span> <span class="o">&lt;</span> <span class="n">delta_uv</span></div>
@@ -513,56 +538,67 @@ title="Source repository"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+        <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">sparse_matrices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">same_uv</span> <span class="o">:=</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">vv</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sparse_matrices</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Provided uu and vv arrays are multi-dimensional, suggesting an &quot;</span>
+                <span class="s2">&quot;intent to parallelize using the &#39;batch&#39; dimension. This feature &quot;</span>
+                <span class="s2">&quot;is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix &quot;</span>
+                <span class="s2">&quot;interpolation (sparse_matrices=True), therefore we are proceeding &quot;</span>
+                <span class="s2">&quot;with table interpolation (sparse_matrices=False).&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_mat</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="n">sparse_matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span> <span class="o">=</span> <span class="n">same_uv</span>
 
         <span class="c1"># initialize the non-uniform FFT object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">KbNufft</span><span class="p">(</span>
             <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">uu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;k_traj&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_ktraj</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;uu and vv are required arguments.&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="n">sparse_matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;k_traj&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_ktraj</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span><span class="p">:</span>
-                <span class="c1"># precompute the sparse interpolation matrices</span>
-                <span class="n">real_interp_mat</span><span class="p">,</span> <span class="n">imag_interp_mat</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">calc_tensor_spmatrix</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span> <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;real_interp_mat&quot;</span><span class="p">,</span> <span class="n">real_interp_mat</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;imag_interp_mat&quot;</span><span class="p">,</span> <span class="n">imag_interp_mat</span><span class="p">)</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="kn">import</span> <span class="nn">warnings</span>
-
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the &#39;batch&#39; dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).&quot;</span><span class="p">,</span>
-                    <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">interp_mats</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># precompute the sparse interpolation matrices</span>
+            <span class="n">real_interp_mat</span><span class="p">,</span> <span class="n">imag_interp_mat</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">calc_tensor_spmatrix</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span> <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;real_interp_mat&quot;</span><span class="p">,</span> <span class="n">real_interp_mat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;imag_interp_mat&quot;</span><span class="p">,</span> <span class="n">imag_interp_mat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">sparse_matrices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NuFFT</span><span class="p">:</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
 
 <span class="sd">        These concepts can be a little confusing because there are two angular measures at play.</span>
@@ -593,7 +629,9 @@ title="Source repository"
 
         <span class="k">return</span> <span class="n">u_rad_per_pix</span>
 
-    <span class="k">def</span> <span class="nf">_assemble_ktraj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_assemble_ktraj</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.</span>
 
@@ -611,10 +649,11 @@ title="Source repository"
         <span class="n">uu_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
         <span class="n">vv_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
 
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+
         <span class="c1"># if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.</span>
         <span class="c1"># otherwise, we assume that we will parallelize across the batch dimension.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uu</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span><span class="p">:</span>
             <span class="c1"># k-trajectory needs to be packed the way the image is packed (y,x), so</span>
             <span class="c1"># the trajectory needs to be packed (v, u)</span>
@@ -622,33 +661,32 @@ title="Source repository"
             <span class="c1"># that the k-traj is the same for all coils/channels.</span>
             <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
             <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vv_radpix</span><span class="p">,</span> <span class="n">uu_radpix</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">k_traj</span>
 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># in this case, we are given two tensors of shape (nchan, nvis)</span>
-            <span class="c1"># first, augment each tensor individually to create a (nbatch, 1, nvis) tensor</span>
-            <span class="c1"># then, concatenate the tensors along the axis=1 dimension.</span>
+        <span class="c1"># in this case, we are given two tensors of shape (nchan, nvis)</span>
+        <span class="c1"># first, augment each tensor individually to create a (nbatch, 1, nvis) tensor</span>
+        <span class="c1"># then, concatenate the tensors along the axis=1 dimension.</span>
 
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
-            <span class="p">),</span> <span class="s2">&quot;nchan of uu (</span><span class="si">{:}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{:}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
-            <span class="p">)</span>
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
-            <span class="p">),</span> <span class="s2">&quot;nchan of vv (</span><span class="si">{:}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{:}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
+        <span class="k">if</span> <span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of uu (</span><span class="si">{</span><span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="p">)</span>
 
-            <span class="n">uu_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">vv_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of vv (</span><span class="si">{</span><span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
 
-            <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
-            <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">vv_radpix_aug</span><span class="p">,</span> <span class="n">uu_radpix_aug</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension</span>
+        <span class="n">uu_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">vv_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
+        <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">vv_radpix_aug</span><span class="p">,</span> <span class="n">uu_radpix_aug</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension</span>
 
         <span class="k">return</span> <span class="n">k_traj</span>
 
-<div class="viewcode-block" id="NuFFT.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
+<div class="viewcode-block" id="NuFFT.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.</span>
 
@@ -659,12 +697,12 @@ title="Source repository"
 <span class="sd">            torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># make sure that the nchan assumptions for the ImageCube and the NuFFT setup are the same</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">cube</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
-        <span class="p">),</span> <span class="s2">&quot;nchan of ImageCube (</span><span class="si">{:}</span><span class="s2">) is different than that used to initialize NuFFT layer (</span><span class="si">{:}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">cube</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span>
-        <span class="p">)</span>
+        <span class="c1"># make sure that the nchan assumptions for the ImageCube and the NuFFT</span>
+        <span class="c1"># setup are the same</span>
+        <span class="k">if</span> <span class="n">cube</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of ImageCube (</span><span class="si">{</span><span class="n">cube</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">) is different than that used to initialize NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># &quot;unpack&quot; the cube, but leave it flipped</span>
         <span class="c1"># NuFFT routine expects a &quot;normal&quot; cube, not an fftshifted one</span>
@@ -673,39 +711,50 @@ title="Source repository"
         <span class="c1"># convert the cube to a complex type, since this is required by TorchKbNufft</span>
         <span class="n">complexed</span> <span class="o">=</span> <span class="n">shifted</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
 
-        <span class="c1"># Consider how the similarity of the spatial frequency samples should be treated. We already took care of this on the k_traj side, since we set the shapes. But this also needs to be taken care of on the image side.</span>
-        <span class="c1">#   * If we plan to parallelize using the batch dimension, then we need an image with shape (nchan, 1, npix, npix).</span>
-        <span class="c1">#   * If we plan to parallelize with the coil dimension, then we need an image with shape (1, nchan, npix, npix).</span>
+        <span class="c1"># Consider how the similarity of the spatial frequency samples should be</span>
+        <span class="c1"># treated. We already took care of this on the k_traj side, since we set</span>
+        <span class="c1"># the shapes. But this also needs to be taken care of on the image side.</span>
+        <span class="c1">#   * If we plan to parallelize with the coil dimension, then we need an</span>
+        <span class="c1">#     image with shape (1, nchan, npix, npix).</span>
+        <span class="c1">#   * If we plan to parallelize using the batch dimension, then we need</span>
+        <span class="c1">#     an image with shape (nchan, 1, npix, npix).</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span><span class="p">:</span>
-            <span class="c1"># expand the cube to include a batch dimension</span>
-            <span class="n">expanded</span> <span class="o">=</span> <span class="n">complexed</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="c1"># now [1, nchan, npix, npix] shape</span>
+            <span class="c1"># we want to unsqueeze/squeeze at dim=0 to parallelize over the coil</span>
+            <span class="c1"># dimension</span>
+            <span class="c1"># unsquezee shape: [1, nchan, npix, npix]</span>
+            <span class="n">altered_dimension</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">expanded</span> <span class="o">=</span> <span class="n">complexed</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="c1"># now [nchan, 1, npix, npix] shape</span>
+            <span class="c1"># we want to unsqueeze/squeeze at dim=1 to parallelize over the</span>
+            <span class="c1"># batch dimension</span>
+            <span class="c1"># unsquezee shape: [nchan, 1, npix, npix]</span>
+            <span class="n">altered_dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">expanded</span> <span class="o">=</span> <span class="n">complexed</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">altered_dimension</span><span class="p">)</span>
 
         <span class="c1"># torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span>
-                <span class="n">expanded</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span>
-                <span class="n">interp_mats</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span>
+            <span class="n">expanded</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">,</span>
+            <span class="n">interp_mats</span><span class="o">=</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span><span class="p">:</span>
-            <span class="c1"># nchan took on the ncoil position, so remove the nbatch dimension</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># nchan took on the nbatch position, so remove the ncoil dimension</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># squeezed shape: [nchan, npix, npix]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">altered_dimension</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output</span></div></div>
 
 
-<div class="viewcode-block" id="make_fake_data"><a class="viewcode-back" href="../../api.html#mpol.fourier.make_fake_data">[docs]</a><span class="k">def</span> <span class="nf">make_fake_data</span><span class="p">(</span><span class="n">imageCube</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+<div class="viewcode-block" id="make_fake_data"><a class="viewcode-back" href="../../api.html#mpol.fourier.make_fake_data">[docs]</a><span class="k">def</span> <span class="nf">make_fake_data</span><span class="p">(</span>
+    <span class="n">image_cube</span><span class="p">:</span> <span class="n">ImageCube</span><span class="p">,</span>
+    <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">weight</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.</span>
 
@@ -723,7 +772,7 @@ title="Source repository"
 
     <span class="c1"># instantiate a NuFFT object based on the ImageCube</span>
     <span class="c1"># OK if uu shape (nvis,)</span>
-    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">imageCube</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">imageCube</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
+    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
 
     <span class="c1"># make into a multi-channel dataset, even if only a single-channel provided</span>
     <span class="k">if</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -732,7 +781,8 @@ title="Source repository"
         <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
 
     <span class="c1"># carry it forward to the visibilities, which will be (nchan, nvis)</span>
-    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">imageCube</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">vis_noiseless</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">image_cube</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
     <span class="c1"># generate complex noise</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
@@ -746,27 +796,33 @@ title="Source repository"
     <span class="k">return</span> <span class="n">vis_noise</span><span class="p">,</span> <span class="n">vis_noiseless</span></div>
 
 
-<div class="viewcode-block" id="get_vis_residuals"><a class="viewcode-back" href="../../api.html#mpol.fourier.get_vis_residuals">[docs]</a><span class="k">def</span> <span class="nf">get_vis_residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">u_true</span><span class="p">,</span> <span class="n">v_true</span><span class="p">,</span> <span class="n">V_true</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="get_vis_residuals"><a class="viewcode-back" href="../../api.html#mpol.fourier.get_vis_residuals">[docs]</a><span class="k">def</span> <span class="nf">get_vis_residuals</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">MPoLModel</span><span class="p">,</span>
+    <span class="n">u_true</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">v_true</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">V_true</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose </span>
+<span class="sd">    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose</span>
 <span class="sd">    (ungridded) data visiblities at data (u, v) coordinates</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model : `torch.nn.Module` object</span>
-<span class="sd">        Instance of the `mpol.precomposed.SimpleNet` class. Contains model </span>
+<span class="sd">        Instance of the `mpol.precomposed.SimpleNet` class. Contains model</span>
 <span class="sd">        visibilities.</span>
 <span class="sd">    u_true, v_true : array, unit=[k\lambda]</span>
 <span class="sd">        Data u- and v-coordinates</span>
 <span class="sd">    V_true : array, unit=[Jy]</span>
-<span class="sd">        Data visibility amplitudes </span>
+<span class="sd">        Data visibility amplitudes</span>
 <span class="sd">    channel : int, default=0</span>
 <span class="sd">        Channel (of `model`) to use to calculate residual visibilities</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    vis_resid : array of complex</span>
-<span class="sd">        Model loose residual visibility amplitudes of the form </span>
+<span class="sd">        Model loose residual visibility amplitudes of the form</span>
 <span class="sd">        Re(V) + 1j * Im(V)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">u_true</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">v_true</span><span class="p">)</span>
@@ -775,6 +831,7 @@ title="Source repository"
     <span class="c1"># convert to numpy, select channel</span>
     <span class="n">vis_model</span> <span class="o">=</span> <span class="n">vis_model</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="n">channel</span><span class="p">]</span>
 
+    <span class="n">vis_resid</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="n">vis_resid</span> <span class="o">=</span> <span class="n">V_true</span> <span class="o">-</span> <span class="n">vis_model</span>
 
     <span class="k">return</span> <span class="n">vis_resid</span></div>
