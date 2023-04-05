@@ -78,6 +78,9 @@ class GridCoords:
         # max u or v freq supported by current grid
         self.max_grid = get_max_spatial_freq(cell_size, npix)
 
+    def __repr__(self):
+        return f"GridCoords(cell_size={self.cell_size:.2e}, npix={self.npix})"
+
     @property
     def cell_size(self) -> float:
         return self._cell_size

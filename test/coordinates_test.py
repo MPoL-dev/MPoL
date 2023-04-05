@@ -75,7 +75,9 @@ def test_grid_coords_plot_2D_uvq_packed(tmp_path):
 
 
 def test_grid_coords_odd_fail():
-    with pytest.raises(ValueError, match="Image must have an even number of pixels."):
+    with pytest.raises(
+        ValueError, match="Image must have a positive and even number of pixels."
+    ):
         coordinates.GridCoords(cell_size=0.01, npix=511)
 
 
