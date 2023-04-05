@@ -139,7 +139,7 @@ class CrossValidate:
 
         Parameters
         ----------
-        dataset : PyTorch dataset object
+        dataset : dataset object
             Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------

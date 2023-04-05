@@ -248,7 +248,6 @@ import torch
 from torch import nn
 from mpol import geometry, gridding, images, fourier, utils
 from mpol.constants import deg
-from mpol.datasets import index_vis
 
 import pyro
 import pyro.distributions as dist
@@ -559,15 +558,13 @@ class VisibilityModel(PyroModule):
             data_im=np.imag(data),
         )
         
-        dset = averager.to_pytorch_dataset()
+        self.dataset = averager.to_pytorch_dataset()
         
         # extract relevant quantities
-        self.data_re = torch.as_tensor(np.real(dset.vis_indexed).flatten(), device=device)
-        self.data_im = torch.as_tensor(np.imag(dset.vis_indexed).flatten(), device=device)
-        self.sigma = torch.as_tensor(np.sqrt(1 / dset.weight_indexed).flatten(), device=device)
-
-        self.dataset = dset.to(device)
-
+        self.data_re = torch.as_tensor(np.real(self.dataset.vis_indexed).flatten(), device=device)
+        self.data_im = torch.as_tensor(np.imag(self.dataset.vis_indexed).flatten(), device=device)
+        self.sigma = torch.as_tensor(np.sqrt(1 / self.dataset.weight_indexed).flatten(), device=device)
+        
         # objects for forward loop
         self.icube = images.ImageCube(
             coords=self.coords, nchan=self.nchan, passthrough=True
@@ -605,10 +602,10 @@ class VisibilityModel(PyroModule):
             # evaluate the likelihood
             
             # use the FourierCube layer to get a gridded model
-            full_vis = self.flayer(img)
+            modelVisibilityCube = self.flayer(img)
 
             # extract the model visibilities corresponding to the gridded data
-            vis = index_vis(full_vis, self.dataset).flatten()
+            vis = self.dataset(modelVisibilityCube).flatten()
 
             with pyro.plate("data", len(self.data_re)):
                 # condition on the real and imaginaries of the data independently
