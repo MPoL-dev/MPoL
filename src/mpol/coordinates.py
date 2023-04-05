@@ -64,8 +64,8 @@ class GridCoords:
         self._npix = npix
 
         # Image related
-        self._dimage = self.cell_size * const.arcsec  # [radians]
-        self._image_centers = self._dimage * np.arange(npix) - npix // 2
+        self._dimage = cell_size * const.arcsec  # [radians]
+        self._image_centers = self._dimage * (np.arange(npix) - npix // 2)
 
         # Frequency related
         # These properties are identical for both u & v and defined here

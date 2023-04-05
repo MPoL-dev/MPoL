@@ -104,3 +104,20 @@ def test_grid_coords_fail(mock_visibility_data):
 
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
+
+
+def test_tile_vs_meshgrid_implementation():
+    coords = coordinates.GridCoords(cell_size=0.05, npix=800)
+
+    x_centers_2d, y_centers_2d = np.meshgrid(
+        coords.l_centers / arcsec, coords.m_centers / arcsec, indexing="xy"
+    )
+
+    sky_u_centers_2D, sky_v_centers_2D = np.meshgrid(
+        coords.u_centers, coords.v_centers, indexing="xy"
+    )
+
+    assert np.all(coords.sky_u_centers_2D == sky_u_centers_2D)
+    assert np.all(coords.sky_v_centers_2D == sky_v_centers_2D)
+    assert np.all(coords.x_centers_2D == x_centers_2d)
+    assert np.all(coords.y_centers_2D == y_centers_2d)
