@@ -70,7 +70,7 @@ class GridCoords:
         # Frequency related
         # These properties are identical for both u & v and defined here
         self._df = 1 / (npix * self._dimage) * 1e-3  # [kλ]
-        self._f_edges = self._dimage * (np.arange(npix + 1) - npix // 2 - 0.5)  # [kλ]
+        self._f_edges = self._df * (np.arange(npix + 1) - npix // 2 - 0.5)  # [kλ]
         self._f_centers = self._df * (np.arange(npix) - npix // 2)
         self._min_f = float(self._f_edges.min())
         self._max_f = float(self._f_edges.max())

@@ -8,7 +8,7 @@ from mpol.constants import *
 
 
 def test_odd_npix():
-    expected_error_message = "Image must have an even number of pixels."
+    expected_error_message = "Image must have a positive and even number of pixels."
 
     with pytest.raises(ValueError, match=expected_error_message):
         images.BaseCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
@@ -189,7 +189,8 @@ def test_multi_chan_conv(coords, tmp_path):
 
     conv_layer(test_cube)
 
+
 def test_image_flux(coords):
     nchan = 20
-    im = images.ImageCube(coords=coords, nchan=nchan)    
+    im = images.ImageCube(coords=coords, nchan=nchan)
     assert im.flux.size()[0] == nchan
