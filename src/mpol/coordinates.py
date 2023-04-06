@@ -178,6 +178,7 @@ class GridCoords:
     def sky_u_centers_2D(self) -> NDArray[floating[Any]]:
         # only useful for plotting a sky_vis
         # uu increasing, no fftshift
+        # tile replicates the 1D u_centers array to a 2D array the size of the full UV grid
         return np.tile(self.u_centers, (self.ncell_u, 1))
 
     @cached_property
