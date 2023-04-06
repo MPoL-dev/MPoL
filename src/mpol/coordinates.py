@@ -64,19 +64,20 @@ class GridCoords:
         self._npix = npix
 
         # Image related
-        self._dimage = cell_size * const.arcsec  # [radians]
-        self._image_centers = self._dimage * (np.arange(npix) - npix // 2)
+        self._image_pixel_width = cell_size * const.arcsec  # [radians]
+        self._image_centers = self._image_pixel_width * (np.arange(npix) - npix // 2)
 
-        # Frequency related
+        # Spatial frequency related
         # These properties are identical for both u & v and defined here
-        self._df = 1 / (npix * self._dimage) * 1e-3  # [kλ]
-        self._f_edges = self._df * (np.arange(npix + 1) - npix // 2 - 0.5)  # [kλ]
-        self._f_centers = self._df * (np.arange(npix) - npix // 2)
-        self._min_f = float(self._f_edges.min())
-        self._max_f = float(self._f_edges.max())
+        # All units in [kλ]
+        self._uv_pixel_width = 1 / (npix * self._image_pixel_width) * 1e-3
+        self.uv_edges = self._uv_pixel_width * (np.arange(npix + 1) - npix // 2 - 0.5)
+        self._uv_centers = self._uv_pixel_width * (np.arange(npix) - npix // 2)
+        self._min_uv = float(self.uv_edges.min())
+        self._max_uv = float(self.uv_edges.max())
 
         # max u or v freq supported by current grid
-        self.max_grid = get_max_spatial_freq(cell_size, npix)
+        self.max_uv_grid_value = get_max_spatial_freq(cell_size, npix)
 
     def __repr__(self):
         return f"GridCoords(cell_size={self.cell_size:.2e}, npix={self.npix})"
@@ -91,11 +92,11 @@ class GridCoords:
 
     @property
     def dl(self) -> float:
-        return self._dimage  # [radians]
+        return self._image_pixel_width  # [radians]
 
     @property
     def dm(self) -> float:
-        return self._dimage  # [radians]
+        return self._image_pixel_width  # [radians]
 
     @property
     def l_centers(self) -> NDArray[floating[Any]]:
@@ -115,43 +116,43 @@ class GridCoords:
 
     @property
     def du(self) -> float:
-        return self._df
+        return self._uv_pixel_width
 
     @property
     def dv(self) -> float:
-        return self._df
+        return self._uv_pixel_width
 
     @property
     def u_edges(self) -> NDArray[floating[Any]]:
-        return self._f_edges
+        return self.uv_edges
 
     @property
     def v_edges(self) -> NDArray[floating[Any]]:
-        return self._f_edges
+        return self.uv_edges
 
     @property
     def u_centers(self) -> NDArray[floating[Any]]:
-        return self._f_centers
+        return self._uv_centers
 
     @property
     def v_centers(self) -> NDArray[floating[Any]]:
-        return self._f_centers
+        return self._uv_centers
 
     @property
     def u_bin_min(self) -> float:
-        return self._min_f
+        return self._min_uv
 
     @property
     def v_bin_min(self) -> float:
-        return self._min_f
+        return self._min_uv
 
     @property
     def u_bin_max(self) -> float:
-        return self._max_f
+        return self._max_uv
 
     @property
     def v_bin_max(self) -> float:
-        return self._max_f
+        return self._max_uv
 
     @property
     def img_ext(self) -> list[float]:
@@ -270,14 +271,14 @@ class GridCoords:
         # max freq needed to support dataset
         max_cell_size = get_maximum_cell_size(max_uu_vv)
 
-        if np.abs(uu).max() > self.max_grid:
+        if np.abs(uu).max() > self.max_uv_grid_value:
             raise CellSizeError(
                 "Dataset contains uu spatial frequency measurements larger "
                 "than those in the proposed model image. "
                 f"Decrease cell_size below {max_cell_size} arcsec."
             )
 
-        if np.abs(vv).max() > self.max_grid:
+        if np.abs(vv).max() > self.max_uv_grid_value:
             raise CellSizeError(
                 "Dataset contains vv spatial frequency measurements larger "
                 "than those in the proposed model image. "

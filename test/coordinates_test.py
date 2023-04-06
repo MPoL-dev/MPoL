@@ -100,7 +100,7 @@ def test_grid_coords_fail(mock_visibility_data):
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     print("max u data", np.max(uu))
-    print("max u grid", coords.max_grid)
+    print("max u grid", coords.max_uv_grid_value)
 
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
