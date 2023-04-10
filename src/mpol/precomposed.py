@@ -2,7 +2,7 @@ import torch
 
 from mpol.coordinates import GridCoords
 
-from . import fourier, images
+from . import fourier, images, primary_beam
 
 
 class SimpleNet(torch.nn.Module):
@@ -56,7 +56,7 @@ class SimpleNet(torch.nn.Module):
             coords=self.coords, nchan=self.nchan, passthrough=True
         )
 
-        self.pbcube = images.PrimaryBeamCube(
+        self.pbcube = primary_beam.PrimaryBeamCube(
             coords = self.coords,
             nchan=self.nchan,
             chan_freqs=chan_freqs,

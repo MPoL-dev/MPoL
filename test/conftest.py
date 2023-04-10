@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from astropy.utils.data import download_file
+import torch
 
 from mpol import coordinates, gridding
 
@@ -52,6 +53,14 @@ def mock_visibility_data_cont(mock_visibility_archive):
 def coords():
     return coordinates.GridCoords(cell_size=0.005, npix=800)
 
+
+@pytest.fixture
+def unit_cube(coords):
+    nchan = 4
+    input_cube = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=1.0, dtype=torch.double
+    )
+    return input_cube
 
 @pytest.fixture
 def averager(mock_visibility_data, coords):

@@ -29,10 +29,6 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
             "Input data vectors should be either 1D or 2D numpy arrays."
         )
 
-    if freq is not None: # TODO: remove assertion
-        assert len(uu) == len(freq), "uu must have same number of channels as freq array."
-
-
     if not all(array.shape == uu.shape for array in [vv, weight, data_re, data_im]):
         raise WrongDimensionError(
             "All dataset inputs must be the same input shape and size."
@@ -626,7 +622,7 @@ class DirtyImager(GridderBase):
     ):
         # check everything should be 2d, expand if not
         # also checks data does not contain Hermitian pairs
-        uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
+        uu, vv, weight, data_re, data_im, freq = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
 
