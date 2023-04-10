@@ -1,9 +1,7 @@
 name: package test
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
-  push:
+  pull_request:
 
 jobs:
   dl_files:

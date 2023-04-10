@@ -5,8 +5,6 @@ name: docs test
 on:
   pull_request:
     types: [review_requested, closed]
-  pull_request_target:
-    types: [review_requested, closed]
 
 # Prevent multiple PRs from building/deploying the docs at the same time
 concurrency:

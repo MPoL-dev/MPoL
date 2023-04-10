@@ -6,7 +6,7 @@ from mpol import datasets, fourier, images
 from mpol.constants import *
 
 
-def test_index_vis(coords, dataset):
+def test_index(coords, dataset):
     # test that we can index a dataset
 
     flayer = fourier.FourierCube(coords=coords)
@@ -29,11 +29,11 @@ def test_index_vis(coords, dataset):
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
-    # produce model visibilities
-    vis = flayer(imagecube(basecube()))
+    # produce dense model visibility cube
+    modelVisibilityCube = flayer(imagecube(basecube()))
 
     # take a basecube, imagecube, and GriddedDataset and predict corresponding visibilities.
-    datasets.index_vis(vis, dataset)
+    dataset(modelVisibilityCube)
 
 
 def test_connector_grad(coords, dataset):
@@ -45,8 +45,8 @@ def test_connector_grad(coords, dataset):
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
     # produce model visibilities
-    vis = flayer(imagecube(basecube()))
-    samples = datasets.index_vis(vis, dataset)
+    modelVisibilityCube = flayer(imagecube(basecube()))
+    samples = dataset(modelVisibilityCube)
 
     print(samples)
     loss = torch.sum(torch.abs(samples))
