@@ -54,10 +54,11 @@ def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
     # model (u,v) coordinates [k\lambda]
     uu, vv = coords.sky_u_centers_2D, coords.sky_v_centers_2D
 
-    from frank.geometry import FixedGeometry
-    geom_frank = FixedGeometry(geom["incl"], geom["Omega"], geom["dRA"], geom["dDec"])  # TODO: signs
-    # phase-shift the model visibilities and deproject the model (u,v) points
-    up, vp, Vp = geom_frank.apply_correction(uu.ravel() * 1e3, vv.ravel() * 1e3, V.ravel())
+    from frank.geometry import apply_phase_shift, deproject
+    # phase-shift the model visibilities
+    Vp = apply_phase_shift(uu.ravel() * 1e3, vv.ravel() * 1e3, V.ravel(), geom["dRA"], geom["dDec"], inverse=True)
+    # deproject the model (u,v) points
+    up, vp, _ = deproject(uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], geom["Omega"])
 
     # if the source is optically thick, rescale the deprojected Re(V)
     if rescale_flux: 
@@ -66,16 +67,15 @@ def get_1d_vis_profile(V, coords, geom, rescale_flux=True, bins=None):
     # convert back to [k\lambda]
     up /= 1e3
     vp /= 1e3
-
     qq = np.hypot(up, vp) 
 
     if bins is None:
         step = np.hypot(coords.du, coords.dv)
         bins = np.arange(0.0, max(qq), step)
 
-    # get number of points in each radial bin
+    # number of points in radial bins
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
-    # get radial vis amplitudes
+    # V amplitudes in radial bins
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
     Vs /= bin_counts
     
@@ -144,9 +144,9 @@ def get_1d_image_profile(image, coords, geom, bins=None, rescale_flux=True):
         step = np.hypot(coords.cell_size, coords.cell_size)
         bins = np.arange(0.0, max(rr), step)
 
-    # get number of points in each radial bin
+    # number of points in radial bins
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
-    # get radial brightness
+    # brightness in radial bins
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
     Is /= bin_counts
 
