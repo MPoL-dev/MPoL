@@ -286,7 +286,7 @@ def get_optimal_image_properties(image_width, u, v):
     For an image of desired width, determine the maximum pixel size that
     ensures Nyquist sampling of the provided spatial frequency points, and the 
     corresponding number of pixels to obtain the desired image width.
-    
+
     Parameters
     ----------
     image_width : float, unit = arcsec
@@ -294,7 +294,7 @@ def get_optimal_image_properties(image_width, u, v):
         `image_width` :math:`\times` `image_width`).
     u, v : float or array, unit = :math:`k\lambda`
         `u` and `v` spatial frequency points. 
-        
+
     Returns
     -------
     cell_size : float, unit = arcsec
