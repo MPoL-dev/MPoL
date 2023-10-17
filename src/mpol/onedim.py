@@ -6,7 +6,7 @@ from mpol.utils import torch2npy
 def radialV(V, coords, geom, rescale_flux, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
-    image-domain model. 
+    image. 
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
                 Phase center offset in right ascension. Positive is west of north. 
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination
-    rescale_flux : bool, default=True 
+    rescale_flux : bool
         If True, the visibility amplitudes and weights are rescaled to account 
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
@@ -50,7 +50,7 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
 
-    # model (u,v) coordinates [k\lambda]
+    # projected model (u,v) coordinates [k\lambda]
     uu, vv = coords.sky_u_centers_2D, coords.sky_v_centers_2D
 
     from frank.geometry import apply_phase_shift, deproject
@@ -59,7 +59,7 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
     # deproject the model (u,v) points
     up, vp, _ = deproject(uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], geom["Omega"])
 
-    # if the source is optically thick, rescale the deprojected Re(V)
+    # if the source is optically thick, rescale the deprojected V(q)
     if rescale_flux: 
         Vp.real /= np.cos(geom["incl"] * np.pi / 180)
 
