@@ -9,6 +9,40 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
 
     Parameters
     ----------
+    image : array
+        2D image array 
+    coords : `mpol.coordinates.GridCoords` object
+        Instance of the `mpol.coordinates.GridCoords` class
+    geom : dict 
+        Dictionary of source geometry. Keys:
+            "incl" : float, unit=[deg]
+                Inclination 
+            "Omega" : float, unit=[deg]
+                Position angle of the ascending node 
+            "omega" : float, unit=[deg]
+                Argument of periastron
+            "dRA" : float, unit=[arcsec]
+                Phase center offset in right ascension. Positive is west of north.
+            "dDec" : float, unit=[arcsec]
+                Phase center offset in declination.
+    rescale_flux : bool
+        If True, the brightness values are rescaled to account for the 
+        difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit. 
+    bins : array, default=None, unit=[arcsec]
+        Radial bin edges to use in calculating I(r). If None, bins will span 
+        the full image, with widths equal to the hypotenuse of the pixels
+
+    Returns
+    -------
+    bin_centers : array, unit=[arcsec]
+        Radial coordinates of image at center of `bins`
+    Is : array, unit=[Jy / arcsec^2] (if `image` has these units)
+        Azimuthally averaged pixel brightness at `rs`
+    """
 
 def radialV(V, coords, geom, rescale_flux, bins=None):
     r"""
