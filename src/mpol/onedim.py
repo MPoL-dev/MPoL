@@ -3,6 +3,13 @@ import numpy as np
 from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
+def radialI(image, coords, geom, rescale_flux, bins=None):
+    r"""
+    Obtain a 1D (radial) brightness profile I(r) from an image.
+
+    Parameters
+    ----------
+
 def radialV(V, coords, geom, rescale_flux, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
