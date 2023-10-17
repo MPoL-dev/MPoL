@@ -2,11 +2,19 @@ r"""The ``fourier`` module provides the core functionality of MPoL via :class:`m
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
+from numpy import complexfloating, floating
+from numpy.typing import NDArray
 from torch import nn
+
+from mpol.exceptions import DimensionMismatchError
+from mpol.images import ImageCube
+from mpol.protocols import MPoLModel
 
 from . import utils
 from .coordinates import GridCoords
@@ -17,34 +25,40 @@ class FourierCube(nn.Module):
     This layer performs the FFT of an ImageCube and stores the corresponding dense FFT output as a cube. If you are using this layer in a forward-modeling RML workflow, because the FFT of the model is essentially stored as a grid, you will need to make the loss function calculation using a gridded loss function (e.g., :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g., :class:`mpol.datasets.GriddedDataset`).
 
     Args:
-        cell_size (float): the width of an image-plane pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        coords (GridCoords): an object already instantiated from the GridCoords class.
         persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
     """
 
-    def __init__(self, cell_size=None, npix=None, coords=None, persistent_vis=False):
+    def __init__(self, coords: GridCoords, persistent_vis: bool = False):
         super().__init__()
 
+        # TODO: Is this comment relevant? There was no nchan instantiation
+        # before
+        # ---
         # we don't want to bother with the nchan argument here, so
         # we don't use the convenience method _setup_coords
         # and just do it manually
-        if coords:
-            assert (
-                npix is None and cell_size is None
-            ), "npix and cell_size must be empty if precomputed GridCoords are supplied."
-            self.coords = coords
 
-        elif npix or cell_size:
-            assert (
-                coords is None
-            ), "GridCoords must be empty if npix and cell_size are supplied."
-
-            self.coords = GridCoords(cell_size=cell_size, npix=npix)
+        self.coords = coords
 
         self.register_buffer("vis", None, persistent=persistent_vis)
+        self.vis: torch.Tensor
 
-    def forward(self, cube):
+    @classmethod
+    def from_image_properties(
+        cls, cell_size: float, npix: int, persistent_vis: bool = False
+    ) -> FourierCube:
+        r"""Alternative method for instantiating a FourierCube from ``cell_size``
+         and ``npix``
+        Args:
+            cell_size (float): the width of an image-plane pixel [arcseconds]
+            npix (int): the number of pixels per image side
+            persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
+        """
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, persistent_vis)
+
+    def forward(self, cube: torch.Tensor) -> torch.Tensor:
         """
         Perform the FFT of the image cube on each channel.
 
@@ -66,7 +80,7 @@ class FourierCube(nn.Module):
         return self.vis
 
     @property
-    def ground_vis(self):
+    def ground_vis(self) -> torch.Tensor:
         r"""
         The visibility cube in ground format cube fftshifted for plotting with ``imshow``.
 
@@ -77,7 +91,7 @@ class FourierCube(nn.Module):
         return utils.packed_cube_to_ground_cube(self.vis)
 
     @property
-    def ground_amp(self):
+    def ground_amp(self) -> torch.Tensor:
         r"""
         The amplitude of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
@@ -87,7 +101,7 @@ class FourierCube(nn.Module):
         return torch.abs(self.ground_vis)
 
     @property
-    def ground_phase(self):
+    def ground_phase(self) -> torch.Tensor:
         r"""
         The phase of the cube, arranged in unpacked format corresponding to the FFT of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
@@ -97,7 +111,13 @@ class FourierCube(nn.Module):
         return torch.angle(self.ground_vis)
 
 
-def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
+def safe_baseline_constant_meters(
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    freqs: NDArray[floating[Any]],
+    coords: GridCoords,
+    uv_cell_frac: float = 0.05,
+) -> bool:
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel when they converted from meters to units of kilolambda.
 
@@ -139,13 +159,18 @@ def safe_baseline_constant_meters(uu, vv, freqs, coords, uv_cell_frac=0.05):
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = uv_diff.max()
+    max_diff: float = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
 
 
-def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
+def safe_baseline_constant_kilolambda(
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    coords: GridCoords,
+    uv_cell_frac: float = 0.05,
+) -> bool:
     r"""
     This routine determines whether the baselines can safely be assumed to be constant with channel, when the are represented in units of kilolambda.
 
@@ -177,7 +202,7 @@ def safe_baseline_constant_kilolambda(uu, vv, coords, uv_cell_frac=0.05):
     uv_diff = uv_max - uv_min
 
     # find maximum of that
-    max_diff = uv_diff.max()
+    max_diff: float = uv_diff.max()
 
     # compare to uv_cell_frac
     return max_diff < delta_uv
@@ -218,56 +243,67 @@ class NuFFT(nn.Module):
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        uu=None,
-        vv=None,
-        sparse_matrices=True,
+        coords: GridCoords,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
     ):
         super().__init__()
 
+        if not (same_uv := uu.ndim == 1 and vv.ndim == 1) and sparse_matrices:
+            import warnings
+
+            warnings.warn(
+                "Provided uu and vv arrays are multi-dimensional, suggesting an "
+                "intent to parallelize using the 'batch' dimension. This feature "
+                "is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix "
+                "interpolation (sparse_matrices=True), therefore we are proceeding "
+                "with table interpolation (sparse_matrices=False).",
+                category=RuntimeWarning,
+            )
+            sparse_matrices = False
+            self.interp_mat = None
+
         self.coords = coords
         self.nchan = nchan
+        self.sparse_matrices = sparse_matrices
+        self.same_uv = same_uv
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
             im_size=(self.coords.npix, self.coords.npix)
         )
 
-        if (uu is not None) and (vv is not None):
-            self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
-        else:
-            raise ValueError("uu and vv are required arguments.")
-
-        self.sparse_matrices = sparse_matrices
+        self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
+        self.k_traj: torch.Tensor
 
         if self.sparse_matrices:
-            if self.same_uv:
-                # precompute the sparse interpolation matrices
-                real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
-                    self.k_traj, im_size=(self.coords.npix, self.coords.npix)
-                )
-                self.register_buffer("real_interp_mat", real_interp_mat)
-                self.register_buffer("imag_interp_mat", imag_interp_mat)
-
-            else:
-                import warnings
-
-                warnings.warn(
-                    "Provided uu and vv arrays are multi-dimensional, suggesting an intent to parallelize using the 'batch' dimension. This feature is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix interpolation (sparse_matrices=True), therefore we are proceeding with table interpolation (sparse_matrices=False).",
-                    category=RuntimeWarning,
-                )
-                self.interp_mats = None
-                self.sparse_matrices = False
+            # precompute the sparse interpolation matrices
+            real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
+                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
+            )
+            self.register_buffer("real_interp_mat", real_interp_mat)
+            self.register_buffer("imag_interp_mat", imag_interp_mat)
+            self.real_interp_mat: torch.Tensor
+            self.imag_interp_mat: torch.Tensor
 
     @classmethod
     def from_image_properties(
-        cls, cell_size, npix, nchan=1, uu=None, vv=None, sparse_matrices=True
+        cls,
+        cell_size: float,
+        npix: int,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
     ) -> NuFFT:
         coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, uu, vv, sparse_matrices)
+        return cls(coords, uu, vv, nchan, sparse_matrices)
 
-    def _klambda_to_radpix(self, klambda):
+    def _klambda_to_radpix(
+        self, klambda: float | NDArray[floating[Any]]
+    ) -> float | NDArray[floating[Any]]:
         """Convert a spatial frequency in units of klambda to 'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
 
         These concepts can be a little confusing because there are two angular measures at play.
@@ -298,7 +334,9 @@ class NuFFT(nn.Module):
 
         return u_rad_per_pix
 
-    def _assemble_ktraj(self, uu, vv):
+    def _assemble_ktraj(
+        self, uu: NDArray[floating[Any]], vv: NDArray[floating[Any]]
+    ) -> torch.Tensor:
         r"""
         This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.
 
@@ -316,10 +354,11 @@ class NuFFT(nn.Module):
         uu_radpix = self._klambda_to_radpix(uu)
         vv_radpix = self._klambda_to_radpix(vv)
 
+        assert isinstance(uu_radpix, np.ndarray)
+        assert isinstance(vv_radpix, np.ndarray)
+
         # if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.
         # otherwise, we assume that we will parallelize across the batch dimension.
-        self.same_uv = len(uu.shape) == 1
-
         if self.same_uv:
             # k-trajectory needs to be packed the way the image is packed (y,x), so
             # the trajectory needs to be packed (v, u)
@@ -327,33 +366,32 @@ class NuFFT(nn.Module):
             # that the k-traj is the same for all coils/channels.
             # interim convert to numpy array because of torch warning about speed
             k_traj = torch.tensor(np.array([vv_radpix, uu_radpix]))
+            return k_traj
 
-        else:
-            # in this case, we are given two tensors of shape (nchan, nvis)
-            # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
-            # then, concatenate the tensors along the axis=1 dimension.
+        # in this case, we are given two tensors of shape (nchan, nvis)
+        # first, augment each tensor individually to create a (nbatch, 1, nvis) tensor
+        # then, concatenate the tensors along the axis=1 dimension.
 
-            assert (
-                uu_radpix.shape[0] == self.nchan
-            ), "nchan of uu ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
-                uu_radpix.shape[0], self.nchan
-            )
-            assert (
-                vv_radpix.shape[0] == self.nchan
-            ), "nchan of vv ({:}) is more than one but different than that used to initialize the NuFFT layer ({:})".format(
-                vv_radpix.shape[0], self.nchan
+        if uu_radpix.shape[0] != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of uu ({uu_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
             )
 
-            uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
-            vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+        if vv_radpix.shape[0] != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of vv ({vv_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
+            )
 
-            # interim convert to numpy array because of torch warning about speed
-            k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], axis=1)
-            # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
+        uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
+        vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+
+        # interim convert to numpy array because of torch warning about speed
+        k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
+        # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
 
-    def forward(self, cube):
+    def forward(self, cube: torch.Tensor) -> torch.Tensor:
         r"""
         Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.
 
@@ -364,12 +402,12 @@ class NuFFT(nn.Module):
             torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.
         """
 
-        # make sure that the nchan assumptions for the ImageCube and the NuFFT setup are the same
-        assert (
-            cube.shape[0] == self.nchan
-        ), "nchan of ImageCube ({:}) is different than that used to initialize NuFFT layer ({:})".format(
-            cube.shape[0], self.nchan
-        )
+        # make sure that the nchan assumptions for the ImageCube and the NuFFT
+        # setup are the same
+        if cube.size(0) != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+            )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
@@ -378,39 +416,50 @@ class NuFFT(nn.Module):
         # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted.type(torch.complex128)
 
-        # Consider how the similarity of the spatial frequency samples should be treated. We already took care of this on the k_traj side, since we set the shapes. But this also needs to be taken care of on the image side.
-        #   * If we plan to parallelize using the batch dimension, then we need an image with shape (nchan, 1, npix, npix).
-        #   * If we plan to parallelize with the coil dimension, then we need an image with shape (1, nchan, npix, npix).
+        # Consider how the similarity of the spatial frequency samples should be
+        # treated. We already took care of this on the k_traj side, since we set
+        # the shapes. But this also needs to be taken care of on the image side.
+        #   * If we plan to parallelize with the coil dimension, then we need an
+        #     image with shape (1, nchan, npix, npix).
+        #   * If we plan to parallelize using the batch dimension, then we need
+        #     an image with shape (nchan, 1, npix, npix).
+
         if self.same_uv:
-            # expand the cube to include a batch dimension
-            expanded = complexed.unsqueeze(0)
-            # now [1, nchan, npix, npix] shape
+            # we want to unsqueeze/squeeze at dim=0 to parallelize over the coil
+            # dimension
+            # unsquezee shape: [1, nchan, npix, npix]
+            altered_dimension = 0
         else:
-            expanded = complexed.unsqueeze(1)
-            # now [nchan, 1, npix, npix] shape
+            # we want to unsqueeze/squeeze at dim=1 to parallelize over the
+            # batch dimension
+            # unsquezee shape: [nchan, 1, npix, npix]
+            altered_dimension = 1
+
+        expanded = complexed.unsqueeze(altered_dimension)
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
-        if self.sparse_matrices:
-            output = self.coords.cell_size**2 * self.nufft_ob(
-                expanded,
-                self.k_traj,
-                interp_mats=(self.real_interp_mat, self.imag_interp_mat),
-            )
-        else:
-            output = self.coords.cell_size**2 * self.nufft_ob(expanded, self.k_traj)
+        output: torch.Tensor = self.coords.cell_size**2 * self.nufft_ob(
+            expanded,
+            self.k_traj,
+            interp_mats=(
+                (self.real_interp_mat, self.imag_interp_mat)
+                if self.sparse_matrices
+                else None
+            ),
+        )
 
-        if self.same_uv:
-            # nchan took on the ncoil position, so remove the nbatch dimension
-            output = torch.squeeze(output, dim=0)
-
-        else:
-            # nchan took on the nbatch position, so remove the ncoil dimension
-            output = torch.squeeze(output, dim=1)
+        # squeezed shape: [nchan, npix, npix]
+        output = torch.squeeze(output, dim=altered_dimension)
 
         return output
 
 
-def make_fake_data(imageCube, uu, vv, weight):
+def make_fake_data(
+    image_cube: ImageCube,
+    uu: NDArray[floating[Any]],
+    vv: NDArray[floating[Any]],
+    weight: NDArray[floating[Any]],
+) -> tuple[NDArray[complexfloating[Any, Any]], ...]:
     r"""
     Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See :ref:`mock-dataset-label` for more details on how to prepare a generic image for use in an :class:`~mpol.images.ImageCube`.
 
@@ -428,7 +477,7 @@ def make_fake_data(imageCube, uu, vv, weight):
 
     # instantiate a NuFFT object based on the ImageCube
     # OK if uu shape (nvis,)
-    nufft = NuFFT(coords=imageCube.coords, nchan=imageCube.nchan, uu=uu, vv=vv)
+    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan, uu=uu, vv=vv)
 
     # make into a multi-channel dataset, even if only a single-channel provided
     if uu.ndim == 1:
@@ -437,7 +486,8 @@ def make_fake_data(imageCube, uu, vv, weight):
         weight = np.atleast_2d(weight)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
-    vis_noiseless = nufft(imageCube()).detach().numpy()
+    vis_noiseless: NDArray[complexfloating[Any, Any]]
+    vis_noiseless = nufft(image_cube()).detach().numpy()
 
     # generate complex noise
     sigma = 1 / np.sqrt(weight)
@@ -451,27 +501,33 @@ def make_fake_data(imageCube, uu, vv, weight):
     return vis_noise, vis_noiseless
 
 
-def get_vis_residuals(model, u_true, v_true, V_true, channel=0):
+def get_vis_residuals(
+    model: MPoLModel,
+    u_true: NDArray[floating[Any]],
+    v_true: NDArray[floating[Any]],
+    V_true: NDArray[complexfloating[Any, Any]],
+    channel: int = 0,
+) -> NDArray[complexfloating[Any, Any]]:
     r"""
-    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose 
+    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
     (ungridded) data visiblities at data (u, v) coordinates
-    
+
     Parameters
     ----------
     model : `torch.nn.Module` object
-        Instance of the `mpol.precomposed.SimpleNet` class. Contains model 
+        Instance of the `mpol.precomposed.SimpleNet` class. Contains model
         visibilities.
     u_true, v_true : array, unit=[k\lambda]
         Data u- and v-coordinates
     V_true : array, unit=[Jy]
-        Data visibility amplitudes 
+        Data visibility amplitudes
     channel : int, default=0
         Channel (of `model`) to use to calculate residual visibilities
 
     Returns
     -------
     vis_resid : array of complex
-        Model loose residual visibility amplitudes of the form 
+        Model loose residual visibility amplitudes of the form
         Re(V) + 1j * Im(V)
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u_true, vv=v_true)
@@ -480,6 +536,7 @@ def get_vis_residuals(model, u_true, v_true, V_true, channel=0):
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 
+    vis_resid: NDArray[complexfloating[Any, Any]]
     vis_resid = V_true - vis_model
 
     return vis_resid

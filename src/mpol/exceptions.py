@@ -13,5 +13,9 @@ class DataError(Exception):
     ...
 
 
+class DimensionMismatchError(Exception):
+    ...
+
+
 class ThresholdExceededError(Exception):
     ...
