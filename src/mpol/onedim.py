@@ -44,6 +44,42 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
         Azimuthally averaged pixel brightness at `rs`
     """
 
+    # projected Cartesian pixel coordinates [arcsec]
+    xx, yy = coords.sky_x_centers_2D, coords.sky_y_centers_2D
+
+    # deproject and rotate image 
+    xdep, ydep = observer_to_flat(xx, yy,
+        omega=geom["omega"] * np.pi / 180, 
+        incl=geom["incl"] * np.pi / 180,
+        Omega=geom["Omega"] * np.pi / 180,
+        )
+
+    # shift image center to source center
+    xc, yc = xdep - geom["dRA"], ydep - geom["dDec"]
+
+
+    # radial pixel coordinates
+    rr = np.ravel(np.hypot(xc, yc))
+
+    if bins is None:
+        step = np.hypot(coords.cell_size, coords.cell_size)
+        bins = np.arange(0.0, max(rr), step)
+
+    # number of points in radial bins
+    bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
+    # brightness in radial bins
+    Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
+    Is /= bin_counts
+
+    # if the source is optically thick, rescale the deprojected I(r)
+    if rescale_flux:
+        Is *= np.cos(geom["incl"] * np.pi / 180)
+
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    return bin_centers, Is
+
+
 def radialV(V, coords, geom, rescale_flux, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
