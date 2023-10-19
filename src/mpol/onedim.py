@@ -57,6 +57,12 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
     # shift image center to source center
     xc, yc = xdep - geom["dRA"], ydep - geom["dDec"]
 
+    # TODO: this block temp
+    # cos_PA = np.cos(geom["Omega"] * np.pi / 180)
+    # sin_PA = np.sin(geom["Omega"] * np.pi / 180)
+    # xdep =  xshift * cos_PA - yshift * sin_PA
+    # ydep = xshift * sin_PA + yshift * cos_PA
+    # xdep /= (geom["incl"] * np.pi / 180)
 
     # radial pixel coordinates
     rr = np.ravel(np.hypot(xc, yc))
@@ -72,7 +78,7 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
     Is /= bin_counts
 
     # if the source is optically thick, rescale the deprojected I(r)
-    if rescale_flux:
+    if rescale_flux: # TODO
         Is *= np.cos(geom["incl"] * np.pi / 180)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
