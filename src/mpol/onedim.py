@@ -3,7 +3,7 @@ import numpy as np
 from mpol.geometry import observer_to_flat
 from mpol.utils import torch2npy
 
-def radialI(image, coords, geom, rescale_flux, bins=None):
+def radialI(image, coords, geom, bins=None):
     r"""
     Obtain a 1D (radial) brightness profile I(r) from an image.
 
@@ -25,13 +25,6 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
                 Phase center offset in right ascension. Positive is west of north.
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination.
-    rescale_flux : bool
-        If True, the brightness values are rescaled to account for the 
-        difference between the inclined (observed) brightness and the 
-        assumed face-on brightness, assuming the emission is optically thick. 
-        The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
-        No rescaling would be appropriate in the optically thin limit. 
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r). If None, bins will span 
         the full image, with widths equal to the hypotenuse of the pixels
@@ -76,10 +69,6 @@ def radialI(image, coords, geom, rescale_flux, bins=None):
     # brightness in radial bins
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
     Is /= bin_counts
-
-    # if the source is optically thick, rescale the deprojected I(r)
-    if rescale_flux: # TODO
-        Is *= np.cos(geom["incl"] * np.pi / 180)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
