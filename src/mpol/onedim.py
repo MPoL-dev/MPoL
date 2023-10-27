@@ -50,17 +50,20 @@ def radialI(image, coords, geom, bins=None):
     yd = xc * sin_PA + yc * cos_PA
     xd /= np.cos(geom["incl"] * np.pi / 180)
 
-    # radial pixel coordinates
-    rr = np.ravel(np.hypot(xc, yc))
+    # deprojected radial coordinates
+    rr = np.ravel(np.hypot(xd, yd))
 
     if bins is None:
         step = np.hypot(coords.cell_size, coords.cell_size)
         bins = np.arange(0.0, max(rr), step)
 
-    # number of points in radial bins
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
-    # brightness in radial bins
+
+    # cumulative binned brightness in each annulus
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
+
+
+    # average binned brightness in each annulus
     Is /= bin_counts
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
