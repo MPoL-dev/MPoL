@@ -63,6 +63,9 @@ def radialI(image, coords, geom, bins=None):
     # cumulative binned brightness in each annulus
     Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
 
+    # mask empty bins
+    mask = (bin_counts == 0)
+    Is = np.ma.masked_where(mask, Is)
 
     # average binned brightness in each annulus
     Is /= bin_counts
