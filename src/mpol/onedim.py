@@ -152,6 +152,10 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
     # cumulative binned visibility amplitude in each annulus
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
 
+    # mask empty bins
+    mask = (bin_counts == 0)
+    Vs = np.ma.masked_where(mask, Vs)
+
     # average binned visibility amplitude in each annulus
     Vs /= bin_counts
     
