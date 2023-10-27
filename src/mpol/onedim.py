@@ -48,7 +48,7 @@ def radialI(image, coords, geom, bins=None):
         )
 
     # shift image center to source center
-    xc, yc = xdep - geom["dRA"], ydep - geom["dDec"]
+    xc, yc = xx - geom["dRA"], yy - geom["dDec"]
 
     # TODO: this block temp
     # cos_PA = np.cos(geom["Omega"] * np.pi / 180)
