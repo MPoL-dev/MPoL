@@ -56,7 +56,7 @@ def radialI(image, coords, geom, bins=None):
     if bins is None:
         # choose sensible bin size and range
         step = np.hypot(coords.cell_size, coords.cell_size)
-        bins = np.arange(min(abs(np.ravel(xc))), max(abs(np.ravel(xc))), step)
+        bins = np.arange(0.0, np.max((abs(xc.ravel()), abs(yc.ravel()))), step)
 
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
 
