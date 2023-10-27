@@ -138,16 +138,21 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
     # convert back to [k\lambda]
     up /= 1e3
     vp /= 1e3
+
+    # deprojected baseline coordinates
     qq = np.hypot(up, vp) 
 
     if bins is None:
+        # choose sensible bin size and range
         step = np.hypot(coords.du, coords.dv)
         bins = np.arange(0.0, max(qq), step)
 
-    # number of points in radial bins
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
-    # V amplitudes in radial bins
+
+    # cumulative binned visibility amplitude in each annulus
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
+
+    # average binned visibility amplitude in each annulus
     Vs /= bin_counts
     
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
