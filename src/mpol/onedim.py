@@ -40,22 +40,15 @@ def radialI(image, coords, geom, bins=None):
     # projected Cartesian pixel coordinates [arcsec]
     xx, yy = coords.sky_x_centers_2D, coords.sky_y_centers_2D
 
-    # deproject and rotate image 
-    xdep, ydep = observer_to_flat(xx, yy,
-        omega=geom["omega"] * np.pi / 180, 
-        incl=geom["incl"] * np.pi / 180,
-        Omega=geom["Omega"] * np.pi / 180,
-        )
-
     # shift image center to source center
     xc, yc = xx - geom["dRA"], yy - geom["dDec"]
 
-    # TODO: this block temp
-    # cos_PA = np.cos(geom["Omega"] * np.pi / 180)
-    # sin_PA = np.sin(geom["Omega"] * np.pi / 180)
-    # xdep =  xshift * cos_PA - yshift * sin_PA
-    # ydep = xshift * sin_PA + yshift * cos_PA
-    # xdep /= (geom["incl"] * np.pi / 180)
+    # deproject image
+    cos_PA = np.cos(geom["Omega"] * np.pi / 180)
+    sin_PA = np.sin(geom["Omega"] * np.pi / 180)
+    xd = xc * cos_PA - yc * sin_PA
+    yd = xc * sin_PA + yc * cos_PA
+    xd /= np.cos(geom["incl"] * np.pi / 180)
 
     # radial pixel coordinates
     rr = np.ravel(np.hypot(xc, yc))
