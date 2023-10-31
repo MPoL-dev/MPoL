@@ -117,6 +117,28 @@ def dataset_cont(mock_visibility_data_cont, coords):
     return averager.to_pytorch_dataset()
 
 
+@pytest.fixture(scope="session")
+def mock_1d_archive():
+    # use astropy routines to cache data
+    fname = download_file(
+        "https://zenodo.org/record/{:d}}/files/mock_profile_image.npz".format(zenodo_version),
+        cache=True,
+        pkgname="mpol",
+    )
+    
+    return np.load(fname)
+
+@pytest.fixture
+def mock_1d_models(mock_1d_archive):
+    m = mock_1d_archive
+    r = m['r']
+    i = m['i']
+    i2d = m['i2d']
+    xmax = ymax = m['xmax']
+    
+    return r, i, i2d, xmax, ymax
+
+
 @pytest.fixture
 def crossvalidation_products(mock_visibility_data):
     # test the crossvalidation with a smaller set of image / Fourier coordinates than normal,
