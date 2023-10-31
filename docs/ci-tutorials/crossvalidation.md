@@ -51,7 +51,7 @@ from mpol import (
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -361,7 +361,7 @@ For the purposes of comparison, here is the image produced by the tclean algorit
 
 ```{code-cell}
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.tclean.fits",
+    "https://zenodo.org/record/10059491/files/logo_cube.tclean.fits",
     cache=True,
     show_progress=True,
     pkgname="mpol",
