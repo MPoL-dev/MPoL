@@ -5,8 +5,6 @@ import torch
 
 from .constants import arcsec, c_ms, cc, deg, kB
 
-from mpol.images import ImageCube 
-
 def torch2npy(tensor):
     """Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting"""
     return tensor.detach().cpu().numpy()
@@ -34,42 +32,6 @@ def center_np_image(image):
     image_wrapped[:, :Ny//2], image_wrapped[:, Ny//2:] = tmp[:, Ny//2:], tmp[:, :Ny//2]
 
     return image_wrapped
-
-
-def np_to_imagecube(image, coords, nchan=1, wrap=False):
-    """Convenience function for converting a numpy image into an MPoL ImageCube 
-    tensor (see mpol.images.ImageCube)
-
-    Parameters
-    ----------
-    image : array
-        An image in numpy format
-    coords : `mpol.coordinates.GridCoords` object
-        Instance of the `mpol.coordinates.GridCoords` class
-    nchan : int, default=1
-        Number of channels in the image. Default assumes a single 2D image
-    wrap : bool, default=False 
-        Whether to wrap the numpy image so that index 0 is in the image center
-        (FFT algorithms typically place index 0 in the image corner)
-
-    Returns
-    -------
-    icube : `mpol.images.ImageCube` object
-        The image cube tensor
-    """
-    if wrap: 
-        # move the 0 index to the image center 
-        image = center_np_image(image)
-
-    # broadcast image to (nchan, npix, npix)
-    img_packed_cube = np.broadcast_to(image, 
-                                      (nchan, coords.npix, coords.npix)).copy()
-
-    # convert to pytorch tensor
-    img_packed_tensor = torch.from_numpy(img_packed_cube)
-
-    # insert into ImageCube layer
-    return ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 
 
 def ground_cube_to_packed_cube(ground_cube):
