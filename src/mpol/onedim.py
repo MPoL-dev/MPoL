@@ -144,7 +144,7 @@ def radialV(V, coords, geom, rescale_flux, bins=None):
 
     if bins is None:
         # choose sensible bin size and range
-        step = np.hypot(coords.du, coords.dv)
+        step = np.hypot(coords.du, coords.dv) / 2
         bins = np.arange(0.0, max(qq), step)
 
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
