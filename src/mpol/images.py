@@ -341,7 +341,7 @@ def np_to_imagecube(image, coords, nchan=1, wrap=False):
     """
     if wrap: 
         # move the 0 index to the image center 
-        image = utils.center_np_image(image)
+        image = np.fft.fftshift(image)
 
     # broadcast image to (nchan, npix, npix)
     img_packed_cube = np.broadcast_to(image, 
