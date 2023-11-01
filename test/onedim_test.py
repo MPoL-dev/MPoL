@@ -13,12 +13,15 @@ def test_radialI(mock_1d_image_model, tmp_path):
 
     fig, ax = plt.subplots(ncols=2)
 
-    plot_image(i2d, extent=coords.img_ext, ax=ax[0], clab='Jy sr$^{-2}$')
+    plot_image(i2d, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
 
     ax[0].title('AS 209-like profile.\nGeometry: {:}'.format(geom))
 
     ax[1].plot(r, i, 'k', label='truth')
     ax[1].plot(rtest, itest, 'r.-', label='result')
+    
+    ax[1].set_xlabel('r [arcsec]')
+    ax[1].set_ylabel('I [Jy / sr]')
 
     fig.savefig(tmp_path / "test_radialI.png", dpi=300)
     plt.close("all")
