@@ -6,19 +6,19 @@ from mpol.plot import plot_image
 
 def test_radialI(mock_1d_image_model, tmp_path):
     # obtain a 1d radial brightness profile I(r) from an image    
-    
-    r, i, i2d, _, _, geom, coords = mock_1d_image_model
+
+    rtrue, itrue, i2dtrue, _, _, geom, coords = mock_1d_image_model
 
     bins = np.linspace(0, 2.0, 100)
-    rtest, itest = radialI(i2d, coords, geom, bins=bins)
+    rtest, itest = radialI(i2dtrue, coords, geom, bins=bins)
 
     fig, ax = plt.subplots(ncols=2)
 
-    plot_image(i2d, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
+    plot_image(i2dtrue, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
 
     ax[0].title('AS 209-like profile.\nGeometry: {:}'.format(geom))
 
-    ax[1].plot(r, i, 'k', label='truth')
+    ax[1].plot(rtrue, itrue, 'k', label='truth')
     ax[1].plot(rtest, itest, 'r.-', label='recovery')
     
     ax[1].set_xlabel('r [arcsec]')
