@@ -32,7 +32,8 @@ EXTRA_REQUIRES = {
         "requests",
         "astropy",
         "tensorboard",
-        "mypy",
+        "mypy"
+        "frank>=1.2.1",
     ],
     "docs": [
         "sphinx>=2.3.0",
