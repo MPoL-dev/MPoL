@@ -9,7 +9,8 @@ def test_radialI(mock_1d_image_model, tmp_path):
     
     r, i, i2d, _, _, geom, coords = mock_1d_image_model
 
-    rtest, itest = radialI(i2d, coords, geom, bins=None)
+    bins = np.linspace(0, 2.0, 75)
+    rtest, itest = radialI(i2d, coords, geom, bins=bins)
 
     fig, ax = plt.subplots(ncols=2)
 
