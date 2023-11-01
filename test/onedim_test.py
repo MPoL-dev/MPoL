@@ -59,16 +59,41 @@ def test_radialI(mock_1d_image_model, tmp_path):
                                err_msg="test_radialI")
 
 
-def test_radialV(coords, imager, dataset, generic_parameters):
+def test_radialV(mock_1d_vis_model, tmp_path):
     # obtain a 1d radial visibility profile V(q) from 2d visibilities
-    coords = GridCoords(cell_size=0.005, npix=800)
 
-    g = sky_gaussian_arcsec(coords.sky_x_centers_2D, coords.sky_y_centers_2D)
-    
-    nchan = dataset.nchan
-    model = SimpleNet(coords=coords, nchan=nchan)
+    Vtrue, Vtrue_dep, q_dep, geom, coords = mock_1d_vis_model
 
-def test_radialI(coords, imager, dataset, generic_parameters):
-    # obtain a 1d radial brightness profile I(r) from an image
-    nchan = dataset.nchan
-    model = SimpleNet(coords=coords, nchan=nchan)
+    qtest, Vtest = radialV(Vtrue, coords, geom, rescale_flux=True, bins=None)
+
+
+    expected = [
+        2.53998336e-01,  1.59897580e-01,  8.59460326e-02,  7.42189236e-02,  
+        5.75440687e-02,  1.81324892e-02, -2.92922689e-03,  3.14354163e-03,  
+        6.72339399e-03, -8.54632390e-03, -1.73385166e-02, -4.03826092e-03,
+        1.45595908e-02,  1.61681713e-02,  5.93475866e-03,  2.45555912e-04, 
+        -7.05014619e-04, -6.09266430e-03, -1.02454088e-02, -2.80944776e-03,  
+        8.58212558e-03, 8.39132158e-03, -6.52523293e-04,  -4.34778158e-03,
+        1.08035980e-04,  3.40903070e-03,  2.26682041e-03,  2.42465437e-03,  
+        5.07968926e-03,  4.83377443e-03, 1.26300648e-03,  1.11930639e-03,  
+        6.45157513e-03, 1.05751150e-02,  9.14016956e-03,  5.92209210e-03,
+        5.18455986e-03,  5.88802559e-03,  5.49315770e-03, 4.96398638e-03,  
+        5.81115311e-03,  5.95304063e-03, 3.16208083e-03, -1.71765038e-04, 
+        -4.64532628e-04, 1.12448670e-03,  1.84297313e-03,  1.48094594e-03,
+        1.12953770e-03,  1.01370816e-03,  6.57047907e-04, 1.37570722e-04,  
+        3.00648884e-04,  1.04847404e-03, 1.16856102e-03,  3.08940761e-04, 
+        -5.65721897e-04, -8.38907531e-04, -8.71976125e-04, -1.09567680e-03,
+        -1.42077854e-03, -1.33702627e-03, -9.96839047e-04, -1.16400192e-03, 
+        -1.43584618e-03, -1.07454472e-03, -6.44900590e-04, -4.86165342e-04, 
+        -1.96851463e-04, 5.04190986e-05,  5.73950179e-05,  2.79905736e-04,
+        7.52685847e-04,  1.12546048e-03,  1.37149548e-03, 1.35835560e-03,  
+        1.06470794e-03,  8.81423014e-04, 8.76827161e-04,  9.03579902e-04,  
+        8.39818807e-04, 5.19936424e-04,  1.46415537e-04,  3.29054769e-05,
+        7.30096312e-05,  6.47553400e-05,  2.18817382e-05, 4.47955432e-06,  
+        7.34705616e-06,  9.06184045e-06, 9.45269846e-06,  1.00464939e-05,  
+        8.28166011e-06, 7.09361681e-06,  6.43221021e-06,  3.12425880e-06,
+        2.57495214e-07,  6.48560373e-07,  1.88421498e-07
+        ]
+
+    np.testing.assert_allclose(Vtest, expected, rtol=1e-6,
+                               err_msg="test_radialV")    
