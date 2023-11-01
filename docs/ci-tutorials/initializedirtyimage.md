@@ -40,6 +40,7 @@ from astropy.utils.data import download_file
 
 ```{code-cell}
 from mpol import coordinates, gridding, losses, precomposed, utils
+from mpol.__init__ import zenodo_record
 ```
 
 When saving and loading a model, it is important to make sure that ``cell_size``, ``nchan``, and ``npix`` remain the same. More info on coordinates can be found in {class}`mpol.coordinates.GridCoords`.
@@ -47,7 +48,7 @@ When saving and loading a model, it is important to make sure that ``cell_size``
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
