@@ -1,6 +1,6 @@
 from astropy.utils.data import download_file
 
-version = 4930016
+version = 10059491
 slug = "https://zenodo.org/record/{:d}/files/{:}"
 
 fnames = [

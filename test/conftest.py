@@ -4,22 +4,22 @@ from astropy.utils.data import download_file
 
 from mpol import coordinates, gridding
 
+zenodo_version = 10059491
+
 # We need a fixture which provides mock visibilities of the sort we'd
 # expect from visread, but *without* the CASA dependency.
 
 # fixture to provide tuple of uu, vv, weight, data_re, and data_im values
 @pytest.fixture(scope="session")
 def mock_visibility_archive():
-
     # use astropy routines to cache data
     fname = download_file(
-        "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+        "https://zenodo.org/record/{:d}/files/logo_cube.noise.npz".format(zenodo_version),
         cache=True,
         pkgname="mpol",
     )
 
     return np.load(fname)
-
 
 @pytest.fixture
 def mock_visibility_data(mock_visibility_archive):
