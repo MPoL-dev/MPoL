@@ -13,8 +13,12 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies needed to download files
+        # we're just installing the PyPI version of mpol here to reference the
+        # zenodo record number in __init__. below we'll reinstall the current 
+        # version of mpol for the tests below.
         run: |
           pip install astropy
+          pip install mpol
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:
