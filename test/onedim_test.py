@@ -66,6 +66,18 @@ def test_radialV(mock_1d_vis_model, tmp_path):
 
     qtest, Vtest = radialV(Vtrue, coords, geom, rescale_flux=True, bins=None)
 
+    fig, ax = plt.subplots()
+
+    ax.plot(q_dep / 1e6, Vtrue_dep, 'k.', label='truth deprojected')
+    ax.plot(qtest / 1e6, Vtest, 'r.-', label='recovery')
+
+    ax.set_xlabel(r'Baseline [M$\lambda$]')
+    ax.set_ylabel('Re(V) [Jy]')
+
+    ax.title('Geometry: {:}'.format(geom))
+
+    fig.savefig(tmp_path / "test_radialV.png", dpi=300)
+    plt.close("all")
 
     expected = [
         2.53998336e-01,  1.59897580e-01,  8.59460326e-02,  7.42189236e-02,  
