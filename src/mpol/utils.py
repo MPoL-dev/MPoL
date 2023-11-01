@@ -10,6 +10,30 @@ def torch2npy(tensor):
     return tensor.detach().cpu().numpy()
 
 
+def center_np_image(image):
+    """Wrap a numpy image array so that the 0 index is in the image center.
+    Adapted from frank.utilities.make_image (https://github.com/discsim/frank)
+
+    Parameters
+    ----------
+    image : 2D array
+        The numpy image with index 0 in the corner
+    
+    Returns
+    -------
+    image_wrapped : 2D array
+        The numpy image with index 0 in the center
+    """
+    tmp, image_wrapped = image.copy(), image.copy()
+
+    Nx, Ny = tmp.shape[0], tmp.shape[1]
+
+    tmp[:Nx//2,], tmp[Nx//2:] = image[Nx//2:], image[:Nx//2]
+    image_wrapped[:, :Ny//2], image_wrapped[:, Ny//2:] = tmp[:, Ny//2:], tmp[:, :Ny//2]
+
+    return image_wrapped
+
+
 def ground_cube_to_packed_cube(ground_cube):
     r"""
     Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.
