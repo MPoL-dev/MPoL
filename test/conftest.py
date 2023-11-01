@@ -120,7 +120,7 @@ def dataset_cont(mock_visibility_data_cont, coords):
 def mock_1d_archive():
     # use astropy routines to cache data
     fname = download_file(
-        "https://zenodo.org/record/{:d}/files/mock_disk_1d.npz".format(zenodo_version),
+        f"https://zenodo.org/record/{zenodo_record}/files/mock_disk_1d.npz",
         cache=True,
         pkgname="mpol",
     )
