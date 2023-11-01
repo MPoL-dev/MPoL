@@ -7,19 +7,22 @@ from mpol.plot import plot_image
 def test_radialI(mock_1d_image_model, tmp_path):
     # obtain a 1d radial brightness profile I(r) from an image    
 
-    rtrue, itrue, i2dtrue, _, _, geom, coords = mock_1d_image_model
+    rtrue, itrue, i2dtrue, _, _, _, coords = mock_1d_image_model
+
+    geom = {'incl': 40.0, 'Omega': 130.0, 'omega': 0.0, 'dRA': 0.3, 'dDec': -0.2}
 
     bins = np.linspace(0, 2.0, 100)
+
     rtest, itest = radialI(i2dtrue, coords, geom, bins=bins)
 
     fig, ax = plt.subplots(ncols=2)
 
     plot_image(i2dtrue, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
 
-    ax[0].title('AS 209-like profile.\nGeometry: {:}'.format(geom))
-
     ax[1].plot(rtrue, itrue, 'k', label='truth')
     ax[1].plot(rtest, itest, 'r.-', label='recovery')
+    
+    ax[0].set_title(f"AS 209-like mock disk.\nGeometry {geom}")
     
     ax[1].set_xlabel('r [arcsec]')
     ax[1].set_ylabel('I [Jy / sr]')
@@ -62,9 +65,13 @@ def test_radialI(mock_1d_image_model, tmp_path):
 def test_radialV(mock_1d_vis_model, tmp_path):
     # obtain a 1d radial visibility profile V(q) from 2d visibilities
 
-    Vtrue, Vtrue_dep, q_dep, geom, coords = mock_1d_vis_model
+    Vtrue, Vtrue_dep, q_dep, _, coords = mock_1d_vis_model
 
-    qtest, Vtest = radialV(Vtrue, coords, geom, rescale_flux=True, bins=None)
+    geom = {'incl': 40.0, 'Omega': 130.0, 'omega': 0.0, 'dRA': 0.3, 'dDec': -0.2}
+
+    bins = np.linspace(1,5e3,100)
+
+    qtest, Vtest = radialV(Vtrue, coords, geom, rescale_flux=True, bins=bins)
 
     fig, ax = plt.subplots()
 
@@ -73,8 +80,7 @@ def test_radialV(mock_1d_vis_model, tmp_path):
 
     ax.set_xlabel(r'Baseline [M$\lambda$]')
     ax.set_ylabel('Re(V) [Jy]')
-
-    ax.title('Geometry: {:}'.format(geom))
+    ax.set_title(f"Geometry {geom}")
 
     fig.savefig(tmp_path / "test_radialV.png", dpi=300)
     plt.close("all")
