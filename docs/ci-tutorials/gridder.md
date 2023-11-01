@@ -34,12 +34,13 @@ It's important to remember that MPoL follows the standard baseline convention as
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.utils.data import download_file
+from mpol.__init__ import zenodo_record
 ```
 
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
