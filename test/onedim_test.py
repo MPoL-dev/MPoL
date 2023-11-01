@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from mpol.coordinates import GridCoords
 from mpol.onedim import radialI, radialV
-from mpol.precomposed import SimpleNet
-from mpol.utils import sky_gaussian_arcsec
+from mpol.plot import plot_image
+
 
 def test_radialV(coords, imager, dataset, generic_parameters):
     # obtain a 1d radial visibility profile V(q) from 2d visibilities
