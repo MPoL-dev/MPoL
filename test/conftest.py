@@ -126,7 +126,24 @@ def mock_1d_archive():
         pkgname="mpol",
     )
     
-    return np.load(fname)
+    return np.load(fname, allow_pickle=True)
+
+@pytest.fixture
+def mock_1d_image_models(mock_1d_archive):
+    m = mock_1d_archive
+    r = m['r']
+    i = m['i']
+    i2d = m['i2d']
+    xmax = ymax = m['xmax']
+    geom = m['geometry']
+
+    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2d.shape[0], npix=i2d.shape[0])
+
+    i2d_packed_cube = np.broadcast_to(i2d, (1, coords.npix, coords.npix)).copy()
+    i2d_packed_tensor = torch.from_numpy(i2d_packed_cube)
+    i2d_icube = images.ImageCube(coords=coords, nchan=1, cube=i2d_packed_tensor)
+
+    return r, i, i2d, xmax, ymax, geom, coords, i2d_icube
 
 @pytest.fixture
 def mock_1d_models(mock_1d_archive):
