@@ -33,7 +33,7 @@ EXTRA_REQUIRES = {
         "astropy",
         "tensorboard",
         "mypy"
-        "frank>=1.2.1",
+        "frank",
     ],
     "docs": [
         "sphinx>=2.3.0",
@@ -57,7 +57,7 @@ EXTRA_REQUIRES = {
         "arviz[all]"
     ],
     "analysis": [
-        "frank>=1.2.1",
+        "frank",
     ],
 }
 
