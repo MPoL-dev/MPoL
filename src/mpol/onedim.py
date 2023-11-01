@@ -1,8 +1,5 @@
 import numpy as np 
 
-from mpol.geometry import observer_to_flat
-from mpol.utils import torch2npy
-
 def radialI(image, coords, geom, bins=None):
     r"""
     Obtain a 1D (radial) brightness profile I(r) from an image.

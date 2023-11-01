@@ -132,15 +132,16 @@ def mock_1d_archive():
 @pytest.fixture
 def mock_1d_image_model(mock_1d_archive):
     m = mock_1d_archive
-    r = m['r']
-    i = m['i']
-    i2d = m['i2d']
+    rtrue = m['rtrue']
+    itrue = m['itrue']
+    i2dtrue = m['i2dtrue']
     xmax = ymax = m['xmax']
     geom = m['geometry']
 
-    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2d.shape[0], npix=i2d.shape[0])
+    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
+                                    npix=i2dtrue.shape[0])
 
-    return r, i, i2d, xmax, ymax, geom, coords
+    return rtrue, itrue, i2dtrue, xmax, ymax, geom, coords
 
 
 @pytest.fixture
