@@ -11,6 +11,15 @@ def test_radialI(mock_1d_image_model):
 
     rtest, itest = radialI(i2d, coords, geom, bins=None)
 
+    _, ax = plt.subplots(ncols=2)
+
+    plot_image(i2d, extent=coords.img_ext, ax=ax[0], clab='Jy sr$^{-2}$')
+
+    ax[0].title('AS 209-like profile.\nGeometry: {:}'.format(geom))
+
+    ax[1].plot(r, i, 'k', label='truth')
+    ax[1].plot(rtest, itest, 'r.-', label='result')
+
     expected = [
         5.79780326e+10, 2.47990375e+10, 4.19794053e+09, 1.63165616e+10, 
         2.56197452e+10, 1.86014523e+10, 1.39800643e+10, 1.14935415e+10, 
