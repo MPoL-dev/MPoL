@@ -36,8 +36,6 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
     <script src="https://buttons.github.io/buttons.js"></script>
-    <script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -482,7 +480,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -543,13 +541,13 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f8fae9032e0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f224d22e130&gt;
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1920x1440 with 0 Axes&gt;
 </pre></div>
 </div>
-<img alt="../_images/0952ed4dac7cef480b1d0a5b4554bfd2dbb941eb1795c1666ed48a7b2b245120.png" src="../_images/0952ed4dac7cef480b1d0a5b4554bfd2dbb941eb1795c1666ed48a7b2b245120.png" />
+<img alt="../_images/9965b915ab59d4973851ad9f632b366cbce0e9d398ef0b480812cc63aaf9af5a.png" src="../_images/9965b915ab59d4973851ad9f632b366cbce0e9d398ef0b480812cc63aaf9af5a.png" />
 </div>
 </div>
 <p>We can see that there are a number of pixels with negative flux values</p>
@@ -626,7 +624,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;loss&#39;)
 </pre></div>
 </div>
-<img alt="../_images/e5c70bc702dce33c640409fe92854f1dc86120410dbd92c94b0e9ede66b4f6b2.png" src="../_images/e5c70bc702dce33c640409fe92854f1dc86120410dbd92c94b0e9ede66b4f6b2.png" />
+<img alt="../_images/dc3929faf15eb70d7641b1cf0944a2e293ee28089134c9e7efc2aada7e659f76.png" src="../_images/dc3929faf15eb70d7641b1cf0944a2e293ee28089134c9e7efc2aada7e659f76.png" />
 </div>
 </div>
 <p>Let’s visualize the resulting image cube representation.</p>
@@ -642,10 +640,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f8fa81bad90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f2248354490&gt;
 </pre></div>
 </div>
-<img alt="../_images/d2356c5cfad19ef50bf4af371577c1d444d54bfd0f87975524b17d6cf4eb8783.png" src="../_images/d2356c5cfad19ef50bf4af371577c1d444d54bfd0f87975524b17d6cf4eb8783.png" />
+<img alt="../_images/cfeca592376d9446231d9f395465a99d362145d85f1265d7c2dbaa7c61560579.png" src="../_images/cfeca592376d9446231d9f395465a99d362145d85f1265d7c2dbaa7c61560579.png" />
 </div>
 </div>
 <p>We see that the cube resembles the dirty image, but it contains no pixels with negative flux values.</p>
@@ -677,10 +675,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f8fa8103f10&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f224829ac40&gt;
 </pre></div>
 </div>
-<img alt="../_images/454a47ce0e0eedb174d9b005e2b59a3e2efd20441b76ee54e3837ad7017ca1ab.png" src="../_images/454a47ce0e0eedb174d9b005e2b59a3e2efd20441b76ee54e3837ad7017ca1ab.png" />
+<img alt="../_images/54823db8d1e843fb9b5a6bb7e87c03d6921e745adbb4aab1f9b20438c2d662c9.png" src="../_images/54823db8d1e843fb9b5a6bb7e87c03d6921e745adbb4aab1f9b20438c2d662c9.png" />
 </div>
 </div>
 </section>

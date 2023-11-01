@@ -38,7 +38,7 @@
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>
+    <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -501,7 +501,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -674,10 +674,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f7065b44b20&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864e645b50&gt;
 </pre></div>
 </div>
-<img alt="../_images/61e0dbd7ee5ff8f60c13715df512eba1370a0405ef498658c314229c26d9bcca.png" src="../_images/61e0dbd7ee5ff8f60c13715df512eba1370a0405ef498658c314229c26d9bcca.png" />
+<img alt="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" src="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" />
 </div>
 </div>
 <p>A blank image is not that exciting, but hopefully this demonstrates the state of the parameters at the start of optimization.</p>
@@ -771,10 +771,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f706594cac0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c8620d0&gt;
 </pre></div>
 </div>
-<img alt="../_images/39f3af92309dc0573a9d8be3027ca4a4e90f2fe1f5dc4a4b316fbaaf72deb5a4.png" src="../_images/39f3af92309dc0573a9d8be3027ca4a4e90f2fe1f5dc4a4b316fbaaf72deb5a4.png" />
+<img alt="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" src="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" />
 </div>
 </div>
 <p>The gradient image points in the direction of lower loss values. So the final step is to add the gradient image to the base image in order to advance base parameters in the direction of the minimum loss value. This process is called gradient descent, and can be extremely useful for optimizing large dimensional parameter spaces (like images). The optimizer carries out the addition of the gradient</p>
@@ -828,10 +828,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f70658cd8e0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c75b400&gt;
 </pre></div>
 </div>
-<img alt="../_images/683329d7eae4ca78a05496c6b6c56214b62a22ea5d5be2ae9fff8d96d5f8e4ec.png" src="../_images/683329d7eae4ca78a05496c6b6c56214b62a22ea5d5be2ae9fff8d96d5f8e4ec.png" />
+<img alt="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" src="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" />
 </div>
 </div>
 </section>
@@ -865,8 +865,8 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 25.5 s, sys: 8.07 s, total: 33.6 s
-Wall time: 20.9 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 31.2 s, sys: 9.56 s, total: 40.7 s
+Wall time: 25.4 s
 </pre></div>
 </div>
 </div>
@@ -884,7 +884,7 @@ Wall time: 20.9 s
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;loss&#39;)
 </pre></div>
 </div>
-<img alt="../_images/508f4df798e70fc35675259db0062393a50dfa5e4209e497c49514c8e73f2911.png" src="../_images/508f4df798e70fc35675259db0062393a50dfa5e4209e497c49514c8e73f2911.png" />
+<img alt="../_images/7e25eaefafc9afaed1f844fc1d9c4cbcccad81550ae5e1eeff4d1a12a98ffd9f.png" src="../_images/7e25eaefafc9afaed1f844fc1d9c4cbcccad81550ae5e1eeff4d1a12a98ffd9f.png" />
 </div>
 </div>
 <p>and we see that we’ve reasonably converged to a set of parameters without much further improvement in the loss value.</p>
@@ -911,10 +911,10 @@ Wall time: 20.9 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f7065723460&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c62b460&gt;
 </pre></div>
 </div>
-<img alt="../_images/42e9a1957a05d4f4710a12eb4357cb27d04eb661050e7107f000371c23b1842b.png" src="../_images/42e9a1957a05d4f4710a12eb4357cb27d04eb661050e7107f000371c23b1842b.png" />
+<img alt="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" src="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" />
 </div>
 </div>
 <p>And there you have it, an image optimized to fit the data. To be honest, the results aren’t great—that’s because we’ve used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it’s easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike CLEAN images made with “uniform” weighting) and there is high “noise” in the image.</p>
@@ -931,6 +931,12 @@ Wall time: 20.9 s
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/torchkbnufft/_nufft/spmat.py:101: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:605.)
+  torch.sparse.FloatTensor(inds, real_vals, torch.Size(shape)),  # type: ignore
 </pre></div>
 </div>
 </div>
@@ -1004,7 +1010,7 @@ Wall time: 20.9 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8710cef33099e01f5ac0c9ef49aff33f7fb55071b0c01edc00a02374c362bf4e.png" src="../_images/8710cef33099e01f5ac0c9ef49aff33f7fb55071b0c01edc00a02374c362bf4e.png" />
+<img alt="../_images/c4c1cd4faaf35201ca6bdbc28fa06e1d86e9d2e98a8c1bcfdd55f7c32c1dce01.png" src="../_images/c4c1cd4faaf35201ca6bdbc28fa06e1d86e9d2e98a8c1bcfdd55f7c32c1dce01.png" />
 </div>
 </div>
 <p>If our model is good, we would expect it to fit the signal contained in the data and the residuals contain only noise. As far as this plot is concerned, it appears as though we might have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, though, we should examine the calibration of the data (in particular, the calculation of the visibility weights).</p>
@@ -1040,7 +1046,7 @@ Wall time: 20.9 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/49878fdbf83a04a6879fe57e2b6295fcd89f4c76f6d685f3be500ca593c03505.png" src="../_images/49878fdbf83a04a6879fe57e2b6295fcd89f4c76f6d685f3be500ca593c03505.png" />
+<img alt="../_images/074c5c241bbf9ff95ce0e48433e1368f19e74afa90e5708d12e72134919ed05b.png" src="../_images/074c5c241bbf9ff95ce0e48433e1368f19e74afa90e5708d12e72134919ed05b.png" />
 </div>
 </div>
 <p>We see that the residual image appears to be mostly noise, though with some low-frequency spatial structure to the image. This suggests that our model has done a reasonable job of capturing the <em>signal</em> in the data. But, there is still obvious room for improvement in regularizing some of the noiser features. In the following tutorials we’ll examine how to set up additional regularizer terms that will yield more desireable image characteristics.</p>

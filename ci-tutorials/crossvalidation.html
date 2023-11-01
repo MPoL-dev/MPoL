@@ -38,8 +38,6 @@
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -469,7 +467,7 @@ title="Print to PDF"
 
 <span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -522,7 +520,7 @@ title="Print to PDF"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-<img alt="../_images/f9f8d384d3ef88b296067741c6f5e4425900f3b54f90d651651f455b61b9c7d0.png" src="../_images/f9f8d384d3ef88b296067741c6f5e4425900f3b54f90d651651f455b61b9c7d0.png" />
+<img alt="../_images/68b1f5daf0165a1bb7e842d5ca06da0f62ba1ce332f54200f83abe35bbdf7a80.png" src="../_images/68b1f5daf0165a1bb7e842d5ca06da0f62ba1ce332f54200f83abe35bbdf7a80.png" />
 </div>
 </div>
 </section>
@@ -559,7 +557,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7466e914ec3b16f46535a6c287432351653563f830df28ac01801a26ee676bea.png" src="../_images/7466e914ec3b16f46535a6c287432351653563f830df28ac01801a26ee676bea.png" />
+<img alt="../_images/f81483056cc0df68de1fd938b3a2b2c5cc6f05acfba0fe39e2f52ff74282aa13.png" src="../_images/f81483056cc0df68de1fd938b3a2b2c5cc6f05acfba0fe39e2f52ff74282aa13.png" />
 </div>
 </div>
 <p>As you can see, the <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> space is sampled in a very structured way:</p>
@@ -595,7 +593,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/b9a7df4fec596a3628e39371013dfafe9f57eef598f7db7438f979e74c2b8552.png" src="../_images/b9a7df4fec596a3628e39371013dfafe9f57eef598f7db7438f979e74c2b8552.png" />
+<img alt="../_images/3a1d404a0ae5c5da1d7813b7bee0579d1da1dfde237b1ced76eba752d3e13329.png" src="../_images/3a1d404a0ae5c5da1d7813b7bee0579d1da1dfde237b1ced76eba752d3e13329.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -675,7 +673,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/55e9e4b84d6359d4e57bb99de8e4e7020fdf672242e900266a08d86ae0db3d9d.png" src="../_images/55e9e4b84d6359d4e57bb99de8e4e7020fdf672242e900266a08d86ae0db3d9d.png" />
+<img alt="../_images/17bc4bcd65f39b8bcc801b67a85d68826b912b3a258ca7053ac33b34bb5dd302.png" src="../_images/17bc4bcd65f39b8bcc801b67a85d68826b912b3a258ca7053ac33b34bb5dd302.png" />
 </div>
 </div>
 </section>
@@ -801,13 +799,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 30.529687767119373
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 30.529687889692518
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/7a841dcbc4e190d441d9999e543a58eb8d94bfd11bb397ef9eaf3c87e1479d5a.png" src="../_images/7a841dcbc4e190d441d9999e543a58eb8d94bfd11bb397ef9eaf3c87e1479d5a.png" />
+<img alt="../_images/1198f43b8a9d74666ec4478846200355e7674135d3b3d33e07417b9db32b54eb.png" src="../_images/1198f43b8a9d74666ec4478846200355e7674135d3b3d33e07417b9db32b54eb.png" />
 </div>
 </div>
 <p>This image looks only slightly better than the dirty image itself. This is because it is nearly equivalent, the only difference is the baked-in regularization provided by our non-negative pixels. Next, let’s try a small level of regularization</p>
@@ -820,13 +818,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 11.518084924455199
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 11.518120967027482
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/dab685006e4b28b14500b2e138fe41f38bc6e6c273e6ea47b1bc998949a75e47.png" src="../_images/dab685006e4b28b14500b2e138fe41f38bc6e6c273e6ea47b1bc998949a75e47.png" />
+<img alt="../_images/34b824595ea1185a2aa56c707e4f748b738aa1e63ecd78e7ebe2713f9d601919.png" src="../_images/34b824595ea1185a2aa56c707e4f748b738aa1e63ecd78e7ebe2713f9d601919.png" />
 </div>
 </div>
 <p>We see that the cross validation score improved significantly, meaning that these hyperparameter settings produce models that do a better job generalizing to new data. And, we can keep tweaking the hyperparameters to see how low of a cross-validation metric we can find.</p>
@@ -839,13 +837,13 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.306894904074458
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross validation score: 7.306494520021946
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1920x1440 with 1 Axes&gt;, &lt;Axes: &gt;)
 </pre></div>
 </div>
-<img alt="../_images/95a4ab486788b3b6d95242c6ca59ec4003415bccd1316a34a9e803364a863e40.png" src="../_images/95a4ab486788b3b6d95242c6ca59ec4003415bccd1316a34a9e803364a863e40.png" />
+<img alt="../_images/e275fa1d53ccadc9fb754ad543d7ad730b254ff64f54b0a4b56371509eea5b6e.png" src="../_images/e275fa1d53ccadc9fb754ad543d7ad730b254ff64f54b0a4b56371509eea5b6e.png" />
 </div>
 </div>
 <p>More regularizing strength doesn’t always mean better… there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the <code class="docutils literal notranslate"><span class="pre">nll_gridded</span></code> term). To help you perform a full hyperparameter sweep and identify the “best” settings quickly, we recommend checking out tools like <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">Tensorboard</a> and <a class="reference external" href="https://docs.ray.io/en/master/tune/index.html">Ray Tune</a>.</p>
@@ -853,7 +851,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.tclean.fits&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.tclean.fits&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -906,7 +904,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;$\\Delta \\delta$ [${}^{\\prime\\prime}$]&#39;)
 </pre></div>
 </div>
-<img alt="../_images/fc8c7f2d6de44a59c1122f9f8c12fabe5fda67baf488137490c4d290cbcb1b5b.png" src="../_images/fc8c7f2d6de44a59c1122f9f8c12fabe5fda67baf488137490c4d290cbcb1b5b.png" />
+<img alt="../_images/c92631d3b3448bed531ba9b42c5b3c657f97907ead343ecf7f148be404aaac3b.png" src="../_images/c92631d3b3448bed531ba9b42c5b3c657f97907ead343ecf7f148be404aaac3b.png" />
 </div>
 </div>
 </section>

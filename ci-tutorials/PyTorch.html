@@ -38,8 +38,6 @@
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -585,7 +583,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/aa4014aa819c4fd1240e4a412fa9c5f975b660c6935e84d2412d2cf2876047a6.png" src="../_images/aa4014aa819c4fd1240e4a412fa9c5f975b660c6935e84d2412d2cf2876047a6.png" />
+<img alt="../_images/9e6515d7281d0636faf745b79b518cb3b256a9a5953827cd1499dc218ded1582.png" src="../_images/9e6515d7281d0636faf745b79b518cb3b256a9a5953827cd1499dc218ded1582.png" />
 </div>
 </div>
 <p>We see we need to go to the right to go down toward the minimum. For a multivariate function, the gradient will be a vector pointing in the direction of the steepest downward slope. When we take steps, we find the x coordinate of our new location by:</p>
@@ -649,7 +647,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ade4bc80dd522959106b566d6fde94298c7ac454f018589c5d93860443d26859.png" src="../_images/ade4bc80dd522959106b566d6fde94298c7ac454f018589c5d93860443d26859.png" />
+<img alt="../_images/034e030958c936689acf508e6dd99f2e4625133cd4d689be8cd932863dc01760.png" src="../_images/034e030958c936689acf508e6dd99f2e4625133cd4d689be8cd932863dc01760.png" />
 </div>
 </div>
 <p>The gradient at our new point (shown in orange) is still not close to zero, meaning we haven’t reached the minimum. We’ll continue this process of checking if the gradient is nearly zero, and take a step in the direction of steepest descent until we reach the bottom of the valley. We’ll say we’ve reached the bottom of the valley when the absolute value of the gradient is <span class="math notranslate nohighlight">\(&lt;0.1\)</span>:</p>
@@ -696,7 +694,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/b555dc26be48899b117e71e690cb7df070138fa29eee2689d72878b436f76e01.png" src="../_images/b555dc26be48899b117e71e690cb7df070138fa29eee2689d72878b436f76e01.png" />
+<img alt="../_images/1d8abadb937d7eafab8c2f0405fab90e61ccdd4e79469d10af84ce15d6812eb5.png" src="../_images/1d8abadb937d7eafab8c2f0405fab90e61ccdd4e79469d10af84ce15d6812eb5.png" />
 </div>
 </div>
 <p>This works, but it takes a long time since we have several small steps.</p>
@@ -749,7 +747,7 @@ y: 9.0
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/03507cfedf12a44d611a8d154f2826c860b51a2438ffbd10054023085b3a891c.png" src="../_images/03507cfedf12a44d611a8d154f2826c860b51a2438ffbd10054023085b3a891c.png" />
+<img alt="../_images/ac4b397a7095065b3dc48ea2d72413ad0ca6daed4747c16b396cdcb168946640.png" src="../_images/ac4b397a7095065b3dc48ea2d72413ad0ca6daed4747c16b396cdcb168946640.png" />
 </div>
 </div>
 <p><em>Note the change in scale!</em> With only one step, we already see that we stepped <em>right over</em> the minimum to somewhere far up the other side of the valley (orange point)! This is not good. If we kept iterating with the same learning rate, we’d find that the optimization process diverges and the step sizes start blowing up. This is why it is important to pick the proper step size by setting the learning rate appropriately. Steps that are too small take a long time while steps that are too large render the optimization process invalid. In this case, a reasonable choice appears to be <code class="docutils literal notranslate"><span class="pre">step</span> <span class="pre">size</span> <span class="pre">=</span> <span class="pre">0.6</span></code>, which would have reached pretty close to the minimum after only 3 steps.</p>

@@ -47,7 +47,7 @@ When saving and loading a model, it is important to make sure that ``cell_size``
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",

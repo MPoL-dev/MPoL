@@ -38,8 +38,6 @@
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -499,7 +497,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/4930016/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -554,7 +552,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/718e9367287cf36142d034bbf0363ee526d73082c14ca6629d5d87b8fd043543.png" src="../_images/718e9367287cf36142d034bbf0363ee526d73082c14ca6629d5d87b8fd043543.png" />
+<img alt="../_images/e703801b824fcf332e040be1577bf95fc6432a0908ea038266a05708c6f30088.png" src="../_images/e703801b824fcf332e040be1577bf95fc6432a0908ea038266a05708c6f30088.png" />
 </div>
 </div>
 <p>The fact that visibility data has two spatial frequency coordinates sometimes makes plotting representations of the data values a little challenging. To simplify things, let’s define a 1D “radial” visibility coordinate as <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span>, and plot the real, imaginary, amplitude, and phase values of the visibilities against this.</p>
@@ -587,7 +585,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/50df55b89deeb620c3e1ca20678aa7a09e27e0956a88f223fa68eaf964526ce4.png" src="../_images/50df55b89deeb620c3e1ca20678aa7a09e27e0956a88f223fa68eaf964526ce4.png" />
+<img alt="../_images/a3a3f1a40af6aeb7963a6b181c7a8d5dc729915759c6e58771b095397edd44f7.png" src="../_images/a3a3f1a40af6aeb7963a6b181c7a8d5dc729915759c6e58771b095397edd44f7.png" />
 </div>
 </div>
 <p>There are nearly a third of a million points in each figure, and each is quite noisy, so we can’t learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms">plotms</a> tool.</p>
@@ -707,7 +705,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/135da03f618d7a01f895dd6945737cfdd580ecdcd6bcbbab4c32be6205d91631.png" src="../_images/135da03f618d7a01f895dd6945737cfdd580ecdcd6bcbbab4c32be6205d91631.png" />
+<img alt="../_images/4cfff9b0c942c0cea1ecce9db923ee85b0ecf2fc0f28c40f4dbc1b5b1d4ec199.png" src="../_images/4cfff9b0c942c0cea1ecce9db923ee85b0ecf2fc0f28c40f4dbc1b5b1d4ec199.png" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.</p>
