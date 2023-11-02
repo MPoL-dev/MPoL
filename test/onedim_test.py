@@ -15,17 +15,18 @@ def test_radialI(mock_1d_image_model, tmp_path):
 
     rtest, itest = radialI(i2dtrue, coords, geom, bins=bins)
 
-    fig, ax = plt.subplots(ncols=2)
+    fig, ax = plt.subplots(ncols=2, figsize=(10,5))
 
     plot_image(i2dtrue, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
 
     ax[1].plot(rtrue, itrue, 'k', label='truth')
     ax[1].plot(rtest, itest, 'r.-', label='recovery')
     
-    ax[0].set_title(f"AS 209-like mock disk.\nGeometry {geom}")
+    ax[0].set_title(f"Geometry:\n{geom}", fontsize=7)
     
     ax[1].set_xlabel('r [arcsec]')
     ax[1].set_ylabel('I [Jy / sr]')
+    ax[1].legend()
 
     fig.savefig(tmp_path / "test_radialI.png", dpi=300)
     plt.close("all")
