@@ -77,11 +77,13 @@ def test_radialV(mock_1d_vis_model, tmp_path):
     fig, ax = plt.subplots()
 
     ax.plot(q_dep / 1e6, Vtrue_dep, 'k.', label='truth deprojected')
-    ax.plot(qtest / 1e6, Vtest, 'r.-', label='recovery')
+    ax.plot(qtest / 1e3, Vtest, 'r.-', label='recovery')
 
+    ax.set_xlim(-0.5, 6)
     ax.set_xlabel(r'Baseline [M$\lambda$]')
     ax.set_ylabel('Re(V) [Jy]')
-    ax.set_title(f"Geometry {geom}")
+    ax.set_title(f"Geometry {geom}", fontsize=10)
+    ax.legend()
 
     fig.savefig(tmp_path / "test_radialV.png", dpi=300)
     plt.close("all")
