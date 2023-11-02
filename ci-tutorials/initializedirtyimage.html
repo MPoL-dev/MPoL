@@ -471,6 +471,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">mpol.__init__</span> <span class="kn">import</span> <span class="n">zenodo_record</span>
 </pre></div>
 </div>
 </div>
@@ -480,7 +481,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -541,7 +542,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f224d22e130&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f1bdbde13d0&gt;
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1920x1440 with 0 Axes&gt;
@@ -640,7 +641,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f2248354490&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f1bd4f487f0&gt;
 </pre></div>
 </div>
 <img alt="../_images/cfeca592376d9446231d9f395465a99d362145d85f1265d7c2dbaa7c61560579.png" src="../_images/cfeca592376d9446231d9f395465a99d362145d85f1265d7c2dbaa7c61560579.png" />
@@ -675,7 +676,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f224829ac40&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f1bd4e8ee80&gt;
 </pre></div>
 </div>
 <img alt="../_images/54823db8d1e843fb9b5a6bb7e87c03d6921e745adbb4aab1f9b20438c2d662c9.png" src="../_images/54823db8d1e843fb9b5a6bb7e87c03d6921e745adbb4aab1f9b20438c2d662c9.png" />

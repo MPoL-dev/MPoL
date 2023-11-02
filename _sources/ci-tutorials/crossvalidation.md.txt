@@ -48,10 +48,11 @@ from mpol import (
     losses,
     precomposed,
 )
+from mpol.__init__ import zenodo_record
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -361,7 +362,7 @@ For the purposes of comparison, here is the image produced by the tclean algorit
 
 ```{code-cell}
 fname = download_file(
-    "https://zenodo.org/record/10059491/files/logo_cube.tclean.fits",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.tclean.fits",
     cache=True,
     show_progress=True,
     pkgname="mpol",

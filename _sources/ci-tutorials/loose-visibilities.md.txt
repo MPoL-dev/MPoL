@@ -42,6 +42,7 @@ and the relevant MPoL modules
 
 ```{code-cell}
 from mpol import coordinates, gridding, losses, precomposed, utils, images, fourier
+from mpol.__init__ import zenodo_record
 ```
 
 and loading the dataset
@@ -49,7 +50,7 @@ and loading the dataset
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/10059491/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",

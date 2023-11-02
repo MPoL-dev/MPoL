@@ -493,6 +493,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">fourier</span><span class="p">,</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">mpol.__init__</span> <span class="kn">import</span> <span class="n">zenodo_record</span>
 </pre></div>
 </div>
 </div>
@@ -501,7 +502,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -674,7 +675,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864e645b50&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4169dd51c0&gt;
 </pre></div>
 </div>
 <img alt="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" src="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" />
@@ -771,7 +772,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c8620d0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f416156e700&gt;
 </pre></div>
 </div>
 <img alt="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" src="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" />
@@ -828,7 +829,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c75b400&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4163fc2a90&gt;
 </pre></div>
 </div>
 <img alt="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" src="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" />
@@ -865,8 +866,8 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 31.2 s, sys: 9.56 s, total: 40.7 s
-Wall time: 25.4 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 25.1 s, sys: 6.11 s, total: 31.2 s
+Wall time: 18.7 s
 </pre></div>
 </div>
 </div>
@@ -911,7 +912,7 @@ Wall time: 25.4 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f864c62b460&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f4163e91be0&gt;
 </pre></div>
 </div>
 <img alt="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" src="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" />

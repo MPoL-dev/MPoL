@@ -545,6 +545,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">precomposed</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">fourier</span>
+<span class="kn">from</span> <span class="nn">mpol.__init__</span> <span class="kn">import</span> <span class="n">zenodo_record</span>
 </pre></div>
 </div>
 </div>
@@ -554,7 +555,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>

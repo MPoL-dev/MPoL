@@ -703,7 +703,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7fd714099eb0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7feafc24df10&gt;
 </pre></div>
 </div>
 <img alt="../_images/e9cfcd79d2277afb1491178e2e9d8b3d96157676ce49b9452d11a5480f78def5.png" src="../_images/e9cfcd79d2277afb1491178e2e9d8b3d96157676ce49b9452d11a5480f78def5.png" />
@@ -718,7 +718,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7fd70ba023d0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7feafc19ea00&gt;
 </pre></div>
 </div>
 <img alt="../_images/904a3d5bc9e207868b692b9bec3a323b962ed1e112707b71a69ce081cb8451ec.png" src="../_images/904a3d5bc9e207868b692b9bec3a323b962ed1e112707b71a69ce081cb8451ec.png" />
@@ -836,10 +836,11 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.utils.data</span> <span class="kn">import</span> <span class="n">download_file</span>
+<span class="kn">from</span> <span class="nn">mpol.__init__</span> <span class="kn">import</span> <span class="n">zenodo_record</span>
 
 <span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -895,9 +896,9 @@ title="Print to PDF"
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1, 325080)
 (1, 325080)
-[[ 1.99690974-1.43535972j  7.5063947 +1.07073246j  0.07297529-0.65099814j
-  ...  1.17592585+0.44806424j -0.04548221+0.9672253j
-  -0.88954192-0.48312028j]]
+[[-1.61095068+0.35601013j  8.58315641+2.60414077j  0.85967579+3.90787414j
+  ... -3.18204028-2.05827525j  0.84410198-0.5076383j
+  -0.51759792+1.95124558j]]
 </pre></div>
 </div>
 </div>
@@ -974,7 +975,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/16c0988f8dcbdf684083d04c0aad6044a915dca8233ccd0d4ce77809dfe74dcc.png" src="../_images/16c0988f8dcbdf684083d04c0aad6044a915dca8233ccd0d4ce77809dfe74dcc.png" />
+<img alt="../_images/2a4eebdacc9e12a895811ddfcda098dc72b692dcc4e030eefe72c711d8f9d1c2.png" src="../_images/2a4eebdacc9e12a895811ddfcda098dc72b692dcc4e030eefe72c711d8f9d1c2.png" />
 </div>
 </div>
 <p>We can even subtract this on a pixel-by-pixel basis and compare to the original image.</p>
@@ -1005,7 +1006,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ce15b2079d4d30a7331e4f6c5aef7c9e4e729d1a10c379105092cd91eb601a35.png" src="../_images/ce15b2079d4d30a7331e4f6c5aef7c9e4e729d1a10c379105092cd91eb601a35.png" />
+<img alt="../_images/3c3cddf6e3463a08a5a2e1e860816c8b8108b723c4306b99370028f74f2e0298.png" src="../_images/3c3cddf6e3463a08a5a2e1e860816c8b8108b723c4306b99370028f74f2e0298.png" />
 </div>
 </div>
 <p>The subtraction revears some interesting artefacts.</p>

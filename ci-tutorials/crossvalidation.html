@@ -464,10 +464,11 @@ title="Print to PDF"
     <span class="n">losses</span><span class="p">,</span>
     <span class="n">precomposed</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mpol.__init__</span> <span class="kn">import</span> <span class="n">zenodo_record</span>
 
 <span class="c1"># load the mock dataset of the ALMA logo</span>
 <span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.noise.npz&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
@@ -593,7 +594,7 @@ title="Print to PDF"
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>650160 visibilities total
 </pre></div>
 </div>
-<img alt="../_images/3a1d404a0ae5c5da1d7813b7bee0579d1da1dfde237b1ced76eba752d3e13329.png" src="../_images/3a1d404a0ae5c5da1d7813b7bee0579d1da1dfde237b1ced76eba752d3e13329.png" />
+<img alt="../_images/5c2f302ab2bc381fa2eb442a57d5f0be15520bbbaa4621161550a4ce548b9eb9.png" src="../_images/5c2f302ab2bc381fa2eb442a57d5f0be15520bbbaa4621161550a4ce548b9eb9.png" />
 </div>
 </div>
 <p>As you can see, this training set looks very similar to the full dataset, with the same holes in <span class="math notranslate nohighlight">\(u\)</span>,<span class="math notranslate nohighlight">\(v\)</span> coverage and similar sampling densities.</p>
@@ -851,7 +852,7 @@ f_\mathrm{loss} = f_\mathrm{nll} + \lambda_\mathrm{sparsity} f_\mathrm{sparsity}
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span>
-    <span class="s2">&quot;https://zenodo.org/record/10059491/files/logo_cube.tclean.fits&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;https://zenodo.org/record/</span><span class="si">{</span><span class="n">zenodo_record</span><span class="si">}</span><span class="s2">/files/logo_cube.tclean.fits&quot;</span><span class="p">,</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">pkgname</span><span class="o">=</span><span class="s2">&quot;mpol&quot;</span><span class="p">,</span>
