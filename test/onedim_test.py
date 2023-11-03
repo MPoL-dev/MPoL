@@ -64,9 +64,7 @@ def test_radialI(mock_1d_image_model, tmp_path):
 def test_radialV(mock_1d_vis_model, tmp_path):
     # obtain a 1d radial visibility profile V(q) from 2d visibilities
 
-    Vtrue, Vtrue_dep, q_dep, _, coords = mock_1d_vis_model
-
-    geom = {'incl': 40.0, 'Omega': 130.0, 'omega': 0.0, 'dRA': 0.3, 'dDec': -0.2}
+    fcube, Vtrue_dep, q_dep, geom = mock_1d_vis_model
 
     bins = np.linspace(1,5e3,100)
 
