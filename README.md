@@ -21,14 +21,14 @@ If you use this package or derivatives of it, please cite
                     Hannah Grzybowski and
                     Robert Frazier and
                     Tyler Quinn},
-    title        = {MPoL-dev/MPoL: v0.1.1 Release},
-    month        = jun,
-    year         = 2021,
+    title        = {MPoL-dev/MPoL: v0.2.0 Release},
+    month        = nov,
+    year         = 2023,
     publisher    = {Zenodo},
-    version      = {v0.1.1},
+    version      = {v0.2.0},
     doi          = {10.5281/zenodo.4939048},
     url          = {https://doi.org/10.5281/zenodo.4939048}
     }
 
 ---
-Copyright Ian Czekala and contributors 2019-21
+Copyright Ian Czekala and contributors 2019-23
