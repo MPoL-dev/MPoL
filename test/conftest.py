@@ -146,6 +146,11 @@ def mock_1d_image_model(mock_1d_archive):
     # undo this as expected by input to ImageCube
     i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
 
+    # pack the numpy image array into an ImageCube
+    packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
+    packed_tensor = torch.from_numpy(packed_cube)
+    cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
+
 
 
 @pytest.fixture
