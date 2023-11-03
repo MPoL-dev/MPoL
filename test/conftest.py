@@ -169,7 +169,11 @@ def mock_1d_vis_model(mock_1d_archive):
     coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0],
                                     npix=i2dtrue.shape[0])
 
-    return Vtrue, Vtrue_dep, q_dep, geom, coords
+    # create a FourierCube
+    packed_cube = np.broadcast_to(Vtrue, (1, len(Vtrue))).copy()
+    packed_tensor = torch.from_numpy(packed_cube)
+    cube_true = fourier.FourierCube(coords=coords)
+
 
 
 
