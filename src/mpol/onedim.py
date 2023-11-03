@@ -103,6 +103,8 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
         The source's integrated (2D) flux is assumed to be:
             :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
         No rescaling would be appropriate in the optically thin limit. 
+    chan : int, default=0
+        Channel of the image cube corresponding to the desired image        
     bins : array, default=None, unit=[k\lambda]
         Baseline bin edges to use in calculating V(q). If None, bins will span 
         the model baseline distribution, with widths equal to the hypotenuse of 
@@ -110,7 +112,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
 
     Returns
     -------
-    q : array, unit=:math:[`k\lambda`]
+    bin_centers : array, unit=:math:[`k\lambda`]
         Baselines corresponding to `u` and `v`
     Vs : array, unit=[Jy] 
         Visibility amplitudes at `q`
