@@ -1013,7 +1013,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.geometry.observer_to_flat">
 <span class="sig-prename descclassname"><span class="pre">mpol.geometry.</span></span><span class="sig-name descname"><span class="pre">observer_to_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/geometry.html#observer_to_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.geometry.observer_to_flat" title="Permalink to this definition">#</a></dt>
-<dd><p>Rotate the from to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</p>
+<dd><p>Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</p>
 <p>It is assumed that the +Z axis points <em>towards</em> the observer. The rotation operations are the inverse of the <a class="reference internal" href="#mpol.geometry.flat_to_observer" title="mpol.geometry.flat_to_observer"><code class="xref py py-func docutils literal notranslate"><span class="pre">flat_to_observer()</span></code></a> operations.</p>
 <p>In order,</p>
 <ol class="arabic simple">
@@ -1033,7 +1033,7 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Two tensors representing <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in the observer frame.</p>
+<dd class="field-even"><p>Two tensors representing <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> in the flat frame.</p>
 </dd>
 </dl>
 </dd></dl>

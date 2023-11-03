@@ -323,7 +323,6 @@ title="Source repository"
 <span class="sd">    Returns:</span>
 <span class="sd">        Two tensors representing ``(X, Y)`` in the observer frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.</span>
     <span class="c1"># For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.</span>
     <span class="c1"># A vector in the coordinate system will appear as though it has been rotated counter-clockwise.</span>
@@ -365,7 +364,7 @@ title="Source repository"
 
 
 <div class="viewcode-block" id="observer_to_flat"><a class="viewcode-back" href="../../api.html#mpol.geometry.observer_to_flat">[docs]</a><span class="k">def</span> <span class="nf">observer_to_flat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the from to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</span>
 
 <span class="sd">    It is assumed that the +Z axis points *towards* the observer. The rotation operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.</span>
 
@@ -385,9 +384,8 @@ title="Source repository"
 <span class="sd">        Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Two tensors representing ``(x, y)`` in the observer frame.</span>
+<span class="sd">        Two tensors representing ``(x, y)`` in the flat frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.</span>
     <span class="c1"># For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.</span>
     <span class="c1"># A vector in the coordinate system will appear as though it has been rotated counter-clockwise.</span>
