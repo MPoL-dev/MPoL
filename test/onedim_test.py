@@ -7,9 +7,7 @@ from mpol.plot import plot_image
 def test_radialI(mock_1d_image_model, tmp_path):
     # obtain a 1d radial brightness profile I(r) from an image    
 
-    rtrue, itrue, i2dtrue, _, _, _, coords = mock_1d_image_model
-
-    geom = {'incl': 40.0, 'Omega': 130.0, 'omega': 0.0, 'dRA': 0.3, 'dDec': -0.2}
+    rtrue, itrue, icube, _, _, geom = mock_1d_image_model
 
     bins = np.linspace(0, 2.0, 100)
 
