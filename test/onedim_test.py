@@ -70,7 +70,7 @@ def test_radialV(mock_1d_vis_model, tmp_path):
 
     bins = np.linspace(1,5e3,100)
 
-    qtest, Vtest = radialV(Vtrue, coords, geom, rescale_flux=True, bins=bins)
+    qtest, Vtest = radialV(fcube, geom, rescale_flux=True, bins=bins)
 
     fig, ax = plt.subplots()
 
