@@ -10,7 +10,7 @@ Million Points of Light (MPoL)
 |Discussions badge|
 
 
-.. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg
+.. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main
    :target: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml
 
 .. |Discussions badge| image:: https://img.shields.io/badge/community-Github%20Discussions-orange
