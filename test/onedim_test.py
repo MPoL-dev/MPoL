@@ -3,6 +3,7 @@ import numpy as np
 
 from mpol.onedim import radialI, radialV
 from mpol.plot import plot_image
+from mpol.utils import torch2npy
 
 def test_radialI(mock_1d_image_model, tmp_path):
     # obtain a 1d radial brightness profile I(r) from an image    
@@ -11,11 +12,12 @@ def test_radialI(mock_1d_image_model, tmp_path):
 
     bins = np.linspace(0, 2.0, 100)
 
-    rtest, itest = radialI(i2dtrue, coords, geom, bins=bins)
+    rtest, itest = radialI(icube, geom, bins=bins)
 
     fig, ax = plt.subplots(ncols=2, figsize=(10,5))
 
-    plot_image(i2dtrue, extent=coords.img_ext, ax=ax[0], clab='Jy / sr')
+    plot_image(np.squeeze(torch2npy(icube.sky_cube)), extent=icube.coords.img_ext, 
+               ax=ax[0], clab='Jy / sr')
 
     ax[1].plot(rtrue, itrue, 'k', label='truth')
     ax[1].plot(rtest, itest, 'r.-', label='recovery')
