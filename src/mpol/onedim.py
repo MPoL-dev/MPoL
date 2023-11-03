@@ -36,7 +36,7 @@ def radialI(icube, geom, chan=0, bins=None):
     """
 
     # projected Cartesian pixel coordinates [arcsec]
-    xx, yy = coords.sky_x_centers_2D, coords.sky_y_centers_2D
+    xx, yy = icube.coords.sky_x_centers_2D, icube.coords.sky_y_centers_2D
 
     # shift image center to source center
     xc, yc = xx - geom["dRA"], yy - geom["dDec"]
@@ -53,13 +53,15 @@ def radialI(icube, geom, chan=0, bins=None):
 
     if bins is None:
         # choose sensible bin size and range
-        step = np.hypot(coords.cell_size, coords.cell_size)
+        step = np.hypot(icube.coords.cell_size, icube.coords.cell_size)
         bins = np.arange(0.0, np.max((abs(xc.ravel()), abs(yc.ravel()))), step)
 
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
 
     # cumulative binned brightness in each annulus
-    Is, _ = np.histogram(a=rr, bins=bins, weights=np.ravel(image))
+    Is, _ = np.histogram(a=rr, bins=bins, 
+                         weights=torch2npy(icube.sky_cube[chan]).ravel()
+                         )
 
     # mask empty bins
     mask = (bin_counts == 0)
