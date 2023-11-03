@@ -1,15 +1,14 @@
 import numpy as np 
+from mpol.utils import torch2npy
 
-def radialI(image, coords, geom, bins=None):
+def radialI(icube, geom, chan=0, bins=None):
     r"""
-    Obtain a 1D (radial) brightness profile I(r) from an image.
+    Obtain a 1D (radial) brightness profile I(r) from an image cube.
 
     Parameters
     ----------
-    image : array
-        2D image array 
-    coords : `mpol.coordinates.GridCoords` object
-        Instance of the `mpol.coordinates.GridCoords` class
+    icube : `mpol.images.ImageCube` object
+        Instance of the MPoL `images.ImageCube` class
     geom : dict 
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
