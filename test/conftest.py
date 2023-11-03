@@ -178,6 +178,8 @@ def mock_1d_vis_model(mock_1d_archive):
     # populated by taking the FFT of an image)
     cube_true.ground_cube = packed_tensor
 
+    return cube_true, Vtrue_dep, q_dep, geom
+
 
 
 @pytest.fixture
