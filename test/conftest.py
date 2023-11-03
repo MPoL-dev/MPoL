@@ -141,8 +141,11 @@ def mock_1d_image_model(mock_1d_archive):
 
     coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
                                     npix=i2dtrue.shape[0])
+    
+    # the center of the array is already at the center of the image -->
+    # undo this as expected by input to ImageCube
+    i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
 
-    return rtrue, itrue, i2dtrue, xmax, ymax, geom, coords
 
 
 @pytest.fixture
