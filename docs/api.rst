@@ -10,21 +10,25 @@ Utilities
 ---------
 
 .. automodule:: mpol.utils
-    :members:
+
 
 Coordinates
 -----------
 
 .. automodule:: mpol.coordinates
-    :members:
+
+Geometry
+--------
+
+.. automodule:: mpol.geometry
 
 Gridding
 --------
 
 .. automodule:: mpol.gridding
 
-Datasets and Cross-Validation
------------------------------
+Datasets
+--------
 
 .. automodule:: mpol.datasets
 
@@ -52,11 +56,19 @@ Losses
 .. automodule:: mpol.losses
 
 
-Connectors
-----------
+Training and testing
+--------------------
 
-The objects in the Images and Precomposed modules are focused on bringing some image-plane model to the space of the data, where the similarity of the model visibilities to the data visibilities will be evaluated by a negative log-likelihood loss. In some situations, though, it is useful to have access to the residual visibilities directly. For example, for visualization or debugging purposes.
+.. automodule:: mpol.training
 
-Connectors are a PyTorch layer to help compute those residual visibilities (on a gridded form).
 
-.. automodule:: mpol.connectors
+Cross-validation
+----------------
+
+.. automodule:: mpol.crossval
+
+
+Plotting
+--------
+
+.. automodule:: mpol.plot

@@ -44,7 +44,7 @@ source_suffix = {
 myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
-autodoc_member_order = "bysource" 
+autodoc_member_order = "bysource"
 autodoc_default_options = {"members": None}
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,7 +58,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_book_theme"
 html_theme_options = {
-    "analytics_id": "UA-5472810-8",
     "repository_url": "https://github.com/MPoL-dev/MPoL",
     "use_repository_button": True,
 }
@@ -92,7 +91,8 @@ html_js_files = ["https://buttons.github.io/buttons.js"]
 
 nb_execution_mode = "cache"
 nb_execution_timeout = -1
+nb_execution_raise_on_error = True
 # .ipynb are produced using Makefile on own terms,
 # # both .md and executed .ipynb are kept in git repo
-nb_execution_excludepatterns = ["large-tutorials/*.md", "**.ipynb_checkpoints"]
+nb_execution_excludepatterns = ["large-tutorials/*.md", "large-tutorials/*.ipynb", "**.ipynb_checkpoints"]
 myst_heading_anchors = 3

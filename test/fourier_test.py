@@ -28,7 +28,7 @@ def test_fourier_cube(coords, tmp_path):
     flayer = fourier.FourierCube(coords=coords)
     # convert img_packed to pytorch tensor
     img_packed_tensor = torch.from_numpy(img_packed[np.newaxis, :, :])
-    fourier_packed_num = np.squeeze(flayer.forward(img_packed_tensor).numpy())
+    fourier_packed_num = np.squeeze(flayer(img_packed_tensor).numpy())
 
     # calculate the analytical FFT
     fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
@@ -92,7 +92,7 @@ def test_fourier_cube_grad(coords):
     # calculated the packed FFT using the FourierLayer
     flayer = fourier.FourierCube(coords=coords)
 
-    output = flayer.forward(img_packed_tensor)
+    output = flayer(img_packed_tensor)
     loss = torch.sum(torch.abs(output))
 
     loss.backward()
@@ -145,7 +145,7 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
     layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # predict the values of the cube at the u,v locations
-    output = layer.forward(imagecube.forward())
+    output = layer(imagecube())
 
     # make sure we got back the number of visibilities we expected
     assert output.shape == (nchan, len(uu))
@@ -179,7 +179,7 @@ def test_nufft_predict_GPU(coords, mock_visibility_data_cont):
         layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv).to(device=device)
 
         # predict the values of the cube at the u,v locations
-        output = layer.forward(imagecube.forward())
+        output = layer(imagecube())
 
         # make sure we got back the number of visibilities we expected
         assert output.shape == (nchan, len(uu))
@@ -218,7 +218,7 @@ def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path)
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer.forward(img_packed_tensor)[0].detach().numpy() # take the channel dim out
+    num_output = layer(img_packed_tensor)[0].detach().numpy() # take the channel dim out
 
     # calculate the values analytically
     an_output = utils.fourier_gaussian_klambda_arcsec(
@@ -291,7 +291,7 @@ def test_nufft_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)), requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer.forward(img_packed_tensor).detach().numpy() 
+    num_output = layer(img_packed_tensor).detach().numpy() 
 
     # calculate the values analytically, for a single channel
     an_output = utils.fourier_gaussian_klambda_arcsec(
@@ -334,7 +334,7 @@ def test_nufft_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)), requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer.forward(img_packed_tensor).detach().numpy() 
+    num_output = layer(img_packed_tensor).detach().numpy() 
 
     # plot a single channel, to check
     ichan = 3

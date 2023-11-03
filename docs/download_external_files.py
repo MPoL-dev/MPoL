@@ -1,6 +1,6 @@
 from astropy.utils.data import download_file
+from mpol.__init__ import zenodo_record
 
-version = 4930016
 slug = "https://zenodo.org/record/{:d}/files/{:}"
 
 fnames = [
@@ -10,7 +10,7 @@ fnames = [
 ]
 
 for fname in fnames:
-    url = slug.format(version, fname)
+    url = slug.format(zenodo_record, fname)
     download_file(
         url,
         cache=True,

@@ -32,6 +32,7 @@ EXTRA_REQUIRES = {
         "requests",
         "astropy",
         "tensorboard",
+        "mypy",
     ],
     "docs": [
         "sphinx>=2.3.0",
@@ -44,12 +45,15 @@ EXTRA_REQUIRES = {
         "jupyter",
         "nbconvert",
         "matplotlib",
-        "sphinxcontrib-mermaid",
+        "sphinxcontrib-mermaid>=0.8.1",
         "astropy",
         "tensorboard",
         "myst-nb",
         "jupyter-cache",
         "Pillow",
+        "asdf",
+        "pyro-ppl",
+        "arviz[all]"
     ],
 }
 
@@ -69,6 +73,7 @@ setuptools.setup(
     url="https://github.com/iancze/MPoL",
     install_requires=[
         "numpy",
+        "fast-histogram",
         "scipy",
         "torch>=1.8.0",
         "torchvision",
@@ -80,9 +85,11 @@ setuptools.setup(
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )

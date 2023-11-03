@@ -40,6 +40,7 @@ from astropy.utils.data import download_file
 
 ```{code-cell}
 from mpol import coordinates, gridding, losses, precomposed, utils
+from mpol.__init__ import zenodo_record
 ```
 
 When saving and loading a model, it is important to make sure that ``cell_size``, ``nchan``, and ``npix`` remain the same. More info on coordinates can be found in {class}`mpol.coordinates.GridCoords`.
@@ -47,7 +48,7 @@ When saving and loading a model, it is important to make sure that ``cell_size``
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -69,19 +70,22 @@ data_im = data.imag
 coords = coordinates.GridCoords(
     cell_size=0.03, npix=180
 )  # Smaller cell size and larger npix value can greatly increase run time
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
 )
 
 # export to PyTorch dataset
-dset = gridder.to_pytorch_dataset()
+dset = averager.to_pytorch_dataset()
 ```
 
 Now let's calculate the dirty image. Here we're using Briggs weighting with a robust value of 1.0, but you can use whichever weighting scheme you think looks best for your dataset.
 
 ```{code-cell}
 # Calculate the dirty image
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
+imager = gridding.DirtyImager(
+    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im)
+
+img, beam = imager.get_dirty_image(weighting="briggs", robust=1.0, unit="Jy/arcsec^2")
 ```
 
 Let's visualize this dirty image. Here we're using an aggressive colormap to highlight the many negative flux pixels contained in this image.
@@ -90,7 +94,7 @@ Let's visualize this dirty image. Here we're using an aggressive colormap to hig
 plt.set_cmap(
     "Spectral"
 )  # using Matplotlib diverging colormap to accentuate negative values
-kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+kw = {"origin": "lower", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
 snp = ax.imshow(np.squeeze(img), **kw)
 ax.set_title("image")
@@ -132,7 +136,7 @@ for iteration in range(50):
 
     optimizer.zero_grad()
 
-    rml.forward()
+    rml()
 
     sky_cube = rml.icube.sky_cube
 
@@ -205,7 +209,7 @@ rml = precomposed.SimpleNet(coords=coords)
 rml.state_dict()  # the now uninitialized parameters of the model (the ones we started with)
 ```
 
-Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the paramters through the optimization function. Loading our saved dirty image state into the model is as simple as
+Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the parameters through the optimization function. Loading our saved dirty image state into the model is as simple as
 
 ```{code-cell}
 rml.load_state_dict(torch.load("dirty_image_model.pt"))

@@ -1,6 +1,7 @@
 name: package test
 
-on: push
+on:
+  pull_request:
 
 jobs:
   dl_files:
@@ -12,8 +13,11 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies needed to download files
+        # we're just installing mpol here to reference the zenodo record number 
+        # in __init__. below we'll reinstall for the tests.
         run: |
           pip install astropy
+          pip install .
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:
@@ -52,6 +56,12 @@ jobs:
       - name: Install pip
         run: |
           pip install --upgrade pip
+      - name: Install vanilla package
+        run: |
+          pip install .
+      - name: Install test dependencies
+        run: |
+          pip install .[test]
       - name: Lint with flake8
         run: |
           pip install flake8
@@ -59,12 +69,9 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Install vanilla package
+      - name: Check types with MyPy
         run: |
-          pip install .
-      - name: Install test dependencies
-        run: |
-          pip install .[test]
+          mypy src/mpol --pretty
       - name: Cache/Restore the .mpol folder cache
         uses: actions/cache@v3
         env:

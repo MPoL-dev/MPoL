@@ -51,7 +51,7 @@ def loose_visibilities(mock_visibility_data, image_cube):
     vv_chan = vv[chan]
 
     nufft = fourier.NuFFT(coords=image_cube.coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
-    return nufft.forward(image_cube.forward())
+    return nufft(image_cube())
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def gridded_visibilities(image_cube):
 
     # use the FourierCube to produce model visibilities
     flayer = fourier.FourierCube(coords=image_cube.coords)
-    return flayer.forward(image_cube.forward())
+    return flayer(image_cube())
 
 
 def test_chi_squared_evaluation(

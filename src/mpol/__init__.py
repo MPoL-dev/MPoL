@@ -1,4 +1,5 @@
 __version__ = "0.1.13"
+zenodo_record = 10064221
 
 def enable_logging(log_file=None):
     """Turn on internal logging for MPoL

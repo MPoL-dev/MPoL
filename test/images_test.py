@@ -8,40 +8,43 @@ from mpol.constants import *
 
 
 def test_odd_npix():
-    with pytest.raises(AssertionError):
-        images.BaseCube(npix=853, nchan=30, cell_size=0.015)
+    expected_error_message = "Image must have an even number of pixels."
 
-    with pytest.raises(AssertionError):
-        images.ImageCube(npix=853, nchan=30, cell_size=0.015)
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.BaseCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
+
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.ImageCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
 
 
 def test_negative_cell_size():
-    with pytest.raises(AssertionError):
-        images.BaseCube(npix=800, nchan=30, cell_size=-0.015)
+    expected_error_message = "cell_size must be a positive real number."
 
-    with pytest.raises(AssertionError):
-        images.ImageCube(npix=800, nchan=30, cell_size=-0.015)
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.BaseCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
+
+    with pytest.raises(ValueError, match=expected_error_message):
+        images.ImageCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
 
 
 def test_single_chan():
-    im = images.ImageCube(cell_size=0.015, npix=800)
+    im = images.ImageCube.from_image_properties(cell_size=0.015, npix=800)
     assert im.nchan == 1
 
 
 def test_basecube_grad():
-    bcube = images.BaseCube(npix=800, cell_size=0.015)
-    loss = torch.sum(bcube.forward())
+    bcube = images.BaseCube.from_image_properties(npix=800, cell_size=0.015)
+    loss = torch.sum(bcube())
     loss.backward()
 
 
 def test_imagecube_grad(coords):
-
     bcube = images.BaseCube(coords=coords)
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, passthrough=True)
 
     # send things through this layer
-    loss = torch.sum(imagecube.forward(bcube.forward()))
+    loss = torch.sum(imagecube(bcube()))
 
     loss.backward()
 
@@ -55,7 +58,7 @@ def test_imagecube_tofits(coords, tmp_path):
     imagecube = images.ImageCube(coords=coords, passthrough=True)
 
     # sending the basecube through the imagecube
-    imagecube.forward(bcube.forward())
+    imagecube(bcube())
 
     # creating output fits file with name 'test_cube_fits_file39.fits'
     # file will be deleted after testing
@@ -69,7 +72,6 @@ def test_imagecube_tofits(coords, tmp_path):
 
 
 def test_basecube_imagecube(coords, tmp_path):
-
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
@@ -86,7 +88,7 @@ def test_basecube_imagecube(coords, tmp_path):
     basecube = images.BaseCube(coords=coords, nchan=nchan, base_cube=base_cube)
 
     # the default softplus function should map everything to positive values
-    output = basecube.forward()
+    output = basecube()
 
     fig, ax = plt.subplots(ncols=2, nrows=1)
 
@@ -108,7 +110,7 @@ def test_basecube_imagecube(coords, tmp_path):
     imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
 
     # send things through this layer
-    imagecube.forward(basecube.forward())
+    imagecube(basecube())
 
     fig, ax = plt.subplots(ncols=1)
     im = ax.imshow(
@@ -186,3 +188,8 @@ def test_multi_chan_conv(coords, tmp_path):
     conv_layer = images.HannConvCube(nchan=nchan)
 
     conv_layer(test_cube)
+
+def test_image_flux(coords):
+    nchan = 20
+    im = images.ImageCube(coords=coords, nchan=nchan)    
+    assert im.flux.size()[0] == nchan

@@ -1,8 +1,16 @@
+r"""The ``gridding`` module provides two core classes in :class:`mpol.gridding.DataAverager` and :class:`mpol.gridding.DirtyImager`."""
+
+
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
+from fast_histogram import histogram as fast_hist
 
-from .coordinates import _setup_coords
+from mpol.coordinates import GridCoords
+from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
+
 from .datasets import GriddedDataset
 
 
@@ -16,24 +24,24 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
 
     """
 
-    assert (
-        uu.ndim == 2 or uu.ndim == 1
-    ), "Input data vectors should be either 1D or 2D numpy arrays."
-    shape = uu.shape
+    if not 1 <= uu.ndim <= 2:
+        raise WrongDimensionError(
+            "Input data vectors should be either 1D or 2D numpy arrays."
+        )
 
-    for a in [vv, weight, data_re, data_im]:
-        assert (
-            a.shape == shape
-        ), "All dataset inputs must be the same input shape and size."
+    if not all(array.shape == uu.shape for array in [vv, weight, data_re, data_im]):
+        raise WrongDimensionError(
+            "All dataset inputs must be the same input shape and size."
+        )
 
-    assert np.all(weight > 0.0), "Not all thermal weights are positive, check inputs."
+    if np.any(weight <= 0.0):
+        raise ValueError("Not all thermal weights are positive, check inputs.")
 
-    assert (data_re.dtype == np.single) or (
-        data_re.dtype == np.double
-    ), "data_re should be type single or double"
-    assert (data_im.dtype == np.single) or (
-        data_im.dtype == np.double
-    ), "data_im should be type single or double"
+    if data_re.dtype not in (np.single, np.double):
+        raise TypeError("data_re should be of type np.single or np.double.")
+
+    if data_im.dtype not in (np.single, np.double):
+        raise TypeError("data_im should be of type np.single or np.double.")
 
     if uu.ndim == 1:
         uu = np.atleast_2d(uu)
@@ -43,12 +51,12 @@ def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=N
         data_im = np.atleast_2d(data_im)
 
     # check to see that uu, vv and data do not contain Hermitian pairs
-    assert not contains_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
+    verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
     return uu, vv, weight, data_re, data_im
 
 
-def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
+def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     r"""
     Check that the dataset does not contain Hermitian pairs. Because the sky brightness :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian, meaning that
 
@@ -58,7 +66,7 @@ def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
 
     Most datasets (e.g., those extracted from CASA) will only record one visibility measurement per baseline and not include the duplicate Hermitian pair (to save storage space). This routine attempts to determine if the dataset contains Hermitian pairs or not by choosing one data point at a time and then searching the dataset to see if its Hermitian pair exists. The routine will declare that a dataset contains Hermitian pairs or not after it has searched ``test_vis`` number of data points. If 0 Hermitian pairs have been found for all ``test_vis`` points, then the dataset will be declared to have no Hermitian pairs. If ``test_vis`` Hermitian pairs were found for ``test_vis`` points searched, then the dataset will be declared to have Hermitian pairs. If more than 0 but fewer than ``test_vis`` Hermitian pairs were found for ``test_vis`` points, an error will be raised.
 
-    Gridding objects like :class:`mpol.gridding.Gridder` will naturally augment an input dataset to include the Hermitian pairs, so that images of :math:`I_\nu` produced with the inverse Fourier transform turn out to be real.
+    Gridding objects like :class:`mpol.gridding.DirtyImager` will naturally augment an input dataset to include the Hermitian pairs, so that images of :math:`I_\nu` produced with the inverse Fourier transform turn out to be real.
 
     Args:
         uu (numpy array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
@@ -104,23 +112,27 @@ def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
         # we only need the first dimension, not the u_v dimension
         ind = np.nonzero(uu_vv == -uv_point)[0]
 
-        # if we found something, then take the first result
-        if ind.size > 0:
-            ind = ind[0]
+        # if we found nothing, move on to checking the next point
+        if ind.size == 0:
+            continue
 
-            # test to see whether the data is a conjugate
-            if data[i] == np.conj(data[ind]):
-                num_pairs += 1
+        # if we found something, then take the first result
+        ind = ind[0]
+
+        # test to see whether the data is a conjugate
+        if data[i] == np.conj(data[ind]):
+            num_pairs += 1
 
     if num_pairs == 0:
-        return False
-    elif num_pairs == test_vis:
-        return True
+        return
+
+    if num_pairs == test_vis:
+        raise DataError(
+            "Hermitian pairs were found in the data. Please provide data without Hermitian pairs."
+        )
     else:
-        raise RuntimeError(
-            "{:} Hermitian pairs were found out of {:} visibilities tested, dataset is inconsistent.".format(
-                num_pairs, test_vis
-            )
+        raise DataError(
+            f"{num_pairs} Hermitian pairs were found out of {test_vis} visibilities tested, dataset is inconsistent."
         )
 
     # choose a uu, vv point, then see if the opposite value exists in the dataset
@@ -132,19 +144,17 @@ def contains_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     return False
 
 
-class Gridder:
+class GridderBase:
     r"""
-    The Gridder object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
+    This class is not designed to be used directly, but rather to be subclassed.
 
-    The :class:`.Gridder` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, the Gridder will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.' The visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the Gridder assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+    Subclasses will need to implement a `_grid_visibilities(self,...)` method.
 
-    If your goal is to use these gridded visibilities in Regularized Maximum Likelihood imaging, you can export them to the appropriate PyTorch object using the :func:`~mpol.gridding.Gridder.to_pytorch_dataset` routine.
+    The GridderBase object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
 
-    If you want to take a quick look at the rough image plane representation of the visibilities, you can view the 'dirty image' and the point spread function or 'dirty beam' using the :func:`~mpol.gridding.Gridder.get_dirty_image` and :func:`~mpol.gridding.Gridder.get_dirty_beam` methods.
+    Subclasses will accept "loose" *ungridded* visibility data and store the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered).  The visibilities can be 1d for a single continuum channel, or 2d for an image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, GridderBase assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
 
     Args:
-        cell_size (float): width of a single square pixel in [arcsec]
-        npix (int): number of pixels in the width of the image
         coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
@@ -156,8 +166,6 @@ class Gridder:
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
         uu=None,
         vv=None,
@@ -165,29 +173,45 @@ class Gridder:
         data_re=None,
         data_im=None,
     ):
-
         # check everything should be 2d, expand if not
+        # also checks data does not contain Hermitian pairs
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
             uu, vv, weight, data_re, data_im
         )
 
         # setup the coordinates object
-        nchan = len(uu)
-        _setup_coords(self, cell_size, npix, coords, nchan)
-
-        # expand the vectors to include complex conjugates
-        uu_full = np.concatenate([uu, -uu], axis=1)
-        vv_full = np.concatenate([vv, -vv], axis=1)
+        self.coords = coords
+        self.nchan = len(uu)
 
         # make sure we still fit into the grid
-        self.coords.check_data_fit(uu_full, vv_full)
+        self.coords.check_data_fit(uu, vv)
 
-        self.uu = uu_full
-        self.vv = vv_full
-        self.weight = np.concatenate([weight, weight], axis=1)
-        self.data_re = np.concatenate([data_re, data_re], axis=1)
-        self.data_im = np.concatenate([data_im, -data_im], axis=1)
+        # classes that inherit this will need to set data attributes
+        # deciding on whether to include Hermitian pairs
+        self.uu = uu
+        self.vv = vv
+        self.weight = weight
+        self.data_re = data_re
+        self.data_im = data_im
 
+        # and register cell indices against data
+        self._create_cell_indices()
+
+    @classmethod
+    def from_image_properties(
+        cls,
+        cell_size,
+        npix,
+        uu=None,
+        vv=None,
+        weight=None,
+        data_re=None,
+        data_im=None,
+    ) -> GridderBase:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, uu, vv, weight, data_re, data_im)
+
+    def _create_cell_indices(self):
         # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
         # do this by calculating the nearest cell index [0, N] for all samples
@@ -222,19 +246,23 @@ class Gridder:
             A 2D array of size ``(npix, npix)`` in ground format containing the summed cell quantities.
         """
 
-        result = np.histogram2d(
+        result = fast_hist.histogram2d(
             vv,
             uu,
-            bins=[self.coords.v_edges, self.coords.u_edges],
+            bins=self.coords.ncell_u,
+            range=[
+                [self.coords.v_bin_min, self.coords.v_bin_max],
+                [self.coords.u_bin_min, self.coords.u_bin_max],
+            ],
             weights=values,
         )
 
         # only return the "H" value
-        return result[0]
+        return result
 
     def _sum_cell_values_cube(self, values=None):
         r"""
-        Perform the :func:`~mpol.gridding.Gridder.sum_cell_values_channel` routine over all channels of the
+        Perform the :func:`~mpol.gridding.DataAverager.sum_cell_values_channel` routine over all channels of the
         input visibilities.
 
         Args:
@@ -277,120 +305,6 @@ class Gridder:
             ]
         )
 
-    def _grid_visibilities(
-        self,
-        weighting="uniform",
-        robust=None,
-        taper_function=None,
-    ):
-        r"""
-        Grid the loose data visibilities to the Fourier grid in preparation for imaging.
-
-        Args:
-            weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
-            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approximately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
-            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
-        """
-
-        if taper_function is None:
-            tapering_weight = np.ones_like(self.weight)
-        else:
-            tapering_weight = taper_function(self.uu, self.vv)
-
-        # create the cells as edges around the existing points
-        # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._sum_cell_values_cube(self.weight)
-
-        # boolean index for cells that *contain* visibilities
-        mask = cell_weight > 0.0
-
-        # calculate the density weights
-        # the density weights have the same shape as the re, im samples.
-        if weighting == "natural":
-            density_weight = np.ones_like(self.weight)
-        elif weighting == "uniform":
-            # cell_weight is (nchan, ncell_v, ncell_u)
-            # self.index_v, self.index_u are (nchan, nvis)
-            # we want density_weights to be (nchan, nvis)
-            density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
-
-        elif weighting == "briggs":
-            if robust is None:
-                raise ValueError(
-                    "If 'briggs' weighting, a robust value must be specified between [-2, 2]."
-                )
-            assert (robust >= -2) and (
-                robust <= 2
-            ), "robust parameter must be in the range [-2, 2]"
-
-            # implement robust weighting using the definition used in CASA
-            # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
-
-            # calculate the robust parameter f^2 for each channel
-            f_sq = ((5 * 10 ** (-robust)) ** 2) / (
-                np.sum(cell_weight**2, axis=(1, 2)) / np.sum(self.weight, axis=1)
-            )
-
-            # the robust weight corresponding to the cell
-            cell_robust_weight = 1 / (1 + cell_weight * f_sq[:, np.newaxis, np.newaxis])
-
-            # zero out cells that have no visibilities
-            # to prevent normalization error in next step
-            cell_robust_weight[~mask] = 0
-
-            # now assign the cell robust weight to each visibility within that cell
-            density_weight = self._extract_gridded_values_to_loose(cell_robust_weight)
-
-        else:
-            raise ValueError(
-                "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
-            )
-
-        # the factor of 2 in the denominator is needed because
-        # we are approximating the Eqn 3.8 of Briggs' thesis
-        # we need to sum over the Hermitian quantities in the
-        # normalization constant.
-        self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
-
-        # grid the reals and imaginaries separately
-        # outputs from _sum_cell_values_cube are *not* pre-packed
-        data_re_gridded = self._sum_cell_values_cube(
-            self.data_re * tapering_weight * density_weight * self.weight
-        )
-
-        data_im_gridded = self._sum_cell_values_cube(
-            self.data_im * tapering_weight * density_weight * self.weight
-        )
-
-        # the beam is the response to a point source, which is data_re = constant, data_im = 0
-        # so we save time and only calculate the reals, because gridded_beam_im = 0
-        re_gridded_beam = self._sum_cell_values_cube(
-            tapering_weight * density_weight * self.weight
-        )
-
-        # store the pre-packed FFT products for access by outside routines
-        self.mask = np.fft.fftshift(mask)
-        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
-        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
-        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
-        self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
-
-    def _grid_weights(self):
-        r"""
-        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
-        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
-        within that cell.
-        """
-
-        # create the cells as edges around the existing points
-        # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._sum_cell_values_cube(self.weight)
-
-        # instantiate uncertainties for each averaged visibility.
-        self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
-
     def _estimate_cell_standard_deviation(self):
         r"""
         Estimate the `standard deviation <https://en.wikipedia.org/wiki/Standard_deviation>`__ of the real and imaginary visibility values within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords`` using the following steps.
@@ -416,7 +330,7 @@ class Gridder:
         """
 
         # 1. use the gridding routine to calculate the mean real and imaginary values on the grid
-        self._grid_visibilities(weighting="uniform")
+        self._grid_visibilities()
 
         # convert grid back to ground format
         mu_re_gridded = np.fft.fftshift(self.data_re_gridded, axes=(1, 2))
@@ -491,6 +405,310 @@ class Gridder:
     def _fliplr_cube(self, cube):
         return cube[:, :, ::-1]
 
+    @property
+    def ground_cube(self):
+        r"""
+        The visibility FFT cube fftshifted for plotting with ``imshow``.
+
+        Returns:
+            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
+        """
+
+        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))
+
+
+class DataAverager(GridderBase):
+    r"""
+    The DataAverager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
+
+    The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain, and should not contain Hermitian pairs (an error will be raised, if they are encountered). (Note that, unlike :class:`~mpol.gridding.DirtyImager`, this class *will not* augment the dataset to include Hermitian pairs. This is by design, since Hermitian pairs should not be used in likelihood calculations).
+
+    The input visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DataAverager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    Once the DataAverager object is initialized with loose visibilities, you can average them and export them for use in Regularized Maximum Likelihood imaging with the :func:`mpol.gridding.DataAverager.to_pytorch_dataset` routine.
+
+    Example::
+
+        averager = gridding.DataAverager(
+            coords=coords,
+            uu=uu,
+            vv=vv,
+            weight=weight,
+            data_re=data_re,
+            data_im=data_im,
+            )
+
+        dset = averager.to_pytorch_dataset()
+
+
+    Args:
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
+        data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+
+    """
+
+    def _grid_visibilities(self):
+        r"""
+        Average the loose data visibilities to the Fourier grid.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # boolean index for cells that *contain* visibilities
+        mask = cell_weight > 0.0
+
+        # calculate the density weights under "uniform"
+        # the density weights have the same shape as the re, im samples.
+        # cell_weight is (nchan, ncell_v, ncell_u)
+        # self.index_v, self.index_u are (nchan, nvis)
+        # we want density_weights to be (nchan, nvis)
+        density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
+
+        # grid the reals and imaginaries separately
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
+            self.data_re * density_weight * self.weight
+        )
+
+        data_im_gridded = self._sum_cell_values_cube(
+            self.data_im * density_weight * self.weight
+        )
+
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask, axes=(1, 2))
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+
+    def _grid_weights(self):
+        r"""
+        Average the visibility weights to the Fourier grid contained in ``self.coords``, such that
+        the ``self.weight_gridded`` corresponds to the equivalent weight on the averaged visibilities
+        within that cell.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # instantiate uncertainties for each averaged visibility.
+        self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
+
+    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
+        r"""
+        Export gridded visibilities to a PyTorch dataset object.
+
+        Args:
+            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeError`` will be raised if any cell has a scatter larger than ``max_scatter``.
+            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.
+
+        Returns:
+            :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
+        """
+
+        # check the visibility scatter and flag user if there are issues
+        if check_visibility_scatter:
+            d = self._check_scatter_error(max_scatter)
+            if d["return_status"]:
+                raise RuntimeError(
+                    "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
+                        max_scatter, d["median_re"], d["median_im"]
+                    )
+                )
+
+        # grid visibilities (uniform weighting necessary here) and weights
+        self._grid_visibilities()
+        self._grid_weights()
+
+        return GriddedDataset(
+            coords=self.coords,
+            nchan=self.nchan,
+            vis_gridded=self.vis_gridded,
+            weight_gridded=self.weight_gridded,
+            mask=self.mask,
+        )
+
+
+class DirtyImager(GridderBase):
+    r"""
+    This class is mainly used for producing diagnostic "dirty" images of the visibility data.
+
+    The DirtyImager object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid as a :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied at once. For more details on the properties of the grid that is created, see the :class:`.GridCoords` documentation.
+
+    The :class:`.DirtyImager` object accepts "loose" *ungridded* visibility data and stores the arrays to the object as instance attributes. The input visibility data should be the normal set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` domain; internally the DirtyImager will automatically augment the dataset to include the complex conjugates, i.e. the 'Hermitian pairs.'
+
+    The input visibilities can be 1d for a single continuum channel, or 2d for image cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. Like the :class:`~mpol.images.ImageCube` class, after construction, the DirtyImager assumes that you are operating with a multi-channel set of visibilities. These routines will still work with single-channel 'continuum' visibilities, they will just have nchan = 1 in the first dimension of most products.
+
+    Example::
+
+        imager = gridding.DirtyImager(
+            coords=coords,
+            uu=uu,
+            vv=vv,
+            weight=weight,
+            data_re=data_re,
+            data_im=data_im,
+            )
+
+        img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0)
+
+
+    Args:
+        cell_size (float): width of a single square pixel in [arcsec]
+        npix (int): number of pixels in the width of the image
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+        weight (2d numpy array): (nchan, nvis) array of thermal weights. Units of [:math:`1/\mathrm{Jy}^2`]
+        data_re (2d numpy array): (nchan, nvis) array of the real part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+        data_im (2d numpy array): (nchan, nvis) array of the imaginary part of the visibility measurements. Units of [:math:`\mathrm{Jy}`]
+
+
+
+    """
+
+    def __init__(
+        self,
+        coords=None,
+        uu=None,
+        vv=None,
+        weight=None,
+        data_re=None,
+        data_im=None,
+    ):
+        # check everything should be 2d, expand if not
+        # also checks data does not contain Hermitian pairs
+        uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
+            uu, vv, weight, data_re, data_im
+        )
+
+        # setup the coordinates object
+        self.coords = coords
+        self.nchan = len(uu)
+
+        # make sure we still fit into the grid
+        self.coords.check_data_fit(uu, vv)
+
+        # expand the vectors to include complex conjugates
+        uu_full = np.concatenate([uu, -uu], axis=1)
+        vv_full = np.concatenate([vv, -vv], axis=1)
+
+        # make sure we still fit into the grid (with expansion)
+        self.coords.check_data_fit(uu_full, vv_full)
+
+        self.uu = uu_full
+        self.vv = vv_full
+        self.weight = np.concatenate([weight, weight], axis=1)
+        self.data_re = np.concatenate([data_re, data_re], axis=1)
+        self.data_im = np.concatenate([data_im, -data_im], axis=1)
+
+        # and register cell indices against data
+        self._create_cell_indices()
+
+    def _grid_visibilities(
+        self,
+        weighting="uniform",
+        robust=None,
+        taper_function=None,
+    ):
+        r"""
+        Grid the loose data visibilities to the Fourier grid in preparation for imaging.
+
+        Args:
+            weighting (string): The type of cell averaging to perform. Choices of ``"natural"``, ``"uniform"``, or ``"briggs"``, following CASA tclean. If ``"briggs"``, also specify a robust value.
+            robust (float): If ``weighting='briggs'``, specify a robust value in the range [-2, 2]. ``robust=-2`` approximately corresponds to uniform weighting and ``robust=2`` approximately corresponds to natural weighting.
+            taper_function (function reference): a function assumed to be of the form :math:`f(u,v)` which calculates a prefactor in the range :math:`[0,1]` and premultiplies the visibility data. The function must assume that :math:`u` and :math:`v` will be supplied in units of :math:`\mathrm{k}\lambda`. By default no taper is applied.
+        """
+
+        if taper_function is None:
+            tapering_weight = np.ones_like(self.weight)
+        else:
+            tapering_weight = taper_function(self.uu, self.vv)
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # boolean index for cells that *contain* visibilities
+        mask = cell_weight > 0.0
+
+        # calculate the density weights
+        # the density weights have the same shape as the re, im samples.
+        if weighting == "natural":
+            density_weight = np.ones_like(self.weight)
+        elif weighting == "uniform":
+            # cell_weight is (nchan, ncell_v, ncell_u)
+            # self.index_v, self.index_u are (nchan, nvis)
+            # we want density_weights to be (nchan, nvis)
+            density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
+
+        elif weighting == "briggs":
+            if robust is None or not -2 <= robust <= 2:
+                raise ValueError(
+                    "With 'briggs' weighting, a robust value must be specified between [-2, 2]."
+                )
+
+            # implement robust weighting using the definition used in CASA
+            # https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting
+
+            # calculate the robust parameter f^2 for each channel
+            f_sq = ((5 * 10 ** (-robust)) ** 2) / (
+                np.sum(cell_weight**2, axis=(1, 2)) / np.sum(self.weight, axis=1)
+            )
+
+            # the robust weight corresponding to the cell
+            cell_robust_weight = 1 / (1 + cell_weight * f_sq[:, np.newaxis, np.newaxis])
+
+            # zero out cells that have no visibilities
+            # to prevent normalization error in next step
+            cell_robust_weight[~mask] = 0
+
+            # now assign the cell robust weight to each visibility within that cell
+            density_weight = self._extract_gridded_values_to_loose(cell_robust_weight)
+
+        else:
+            raise ValueError(
+                "weighting must be specified as one of 'natural', 'uniform', or 'briggs'"
+            )
+
+        # the factor of 2 in the denominator is needed because
+        # we are approximating the Eqn 3.8 of Briggs' thesis
+        # we need to sum over the Hermitian quantities in the
+        # normalization constant.
+        self.C = 1 / np.sum(tapering_weight * density_weight * self.weight, axis=1)
+
+        # grid the reals and imaginaries separately
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
+            self.data_re * tapering_weight * density_weight * self.weight
+        )
+
+        data_im_gridded = self._sum_cell_values_cube(
+            self.data_im * tapering_weight * density_weight * self.weight
+        )
+
+        # the beam is the response to a point source, which is data_re = constant, data_im = 0
+        # so we save time and only calculate the reals, because gridded_beam_im = 0
+        re_gridded_beam = self._sum_cell_values_cube(
+            tapering_weight * density_weight * self.weight
+        )
+
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask)
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+        self.re_gridded_beam = np.fft.fftshift(re_gridded_beam, axes=(1, 2))
+
     def _get_dirty_beam(self, C, re_gridded_beam):
         """
         Compute the dirty beam corresponding to the gridded visibilities.
@@ -517,9 +735,10 @@ class Gridder:
             )
         )
 
-        assert (
-            np.max(beam.imag) < 1e-10
-        ), "Dirty beam contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        if np.max(beam.imag) >= 1e-10:
+            raise ThresholdExceededError(
+                "Dirty beam contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+            )
 
         self.beam = beam.real
 
@@ -593,7 +812,7 @@ class Gridder:
 
     def get_dirty_beam_area(self, ntheta=24, single_channel_estimate=True):
         r"""
-        Compute the effective area of the dirty beam for each channel. Assumes that the beam has already been generated by running :func:`~mpol.gridding.Gridder.get_dirty_image`. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
+        Compute the effective area of the dirty beam for each channel. Assumes that the beam has already been generated by running :func:`~mpol.gridding.DirtyImager.get_dirty_image`. This is an approximate calculation involving a simple sum over all pixels out to the first null (zero crossing) of the dirty beam. This quantity is designed to approximate the conversion of image units from :math:`[\mathrm{Jy}\,\mathrm{beam}^{-1}]` to :math:`[\mathrm{Jy}\,\mathrm{arcsec}^{-2}]`, even though units of :math:`[\mathrm{Jy}\,\mathrm{dirty\;beam}^{-1}]` are technically undefined.
 
         Args:
             ntheta (int): number of azimuthal wedges to use for the 1st null calculation. More wedges will result in a more accurate estimate of dirty beam area, but will also take longer.
@@ -615,7 +834,7 @@ class Gridder:
         unit="Jy/beam",
         check_visibility_scatter=True,
         max_scatter=1.2,
-        **beam_kwargs
+        **beam_kwargs,
     ):
         r"""
         Calculate the dirty image.
@@ -681,53 +900,9 @@ class Gridder:
 
             img /= beam_area_per_chan[:, np.newaxis, np.newaxis]
 
-        assert (
-            np.max(img.imag) < 1e-10
-        ), "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+        if np.max(img.imag) >= 1e-10:
+            raise ThresholdExceededError(
+                "Dirty image contained substantial imaginary values, check input visibilities, otherwise raise a github issue."
+            )
 
         return img.real, beam
-
-    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
-        r"""
-        Export gridded visibilities to a PyTorch dataset object.
-
-        Args:
-            check_visibility_scatter (bool): whether the routine should check the standard deviation of visibilities in each within each :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Default is ``True``. A ``RuntimeError`` will be raised if any cell has a scatter larger than ``max_scatter``.
-            max_scatter (float): the maximum allowable standard deviation of visibility values in a given :math:`u,v` cell (:math:`\mathrm{cell}_{i,j}`) defined by ``self.coords``. Defaults to a factor of 120%.
-
-        Returns:
-            :class:`~mpol.datasets.GriddedDataset` with gridded visibilities.
-        """
-
-        # check the visibility scatter and flag user if there are issues
-        if check_visibility_scatter:
-            d = self._check_scatter_error(max_scatter)
-            if d["return_status"]:
-                raise RuntimeError(
-                    "Visibility scatter exceeds ``max_scatter``:{:}, indicating a potential problem with data weights. Consider inspecting weights using CASA tools before exporting visibilities for use with MPoL. Median real scatter: {:} x sigma. Median imag scatter: {:} x sigma.".format(
-                        max_scatter, d["median_re"], d["median_im"]
-                    )
-                )
-
-        # grid visibilites (uniform weighting necessary here) and weights
-        self._grid_visibilities(weighting="uniform")
-        self._grid_weights()
-
-        return GriddedDataset(
-            coords=self.coords,
-            nchan=self.nchan,
-            vis_gridded=self.vis_gridded,
-            weight_gridded=self.weight_gridded,
-            mask=self.mask,
-        )
-
-    @property
-    def ground_cube(self):
-        r"""
-        The visibility FFT cube fftshifted for plotting with ``imshow``.
-
-        Returns:
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the image cube, in sky plane format.
-        """
-
-        return np.fft.fftshift(self.vis_gridded, axes=(1, 2))

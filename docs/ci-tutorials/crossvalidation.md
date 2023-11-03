@@ -39,8 +39,8 @@ from astropy.utils.data import download_file
 from torch.utils.tensorboard import SummaryWriter
 
 from mpol import (
-    connectors,
     coordinates,
+    crossval,
     datasets,
     gridding,
     images,
@@ -48,10 +48,11 @@ from mpol import (
     losses,
     precomposed,
 )
+from mpol.__init__ import zenodo_record
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -71,18 +72,25 @@ data_im = np.imag(data)
 # define the image dimensions, making sure they are big enough to fit all
 # of the expected emission
 coords = coordinates.GridCoords(cell_size=0.03, npix=180)
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
 )
 
 # export to PyTorch dataset
-dset = gridder.to_pytorch_dataset()
+dset = averager.to_pytorch_dataset()
 ```
 
+Now, let's also make a diagnostic dirty image
+
 ```{code-cell}
+imager = gridding.DirtyImager(
+    coords=coords, uu=uu, vv=vv, weight=weight, data_re=data_re, data_im=data_im
+)
+
+
 # Show the dirty image
-img, beam = gridder.get_dirty_image(weighting="briggs", robust=0.0)
-kw = {"origin": "lower", "extent": gridder.coords.img_ext}
+img, beam = imager.get_dirty_image(weighting="briggs", robust=0.0)
+kw = {"origin": "lower", "extent": imager.coords.img_ext}
 fig, ax = plt.subplots(ncols=1)
 ax.imshow(np.squeeze(img), **kw)
 ax.set_title("image")
@@ -159,7 +167,7 @@ As you can see, this training set looks very similar to the full dataset, with t
 
 It turns out that the missing holes in the real dataset are quite important to image fidelity---if we had complete $u$,$v$ coverage, we wouldn't need to be worrying about CLEAN or RML imaging techniques in the first place! When we make a new interferometric observation, it will have it's own (different) set of missing holes depending on array configuration, observation duration, and hour angle coverage. We would like our cross validation slices to simulate the $u$,$v$ distribution of possible *new datasets*, and, at least for ALMA, random sampling doesn't probe this very well.
 
-Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a $K$-fold subselection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.
+Instead, we suggest an approach where we break the UV plane into radial ($q=\sqrt{u^2 + v^2}$) and azimuthal ($\phi = \mathrm{arctan2}(v,u)$) cells and cross validate by drawing a $K$-fold sub-selection of these cells. This is just one potential suggestion. There are, of course, no limits on how you might split your dataset for cross-validation; it really depends on what works best for your imaging goals.
 
 ```{code-cell}
 # create a radial and azimuthal partition
@@ -167,7 +175,7 @@ dartboard = datasets.Dartboard(coords=coords)
 
 # create cross validator using this "dartboard"
 k = 5
-cv = datasets.KFoldCrossValidatorGridded(dset, k, dartboard=dartboard, npseed=42)
+cv = crossval.DartboardSplitGridded(dset, k, dartboard=dartboard, seed=42)
 
 # ``cv`` is a Python iterator, it will return a ``(train, test)`` pair of ``GriddedDataset``s for each iteration.
 # Because we'll want to revisit the individual datasets
@@ -177,49 +185,37 @@ k_fold_datasets = [(train, test) for (train, test) in cv]
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)
-flayer.forward(torch.zeros(dset.nchan, coords.npix, coords.npix))
+flayer(torch.zeros(dset.nchan, coords.npix, coords.npix))
 ```
 
-The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities, the dirty image corresponding to those training visibilities, and the "test" visibilities which will be used to evaluate the predictive ability of the model.
+The following plots visualize how we've split up the data. For each $K$-fold, we have the "training" visibilities and the "test" visibilities which will be used to evaluate the predictive ability of the model.
 
 ```{code-cell}
-fig, ax = plt.subplots(nrows=k, ncols=3, figsize=(6, 10))
+fig, ax = plt.subplots(nrows=k, ncols=2, figsize=(4, 10))
 
 for i, (train_subset, test_subset) in enumerate(k_fold_datasets):
 
-    rtrain = connectors.GriddedResidualConnector(flayer, train_subset)
-    rtrain.forward()
-    rtest = connectors.GriddedResidualConnector(flayer, test_subset)
-    rtest.forward()
+    # train_subset and test_subset are `GriddedDataset`s
 
-    vis_ext = rtrain.coords.vis_ext
-    img_ext = rtrain.coords.img_ext
-
-    train_mask = rtrain.ground_mask[0]
-    train_chan = rtrain.sky_cube[0]
-
-    test_mask = rtest.ground_mask[0]
-    test_chan = rtest.sky_cube[0]
+    train_mask = train_subset.ground_mask[0]
+    test_mask = test_subset.ground_mask[0]
 
     ax[i, 0].imshow(
         train_mask.detach().numpy(),
         interpolation="none",
         origin="lower",
-        extent=vis_ext,
+        extent=coords.vis_ext,
         cmap="GnBu",
     )
 
-    ax[i, 1].imshow(train_chan.detach().numpy(), origin="lower", extent=img_ext)
-
-    ax[i, 2].imshow(
-        test_mask.detach().numpy(), origin="lower", extent=vis_ext, cmap="GnBu"
+    ax[i, 1].imshow(
+        test_mask.detach().numpy(), origin="lower", extent=coords.vis_ext, cmap="GnBu"
     )
 
     ax[i, 0].set_ylabel("k-fold {:}".format(i))
 
 ax[0, 0].set_title("train mask")
-ax[0, 1].set_title("train dirty img.")
-ax[0, 2].set_title("test mask")
+ax[0, 1].set_title("test mask")
 
 for a in ax.flatten():
     a.xaxis.set_ticklabels([])
@@ -245,7 +241,7 @@ def train(model, dset, config, optimizer, writer=None):
         model.zero_grad()
 
         # get the predicted model
-        vis = model.forward()
+        vis = model()
 
         # get the sky cube too
         sky_cube = model.icube.sky_cube
@@ -273,7 +269,7 @@ We also create a separate "test" function to evaluate the trained model against 
 def test(model, dset):
     model.train(False)
     # evaluate test score
-    vis = model.forward()
+    vis = model()
     loss = losses.nll_gridded(vis, dset)
     return loss.item()
 ```
@@ -366,7 +362,7 @@ For the purposes of comparison, here is the image produced by the tclean algorit
 
 ```{code-cell}
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.tclean.fits",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.tclean.fits",
     cache=True,
     show_progress=True,
     pkgname="mpol",

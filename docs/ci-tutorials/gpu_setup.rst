@@ -161,7 +161,7 @@ step our optimizer.
         model.zero_grad()
 
         # forward pass
-        vis = model.forward()
+        vis = model()
 
         # get skycube from our forward model
         sky_cube = model.icube.sky_cube

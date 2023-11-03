@@ -1,5 +1,7 @@
 r"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
 
+from __future__ import annotations
+
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
@@ -7,7 +9,6 @@ from torch import nn
 
 from . import utils
 from .coordinates import GridCoords
-from .gridding import _setup_coords
 
 
 class BaseCube(nn.Module):
@@ -31,16 +32,15 @@ class BaseCube(nn.Module):
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         pixel_mapping=None,
         base_cube=None,
     ):
-
         super().__init__()
-        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.coords = coords
+        self.nchan = nchan
 
         # The ``base_cube`` is already packed to make the Fourier transformation easier
         if base_cube is None:
@@ -66,6 +66,13 @@ class BaseCube(nn.Module):
         else:
             # TODO assert that this is a PyTorch function
             self.pixel_mapping = pixel_mapping
+
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan=1, pixel_mapping=None, base_cube=None
+    ) -> BaseCube:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, pixel_mapping, base_cube)
 
     def forward(self):
         r"""
@@ -103,7 +110,6 @@ class HannConvCube(nn.Module):
     """
 
     def __init__(self, nchan, requires_grad=False):
-
         super().__init__()
         # simple convolutional filter operates on per-channel basis
         # 3x3 Hann filter
@@ -178,15 +184,15 @@ class ImageCube(nn.Module):
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         passthrough=False,
         cube=None,
     ):
         super().__init__()
-        _setup_coords(self, cell_size, npix, coords, nchan)
+
+        self.coords = coords
+        self.nchan = nchan
 
         self.passthrough = passthrough
 
@@ -213,6 +219,13 @@ class ImageCube(nn.Module):
             # only be provided as an arg to the forward method, not as
             # an initialization argument
             self.cube = None
+
+    @classmethod
+    def from_image_properties(
+        cls, cell_size, npix, nchan=1, passthrough=False, cube=None
+    ) -> ImageCube:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, passthrough, cube)
 
     def forward(self, cube=None):
         r"""
@@ -247,6 +260,19 @@ class ImageCube(nn.Module):
 
         """
         return utils.packed_cube_to_sky_cube(self.cube)
+
+    @property
+    def flux(self):
+        """
+        The spatially-integrated flux of the image. Returns a 'spectrum' with the flux in each channel in units of Jy.
+
+        Returns:
+            torch.double: a 1D tensor of length ``(nchan)`` 
+        """
+
+        # convert from Jy/arcsec^2 to Jy/pixel using area of a pixel
+        # multiply by arcsec^2/pixel
+        return self.coords.cell_size**2 * torch.sum(self.cube, dim=(1,2))
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """

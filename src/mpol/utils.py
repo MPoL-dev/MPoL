@@ -1,8 +1,13 @@
-import numpy as np
 import math
+
+import numpy as np
 import torch
 
 from .constants import arcsec, c_ms, cc, deg, kB
+
+def torch2npy(tensor):
+    """Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting"""
+    return tensor.detach().cpu().numpy()
 
 
 def ground_cube_to_packed_cube(ground_cube):
@@ -19,7 +24,7 @@ def ground_cube_to_packed_cube(ground_cube):
     return shifted
 
 
-def packed_cube_to_ground_cube(packed_cube):
+def packed_cube_to_ground_cube(packed_cube) -> torch.Tensor:
     r"""
     Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.
 
@@ -30,6 +35,7 @@ def packed_cube_to_ground_cube(packed_cube):
         torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Ground Cube.
     """
     # fftshift the image cube to the correct quadrants
+    shifted: torch.Tensor
     shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
     return shifted
 
@@ -152,16 +158,54 @@ def fftspace(width, N):
     return xx
 
 
+def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
+    """
+    Check if baseline lengths are sensible for expected code unit of
+    [klambda], or if instead they're being supplied in [lambda].
+
+    Parameters
+    ----------
+     q : array, unit = :math:`k\lambda`
+        Baseline distribution (all values must be non-negative).
+    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0
+        Minimum baseline in code units expected for a dataset. The default
+        value of 1e0 is a conservative value for ALMA, assuming a minimum
+        antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.
+    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5
+        Maximum baseline in code units expected for a dataset. The default
+        value of 1e5 is a conservative value for ALMA, assuming a maximum
+        antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.
+    """
+
+    assert np.all(q >= 0), "All baselines should be >=0."
+
+    if max(q) > max_feasible_q:
+        raise Warning(
+            "Maximum baseline of {:.1e} is > maximum expected "
+            "value of {:.1e}. Baselines must be in units of "
+            "[klambda], but it looks like they're in "
+            "[lambda].".format(max(q), max_feasible_q)
+        )
+
+    if min(q) > min_feasible_q * 1e3:
+        raise Warning(
+            "Minimum baseline of {:.1e} is large for expected "
+            "minimum value of {:.1e}. Baselines must be in units of "
+            "[klambda], but it looks like they're in "
+            "[lambda].".format(min(q), min_feasible_q * 1e3)
+        )
+
+
 def convert_baselines(baselines, freq=None, wle=None):
     r"""
     Convert baselines in meters to kilolambda.
     Args:
         baselines (float or np.array): baselines in [m].
-        freq (float or np.array), optional: frequencies in [Hz]. 
+        freq (float or np.array), optional: frequencies in [Hz].
         wle (float or np.array), optional: wavelengths in [m].
     Returns:
         (1D array nvis): baselines in [klambda]
-    Notes: 
+    Notes:
         If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be broadcast-able.
     """
     if (freq is None and wle is None) or (wle and freq):
@@ -237,52 +281,51 @@ def get_maximum_cell_size(uu_vv_point):
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
 
 
-def get_optimal_image_properties(image_width, q, percentile=100):
+def get_optimal_image_properties(image_width, u, v):
     r"""
-    For an image of desired width, determine the maximum pixel size that 
-    ensures Nyquist sampling of the provided baseline (or baseline 
-    distribution, out to a chosen percentile), and the number of pixels 
-    (given this pixel size) to obtain the desired image width.
+    For an image of desired width, determine the maximum pixel size that
+    ensures Nyquist sampling of the provided spatial frequency points, and the 
+    corresponding number of pixels to obtain the desired image width.
 
     Parameters
     ----------
     image_width : float, unit = arcsec
-        Desired width of the image (i.e., image will be a 
-        image_width :math:`\times` image_width square).
-    q : float or array, unit = :math:`k\lambda`
-        Baseline distribution (all values must be non-negative). If a single 
-        value, 'percentile' has no effect.
-    percentile : int, default = 100
-        Percentile of the baseline distribution (between 0 - 100) out to which 
-        the desired image will Nyquist sample. 
+        Desired width of the image (for a square image of size
+        `image_width` :math:`\times` `image_width`).
+    u, v : float or array, unit = :math:`k\lambda`
+        `u` and `v` spatial frequency points. 
 
     Returns
     -------
     cell_size : float, unit = arcsec
         Image pixel size required to Nyquist sample.
     npix : int
-        Number of pixels of cell_size to equal (or slightly exceed) the image 
+        Number of pixels of cell_size to equal (or slightly exceed) the image
         width (npix will be rounded up and enforced as even).
 
     Notes
     -----
-    To obtain the image properties for a single baseline distance, pass 'q' as 
-    a float. In this case, 'percentile' has no effect.
-
-    No assumption or correction is made concerning whether the baseline 
-    (distribution) is projected or deprojected.
+    No assumption or correction is made concerning whether the spatial 
+    frequency points are projected or deprojected.
     """
+    max_freq = max(max(abs(u)), max(abs(v)))
 
-    assert np.all(q >= 0), "All baselines should be >=0." 
+    cell_size = get_maximum_cell_size(max_freq)
 
-    q_optimal = np.percentile(q, percentile)
-    cell_size = get_maximum_cell_size(q_optimal)
-
-    # round the desired number of pixels up to the nearest integer
+    # round npix up to nearest integer
     npix = math.ceil(image_width / cell_size)
+
+    # account for Nyquist of proposed cell_size, npix
+    cell_size *= cell_size / get_maximum_cell_size(get_max_spatial_freq(cell_size, npix))
+
+    npix = math.ceil(image_width / cell_size)
+    
     # enforce that npix be even
     if npix % 2 == 1:
         npix += 1
+
+    # should never occur 
+    assert(get_max_spatial_freq(cell_size, npix) >= max_freq), "error in get_optimal_image_properties"
 
     return cell_size, npix
 

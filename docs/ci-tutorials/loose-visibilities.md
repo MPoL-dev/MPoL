@@ -42,6 +42,7 @@ and the relevant MPoL modules
 
 ```{code-cell}
 from mpol import coordinates, gridding, losses, precomposed, utils, images, fourier
+from mpol.__init__ import zenodo_record
 ```
 
 and loading the dataset
@@ -49,7 +50,7 @@ and loading the dataset
 ```{code-cell}
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -102,14 +103,14 @@ and then use these values to initialize a {class}`mpol.fourier.NuFFT` object
 nufft = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
 ```
 
-Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.Gridder` object and create an image for use in the forward model.
+Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.DataAverager` object and create an image for use in the forward model.
 
-## Compared to the Gridder object
+## Compared to the {class}`mpol.gridding.DataAverager` object
 
 As before, we simply send the visibilities to the object and export a {class}`mpol.datasets.GriddedDataset`
 
 ```{code-cell}
-gridder = gridding.Gridder(
+averager = gridding.DataAverager(
     coords=coords,
     uu=uu,
     vv=vv,
@@ -118,10 +119,10 @@ gridder = gridding.Gridder(
     data_im=data_im,
 )
 
-gridded_dset = gridder.to_pytorch_dataset()
+gridded_dset = averager.to_pytorch_dataset()
 ```
 
-And we can initialize a :class:`mpol.fourier.FourierCube`
+And we can initialize a {class}`mpol.fourier.FourierCube`
 
 ```{code-cell}
 flayer = fourier.FourierCube(coords=coords)
@@ -162,7 +163,7 @@ icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.
 
 ```{code-cell}
-vis_model_loose = nufft.forward(icube.forward())
+vis_model_loose = nufft(icube())
 print("Loose model visibilities from the NuFFT have shape {:}".format(vis_model_loose.shape))
 print("The original loose data visibilities have shape {:}".format(data.shape))
 ```
@@ -170,7 +171,7 @@ print("The original loose data visibilities have shape {:}".format(data.shape))
 By comparison, the {class}`~mpol.gridding.Gridder` object puts the visibilities onto a grid and exports a {class}`~mpol.datasets.GriddedDataset` object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the {class}`~mpol.fourier.FourierCube` layer
 
 ```{code-cell}
-vis_model_gridded = flayer.forward(icube.forward())
+vis_model_gridded = flayer(icube())
 print("Gridded model visibilities from FourierCube have shape {:}".format(vis_model_gridded.shape))
 print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded.shape))
 ```

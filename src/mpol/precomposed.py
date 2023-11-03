@@ -1,7 +1,8 @@
 import torch
 
+from mpol.coordinates import GridCoords
+
 from . import fourier, images
-from .coordinates import _setup_coords
 
 
 class SimpleNet(torch.nn.Module):
@@ -31,15 +32,14 @@ class SimpleNet(torch.nn.Module):
 
     def __init__(
         self,
-        cell_size=None,
-        npix=None,
         coords=None,
-        nchan=None,
+        nchan=1,
         base_cube=None,
     ):
         super().__init__()
 
-        _setup_coords(self, cell_size, npix, coords, nchan)
+        self.coords = coords
+        self.nchan = nchan
 
         self.bcube = images.BaseCube(
             coords=self.coords, nchan=self.nchan, base_cube=base_cube
@@ -52,14 +52,19 @@ class SimpleNet(torch.nn.Module):
         )
         self.fcube = fourier.FourierCube(coords=self.coords)
 
+    @classmethod
+    def from_image_properties(cls, cell_size, npix, nchan, base_cube):
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, nchan, base_cube)
+
     def forward(self):
         r"""
         Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.fourier.FourierCube` to produce the visibility cube.
 
         Returns: 1D complex torch tensor of model visibilities.
         """
-        x = self.bcube.forward()
+        x = self.bcube()
         x = self.conv_layer(x)
-        x = self.icube.forward(x)
-        vis = self.fcube.forward(x)
+        x = self.icube(x)
+        vis = self.fcube(x)
         return vis

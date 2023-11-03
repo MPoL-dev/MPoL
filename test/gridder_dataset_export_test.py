@@ -5,12 +5,12 @@ from mpol import coordinates, gridding
 from mpol.constants import *
 
 
-# cache an instantiated gridder for future imaging ops
+# cache an instantiated DataAverager for future imaging ops
 @pytest.fixture
-def gridder(mock_visibility_data):
+def averager(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.Gridder(
+    return gridding.DataAverager.from_image_properties(
         cell_size=0.005,
         npix=800,
         uu=uu,
@@ -21,11 +21,11 @@ def gridder(mock_visibility_data):
     )
 
 
-def test_pytorch_export(gridder):
+def test_pytorch_export(averager):
     """
     Test that the dataset export routine doesn't error.
     """
-    gridder.to_pytorch_dataset()
+    averager.to_pytorch_dataset()
 
 
 def test_cell_variance_error_pytorch(mock_visibility_data):
@@ -41,7 +41,7 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
         loc=0, scale=2 * sigma, size=uu.shape
     )
 
-    gridder = gridding.Gridder(
+    averager = gridding.DataAverager(
         coords=coords,
         uu=uu,
         vv=vv,
@@ -51,4 +51,4 @@ def test_cell_variance_error_pytorch(mock_visibility_data):
     )
 
     with pytest.raises(RuntimeError):
-        gridder.to_pytorch_dataset()
+        averager.to_pytorch_dataset()
