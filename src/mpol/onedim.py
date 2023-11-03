@@ -21,6 +21,8 @@ def radialI(icube, geom, chan=0, bins=None):
                 Phase center offset in right ascension. Positive is west of north.
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination.
+    chan : int, default=0
+        Channel of the image cube corresponding to the desired image
     bins : array, default=None, unit=[arcsec]
         Radial bin edges to use in calculating I(r). If None, bins will span 
         the full image, with widths equal to the hypotenuse of the pixels
