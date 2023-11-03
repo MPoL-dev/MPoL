@@ -174,6 +174,9 @@ def mock_1d_vis_model(mock_1d_archive):
     packed_tensor = torch.from_numpy(packed_cube)
     cube_true = fourier.FourierCube(coords=coords)
 
+    # insert the vis tensor into the FourierCube ('vis' would typically be 
+    # populated by taking the FFT of an image)
+    cube_true.ground_cube = packed_tensor
 
 
 
