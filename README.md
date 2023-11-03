@@ -20,14 +20,14 @@ If you use this package or derivatives of it, please cite
                     Ryan Loomis and
                     Hannah Grzybowski and
                     Robert Frazier and
-                    Tyler Quinn},
+                    Tyler Quinn}, # TODO
     title        = {MPoL-dev/MPoL: v0.2.0 Release},
     month        = nov,
     year         = 2023,
     publisher    = {Zenodo},
     version      = {v0.2.0},
-    doi          = {10.5281/zenodo.4939048},
-    url          = {https://doi.org/10.5281/zenodo.4939048}
+    doi          = {10.5281/zenodo.4939048}, # TODO
+    url          = {https://doi.org/10.5281/zenodo.4939048} # TODO
     }
 
 ---
