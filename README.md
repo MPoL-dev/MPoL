@@ -1,6 +1,6 @@
 # MPoL
 
-[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
+[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
 [![gh-pages docs](https://github.com/MPoL-dev/MPoL/actions/workflows/gh_docs.yml/badge.svg)](https://mpol-dev.github.io/MPoL/)
 [![DOI](https://zenodo.org/badge/224543208.svg)](https://zenodo.org/badge/latestdoi/224543208)
 
