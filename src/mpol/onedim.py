@@ -75,17 +75,15 @@ def radialI(icube, geom, chan=0, bins=None):
     return bin_centers, Is
 
 
-def radialV(V, coords, geom, rescale_flux, bins=None):
+def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     r"""
     Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
     image. 
 
     Parameters
     ----------
-    V : array
-        2D visibility amplitudes
-    coords : `mpol.coordinates.GridCoords` object
-        Instance of the `mpol.coordinates.GridCoords` class
+    fcube : `~mpol.fourier.FourierCube` object
+        Instance of the MPoL `fourier.FourierCube` class
     geom : dict 
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
