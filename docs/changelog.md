@@ -2,6 +2,39 @@
 
 # Changelog
 
+## v0.2.0
+
+- Moved docs build out of combined and into standalone test workflow
+- Updated package test workflow with new dependencies and caching
+- Added geometry tests
+- Reorganized some of the docs API
+- Expanded discussion and demonstration in `optimzation.md` tutorial
+- Localized harcoded Zenodo record reference to single instance, and created new external Zenodo record from which to draw
+- Added [Parametric inference with Pyro tutorial](large-tutorials/pyro.md) 
+- Updated some discussion and notation in `rml_intro.md` tutorial
+- Added `mypy` static type checks
+- Added `frank` as a 'test' and 'analysis' extras dependency
+- Added `fast-histogram` as a core dependency
+- Updated support to recent Python versions
+- Removed `mpol.coordinates._setup_coords` helper function from {class}`~mpol.coordinates.GridCoords`
+- Added new program `mpol.crossval` with the new {class}`~mpol.crossval.CrossValidate` for running a cross-validation loop and the new {class}`~mpol.crossval.RandomCellSplitGridded` for splitting data into training and test sets
+- Moved and rescoped {class}`~mpol.datasets.KFoldCrossValidatorGridded` to {class}`~mpol.crossval.DartboardSplitGridded` with some syntax changes
+- Altered {class}`~mpol.datasets.GriddedDataset` to subclass from `torch.nn.Module`, altered its args, added PyTorch buffers to it, added {function}`mpol.datasets.GriddedDataset.forward` to it
+- Added class method `from_image_properties` to various classes including {class}`~mpol.images.BaseCube` and {class}`~mpol.images.ImageCube`
+- Altered {class}`~mpol.datasets.UVDataset` to subclass from `torch.utils.data.Dataset`, altered its initialization signature, added new properties 
+- Altered {class}`~mpol.fourier.FourierCube` args and initialization signature, added PyTorch buffers to it
+- Added {function}`~mpol.fourier.get_vis_residuals`
+- Added new program `mpol.geometry` with new {function}`~mpol.geometry.flat_to_observer` and {function}`~mpol.geometry.observer_to_flat`
+- Replaced {class}`~mpol.gridding.Gridder` with the rescoped {class}`~mpol.gridding.GridderBase` and two classes which subclass this, {class}`~mpol.gridding.DirtyImager` and {class}`~mpol.gridding.DataAverager`
+- Added property `flux` to {class}`~mpol.images.ImageCube`
+- Added new program `mpol.onedim` with new {function}`~mpol.onedim.radialI` and {function}`~mpol.onedim.radialV`
+- Added new program `mpol.training` with new {class}`~mpol.training.TrainTest` and {function}`~mpol.onedim.radialV`
+- Added new utility functions {function}`~mpol.utils.torch2npy`, {function}`~mpol.utils.check_baselines`, {function}`~mpol.utils.get_optimal_image_properties`
+- Added expected types and error checks in several places throughout codebase, as well as new programs - `mpol.exceptions` and `mpol.protocols`
+- Updated tests in several places and added many new tests
+- Added shell script `GPU_SLURM.sh` for future test implementations
+- Updated citations to include new contributors
+
 ## v0.1.4
 
 - Removed the `GriddedResidualConnector` class and the `src/connectors.py` module. Moved `index_vis` to `datasets.py`.
