@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
+import torch
 from astropy.utils.data import download_file
 
-from mpol import coordinates, gridding
+from mpol import coordinates, fourier, gridding, images
 from mpol.__init__ import zenodo_record
 
 # We need a fixture which provides mock visibilities of the sort we'd
@@ -136,6 +137,7 @@ def mock_1d_image_model(mock_1d_archive):
     i2dtrue = m['i2dtrue']
     xmax = ymax = m['xmax']
     geom = m['geometry']
+    geom = geom[()]
 
     coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
                                     npix=i2dtrue.shape[0])
@@ -150,6 +152,7 @@ def mock_1d_vis_model(mock_1d_archive):
     Vtrue_dep = m['vis_dep']
     q_dep = m['baselines_dep']
     geom = m['geometry']
+    geom = geom[()]
 
     xmax = m['xmax']
     i2dtrue = m['i2dtrue']
