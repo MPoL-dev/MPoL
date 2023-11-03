@@ -151,6 +151,7 @@ def mock_1d_image_model(mock_1d_archive):
     packed_tensor = torch.from_numpy(packed_cube)
     cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
 
+    return rtrue, itrue, cube_true, xmax, ymax, geom
 
 
 @pytest.fixture
