@@ -121,15 +121,21 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     -----
     This routine requires the `frank <https://github.com/discsim/frank>`_ package
     """
-
-    # projected model (u,v) coordinates [k\lambda]
-    uu, vv = coords.sky_u_centers_2D, coords.sky_v_centers_2D
-
     from frank.geometry import apply_phase_shift, deproject
-    # phase-shift the model visibilities
-    Vp = apply_phase_shift(uu.ravel() * 1e3, vv.ravel() * 1e3, V.ravel(), geom["dRA"], geom["dDec"], inverse=True)
-    # deproject the model (u,v) points
-    up, vp, _ = deproject(uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], geom["Omega"])
+
+    # projected model (u,v) points [k\lambda]
+    uu, vv = fcube.coords.sky_u_centers_2D, fcube.coords.sky_v_centers_2D
+
+    # visibilities 
+    V = torch2npy(fcube.ground_cube[chan]).ravel()
+
+    # phase-shift the visibilities
+    Vp = apply_phase_shift(uu.ravel() * 1e3, vv.ravel() * 1e3, V, geom["dRA"], 
+                           geom["dDec"], inverse=True)
+    
+    # deproject the (u,v) points
+    up, vp, _ = deproject(uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], 
+                          geom["Omega"])
 
     # if the source is optically thick, rescale the deprojected V(q)
     if rescale_flux: 
@@ -139,12 +145,12 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     up /= 1e3
     vp /= 1e3
 
-    # deprojected baseline coordinates
+    # deprojected baselines
     qq = np.hypot(up, vp) 
 
     if bins is None:
         # choose sensible bin size and range
-        step = np.hypot(coords.du, coords.dv) / 2
+        step = np.hypot(fcube.coords.du, fcube.coords.dv) / 2
         bins = np.arange(0.0, max(qq), step)
 
     bin_counts, bin_edges = np.histogram(a=qq, bins=bins, weights=None)
