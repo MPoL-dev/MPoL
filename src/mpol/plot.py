@@ -272,7 +272,7 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     Parameters
     ----------
     splitter : `mpol.crossval.RandomCellSplitGridded` object
-        Iterator that returns a `(train, test)` pair of `GriddedDataset`s 
+        Iterator that returns a `(train, test)` pair of `GriddedDataset` 
         for each iteration.
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure
@@ -339,9 +339,9 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
-        - model image (both linear and arcsinh colormap normalization)
-        - gradient image
-        - loss function
+    - model image (both linear and arcsinh colormap normalization)
+    - gradient image
+    - loss function
 
     Parameters
     ----------

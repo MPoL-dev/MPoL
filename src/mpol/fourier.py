@@ -48,8 +48,9 @@ class FourierCube(nn.Module):
     def from_image_properties(
         cls, cell_size: float, npix: int, persistent_vis: bool = False
     ) -> FourierCube:
-        r"""Alternative method for instantiating a FourierCube from ``cell_size``
-         and ``npix``
+        r"""
+        Alternative method for instantiating a FourierCube from ``cell_size`` and ``npix``
+
         Args:
             cell_size (float): the width of an image-plane pixel [arcseconds]
             npix (int): the number of pixels per image side
@@ -298,6 +299,7 @@ class NuFFT(nn.Module):
         nchan: int = 1,
         sparse_matrices: bool = True,
     ) -> NuFFT:
+        
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, nchan, sparse_matrices)
 

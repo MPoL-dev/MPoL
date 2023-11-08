@@ -46,9 +46,9 @@ class CrossValidate:
         strength ('lambda', float), whether to guess an initial value for lambda 
         ('guess', bool), and other quantities needed to compute their loss term.
         Example:
-            {"sparsity":{"lambda":1e-3, "guess":False},
-             "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
-            }
+        {"sparsity":{"lambda":1e-3, "guess":False},
+        "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
+        }
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
