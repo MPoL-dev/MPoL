@@ -314,7 +314,9 @@ def test_nufft_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
     nchan = uu.shape[0]
 
     # create a NuFFT layer to perform interpolations to these points
-    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
+    # uu and vv are multidimensional, so we should set `sparse_matrices=False`
+    # to avoid triggering a warning
+    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False)
 
     # a sky Gaussian
     kw = {
