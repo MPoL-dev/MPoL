@@ -36,7 +36,7 @@ EXTRA_REQUIRES = {
         "frank>=1.2.1",
     ],
     "docs": [
-        "sphinx>=2.3.0",
+        "sphinx>=5.0.2",
         "numpy",
         "jupytext",
         "ipython!=8.7.0",  # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
