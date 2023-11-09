@@ -72,16 +72,21 @@ def test_radialV(mock_1d_vis_model, tmp_path):
 
     qtest, Vtest = radialV(fcube, geom, rescale_flux=True, bins=bins)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(ncols=1, nrows=2, figsize=(10,10))
 
-    ax.plot(q_dep / 1e6, Vtrue_dep, 'k.', label='truth deprojected')
-    ax.plot(qtest / 1e3, Vtest, 'r.-', label='recovery')
+    ax[0].plot(q_dep / 1e6, Vtrue_dep.real, 'k.', label='truth deprojected')
+    ax[0].plot(qtest / 1e3, Vtest.real, 'r.-', label='recovery')
 
-    ax.set_xlim(-0.5, 6)
-    ax.set_xlabel(r'Baseline [M$\lambda$]')
-    ax.set_ylabel('Re(V) [Jy]')
-    ax.set_title(f"Geometry {geom}", fontsize=10)
-    ax.legend()
+    ax[1].plot(q_dep / 1e6, Vtrue_dep.imag, 'k.')
+    ax[1].plot(qtest / 1e3, Vtest.imag, 'r.')  
+
+    ax[0].set_xlim(-0.5, 6)
+    ax[1].set_xlim(-0.5, 6)
+    ax[1].set_xlabel(r'Baseline [M$\lambda$]')
+    ax[0].set_ylabel('Re(V) [Jy]')
+    ax[1].set_ylabel('Im(V) [Jy]')
+    ax[0].set_title(f"Geometry {geom}", fontsize=10)
+    ax[0].legend()
 
     fig.savefig(tmp_path / "test_radialV.png", dpi=300)
     plt.close("all")
