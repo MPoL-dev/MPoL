@@ -36,12 +36,12 @@ EXTRA_REQUIRES = {
         "frank>=1.2.1",
     ],
     "docs": [
-        "sphinx>=5.0.2",
+        "sphinx>=5.3.0",
         "numpy",
         "jupytext",
         "ipython!=8.7.0",  # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
         "nbsphinx",
-        "sphinx_book_theme==0.3.3",
+        "sphinx_book_theme>=0.9.3",
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",
