@@ -410,7 +410,7 @@ class DartboardSplitGridded:
         phi_edges: NDArray[floating[Any]],
         seed: int | None = None,
     ) -> DartboardSplitGridded:
-        """
+        r"""
         Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.
 
          Args:
