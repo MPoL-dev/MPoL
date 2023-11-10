@@ -16,11 +16,16 @@ If you use this package or derivatives of it, please cite
 
     @software{mpol,
     author       = {Ian Czekala and
+                    Jeff Jennings and   
                     Brianna Zawadzki and
                     Ryan Loomis and
-                    Hannah Grzybowski and
+                    Kadri Nizam and 
+                    Megan Delamer and 
+                    Kaylee de Soto and
                     Robert Frazier and
-                    Tyler Quinn}, # TODO
+                    Hannah Grzybowski and
+                    Mary Ogborn and                    
+                    Tyler Quinn},
     title        = {MPoL-dev/MPoL: v0.2.0 Release},
     month        = nov,
     year         = 2023,
