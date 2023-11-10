@@ -31,8 +31,8 @@ If you use this package or derivatives of it, please cite
     year         = 2023,
     publisher    = {Zenodo},
     version      = {v0.2.0},
-    doi          = {10.5281/zenodo.4939048}, # TODO
-    url          = {https://doi.org/10.5281/zenodo.4939048} # TODO
+    doi          = {10.5281/zenodo.3594081},
+    url          = {https://doi.org/10.5281/zenodo.3594081}
     }
 
 ---
