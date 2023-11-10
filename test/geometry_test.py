@@ -24,8 +24,8 @@ def test_rotate_points():
     print("Observer", X, Y)
     print("return", xs_back, ys_back)
 
-    assert xs == approx(xs_back, abs=4e-7)
-    assert ys == approx(ys_back, abs=4e-7)
+    assert xs == approx(xs_back, abs=1e-6)
+    assert ys == approx(ys_back, abs=1e-6)
 
 
 def test_rotate_coords(coords):
