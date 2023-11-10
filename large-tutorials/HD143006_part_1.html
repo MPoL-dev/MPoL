@@ -1,435 +1,355 @@
 
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>HD143006 Tutorial Part 1 &#8212; MPoL 0.1.13 documentation</title>
-    
+    <title>HD143006 Tutorial Part 1 &#8212; MPoL 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'large-tutorials/HD143006_part_1';</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="HD143006 Tutorial Part 2" href="HD143006_part_2.html" />
     <link rel="prev" title="Initializing with the Dirty Image" href="../ci-tutorials/initializedirtyimage.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
 
-    
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="../index.html">
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="../_static/logo.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
-        <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  User Guide
- </span>
-</p>
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../rml_intro.html">
-   Introduction to Regularized Maximum Likelihood Imaging
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../installation.html">
-   MPoL Installation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../units-and-conventions.html">
-   Units and Conventions
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../developer-documentation.html">
-   Developer Documentation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../api.html">
-   API
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Tutorials
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/PyTorch.html">
-   Introduction to PyTorch: Tensors and Gradient Descent
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/gridder.html">
-   Gridding and diagnostic images
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/optimization.html">
-   Intro to RML with MPoL
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/loose-visibilities.html">
-   Likelihood functions and model visibilities
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/crossvalidation.html">
-   Cross validation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/gpu_setup.html">
-   GPU Acceleration
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/initializedirtyimage.html">
-   Initializing with the Dirty Image
-  </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   HD143006 Tutorial Part 1
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="HD143006_part_2.html">
-   HD143006 Tutorial Part 2
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../ci-tutorials/fakedata.html">
-   Making a Mock Dataset
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="pyro.html">
-   Parametric Inference with Pyro
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/optimization.html">Intro to RML with MPoL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/loose-visibilities.html">Likelihood functions and model visibilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/crossvalidation.html">Cross validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gpu_setup.html">GPU Acceleration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/initializedirtyimage.html">Initializing with the Dirty Image</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">HD143006 Tutorial Part 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/fakedata.html">Making a Mock Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyro.html">Parametric Inference with Pyro</a></li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../changelog.html">
-   Changelog
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
-</div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
 
 
-          
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
 
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
 <div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
-
-
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
->
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
   
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
-  </span>
-
-</label>
-
-        
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
     </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/MPoL-dev/MPoL" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-expand"></i>
-  </span>
-
-</button>
-<a href="https://github.com/MPoL-dev/MPoL"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="bottom"
-title="Source repository"
->
-  
-
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fab fa-github"></i>
   </span>
 
 </a>
 
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="../_sources/large-tutorials/HD143006_part_1.ipynb.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/large-tutorials/HD143006_part_1.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.ipynb</span>
+<span class="btn__text-container">.ipynb</span>
 </a>
-
-      </li>
+</li>
+      
+      
+      
       
       <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file-pdf"></i>
   </span>
-<span class="headerbtn__text-container">.pdf</span>
+<span class="btn__text-container">.pdf</span>
 </button>
-
-      </li>
+</li>
       
-    </ul>
-  </div>
+  </ul>
 </div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
   </span>
 
+</button>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#viewing-the-clean-image">
-   Viewing the CLEAN image
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plotting-the-baselines">
-   Plotting the Baselines
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-gridding-dirtyimager-object">
-   The
-   <code class="xref py py-class docutils literal notranslate">
-    <span class="pre">
-     mpol.gridding.DirtyImager
-    </span>
-   </code>
-   Object
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#making-diagnostic-dirty-images">
-   Making diagnostic dirty images
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#comparing-dirty-and-cleaned-images">
-   Comparing Dirty and CLEANed Images
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>HD143006 Tutorial Part 1</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#viewing-the-clean-image">
-   Viewing the CLEAN image
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plotting-the-baselines">
-   Plotting the Baselines
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-mpol-gridding-dirtyimager-object">
-   The
-   <code class="xref py py-class docutils literal notranslate">
-    <span class="pre">
-     mpol.gridding.DirtyImager
-    </span>
-   </code>
-   Object
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#making-diagnostic-dirty-images">
-   Making diagnostic dirty images
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#comparing-dirty-and-cleaned-images">
-   Comparing Dirty and CLEANed Images
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>HD143006 Tutorial Part 1</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-clean-image">Viewing the CLEAN image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-the-baselines">Plotting the Baselines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mpol-gridding-dirtyimager-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code> Object</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-dirty-and-cleaned-images">Comparing Dirty and CLEANed Images</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <div class="cell tag_hide-cell docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -451,11 +371,11 @@ title="Print to PDF"
 </details>
 </div>
 <section class="tex2jax_ignore mathjax_ignore" id="hd143006-tutorial-part-1">
-<h1>HD143006 Tutorial Part 1<a class="headerlink" href="#hd143006-tutorial-part-1" title="Permalink to this headline">#</a></h1>
+<h1>HD143006 Tutorial Part 1<a class="headerlink" href="#hd143006-tutorial-part-1" title="Permalink to this heading">#</a></h1>
 <p>This tutorial is the first of an eventual three part series covering a real world application of RML imaging to the HD 143006 protoplanetary disk dataset observed as part of the DSHARP survey (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..41A/abstract">Andrews et al. 2018</a>). In this tutorial (Part 1), we’ll provide a brief introduction to the dataset itself, the MPoL package, and perform some brief diagnostic imaging to make sure we have the basics configured properly.</p>
 <p><a class="reference internal" href="HD143006_part_2.html"><span class="doc std std-doc">Part 2</span></a> of the tutorial will demonstrate how to set up the optimization loop and to create an RML image.</p>
 <section id="viewing-the-clean-image">
-<h2>Viewing the CLEAN image<a class="headerlink" href="#viewing-the-clean-image" title="Permalink to this headline">#</a></h2>
+<h2>Viewing the CLEAN image<a class="headerlink" href="#viewing-the-clean-image" title="Permalink to this heading">#</a></h2>
 <p>Before we dig into RML imaging or the MPoL package, let’s get our bearings by looking at the fiducial image provided by the DSHARP survey, synthesized using the CLEAN algorithm. We can download the FITS file directly from the DSHARP survey page</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -539,7 +459,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="plotting-the-baselines">
-<h2>Plotting the Baselines<a class="headerlink" href="#plotting-the-baselines" title="Permalink to this headline">#</a></h2>
+<h2>Plotting the Baselines<a class="headerlink" href="#plotting-the-baselines" title="Permalink to this heading">#</a></h2>
 <p>Now that we have an idea of what we’re looking to image, let’s load up the actual dataset. First, we’ll download the raw visibilities. To speed things along for the purpose of this tutorial (and avoid introducing CASA as a package dependency), we’ve already extracted the visibility data as a <code class="docutils literal notranslate"><span class="pre">.npz</span></code> file, which we’ve made available on Zenodo.</p>
 <p>More information on how to do this extraction in general is available on the <a class="reference external" href="https://mpol-dev.github.io/visread/">visread</a> documentation page, and the specific commands used to produce this <code class="docutils literal notranslate"><span class="pre">.npz</span></code> file are available in the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets/tree/main/products/HD143006-DSHARP-continuum">mpoldatasets</a> package.</p>
 <div class="cell docutils container">
@@ -588,7 +508,7 @@ title="Print to PDF"
 <p>As you can see, there is a very dense grouping of visibilities with <span class="math notranslate nohighlight">\(q &lt; 2000\, \mathrm{k}\lambda\)</span>, where <span class="math notranslate nohighlight">\(q=\sqrt{u^2 + v^2}\)</span>, which primarily consists of data taken in more compact ALMA configurations. There are also several visibilities with baselines &gt; 7,000 (<span class="math notranslate nohighlight">\(k\lambda\)</span>), which correspond to the extended ALMA configurations and is the reason why the DSHARP data can generate some of the highest spatial resolution images of protoplanetary disks to date.</p>
 </section>
 <section id="the-mpol-gridding-dirtyimager-object">
-<h2>The <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> Object<a class="headerlink" href="#the-mpol-gridding-dirtyimager-object" title="Permalink to this headline">#</a></h2>
+<h2>The <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> Object<a class="headerlink" href="#the-mpol-gridding-dirtyimager-object" title="Permalink to this heading">#</a></h2>
 <p>Though we have lofty ambitions to make RML images with these DSHARP visibilities, our first goals are much humbler (and pragmatic). Basically, we want to make sure that we are loading the visibilities into MPoL correctly with the right units and in the right format.</p>
 <p>One of the simplest ways to do that is by instantiating an <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object, which can perform basic visibility averaging and inverse Fourier transforms as implemented in CASA. This allows us to check that we’re starting from the same basic understanding of the data by creating our own version of a dirty image.</p>
 <p>To instantiate an MPoL Gridder object, we need to make a choice for the size of the pixels <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> and the number of pixels per side of our image, <code class="docutils literal notranslate"><span class="pre">npix</span></code>. You can read more about these properties in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API Documentation.</p>
@@ -627,7 +547,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="making-diagnostic-dirty-images">
-<h2>Making diagnostic dirty images<a class="headerlink" href="#making-diagnostic-dirty-images" title="Permalink to this headline">#</a></h2>
+<h2>Making diagnostic dirty images<a class="headerlink" href="#making-diagnostic-dirty-images" title="Permalink to this heading">#</a></h2>
 <p>Now, we’ll use the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager.get_dirty_image" title="mpol.gridding.DirtyImager.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager.get_dirty_image()</span></code></a> routine to average the visibilities to the grid defined by <code class="docutils literal notranslate"><span class="pre">coords</span></code>, and perform an inverse Fourier transform to get the dirty image.</p>
 <p>There are different ways to weight the visibilities during the averaging process to promote certain image characteristics. More info on the weighting can be found in the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a>. The MPoL <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> is capable of averaging visibilities using uniform, natural, and Briggs robust weighting. We’ll demonstrate this functionality by making several different dirty images under different averaging schemes.</p>
 <p>We’ll write a function to calculate the dirty image and then plot it.</p>
@@ -705,7 +625,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="comparing-dirty-and-cleaned-images">
-<h2>Comparing Dirty and CLEANed Images<a class="headerlink" href="#comparing-dirty-and-cleaned-images" title="Permalink to this headline">#</a></h2>
+<h2>Comparing Dirty and CLEANed Images<a class="headerlink" href="#comparing-dirty-and-cleaned-images" title="Permalink to this heading">#</a></h2>
 <p>All in all, it looks like our diagnostic dirty images produced by the MPoL routine look similar enough in scale and orientation to the DSHARP CLEAN image that we have some confidence that we’re reading in the visibility data correctly.</p>
 <p>To wrap things up, let’s directly compare a dirty image with the DSHARP CLEAN image, which was produced using robust=0.0. (A slight <span class="math notranslate nohighlight">\(u,v\)</span> taper was also used, but we’ll ignore that detail here).</p>
 <div class="cell docutils container">
@@ -739,50 +659,105 @@ title="Print to PDF"
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../ci-tutorials/initializedirtyimage.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Initializing with the Dirty Image</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../ci-tutorials/initializedirtyimage.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Initializing with the Dirty Image</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="HD143006_part_2.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="HD143006_part_2.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">HD143006 Tutorial Part 2</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-clean-image">Viewing the CLEAN image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-the-baselines">Plotting the Baselines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mpol-gridding-dirtyimager-object">The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code> Object</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-diagnostic-dirty-images">Making diagnostic dirty images</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-dirty-and-cleaned-images">Comparing Dirty and CLEANed Images</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Ian Czekala<br/>
-  
-      &copy; Copyright 2019-22, Ian Czekala.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Ian Czekala
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2019-22, Ian Czekala.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

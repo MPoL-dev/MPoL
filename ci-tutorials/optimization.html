@@ -1,465 +1,361 @@
 
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Intro to RML with MPoL &#8212; MPoL 0.1.13 documentation</title>
-    
+    <title>Intro to RML with MPoL &#8212; MPoL 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script src="https://buttons.github.io/buttons.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'ci-tutorials/optimization';</script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Likelihood functions and model visibilities" href="loose-visibilities.html" />
     <link rel="prev" title="Gridding and diagnostic images" href="gridder.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
 
-    
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="../index.html">
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="../_static/logo.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">MPoL 0.1.13 documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
-        <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  User Guide
- </span>
-</p>
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../rml_intro.html">
-   Introduction to Regularized Maximum Likelihood Imaging
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../installation.html">
-   MPoL Installation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../units-and-conventions.html">
-   Units and Conventions
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../developer-documentation.html">
-   Developer Documentation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../api.html">
-   API
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Tutorials
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="PyTorch.html">
-   Introduction to PyTorch: Tensors and Gradient Descent
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="gridder.html">
-   Gridding and diagnostic images
-  </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Intro to RML with MPoL
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="loose-visibilities.html">
-   Likelihood functions and model visibilities
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="crossvalidation.html">
-   Cross validation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="gpu_setup.html">
-   GPU Acceleration
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="initializedirtyimage.html">
-   Initializing with the Dirty Image
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../large-tutorials/HD143006_part_1.html">
-   HD143006 Tutorial Part 1
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../large-tutorials/HD143006_part_2.html">
-   HD143006 Tutorial Part 2
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="fakedata.html">
-   Making a Mock Dataset
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../large-tutorials/pyro.html">
-   Parametric Inference with Pyro
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Intro to RML with MPoL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loose-visibilities.html">Likelihood functions and model visibilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing with the Dirty Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fakedata.html">Making a Mock Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/pyro.html">Parametric Inference with Pyro</a></li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../changelog.html">
-   Changelog
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
-</div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
 
 
-          
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
 
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
 <div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
-
-
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
->
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
   
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
-  </span>
-
-</label>
-
-        
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
     </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/MPoL-dev/MPoL" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-expand"></i>
-  </span>
-
-</button>
-<a href="https://github.com/MPoL-dev/MPoL"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="bottom"
-title="Source repository"
->
-  
-
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fab fa-github"></i>
   </span>
 
 </a>
 
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="../_sources/ci-tutorials/optimization.md.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/ci-tutorials/optimization.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.md</span>
+<span class="btn__text-container">.md</span>
 </a>
-
-      </li>
+</li>
+      
+      
+      
       
       <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file-pdf"></i>
   </span>
-<span class="headerbtn__text-container">.pdf</span>
+<span class="btn__text-container">.pdf</span>
 </button>
-
-      </li>
+</li>
       
-    </ul>
-  </div>
+  </ul>
 </div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
   </span>
 
+</button>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gridding-recap">
-   Gridding recap
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-pytorch-dataset">
-   The PyTorch dataset
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-an-image-model">
-   Building an image model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#breaking-down-the-training-loop">
-   Breaking down the training loop
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-functions">
-   Loss functions
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gradient-descent">
-   Gradient descent
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#iterating-the-training-loop">
-   Iterating the training Loop
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualizing-the-image">
-   Visualizing the image
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualizing-the-residuals">
-   Visualizing the residuals
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Intro to RML with MPoL</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gridding-recap">
-   Gridding recap
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-pytorch-dataset">
-   The PyTorch dataset
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-an-image-model">
-   Building an image model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#breaking-down-the-training-loop">
-   Breaking down the training loop
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-functions">
-   Loss functions
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gradient-descent">
-   Gradient descent
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#iterating-the-training-loop">
-   Iterating the training Loop
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualizing-the-image">
-   Visualizing the image
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualizing-the-residuals">
-   Visualizing the residuals
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Intro to RML with MPoL</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gridding-recap">Gridding recap</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pytorch-dataset">The PyTorch dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-an-image-model">Building an image model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-down-the-training-loop">Breaking down the training loop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions">Loss functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-descent">Gradient descent</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-the-training-loop">Iterating the training Loop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-the-image">Visualizing the image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-the-residuals">Visualizing the residuals</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <div class="cell tag_hide-cell docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -474,10 +370,10 @@ title="Print to PDF"
 </details>
 </div>
 <section class="tex2jax_ignore mathjax_ignore" id="intro-to-rml-with-mpol">
-<h1>Intro to RML with MPoL<a class="headerlink" href="#intro-to-rml-with-mpol" title="Permalink to this headline">#</a></h1>
+<h1>Intro to RML with MPoL<a class="headerlink" href="#intro-to-rml-with-mpol" title="Permalink to this heading">#</a></h1>
 <p>In this tutorial, we’ll construct an optimization loop demonstrating how we can use MPoL to synthesize a basic image. We’ll continue with the dataset described in the <a class="reference internal" href="gridder.html"><span class="doc std std-doc">Gridding and Diagnostic Images</span></a> tutorial.</p>
 <section id="gridding-recap">
-<h2>Gridding recap<a class="headerlink" href="#gridding-recap" title="Permalink to this headline">#</a></h2>
+<h2>Gridding recap<a class="headerlink" href="#gridding-recap" title="Permalink to this heading">#</a></h2>
 <p>Let’s set up the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> and <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> objects as before</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -540,7 +436,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="the-pytorch-dataset">
-<h2>The PyTorch dataset<a class="headerlink" href="#the-pytorch-dataset" title="Permalink to this headline">#</a></h2>
+<h2>The PyTorch dataset<a class="headerlink" href="#the-pytorch-dataset" title="Permalink to this heading">#</a></h2>
 <aside class="margin sidebar">
 <p class="sidebar-title">Cell-averaging</p>
 <p>The visibility averaging step performed by the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> is a weighted average that is numerically equivalent to “uniform” weighting of the visibilities; this does not mean that MPoL or RML only produces images that have “uniform” weighting, however. The <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL <em>forward-models</em> the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">ungridded</span></a> visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.</p>
@@ -562,7 +458,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="building-an-image-model">
-<h2>Building an image model<a class="headerlink" href="#building-an-image-model" title="Permalink to this headline">#</a></h2>
+<h2>Building an image model<a class="headerlink" href="#building-an-image-model" title="Permalink to this heading">#</a></h2>
 <p>MPoL provides “modules” to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We’ve bundled the most common modules for imaging together in a <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.precomposed.SimpleNet</span></code></a> meta-module, which we’ll use here.</p>
 <p>This diagram shows how the primitive modules, like <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a>, <a class="reference internal" href="../api.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>, etc… are connected together to form <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.precomposed.SimpleNet</span></code></a>. In this workflow, the pixel values of the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> are the core model parameters representing the image. More information about all of these components is available in the <a class="reference internal" href="../api.html#api-reference-label"><span class="std std-ref">API documentation</span></a>.</p>
 <div class="mermaid">
@@ -586,7 +482,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="breaking-down-the-training-loop">
-<h2>Breaking down the training loop<a class="headerlink" href="#breaking-down-the-training-loop" title="Permalink to this headline">#</a></h2>
+<h2>Breaking down the training loop<a class="headerlink" href="#breaking-down-the-training-loop" title="Permalink to this heading">#</a></h2>
 <p>Our goal for the rest of the tutorial is to set up a loop that will</p>
 <ol class="arabic simple">
 <li><p>evaluate the current model against a loss function</p></li>
@@ -604,11 +500,11 @@ title="Print to PDF"
 <p>The role of the optimizer is to advance the parameters (in this case, the pixel values of the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> using the gradient of the loss function with respect to those parameters. PyTorch has many different <a class="reference external" href="https://pytorch.org/docs/stable/optim.html#module-torch.optim">optimizers</a> available, and it is worthwhile to try out some of the different ones. Stochastic Gradient Descent (SGD) is one of the simplest, so we’ll start here. The <code class="docutils literal notranslate"><span class="pre">lr</span></code> parameter is the ‘learning rate,’ or how ambitious the optimizer should be in taking descent steps. Tuning this requires a bit of trial and error: you want the learning rate to be small enough so that the algorithm doesn’t diverge but large enough so that the optimization completes in a reasonable amount of time.</p>
 </section>
 <section id="loss-functions">
-<h2>Loss functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">#</a></h2>
+<h2>Loss functions<a class="headerlink" href="#loss-functions" title="Permalink to this heading">#</a></h2>
 <p>In the parlance of the machine learning community, one defines “loss” functions comparing models to data. For regularized maximum likelihood imaging, the most fundamental loss function we’ll use is the <code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses.loss_fn()</span></code> or the <span class="math notranslate nohighlight">\(\chi^2\)</span> value comparing the model visibilities to the data visibilities. For this introductory tutorial, we’ll use only the data likelihood loss function to start, but you should know that because imaging is an ill-defined inverse problem, this is <strong>not a sufficient constraint</strong> by itself. In later tutorials, we will apply regularization to narrow the set of possible images towards ones that we believe are more realistic. The <a class="reference internal" href="../api.html#module-mpol.losses" title="mpol.losses"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mpol.losses</span></code></a> module contains several loss functions currently popular in the literature, so you can experiment to see which best suits your application.</p>
 </section>
 <section id="gradient-descent">
-<h2>Gradient descent<a class="headerlink" href="#gradient-descent" title="Permalink to this headline">#</a></h2>
+<h2>Gradient descent<a class="headerlink" href="#gradient-descent" title="Permalink to this heading">#</a></h2>
 <p>Let’s walk through how we calculate a loss value and optimize the parameters. To start, let’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/saving_loading_models.html">examine the parameters of the model</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -675,7 +571,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fe8203d8400&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f5bda70caf0&gt;
 </pre></div>
 </div>
 <img alt="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" src="../_images/2db8382c727dde8226641bfd5595730e5e549a9def917e5986fb0bc7705bce17.png" />
@@ -772,7 +668,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fe81db7f940&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f5bda5d7070&gt;
 </pre></div>
 </div>
 <img alt="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" src="../_images/14a93de10f999fa5cbc848b5ce63dd51366f0d383ef19cea6fa2e02df661466a.png" />
@@ -829,7 +725,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fe81e5ceca0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f5bd88213d0&gt;
 </pre></div>
 </div>
 <img alt="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" src="../_images/23a86541c6811226a0dd403ec2aa0032c60e8d67350560413dd778170899771c.png" />
@@ -837,7 +733,7 @@ title="Print to PDF"
 </div>
 </section>
 <section id="iterating-the-training-loop">
-<h2>Iterating the training Loop<a class="headerlink" href="#iterating-the-training-loop" title="Permalink to this headline">#</a></h2>
+<h2>Iterating the training Loop<a class="headerlink" href="#iterating-the-training-loop" title="Permalink to this heading">#</a></h2>
 <p>Now that we’ve covered how to use gradient descent to optimize a set of image parameters, let’s wrap these steps into a training loop and iterate a few hundred times to converge to a final product.</p>
 <p>In addition to the steps just outlined, we’ll also track the loss values as we optimize.</p>
 <div class="cell docutils container">
@@ -866,8 +762,8 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 18.4 s, sys: 2.87 s, total: 21.3 s
-Wall time: 11.2 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 17.2 s, sys: 2.94 s, total: 20.2 s
+Wall time: 10.5 s
 </pre></div>
 </div>
 </div>
@@ -892,7 +788,7 @@ Wall time: 11.2 s
 <p>All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the <a class="reference internal" href="gpu_setup.html#gpu-reference-label"><span class="std std-ref">GPU Setup Tutorial</span></a>.</p>
 </section>
 <section id="visualizing-the-image">
-<h2>Visualizing the image<a class="headerlink" href="#visualizing-the-image" title="Permalink to this headline">#</a></h2>
+<h2>Visualizing the image<a class="headerlink" href="#visualizing-the-image" title="Permalink to this heading">#</a></h2>
 <p>Let’s visualize the final image product. The bounds for <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code> are available in the <code class="docutils literal notranslate"><span class="pre">img_ext</span></code> parameter.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -912,7 +808,7 @@ Wall time: 11.2 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fe81e49ebe0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f5bd86f2430&gt;
 </pre></div>
 </div>
 <img alt="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" src="../_images/b3a7bd503e02583eb4e24c37797be3b26a9dab65bea9bbeb43391faa466175f6.png" />
@@ -921,7 +817,7 @@ Wall time: 11.2 s
 <p>And there you have it, an image optimized to fit the data. To be honest, the results aren’t great—that’s because we’ve used minimal regularization in the form of the functional basis set we chose that automatically enforced image positivity (see the <a class="reference internal" href="../api.html#mpol.images.BaseCube" title="mpol.images.BaseCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.BaseCube</span></code></a> documentation). Otherwise, our only contribution to the loss function is the data likelihood. This means it’s easy for the lower signal-to-noise visibilities at longer baselines to dominate the image appearance (not unlike CLEAN images made with “uniform” weighting) and there is high “noise” in the image.</p>
 </section>
 <section id="visualizing-the-residuals">
-<h2>Visualizing the residuals<a class="headerlink" href="#visualizing-the-residuals" title="Permalink to this headline">#</a></h2>
+<h2>Visualizing the residuals<a class="headerlink" href="#visualizing-the-residuals" title="Permalink to this heading">#</a></h2>
 <p>We started this tutorial with a collection of visibility data—the complex-valued samples of the Fourier transform of the true sky brightness. We used the forward-modeling capabilities of MPoL and Pytorch to propose image-plane models of the true sky brightness and then used the Fast Fourier Transform to convert these into model visibilities. These model visibilities were compared against the data visibilities using the negative log likelihood loss function and (optionally) additional losses calculated using regularizers. We then used the Pytorch autodifferentiation machinery to calculate derivatives of this loss function space and evolved the model of the sky brightness until the loss function was minimized. At the end of this process, we are left with an image-plane model that produces the minimum loss function values when compared against the data visibilities and any regularizers.</p>
 <p>It nearly always worthwhile to visualize the residuals, defined as</p>
 <div class="math notranslate nohighlight">
@@ -1056,50 +952,109 @@ Wall time: 11.2 s
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="gridder.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Gridding and diagnostic images</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gridder.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Gridding and diagnostic images</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="loose-visibilities.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="loose-visibilities.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Likelihood functions and model visibilities</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gridding-recap">Gridding recap</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pytorch-dataset">The PyTorch dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-an-image-model">Building an image model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-down-the-training-loop">Breaking down the training loop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loss-functions">Loss functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-descent">Gradient descent</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-the-training-loop">Iterating the training Loop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-the-image">Visualizing the image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-the-residuals">Visualizing the residuals</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Ian Czekala<br/>
-  
-      &copy; Copyright 2019-22, Ian Czekala.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Ian Czekala
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2019-22, Ian Czekala.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
