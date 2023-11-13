@@ -1,6 +1,6 @@
 # MPoL Installation
 
-MPoL requires `python >= 3.6`.
+MPoL requires `python >= 3.8`.
 
 ## Using pip
 
