@@ -12,7 +12,7 @@ authors:
     # corresponding: true
     affiliation: 1
     # affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name:Jeff Jennings
+  - name: Jeff Jennings
     orcid: 0000-0002-7032-2350
     corresponding: true
     affiliation: 2
