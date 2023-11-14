@@ -37,6 +37,8 @@ bibliography: paper.bib
 
 # Summary
 
+Interferometric imaging is the process of recovering a spatial domain image from a Fourier domain signal that is only partially sampled. The technique is applied in a large number of fields from medical imaging to remote sensing, optics and astronomy. Within astronomy, interferometry conducted at radio, infrared and optical frequencies yields unparalleled spatial resolution in an image, corresponding to physical scales that are otherwise inaccessibly small. `Million Points of Light` (`MPoL`) is a Python package for astronomical interferometric imaging. It couples a statistical modeling framework with an efficient computational implementation to reconstruct images of astronomical sources from data measured by large telescopes such as the Atacama Large Millimeter/Submillimeter Array (ALMA). 
+
 # Statement of need
 
 `Million Points of Light` (`MPoL`)
