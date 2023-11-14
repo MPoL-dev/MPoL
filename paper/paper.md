@@ -14,23 +14,43 @@ authors:
     # affiliation: "1, 2" # (Multiple affiliations must be quoted)
   - name: Jeff Jennings
     orcid: 0000-0002-7032-2350
-    # corresponding: true
     affiliation: 2
-  # - name:Brianna Zawadzki
-  #   orcid: 0000-0001-9319-1296
-  #   affiliation: 3
-  # - name:Ryan Loomis
-  #   orcid: 0000-0002-8932-1219
-  #   affiliation: 4
+  - name: Brianna Zawadzki
+    orcid: 0000-0001-9319-1296
+    affiliation: 3
+  - name: Ryan Loomis
+    orcid: 0000-0002-8932-1219
+    affiliation: 4
+  - name: Kadri Nizam
+    orcid: 0000-0002-7217-446X
+    affiliation: 2
+  - name: Megan Delamer
+    # orcid: # can't find
+    affiliation: 2     
+  - name: Kaylee de Soto
+    orcid: 0000-0002-9886-2834
+    affiliation: 2
+  - name: Robert Frazier
+    orcid: 0000-0001-6569-3731
+    affiliation: 2      
+  - name: Hannah Grzybowski
+    # orcid: # can't find
+    affiliation: 2         
+  - name: Mary Ogborn
+    orcid: 0000-0001-9741-2703
+    affiliation: 2
+  - name: Tyler Quinn
+    orcid: 0000-0002-8974-8095
+    affiliation: 2
 affiliations:
- - name: University of St Andrews, Scotland
+ - name: University of St Andrews, Scotland # "institution, country" format suggested by JOSS
    index: 1
  - name: Pennsylvania State University, USA
    index: 2
-#  - name: Wesleyan University, USA
-#    index: 3
-#  - name: National Radio Astronomy Observatory, USA
-#    index: 4      
+ - name: Wesleyan University, USA
+   index: 3
+ - name: National Radio Astronomy Observatory, USA
+   index: 4      
 date: 14 November 2023
 bibliography: paper.bib
 ---
