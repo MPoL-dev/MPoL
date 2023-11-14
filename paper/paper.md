@@ -6,26 +6,32 @@ tags:
   - imaging
   - fourier
 authors:
-  - name: xx
-    orcid: 0000-0000-0000-0000
-    equal-contrib: true
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Author Without ORCID
-    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+  - name: Ian Czekala
+    orcid: 0000-0002-1483-8811
+    # equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+    # corresponding: true
+    affiliation: 1
+    # affiliation: "1, 2" # (Multiple affiliations must be quoted)
+  - name:Jeff Jennings
+    orcid: 0000-0002-7032-2350
+    corresponding: true
     affiliation: 2
-  - name: Author with no affiliation
-    corresponding: true # (This is how to denote the corresponding author)
-    affiliation: 3
-#   - given-names: Ludwig
-#     dropping-particle: van
-#     surname: Beethoven
-#     affiliation: 3
+  # - name:Brianna Zawadzki
+  #   orcid: 0000-0001-9319-1296
+  #   affiliation: 3
+  # - name:Ryan Loomis
+  #   orcid: 0000-0002-8932-1219
+  #   affiliation: 4
 affiliations:
- - name: xx
+ - name: University of St Andrews, Scotland
    index: 1
- - name: Institution Name, Country
+ - name: Pennsylvania State University, USA
    index: 2
-date: xx November 2023
+#  - name: Wesleyan University, USA
+#    index: 3
+#  - name: National Radio Astronomy Observatory, USA
+#    index: 4      
+date: 14 November 2023
 bibliography: paper.bib
 ---
 
