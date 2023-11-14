@@ -49,6 +49,6 @@ Accurately reconstructing an image from sparse Fourier data is an ill-posed prob
 
 # Acknowledgements
 
-<!-- We acknowledge contributions from xx. -->
+We acknowledge contributions from Brianna Zawadzki, Ryan Loomis, Kadri Nizam, Megan Delamer, Kaylee de Soto, Robert Frazier, Hannah Grzybowski, Mary Ogborn, and Tyler Quinn.
 
 # References
