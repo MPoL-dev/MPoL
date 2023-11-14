@@ -41,47 +41,11 @@ Interferometric imaging is the process of recovering a spatial domain image from
 
 # Statement of need
 
-`Million Points of Light` (`MPoL`)
+Accurately reconstructing an image from sparse Fourier data is an ill-posed problem that remains an outstanding challenge in astronomical research, particularly in sub-mm astronomy. There, the current standard approach to interferometric imaging is `CLEAN` [@1974A&AS...15..417H], an empirical, algorithmic procedure that requires a high degree of user intervention. The algorithm is not computationally efficient and thus not practical for large datasets (~100 GB) that are becoming increasingly common in the field. And the enclosing software lacks the accessibility and up-to-date documentation to easily modify the algorithm for custom use cases [@2007ASPC..376..127M]. Collectively these limitations necessitate an alternative imaging formalism and software implementation. 
 
-# Mathematics
+`MPoL` is a statistically robust, nonparametric modeling approach to interferometric imaging in a user-friendly, well-documented package that is computationally performant. The software is designed to be applied to reconstruction of an individual image or an entire 'cube' of tens to hundreds of images of an astronomical source observed at different frequencies. The images obtained are of simultaneously higher spatial resolution and sensitivity than their counterparts produced by `CLEAN`. Programatically, `MPoL` is built on `PyTorch`, using its auto-differentiation capabilities to drive likelihood optimization with gradient descent and its parallelization support to optionally accelerate the imaging workflow on GPUs and TPUs. The imaging framework in `MPoL` is also flexible, with the ability to easily add alternative or additional priors into likelihood calculation. Extensions to the core functionality are actively developed, such as the recent implementation of parametric inference with `Pyro`, as are further optimizations to the core routines.
 
-<!-- Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text. -->
-
-# Citations
-
-<!-- Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)" -->
-
-# Figures
-<!-- 
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% } -->
+`MPoL` is used in astrophysical research to image and study objects such as protoplanetary disks and Solar System bodies. It is currently being applied to multiple projects, from individual use cases to large collaborations. The software could be applied without modification to research in other subfields of astronomy that use data from sub-mm interferometers, including cosmology, extragalactic astronomy, and star formation. With a reasonable amount of modification, it could be adopted for datasets obtained by infrared and optical interferometers, or to interferometric imaging problems beyond astronomy.
 
 # Acknowledgements
 
