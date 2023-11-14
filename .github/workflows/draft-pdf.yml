@@ -1,6 +1,9 @@
 name: build JOSS pdf
 
-on: [push]
+on:
+    push:
+      branches:
+        - joss_paper
 
 jobs:
   paper:
