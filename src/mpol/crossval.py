@@ -6,9 +6,14 @@ from collections import defaultdict
 from typing import Any
 
 import numpy as np
-import torch
 from numpy import floating
 from numpy.typing import NDArray
+
+import torch
+import ray.train
+import ray.tune 
+from ray.tune.search.hyperopt import HyperOptSearch
+from hyperopt import hp
 
 from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet

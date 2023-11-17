@@ -85,7 +85,7 @@ class TrainTest:
         img1 = torch.from_numpy(img1.copy())
         img2 = torch.from_numpy(img2.copy())
 
-        if self._regularizers.get('entropy', {}).get('guess') == True:
+        if self._regularizers.get('entropy', {}).get('guess') is True:
             # force negative pixel values to small positive value
             img1_nn = torch.where(img1 < 0, 1e-10, img1)
             img2_nn = torch.where(img2 < 0, 1e-10, img2)
@@ -96,19 +96,19 @@ class TrainTest:
             # update stored value
             self._regularizers['entropy']['lambda'] = guess_e.numpy().item()
 
-        if self._regularizers.get('sparsity', {}).get('guess') == True:
+        if self._regularizers.get('sparsity', {}).get('guess') is True:
             loss_s1 = sparsity(img1)
             loss_s2 = sparsity(img2)
             guess_s = 1 / (loss_s2 - loss_s1)
             self._regularizers['sparsity']['lambda'] = guess_s.numpy().item()
 
-        if self._regularizers.get('TV', {}).get('guess') == True:
+        if self._regularizers.get('TV', {}).get('guess') is True:
             loss_TV1 = TV_image(img1, self._regularizers['TV']['epsilon'])
             loss_TV2 = TV_image(img2, self._regularizers['TV']['epsilon'])
             guess_TV = 1 / (loss_TV2 - loss_TV1)
             self._regularizers['TV']['lambda'] = guess_TV.numpy().item()
 
-        if self._regularizers.get('TSV', {}).get('guess') == True:
+        if self._regularizers.get('TSV', {}).get('guess') is True:
             loss_TSV1 = TSV(img1)
             loss_TSV2 = TSV(img2)
             guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
