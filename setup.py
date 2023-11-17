@@ -58,6 +58,8 @@ EXTRA_REQUIRES = {
     ],
     "analysis": [
         "frank>=1.2.1",
+        "ray>=2.8.0",
+        "hyperopt>=0.2.7"
     ],
 }
 
