@@ -22,6 +22,8 @@ from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest
 from mpol.plot import split_diagnostics_fig
 
+from mpol.utils import torch2npy # TODO: remove
+
 
 def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, convergence_tol, 
                    train_diag_step, save_prefix, verbose, tuning=False):
@@ -113,6 +115,8 @@ def tune_hyperpars(model, train_set, test_set, imager, epochs, convergence_tol,
     result = tuner.fit()
 
     return result
+
+
 class CrossValidate:
     r"""
     Utilities to run a cross-validation loop (implicitly running a training
@@ -393,7 +397,7 @@ class RandomCellSplitGridded:
         nvis = len(self.dataset.vis_indexed)
         nn = int(nvis * 0.01)
         # get the nn-th largest value in weight_indexed
-        w_thresh = np.partition(self.dataset.weight_indexed, -nn)[-nn]
+        w_thresh = np.partition(torch2npy(self.dataset.weight_indexed), -nn)[-nn] # TODO: torch2npy
         self._top_nn = torch.argwhere(
             self.dataset.weight_gridded[self.channel] >= w_thresh
         ).T
@@ -502,8 +506,8 @@ class DartboardSplitGridded:
         stacked_mask = torch.any(self.griddedDataset.mask, dim=0)
 
         # get qs, phis from dataset and turn into 1D lists
-        qs = self.griddedDataset.coords.packed_q_centers_2D[stacked_mask]
-        phis = self.griddedDataset.coords.packed_phi_centers_2D[stacked_mask]
+        qs = self.griddedDataset.coords.packed_q_centers_2D[torch2npy(stacked_mask)]
+        phis = self.griddedDataset.coords.packed_phi_centers_2D[torch2npy(stacked_mask)]
 
         # create the full cell_list
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
