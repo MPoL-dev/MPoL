@@ -198,7 +198,15 @@ class CrossValidate:
             self._split_figure = (split_fig, split_axes)
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
-            if self._verbose:
+            if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                train_set, test_set = train_set.to(self._device), test_set.to(self._device)
+
+            # create a new model for this k_fold
+            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+            if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                self._model = self._model.to(self._device)
+
+            if self._verbose is True:
                 logging.info(
                     "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds)
                 )
