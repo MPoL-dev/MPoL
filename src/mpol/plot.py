@@ -23,7 +23,7 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
     symmetric : bool, default=False 
         Whether the colormap is symmetric about 0
     """
-    if symmetric:
+    if symmetric is True:
         vmax = max(abs(image.min()), image.max())
         vmin = -vmax
 
