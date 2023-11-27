@@ -6,7 +6,7 @@ from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 
-def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
+def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetric=False):
     """
     Get a colormap normalization to apply to an image. 
 
@@ -20,15 +20,25 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
         gamma=1.0 yields a linear colormap.
     asinh_a : float, default = 0.02
         Scale parameter for an asinh stretch.
+    symmetric : bool, default=False 
+        Whether the colormap is symmetric about 0
     """
-    vmax = image.max()
+    if symmetric:
+        vmax = max(abs(image.min()), image.max())
+        vmin = -vmax
+
+    else:
+        vmax = image.max()
+
+        if stretch == 'power':
+            vmin = 0
+        elif stretch == 'asinh':     
+            vmin = max(0, image.min())
 
     if stretch == 'power':
-        vmin = 0
         norm = mco.PowerNorm(gamma, vmin, vmax)    
     
     elif stretch == 'asinh':
-        vmin = max(0, image.min())
         norm = simple_norm(image, stretch='asinh', asinh_a=asinh_a, 
                         min_cut=vmin, max_cut=vmax)
 
