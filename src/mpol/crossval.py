@@ -76,6 +76,16 @@ def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, co
 
 def tune_hyperpars(model, train_set, test_set, imager, epochs, convergence_tol, 
                    train_diag_step, save_prefix, verbose, tuning=True):
+    # distributions from which to draw regularizer strengths and learning rate
+    search_space = {
+            "entropy": ray.tune.loguniform(1e-8, 1e1),
+            "entropy_prior_intensity": ray.tune.loguniform(1e-8, 1e1),
+            "sparsity": ray.tune.loguniform(1e-8, 1e1),
+            "tv": ray.tune.loguniform(1e-8, 1e1),
+            "tv_epsilon": ray.tune.loguniform(1e-8, 1e1),
+            "tsv": ray.tune.loguniform(1e-8, 1e1),
+            "lr": ray.tune.loguniform(1e-4, 1e-1),
+            }
 
     result = tuner.fit()
 
