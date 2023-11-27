@@ -8,10 +8,12 @@ from typing import Any
 import numpy as np
 from numpy import floating
 from numpy.typing import NDArray
+from functools import partial
 
 import torch
 import ray.train
 import ray.tune 
+from ray.tune.schedulers import ASHAScheduler
 from ray.tune.search.hyperopt import HyperOptSearch
 from hyperopt import hp
 
