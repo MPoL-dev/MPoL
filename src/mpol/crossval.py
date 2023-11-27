@@ -86,6 +86,19 @@ def tune_hyperpars(model, train_set, test_set, imager, epochs, convergence_tol,
             "tsv": ray.tune.loguniform(1e-8, 1e1),
             "lr": ray.tune.loguniform(1e-4, 1e-1),
             }
+    # search_space = {
+    #         "entropy": hp.loguniform("entropy", 1e-8, 1e1),
+    #         "entropy_prior_intensity": hp.loguniform("entropy_prior_intensity", 1e-8, 1e1),
+    #         "sparsity": hp.loguniform("sparsity", 1e-8, 1e1),
+    #         "tv": hp.loguniform("tv", 1e-8, 1e1),
+    #         "tv_epsilon": hp.loguniform("tv_epsilon", 1e-8, 1e1),
+    #         "tsv": hp.loguniform("tsv", 1e-8, 1e1),
+    #         "lr": hp.loguniform("lr", 1e-4, 1e-1),
+    #         }
+        
+    # hyperopt_search = HyperOptSearch(search_space, metric="score", mode="min")
+
+    # result = ray.tune.run(
 
     result = tuner.fit()
 
