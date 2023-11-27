@@ -211,40 +211,13 @@ class CrossValidate:
                     "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds)
                 )
 
-            # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
-
-            # create a new model and optimizer for this k_fold
-            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
-            # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     self._model = self._model.to(self._device)
-
-            optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learn_rate)
-
-            trainer = TrainTest(
-                imager=self._imager,
-                optimizer=optimizer,
-                epochs=self._epochs,
-                convergence_tol=self._convergence_tol,
-                regularizers=self._regularizers,
-                train_diag_step=self._train_diag_step,
-                kfold=kk,
-                save_prefix=self._save_prefix,
-                verbose=self._verbose,
-            )
-
-            # run training 
-            loss, loss_history = trainer.train(self._model, train_set)
-
-            if self._store_cv_diagnostics:
-                self._diagnostics["loss_histories"].append(loss_history)   
-            # update regularizer strength values
-            self._regularizers = trainer.regularizers
-            # store the most recent train figure for diagnostics
-            self._train_figure = trainer.train_figure 
-            
-            # run testing
-            all_scores.append(trainer.test(self._model, test_set))
+            config = copy.deepcopy(self._regularizers) # TODO
+            config['lr'] = self._learn_rate # TODO
+            score = run_train_test(config, self._model, train_set, 
+                                   test_set, kk, self._imager, self._epochs, 
+                                    self._convergence_tol, self._train_diag_step, 
+                                     self._save_prefix, self._verbose, tuning=False ) # TODO
+            all_scores.append(score)
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
