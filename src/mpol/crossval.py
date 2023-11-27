@@ -167,6 +167,15 @@ class CrossValidate:
             if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
                 dataset = dataset.to(self._device)
             
+            # create a split only for tuning
+            tune_split = self.split_dataset(dataset)
+            for zz, (train_set, test_set) in enumerate(tune_split): # TODO
+                if zz == 0:
+                    # (train_set, test_set) = next(tune_split)
+
+                    # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                    #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
+
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
