@@ -56,6 +56,8 @@ class CrossValidate:
         {"sparsity":{"lambda":1e-3, "guess":False},
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
         }
+    tune : bool, default=False
+        Whether to tune hyperparameters prior to running cross-valdiation.
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -76,7 +78,7 @@ class CrossValidate:
 
     def __init__(self, coords, imager, kfolds=5, split_method="random_cell",
                 seed=None, learn_rate=0.5, epochs=10000, convergence_tol=1e-3,
-                regularizers={}, train_diag_step=None, split_diag_fig=False, 
+                regularizers={}, tune=False, train_diag_step=None, split_diag_fig=False, 
                 store_cv_diagnostics=False, save_prefix=None, device=None, 
                 verbose=True
                 ):
@@ -89,6 +91,7 @@ class CrossValidate:
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._regularizers = regularizers
+        self._tune = tune
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
@@ -100,6 +103,7 @@ class CrossValidate:
         self._diagnostics = None
         self._split_figure = None
         self._train_figure = None
+        self._tune_result = None 
 
     def split_dataset(self, dataset):
         r"""
