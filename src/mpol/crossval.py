@@ -240,6 +240,11 @@ class CrossValidate:
         return self._regularizers
 
     @property
+    def tune_result(self):
+        """ray.tune ExperimentAnalysis object containing results of hyperparameter tuning"""
+        return self._tune_result
+    
+    @property
     def diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop"""
         return self._diagnostics
