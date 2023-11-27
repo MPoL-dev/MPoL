@@ -23,6 +23,37 @@ from mpol.training import TrainTest
 from mpol.plot import split_diagnostics_fig
 
 
+def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, convergence_tol, 
+                   train_diag_step, save_prefix, verbose, tuning=False):
+
+    # create a new optimizer for this training run
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    trainer = TrainTest(
+        imager=imager,
+        optimizer=optimizer,
+        epochs=epochs,
+        convergence_tol=convergence_tol,
+        regularizers=regularizers,
+        train_diag_step=train_diag_step,
+        kfold=kfold,
+        save_prefix=save_prefix,
+        verbose=verbose,
+    )
+
+    # run training 
+    loss, loss_history = trainer.train(model, train_set)
+
+    # if self._store_cv_diagnostics is True:
+    #     self._diagnostics["loss_histories"].append(loss_history)   
+    
+    # update regularizer strength values (no effect if regularizers have `"guess":False`)
+    # self._regularizers = trainer.regularizers
+
+    # store the most recent train figure for diagnostics
+    train_figure = trainer.train_figure
+    
+
 class CrossValidate:
     r"""
     Utilities to run a cross-validation loop (implicitly running a training
