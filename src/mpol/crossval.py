@@ -25,6 +25,19 @@ from mpol.plot import split_diagnostics_fig
 
 def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, convergence_tol, 
                    train_diag_step, save_prefix, verbose, tuning=False):
+    if tuning is True:
+        lr=config["lr"]
+        
+        regularizers = { 
+        "entropy": {"lambda":config["entropy"], "guess":False, "prior_intensity":config["entropy_prior_intensity"]},    
+        "sparsity":{"lambda":config["sparsity"], "guess":False},
+        "TV":{"lambda":config["tv"], "guess":False, "epsilon":config["tv"]["epsilon"]},
+        "TSV":{"lambda":config["tsv"], "guess":False}
+        }           
+
+    else:    
+        lr=config['learn_rate']
+        regularizers = config['regularizers']
 
     # create a new optimizer for this training run
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
