@@ -108,7 +108,8 @@ class GriddedDataset(torch.nn.Module):
 
         new_2D_mask = torch.Tensor(mask).detach()
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
-
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu') # TODO
+        new_3D_mask = new_3D_mask.to(device) # TODO
         # update mask via an AND operation, meaning we will only keep visibilities that are
         # 1) part of the original dataset
         # 2) valid within the new mask
