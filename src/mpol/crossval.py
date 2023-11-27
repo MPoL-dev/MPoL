@@ -176,6 +176,11 @@ class CrossValidate:
                     # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
                     #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
+                    # create a new model for tuning
+                    self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+                    if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                        self._model = self._model.to(self._device)        
+        # create a split for cross-val
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
