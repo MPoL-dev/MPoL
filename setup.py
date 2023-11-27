@@ -33,14 +33,15 @@ EXTRA_REQUIRES = {
         "astropy",
         "tensorboard",
         "mypy",
+        "frank>=1.2.1",
     ],
     "docs": [
-        "sphinx>=2.3.0",
+        "sphinx>=5.3.0",
         "numpy",
         "jupytext",
         "ipython!=8.7.0",  # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
         "nbsphinx",
-        "sphinx_book_theme==0.3.3",
+        "sphinx_book_theme>=0.9.3",
         "sphinx_copybutton",
         "jupyter",
         "nbconvert",
@@ -55,10 +56,13 @@ EXTRA_REQUIRES = {
         "pyro-ppl",
         "arviz[all]"
     ],
+    "analysis": [
+        "frank>=1.2.1",
+    ],
 }
 
 EXTRA_REQUIRES["dev"] = (
-    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + ["pylint", "black", "pre-commit"]
+    EXTRA_REQUIRES["test"] + EXTRA_REQUIRES["docs"] + EXTRA_REQUIRES["analysis"] + ["pylint", "black", "pre-commit"]
 )
 
 

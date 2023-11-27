@@ -167,6 +167,8 @@ We strive to release a useable, stable software package. One way to help accompl
 
 If you are adding new code functionality to the package, please make sure you have also written a set of corresponding tests probing the key interfaces. If you submit a pull request implementing code functionality without any new tests, be prepared for 'tests' to be one of the first suggestions on your pull request. Some helpful advice on *which* tests to write is [here](https://docs.python-guide.org/writing/tests/), [here](https://realpython.com/pytest-python-testing/), and [here](https://www.nerdwallet.com/blog/engineering/5-pytest-best-practices/).
 
+For MPoL maintainers, see instructions [here](https://github.com/MPoL-dev/MPoL/wiki/Releasing-a-new-version-of-MPoL) for releasing a new version of MPoL.
+
 ### Contributing documentation
 
 A general workflow for writing documentation might look like

@@ -1,4 +1,4 @@
-__version__ = "0.1.13"
+__version__ = "0.2.0"
 zenodo_record = 10064221
 
 def enable_logging(log_file=None):
@@ -23,3 +23,4 @@ def enable_logging(log_file=None):
                         format='%(message)s',
                         handlers=handlers
                         )
+

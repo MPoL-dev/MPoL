@@ -10,7 +10,7 @@ Million Points of Light (MPoL)
 |Discussions badge|
 
 
-.. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg
+.. |Tests badge| image:: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main
    :target: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml
 
 .. |Discussions badge| image:: https://img.shields.io/badge/community-Github%20Discussions-orange
@@ -29,7 +29,7 @@ To get a sense of how MPoL works, please take a look at the :ref:`rml-intro-labe
 
 If you'd like to help build the MPoL package, please check out the :ref:`developer-documentation-label` to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization `website <https://mpol-dev.github.io/>`_ and `github <https://github.com/MPoL-dev>`__ repository hosting the source code.
 
-
+*If you use MPoL in your research, please cite us!* See https://github.com/MPoL-dev/MPoL#citation for the citation. 
 
 .. toctree::
    :maxdepth: 2
@@ -61,24 +61,6 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    :hidden:
 
    changelog.md
-
-If you use MPoL in your research, please cite us! ::
-
-   @software{ian_czekala_2021_4939048,
-   author       = {Ian Czekala and
-                  Brianna Zawadzki and
-                  Ryan Loomis and
-                  Hannah Grzybowski and
-                  Robert Frazier and
-                  Tyler Quinn},
-   title        = {MPoL-dev/MPoL: v0.1.1 Release},
-   month        = jun,
-   year         = 2021,
-   publisher    = {Zenodo},
-   version      = {v0.1.1},
-   doi          = {10.5281/zenodo.4939048},
-   url          = {https://doi.org/10.5281/zenodo.4939048}
-   }
 
 * :ref:`genindex`
 * :ref:`changelog-reference-label`

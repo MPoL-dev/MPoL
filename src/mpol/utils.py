@@ -302,7 +302,6 @@ def get_optimal_image_properties(image_width, u, v):
     npix : int
         Number of pixels of cell_size to equal (or slightly exceed) the image
         width (npix will be rounded up and enforced as even).
-
     Notes
     -----
     No assumption or correction is made concerning whether the spatial 

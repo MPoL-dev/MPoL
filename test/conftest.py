@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
+import torch
 from astropy.utils.data import download_file
 
-from mpol import coordinates, gridding
+from mpol import coordinates, fourier, gridding, images
 from mpol.__init__ import zenodo_record
 
 # We need a fixture which provides mock visibilities of the sort we'd
@@ -114,6 +115,71 @@ def dataset_cont(mock_visibility_data_cont, coords):
     )
 
     return averager.to_pytorch_dataset()
+
+
+@pytest.fixture(scope="session")
+def mock_1d_archive():
+    # use astropy routines to cache data
+    fname = download_file(
+        f"https://zenodo.org/record/{zenodo_record}/files/mock_disk_1d.npz",
+        cache=True,
+        pkgname="mpol",
+    )
+    
+    return np.load(fname, allow_pickle=True)
+
+
+@pytest.fixture
+def mock_1d_image_model(mock_1d_archive):
+    m = mock_1d_archive
+    rtrue = m['rtrue']
+    itrue = m['itrue']
+    i2dtrue = m['i2dtrue']
+    xmax = ymax = m['xmax']
+    geom = m['geometry']
+    geom = geom[()]
+
+    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
+                                    npix=i2dtrue.shape[0])
+    
+    # the center of the array is already at the center of the image -->
+    # undo this as expected by input to ImageCube
+    i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
+
+    # pack the numpy image array into an ImageCube
+    packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
+    packed_tensor = torch.from_numpy(packed_cube)
+    cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
+
+    return rtrue, itrue, cube_true, xmax, ymax, geom
+
+
+@pytest.fixture
+def mock_1d_vis_model(mock_1d_archive):
+    m = mock_1d_archive
+    Vtrue = m['vis']
+    Vtrue_dep = m['vis_dep']
+    q_dep = m['baselines_dep']
+    geom = m['geometry']
+    geom = geom[()]
+
+    xmax = m['xmax']
+    i2dtrue = m['i2dtrue']
+
+    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0],
+                                    npix=i2dtrue.shape[0])
+
+    # create a FourierCube
+    packed_cube = np.broadcast_to(Vtrue, (1, len(Vtrue))).copy()
+    packed_tensor = torch.from_numpy(packed_cube)
+    cube_true = fourier.FourierCube(coords=coords)
+
+    # insert the vis tensor into the FourierCube ('vis' would typically be 
+    # populated by taking the FFT of an image)
+    cube_true.ground_cube = packed_tensor
+
+    return cube_true, Vtrue_dep, q_dep, geom
+
 
 
 @pytest.fixture

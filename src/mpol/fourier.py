@@ -27,6 +27,7 @@ class FourierCube(nn.Module):
     Args:
         coords (GridCoords): an object already instantiated from the GridCoords class.
         persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
+
     """
 
     def __init__(self, coords: GridCoords, persistent_vis: bool = False):
@@ -48,12 +49,16 @@ class FourierCube(nn.Module):
     def from_image_properties(
         cls, cell_size: float, npix: int, persistent_vis: bool = False
     ) -> FourierCube:
-        r"""Alternative method for instantiating a FourierCube from ``cell_size``
-         and ``npix``
+        """
+        Alternative method for instantiating a FourierCube from ``cell_size`` and ``npix``
+
         Args:
             cell_size (float): the width of an image-plane pixel [arcseconds]
             npix (int): the number of pixels per image side
             persistent_vis (Boolean): should the visibility cube be stored as part of the modules `state_dict`? If `True`, the state of the UV grid will be stored. It is recommended to use `False` for most applications, since the visibility cube will rarely be a direct parameter of the model.
+
+        Returns:
+            instantiated :class:`mpol.fourier.FourierCube` object.
         """
         coords = GridCoords(cell_size, npix)
         return cls(coords, persistent_vis)

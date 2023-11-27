@@ -6,7 +6,7 @@ from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 
-def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
+def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetric=False):
     """
     Get a colormap normalization to apply to an image. 
 
@@ -20,15 +20,25 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
         gamma=1.0 yields a linear colormap.
     asinh_a : float, default = 0.02
         Scale parameter for an asinh stretch.
+    symmetric : bool, default=False 
+        Whether the colormap is symmetric about 0
     """
-    vmax = image.max()
+    if symmetric is True:
+        vmax = max(abs(image.min()), image.max())
+        vmin = -vmax
+
+    else:
+        vmax = image.max()
+
+        if stretch == 'power':
+            vmin = 0
+        elif stretch == 'asinh':     
+            vmin = max(0, image.min())
 
     if stretch == 'power':
-        vmin = 0
         norm = mco.PowerNorm(gamma, vmin, vmax)    
     
     elif stretch == 'asinh':
-        vmin = max(0, image.min())
         norm = simple_norm(image, stretch='asinh', asinh_a=asinh_a, 
                         min_cut=vmin, max_cut=vmax)
 
@@ -41,7 +51,7 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02):
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
                clab=r"Jy arcsec$^{-2}$",
                xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
-               ylab="$\Delta \delta$ [${}^{\prime\prime}$]",
+               ylab=r"$\Delta \delta$ [${}^{\prime\prime}$]",
                ):
     r""" 
     Wrapper for plt.imshow, with colorbar and colormap normalization.
@@ -272,7 +282,7 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     Parameters
     ----------
     splitter : `mpol.crossval.RandomCellSplitGridded` object
-        Iterator that returns a `(train, test)` pair of `GriddedDataset`s 
+        Iterator that returns a `(train, test)` pair of `GriddedDataset` 
         for each iteration.
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure
@@ -339,9 +349,9 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
-        - model image (both linear and arcsinh colormap normalization)
-        - gradient image
-        - loss function
+    - model image (both linear and arcsinh colormap normalization)
+    - gradient image
+    - loss function
 
     Parameters
     ----------
