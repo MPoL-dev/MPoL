@@ -180,6 +180,17 @@ class CrossValidate:
                     self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
                     if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
                         self._model = self._model.to(self._device)        
+
+                    self._tune_result = tune_hyperpars(self._model, train_set, test_set, 
+                                                       self._imager, self._epochs, 
+                                                       self._convergence_tol, 
+                                                       self._train_diag_step, 
+                                                       self._save_prefix, 
+                                                       self._verbose, tuning=True)
+                    best_trial = self._tune_result.get_best_trial("score", "min", "last")
+                    print(f"Best trial config: {best_trial.config}") # TODO: logging
+                    print(f"TEST: best trial should update self._regularizers: {self._regularizers}") # TODO
+
         # create a split for cross-val
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
