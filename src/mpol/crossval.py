@@ -99,6 +99,16 @@ def tune_hyperpars(model, train_set, test_set, imager, epochs, convergence_tol,
     # hyperopt_search = HyperOptSearch(search_space, metric="score", mode="min")
 
     # result = ray.tune.run(
+    tuner = ray.tune.Tuner(
+        partial(run_train_test, model=model, train_set=train_set, test_set=test_set, kfold=0, imager=imager,
+                epochs=epochs, convergence_tol=convergence_tol, train_diag_step=train_diag_step,
+                save_prefix=save_prefix, verbose=verbose, tuning=True),
+        param_space=search_space, 
+        # resources_per_trial={'gpu': 1},
+        # tune_config=ray.tune.TuneConfig(num_samples=1, search_alg=hyperopt_search),
+        tune_config=ray.tune.TuneConfig(num_samples=1, scheduler=ASHAScheduler(metric="score", mode="min")),
+        run_config=ray.train.RunConfig(stop={"training_iteration": 100})
+        )
 
     result = tuner.fit()
 
