@@ -66,6 +66,12 @@ def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, co
     # store the most recent train figure for diagnostics
     train_figure = trainer.train_figure
     
+    # run testing
+    score = trainer.test(model, test_set)
+
+    ray.train.report({"score":score})
+    
+    return score
 
 class CrossValidate:
     r"""
