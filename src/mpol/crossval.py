@@ -143,6 +143,7 @@ class CrossValidate:
 
         return split_iterator
 
+
     def run_crossval(self, dataset):
         r"""
         Run a cross-validation loop for a model obtained with a given set of
@@ -162,6 +163,10 @@ class CrossValidate:
         if self._store_cv_diagnostics:
             self._diagnostics = defaultdict(list)
 
+        if self._tune is True: 
+            if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
+                dataset = dataset.to(self._device)
+            
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
