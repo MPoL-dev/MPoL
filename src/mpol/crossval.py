@@ -148,11 +148,11 @@ class CrossValidate:
             scores across all k-folds, and all raw scores
         """
         all_scores = []
-        if self._store_cv_diagnostics:
+        if self._store_cv_diagnostics is True:
             self._diagnostics = defaultdict(list)
 
         split_iterator = self.split_dataset(dataset)
-        if self._split_diag_fig:
+        if self._split_diag_fig is True:
             split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
             self._split_figure = (split_fig, split_axes)
 
