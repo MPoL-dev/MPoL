@@ -73,6 +73,13 @@ def run_train_test(config, model, train_set, test_set, kfold, imager, epochs, co
     
     return score
 
+
+def tune_hyperpars(model, train_set, test_set, imager, epochs, convergence_tol, 
+                   train_diag_step, save_prefix, verbose, tuning=True):
+
+    result = tuner.fit()
+
+    return result
 class CrossValidate:
     r"""
     Utilities to run a cross-validation loop (implicitly running a training
