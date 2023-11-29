@@ -84,20 +84,21 @@ class CrossValidate:
                 ):
         self._coords = coords
         self._imager = imager
-        self._kfolds = kfolds
-        self._split_method = split_method
-        self._seed = seed
         self._learn_rate = learn_rate
+        self._regularizers = regularizers
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._schedule_factor = schedule_factor
         self._start_dirty_image = start_dirty_image
         self._train_diag_step = train_diag_step
+        self._kfolds = kfolds
+        self._split_method = split_method
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
         self._save_prefix = save_prefix
-        self._device = device
         self._verbose = verbose
+        self._device = device
+        self._seed = seed
 
         self._split_figure = None
 
