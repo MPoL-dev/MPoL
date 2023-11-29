@@ -134,7 +134,10 @@ class TrainTest:
 
         The guesses update `lambda` values in `self._regularizers`.
         """
-
+        if self._verbose:
+            logging.info("    Updating regularizer strengths with automated "
+                         f"guessing. Initial values: {self._regularizers}")
+            
         # generate images of the data using two briggs robust values
         img1, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.0)
         img2, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.5)
@@ -170,6 +173,9 @@ class TrainTest:
             guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
             self._regularizers['TSV']['lambda'] = guess_TSV.numpy().item()
 
+        if self._verbose:
+            logging.info(f"    Updated values: {self._regularizers}")
+                         
 
     def loss_eval(self, vis, dataset, sky_cube=None):
         r"""
