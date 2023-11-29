@@ -4,6 +4,8 @@ import torch
 
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
+from mpol.utils import torch2npy
+
 def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):
     r"""
     Train against a dirty image of the observed visibilities using a loss function 
@@ -362,5 +364,4 @@ class TrainTest:
     @property
     def train_figure(self):
         """(fig, axes) of figure showing training diagnostics"""
-        return self._train_figure
         return self._train_figure
