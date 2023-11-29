@@ -60,8 +60,9 @@ def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_p
     trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
 
-    train_state = trainer.train_state
-    train_fig, train_axes = train_diagnostics_fig(model, losses=loss_history, train_state=train_state)
+    train_fig, train_axes = train_diagnostics_fig(model, 
+                                                  losses=loss_history, 
+                                                  )
     train_fig.savefig(tmp_path / "train_diagnostics_fig.png", dpi=300)
     plt.close("all")
 
