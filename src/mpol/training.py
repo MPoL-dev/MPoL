@@ -221,7 +221,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 
@@ -232,6 +232,7 @@ class TrainTest:
         losses : list of float
             Loss value at each iteration (epoch) in the loop
         """
+
         # set model to training mode
         model.train()
 
@@ -320,7 +321,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 
@@ -341,6 +342,7 @@ class TrainTest:
         # return loss value
         return loss.item()
 
+
     @property
     def regularizers(self):
         """Dict containing regularizers used and their strengths"""
@@ -350,8 +352,4 @@ class TrainTest:
     def train_figure(self):
         """(fig, axes) of figure showing training diagnostics"""
         return self._train_figure
-    
-    @property
-    def train_state(self):
-        """Dict containing parameters of interest in the training loop"""
-        return self._train_state
+        return self._train_figure
