@@ -4,6 +4,33 @@ import torch
 
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
+def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):
+    logging.info("    Initializing model to dirty image")
+
+    img, beam = imager.get_dirty_image(weighting="briggs",
+                                                robust=robust,
+                                                unit="Jy/arcsec^2")
+    dirty_image = torch.tensor(img.copy())
+    optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
+
+    losses = []
+    for ii in range(niter):
+        optimizer.zero_grad()
+
+        model()
+
+        sky_cube = model.icube.sky_cube
+
+        lossfunc = torch.nn.MSELoss(reduction="sum")  
+        # MSELoss calculates mean squared error (squared L2 norm), so sqrt it
+        loss = (lossfunc(sky_cube, dirty_image)) ** 0.5
+        losses.append(loss.item())
+
+        loss.backward()
+        optimizer.step()            
+
+    return model
+
 
 class TrainTest:
     r"""
