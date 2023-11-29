@@ -208,7 +208,7 @@ def crossvalidation_products(mock_visibility_data):
 def generic_parameters(tmp_path):
     # generic model parameters to test training loop and cross-val loop
     regularizers = {
-        "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10},
+        "entropy": {"lambda":1e-3, "guess":False, "prior_intensity":1e-10},
         }
 
     train_pars = {"epochs":15, "convergence_tol":1e-3, 
