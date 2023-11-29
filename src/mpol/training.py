@@ -64,9 +64,7 @@ class TrainTest:
     Args:
         imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.
         optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.
-        epochs (int): Number of training iterations, default=10000
-        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by
-            loss function (suggested <= 1e-3)
+        scheduler (:class:`torch.optim.lr_scheduler` object, default=None): Scheduler for adjusting learning rate during optimization.        
         regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength ('lambda', float), whether to guess an initial value for lambda ('guess', bool), and other quantities needed to compute their loss term.
             
             Example:
@@ -80,15 +78,13 @@ class TrainTest:
         verbose (bool): Whether to print notification messages
     """
 
-    def __init__(self, imager, optimizer, epochs=10000, convergence_tol=1e-3, 
-                regularizers={}, train_diag_step=None, kfold=None, 
-                save_prefix=None, verbose=True
-                ):
+    def __init__(self, imager, optimizer, scheduler=None, regularizers={},
         self._imager = imager
         self._optimizer = optimizer
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._regularizers = regularizers
+        self._scheduler = scheduler        
         self._train_diag_step = train_diag_step
         self._save_prefix = save_prefix
         self._kfold = kfold
