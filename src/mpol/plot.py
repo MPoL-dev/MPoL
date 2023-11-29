@@ -67,6 +67,15 @@ def get_residual_image(model, u, v, V, weights, robust=0.5):
                                                )
     # `get_vis_residuals` has already selected a single channel
     im_resid = np.squeeze(im_resid)
+    
+    norm_resid = get_image_cmap_norm(im_resid, 
+                                     stretch='power', 
+                                     gamma=1, 
+                                     symmetric=True
+                                     )
+
+    return im_resid, norm_resid
+
 
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
                clab=r"Jy arcsec$^{-2}$",
