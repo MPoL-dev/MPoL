@@ -174,8 +174,12 @@ class CrossValidate:
                         )
                     # initial short training loop to get model image to approximate dirty image
                     model_pretrained = train_to_dirty_image(model=model, imager=self._imager)
+                    # save the model to a state we can load in subsequent kfolds
+                    torch.save(model_pretrained.state_dict(), f=self._save_prefix + "_dirty_image_model.pt")
+                else:
+                    # create a new model for this kfold, initializing it to the model pretrained on the dirty image
+                    model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
-            trainer = TrainTest(
                 imager=self._imager,
                 optimizer=optimizer,
                 epochs=self._epochs,
