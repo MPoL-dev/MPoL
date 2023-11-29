@@ -193,7 +193,10 @@ class CrossValidate:
 
             # create a new optimizer and scheduler for this kfold
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
-            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=self._schedule_factor)
+            if self._schedule_factor is None:
+                scheduler = None
+            else:
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=self._schedule_factor)
 
             trainer = TrainTest( 
                 imager=self._imager,
