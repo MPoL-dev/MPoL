@@ -170,7 +170,7 @@ class CrossValidate:
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
                 logging.info(
-                    "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds)
+                    "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds - 1)
                 )
 
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu

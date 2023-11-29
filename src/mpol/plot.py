@@ -351,22 +351,32 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None, old
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
-    - model image (both linear and arcsinh colormap normalization)
+    - model image
+    - flux of model image
     - gradient image
+    - difference image between `old_model_image` and current model image
     - loss function
+    - learning rate
 
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
     losses : list
         Loss value at each epoch in the training loop
-    train_state : dict, default=None
-        Dictionary containing current training parameter values. Used for 
-        figure title and savefile name.
+    learn_rates : list
+        Learning rate at each epoch in the training loop  
+    fluxes : list
+        Total flux in model image at each epoch in the training loop
+    old_model_image : 2D image array, default=None
+        Model image of a previous epoch for comparison to current image        
+    kfold : int, default=None
+        Current cross-validation k-fold
+    epoch : int, default=None
+        Current training epoch
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure        
-    save_prefix : string, default = None
+    save_prefix : str, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
     Returns
