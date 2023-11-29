@@ -242,7 +242,7 @@ class TrainTest:
                 )
 
             # check early-on whether the loss isn't evolving
-            if count == 20:
+            if count == 10:# and self._scheduler is not None:
                 loss_arr = np.array(losses)
                 if all(0.9 <= loss_arr[:-1] / loss_arr[1:]) and all(
                     loss_arr[:-1] / loss_arr[1:] <= 1.1
