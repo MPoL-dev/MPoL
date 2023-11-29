@@ -301,7 +301,9 @@ class TrainTest:
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs or self.loss_convergence(np.array(losses))):
                 train_fig, train_axes = train_diagnostics_fig(
-                    model, losses=losses, train_state=self._train_state, 
+                    model, losses=losses, learn_rates=learn_rates, fluxes=fluxes,
+                    old_model_image=old_mod_im,
+                    kfold=self._kfold, epoch=count,
                     save_prefix=self._save_prefix
                     )
                 self._train_figure = (train_fig, train_axes)
