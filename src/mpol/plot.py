@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
+import torch 
 
 from astropy.visualization.mpl_normalize import simple_norm
 
@@ -49,7 +50,7 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
 
 
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
-               clab=r"Jy arcsec$^{-2}$",
+               clab=r"I [Jy arcsec$^{-2}$]",
                xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
                ylab=r"$\Delta \delta$ [${}^{\prime\prime}$]",
                ):
@@ -98,7 +99,7 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
         norm=norm,
     )
 
-    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1, shrink=0.7)
     cbar.set_label(clab)
 
     ax.set_xlabel(xlab)
