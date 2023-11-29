@@ -16,10 +16,29 @@ def test_traintestclass_training(coords, imager, dataset, generic_parameters):
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
-    # bypass TrainTest.loss_lambda_guess
+    
+    # no regularizers
     train_pars["regularizers"] = {}
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+
+def test_traintestclass_training_scheduler(coords, imager, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop with regularizers, 
+    # using the learning rate scheduler
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"]
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+    # use a scheduler
+    train_pars["schedule_factor"] = 0.995
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
@@ -36,6 +55,8 @@ def test_traintestclass_training_guess(coords, imager, dataset, generic_paramete
     train_pars = generic_parameters["train_pars"] 
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    train_pars['regularizers']['entropy']['guess'] = True 
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
