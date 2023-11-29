@@ -200,8 +200,13 @@ class CrossValidate:
             )
 
             # run training 
-            loss, loss_history = trainer.train(self._model, train_set)
+            loss, loss_history = trainer.train(model, train_set)
 
+            # run testing
+            all_scores.append(trainer.test(model, test_set))
+
+            # store objects from the most recent kfold for diagnostics           
+            self._model = model
             if self._store_cv_diagnostics:
                 self._diagnostics["loss_histories"].append(loss_history)   
             # update regularizer strength values
