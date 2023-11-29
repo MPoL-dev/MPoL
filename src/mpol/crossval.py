@@ -235,33 +235,33 @@ class CrossValidate:
             "std": np.std(all_scores),
             "all": all_scores,
         }
-
+        
         return cv_score
-
+    
     @property
     def model(self):
-        """SimpleNet class instance"""
+        """For the most recent kfold, trained model (`SimpleNet` class instance)"""
         return self._model
 
     @property
     def regularizers(self):
-        """Dict containing regularizers used and their strengths"""
+        """For the most recent kfold, dict containing regularizers used and their strengths"""
         return self._regularizers
 
     @property
-    def diagnostics(self):
-        """Dict containing diagnostics of the cross-validation loop"""
-        return self._diagnostics
-
+    def train_figure(self):
+        """For the most recent kfold, (fig, axes) showing training progress"""
+        return self._train_figure
+        
     @property
     def split_figure(self):
         """(fig, axes) of train/test splitting diagnostic figure"""
         return self._split_figure
-
+    
     @property
-    def train_figure(self):
-        """(fig, axes) of most recent training diagnostic figure"""
-        return self._train_figure
+    def diagnostics(self):
+        """Dict containing diagnostics of the cross-validation loop across all kfolds: models, regularizers, loss values, training figures"""
+        return self._diagnostics
 
 
 class RandomCellSplitGridded:
