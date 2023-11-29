@@ -396,6 +396,17 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
 
     # gradient image
     ax = axes[1,0]
+    plot_image(mod_grad, extent, ax=ax)
+    ax.set_title("Gradient image", fontsize=10)
+
+    if old_model_image is not None:
+        # current model image - model image at last stored epoch
+        ax = axes[0,1]
+        diff_image = mod_im - old_model_image
+        diff_im_norm = get_image_cmap_norm(diff_image, symmetric=True)
+        plot_image(diff_image, extent, cmap='RdBu_r', ax=ax, xlab='', ylab='', norm=diff_im_norm)
+        ax.set_title("Difference image", fontsize=10)
+        
     if fluxes is not None:
         # total flux in model image 
         ax = fig.add_axes([0.08, 0.465, 0.3, 0.08])
