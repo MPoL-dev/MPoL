@@ -72,6 +72,9 @@ class TrainTest:
                 "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
                 }``
 
+        epochs (int): Number of training iterations, default=10000
+        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by
+            loss function (suggested <= 1e-3)
         train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.
         kfold (int): The k-fold of the current training set (for diagnostics)        
         save_prefix (str): Prefix (path) used for saved figure names. If None, figures won't be saved
@@ -79,15 +82,20 @@ class TrainTest:
     """
 
     def __init__(self, imager, optimizer, scheduler=None, regularizers={},
+                epochs=10000, convergence_tol=1e-5,                 
+                train_diag_step=None, 
+                kfold=None, save_prefix=None, verbose=True
+                ): 
         self._imager = imager
-        self._optimizer = optimizer
+        self._optimizer = optimizer      
+        self._scheduler = scheduler
+        self._regularizers = regularizers
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._regularizers = regularizers
-        self._scheduler = scheduler        
+        
         self._train_diag_step = train_diag_step
-        self._save_prefix = save_prefix
         self._kfold = kfold
+        self._save_prefix = save_prefix
         self._verbose = verbose
 
         self._train_figure = None
