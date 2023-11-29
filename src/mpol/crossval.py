@@ -185,6 +185,7 @@ class CrossValidate:
                     # create a new model for this kfold, initializing it to the model pretrained on the dirty image
                     model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
+            trainer = TrainTest( 
                 imager=self._imager,
                 optimizer=optimizer,
                 epochs=self._epochs,
