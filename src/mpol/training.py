@@ -240,6 +240,7 @@ class TrainTest:
         fluxes = []
         losses = []
         learn_rates = []
+        old_mod_im = None
 
         # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
@@ -304,6 +305,9 @@ class TrainTest:
                     save_prefix=self._save_prefix
                     )
                 self._train_figure = (train_fig, train_axes)
+
+            # temporarily store the current model image for use in next call to `train_diagnostics_fig`
+            old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
 
             count += 1
 
