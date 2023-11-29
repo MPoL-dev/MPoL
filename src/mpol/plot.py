@@ -345,8 +345,9 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     return fig, axes
 
 
-def train_diagnostics_fig(model, losses=[], train_state=None, channel=0, 
-                        save_prefix=None):
+def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None, old_model_image=None,
+                          kfold=None, epoch=None,
+                          channel=0, save_prefix=None):
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
@@ -406,6 +407,7 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
         diff_im_norm = get_image_cmap_norm(diff_image, symmetric=True)
         plot_image(diff_image, extent, cmap='RdBu_r', ax=ax, xlab='', ylab='', norm=diff_im_norm)
         ax.set_title("Difference image", fontsize=10)
+        
     if losses is not None:
         # loss function
         ax = fig.add_subplot(426)
