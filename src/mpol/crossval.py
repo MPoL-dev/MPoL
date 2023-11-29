@@ -49,6 +49,9 @@ class CrossValidate:
         {"sparsity":{"lambda":1e-3, "guess":False},
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
         }
+    schedule_factor : float, default=0.995
+        For the `torch.optim.lr_scheduler.ReduceLROnPlateau` scheduler, factor 
+        to which the learning rate is reduced when learning rate stops decreasing
     start_dirty_image : bool, default=False
         Whether to start the RML optimization loop by initializing the model 
         image to a dirty image of the observed data. If False, the optimization
