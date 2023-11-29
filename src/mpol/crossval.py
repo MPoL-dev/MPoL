@@ -190,10 +190,14 @@ class CrossValidate:
                     # create a new model for this kfold, initializing it to the model pretrained on the dirty image
                     model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
+            # create a new optimizer and scheduler for this kfold
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=self._schedule_factor)
+
             trainer = TrainTest( 
                 imager=self._imager,
                 optimizer=optimizer,
+                scheduler=scheduler,
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
                 regularizers=self._regularizers,
