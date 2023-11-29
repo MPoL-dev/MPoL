@@ -406,7 +406,24 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
         diff_im_norm = get_image_cmap_norm(diff_image, symmetric=True)
         plot_image(diff_image, extent, cmap='RdBu_r', ax=ax, xlab='', ylab='', norm=diff_im_norm)
         ax.set_title("Difference image", fontsize=10)
-        
+    if losses is not None:
+        # loss function
+        ax = fig.add_subplot(426)
+        ax.semilogy(losses, 'k', label=f"{losses[-1]:.3f}")
+        ax.legend(loc='upper right')
+        ax.xaxis.set_tick_params(labelbottom=False)
+        ax.set_ylabel('Loss')
+
+    if learn_rates is not None:    
+        # learning rate
+        ax = fig.add_subplot(428)
+        ax.plot(learn_rates, 'k', label=f"{learn_rates[-1]:.3e}")
+        ax.legend(loc='upper right')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Learn rate')
+
+    plt.tight_layout()
+
     if fluxes is not None:
         # total flux in model image 
         ax = fig.add_axes([0.08, 0.465, 0.3, 0.08])
