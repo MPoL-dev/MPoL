@@ -73,3 +73,29 @@ class ProcessFitsImage:
         return BMAJ, BMIN, BPA
 
 
+    def get_image(self, beam=True):
+        """Load a .fits image and return as a numpy array. Also return image 
+        extent and optionally (`beam`) the clean beam dimensions"""
+
+        hdu_list = fits.open(self._fits_file)
+        hdu = hdu_list[0]
+        
+        if len(hdu.data.shape) in [3, 4]:
+            image = hdu.data[self._channel]  # first channel
+        else:
+            image = hdu.data
+
+        image *= 1e3
+
+        if len(image.shape) == 3:
+            image = np.squeeze(image)
+
+        header = hdu.header
+
+        RA, DEC, ext = self.get_extent(hdu.header)
+
+        if beam:
+            return image, ext, self.get_beam(hdu_list, header)
+        else:
+            return image, ext
+        
