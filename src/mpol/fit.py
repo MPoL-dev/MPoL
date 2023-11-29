@@ -103,6 +103,7 @@ def parse_parameters(*args):
         os.path.join(config['input_output']['save_dir'],
                      os.path.splitext(os.path.basename(data_path))[0])
 
+    # enable logger, printing output and writing to file
     log_path = save_prefix + '_mpol_fit.log'
     mpol.enable_logging(log_path) 
 
