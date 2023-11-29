@@ -51,6 +51,33 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
 
 
 def get_residual_image(model, u, v, V, weights, robust=0.5):
+    """ 
+    Get a dirty image and colormap normalization for residual visibilities,
+    the difference of observed visibilities and an MPoL model sampled at the 
+    observed (u,v) points.
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        Instance of the `mpol.precomposed.SimpleNet` class. Contains model
+        visibilities.
+    u, v : array, unit=[k\lambda]
+        Data u- and v-coordinates
+    V : array, unit=[Jy]
+        Data visibility amplitudes
+    weights : array, unit=[Jy^-2]
+        Data weights
+    robust : float, default=0.5
+        Robust weighting parameter used to create the dirty image of the 
+        residual visibilities
+
+    Returns
+    -------
+    im_resid : 2D image array
+        The residual image
+    norm_resid : Matplotlib colormap normalization
+        Symmetric, linear colormap for `im_resid`
+    """
     vis_resid = get_vis_residuals(model, u, v, V)
 
     resid_imager = DirtyImager(
