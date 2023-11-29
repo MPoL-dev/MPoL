@@ -71,8 +71,9 @@ class CrossValidate:
         Whether to print notification messages.
     """
 
-    def __init__(self, coords, imager, learn_rate=0.5, 
-                regularizers={}, epochs=10000, convergence_tol=1e-3, 
+    def __init__(self, coords, imager, learn_rate=0.3, 
+                regularizers={}, epochs=10000, convergence_tol=1e-5, 
+                schedule_factor=0.995,
                 start_dirty_image=False, 
                 train_diag_step=None, kfolds=5, split_method="random_cell", 
                 split_diag_fig=False, store_cv_diagnostics=False, 
@@ -86,7 +87,7 @@ class CrossValidate:
         self._learn_rate = learn_rate
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._regularizers = regularizers
+        self._schedule_factor = schedule_factor
         self._start_dirty_image = start_dirty_image
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
