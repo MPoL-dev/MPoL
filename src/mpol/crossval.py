@@ -219,15 +219,14 @@ class CrossValidate:
 
             # store objects from the most recent kfold for diagnostics           
             self._model = model
+            self._train_figure = trainer.train_figure
+
+            # collect objects from this kfold to store
             if self._store_cv_diagnostics:
-                self._diagnostics["loss_histories"].append(loss_history)   
-            # update regularizer strength values
-            self._regularizers = trainer.regularizers
-            # store the most recent train figure for diagnostics
-            self._train_figure = trainer.train_figure 
-            
-            # run testing
-            all_scores.append(trainer.test(self._model, test_set))
+                self._diagnostics["models"].append(self._model)
+                self._diagnostics["regularizers"].append(self._regularizers)
+                self._diagnostics["loss_histories"].append(loss_history)                
+                self._diagnostics["train_figures"].append(self._train_figure)
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
