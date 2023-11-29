@@ -405,7 +405,7 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
         ax.set_ylabel('Flux [Jy]', fontsize=8)
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_train_diag_kfold{}_epoch{:05d}.png'.format(train_state["kfold"], train_state["epoch"]), dpi=300)
+        fig.savefig(save_prefix + f"_train_diag_kfold{kfold}_epoch{epoch:05d}.png", dpi=300)
     
     plt.close()
 
