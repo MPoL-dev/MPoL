@@ -243,6 +243,7 @@ class TrainTest:
         losses = []
         learn_rates = []
         old_mod_im = None
+        old_mod_epoch = None
 
         # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
@@ -305,6 +306,7 @@ class TrainTest:
                 train_fig, train_axes = train_diagnostics_fig(
                     model, losses=losses, learn_rates=learn_rates, fluxes=fluxes,
                     old_model_image=old_mod_im,
+                    old_model_epoch=old_mod_epoch,
                     kfold=self._kfold, epoch=count,
                     save_prefix=self._save_prefix
                     )
@@ -312,6 +314,7 @@ class TrainTest:
 
             # temporarily store the current model image for use in next call to `train_diagnostics_fig`
             old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
+            old_mod_epoch = count * 1
 
             count += 1
 
