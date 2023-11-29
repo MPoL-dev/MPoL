@@ -136,6 +136,14 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
     plt.close("all")
 
 
+def test_train_to_dirty_image(coords, dataset, imager):
+    # run a training loop against a dirty image
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_to_dirty_image(model, imager, niter=10)
+
+
 def test_tensorboard(coords, dataset_cont, tmp_path):
     # not using TrainTest class, 
     # set everything up to run on a single channel and then
