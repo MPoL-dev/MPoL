@@ -37,10 +37,12 @@ def test_traintestclass_training_scheduler(coords, imager, dataset, generic_para
     train_pars = generic_parameters["train_pars"]
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
-    # use a scheduler
-    train_pars["schedule_factor"] = 0.995
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    # use a scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.995)
+    train_pars["scheduler"] = scheduler
 
     trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
