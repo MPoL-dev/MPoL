@@ -166,12 +166,14 @@ class CrossValidate:
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
-            # create a new model and optimizer for this k_fold
-            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
-            # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     self._model = self._model.to(self._device)
-
-            optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learn_rate)
+            if self._start_dirty_image is True:
+                if kk == 0:
+                    if self._verbose:
+                        logging.info(
+                            "\n  Pre-training to dirty image to initialize subsequent optimization loops"
+                        )
+                    # initial short training loop to get model image to approximate dirty image
+                    model_pretrained = train_to_dirty_image(model=model, imager=self._imager)
 
             trainer = TrainTest(
                 imager=self._imager,
