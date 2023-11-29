@@ -395,17 +395,14 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
 
     # gradient image
     ax = axes[1,0]
-    plot_image(mod_grad, extent, ax=ax, xlab='', ylab='')
-    ax.set_title("Gradient image")
-
-    # loss function
-    ax = axes[1,1]
-    ax.semilogy(losses, 'k')
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss')
-    ax.set_title("Loss function")
-
-    fig.subplots_adjust(wspace=0.25)
+    if fluxes is not None:
+        # total flux in model image 
+        ax = fig.add_axes([0.08, 0.465, 0.3, 0.08])
+        ax.plot(fluxes, 'k', label=f"{fluxes[-1]:.4f}")
+        ax.legend(loc='upper right', fontsize=8)
+        ax.tick_params(labelsize=8)
+        # ax.set_xlabel('Epoch', fontsize=8)
+        ax.set_ylabel('Flux [Jy]', fontsize=8)
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_train_diag_kfold{}_epoch{:05d}.png'.format(train_state["kfold"], train_state["epoch"]), dpi=300)
