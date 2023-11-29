@@ -223,7 +223,7 @@ class TrainTest:
 
         count = 0
         losses = []
-        self._train_state = {}
+        learn_rates = []
 
         # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
@@ -275,6 +275,7 @@ class TrainTest:
 
             if self._scheduler is not None:
                 self._scheduler.step(loss)
+                learn_rates.append(self._optimizer.param_groups[0]['lr'])
 
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs or self.loss_convergence(np.array(losses))):
