@@ -50,6 +50,24 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
     return norm
 
 
+def get_residual_image(model, u, v, V, weights, robust=0.5):
+    vis_resid = get_vis_residuals(model, u, v, V)
+
+    resid_imager = DirtyImager(
+        coords=model.coords,
+        uu=u / 1e3,
+        vv=v / 1e3,
+        weight=weights,
+        data_re=np.real(vis_resid),
+        data_im=np.imag(vis_resid),
+    )
+    im_resid, _ = resid_imager.get_dirty_image(weighting="briggs", 
+                                               robust=robust, 
+                                               unit='Jy/arcsec^2'
+                                               )
+    # `get_vis_residuals` has already selected a single channel
+    im_resid = np.squeeze(im_resid)
+
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
                clab=r"Jy arcsec$^{-2}$",
                xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
