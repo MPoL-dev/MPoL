@@ -384,14 +384,14 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
     extent = model.icube.coords.img_ext
 
     # model image (linear colormap)
-    ax = axes[0,0]
-    plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
-    ax.set_title("Model image")
+    # ax = axes[0,0]
+    # plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
+    # ax.set_title("Model image")
 
     # model image (asinh colormap)
-    ax = axes[0,1]
-    plot_image(mod_im, extent, ax=ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
-    ax.set_title("Model image (asinh stretch)")
+    ax = axes[0,0]
+    plot_image(mod_im, extent, ax=ax, xlab='', ylab='', norm=get_image_cmap_norm(mod_im, stretch='asinh'))
+    ax.set_title("Model image", fontsize=10)
 
     # gradient image
     ax = axes[1,0]
