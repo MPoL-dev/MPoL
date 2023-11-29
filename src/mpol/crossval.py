@@ -71,7 +71,12 @@ class CrossValidate:
         Whether to print notification messages.
     """
 
+    def __init__(self, coords, imager, learn_rate=0.5, 
+                regularizers={}, epochs=10000, convergence_tol=1e-3, 
                 start_dirty_image=False, 
+                train_diag_step=None, kfolds=5, split_method="random_cell", 
+                split_diag_fig=False, store_cv_diagnostics=False, 
+                save_prefix=None, verbose=True, device=None, seed=None,
                 ):
         self._coords = coords
         self._imager = imager
