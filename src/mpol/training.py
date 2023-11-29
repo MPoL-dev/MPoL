@@ -237,6 +237,7 @@ class TrainTest:
         model.train()
 
         count = 0
+        fluxes = []
         losses = []
         learn_rates = []
 
@@ -277,6 +278,10 @@ class TrainTest:
 
             # get predicted sky cube corresponding to model visibilities
             sky_cube = model.icube.sky_cube
+
+            # total flux in model image
+            total_flux = model.coords.cell_size ** 2 * torch.sum(sky_cube)
+            fluxes.append(torch2npy(total_flux))
 
             # calculate loss between model visibilities and data
             loss = self.loss_eval(vis, dataset, sky_cube)
