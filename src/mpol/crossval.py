@@ -49,6 +49,10 @@ class CrossValidate:
         {"sparsity":{"lambda":1e-3, "guess":False},
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
         }
+    start_dirty_image : bool, default=False
+        Whether to start the RML optimization loop by initializing the model 
+        image to a dirty image of the observed data. If False, the optimization
+        loop will start with a blank image.
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
