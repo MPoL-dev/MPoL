@@ -53,3 +53,23 @@ class ProcessFitsImage:
 
         return RA, DEC, ext
 
+
+    def get_beam(self, hdu_list, header):
+        """Get the major and minor widths [arcsec], and position angle, of a 
+        clean beam"""
+
+        if header.get("CASAMBM") is not None:
+            # Get the beam info from average of record array
+            data2 = hdu_list[1].data
+            BMAJ = np.median(data2["BMAJ"])
+            BMIN = np.median(data2["BMIN"])
+            BPA = np.median(data2["BPA"])
+        else:
+            # Get the beam info from the header, like normal
+            BMAJ = 3600 * header["BMAJ"]
+            BMIN = 3600 * header["BMIN"]
+            BPA = header["BPA"]
+
+        return BMAJ, BMIN, BPA
+
+
