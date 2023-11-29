@@ -5,6 +5,31 @@ import torch
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
 def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):
+    r"""
+    Train against a dirty image of the observed visibilities using a loss function 
+    of the mean squared error between the RML model image pixel fluxes and the 
+    dirty image pixel fluxes. Useful for initializing a separate RML optimization 
+    loop at a reasonable starting image.
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
+    imager : :class:`mpol.gridding.DirtyImager` object
+        Instance of the `mpol.gridding.DirtyImager` class.
+    robust : float, default=0.5
+        Robust weighting parameter used to create a dirty image. 
+    learn_rate : float, default=100
+        Learning rate for optimization loop
+    niter : int, default=1000
+        Number of iterations for optimization loop
+
+    Returns
+    -------
+    model : `torch.nn.Module` object
+        The input `model` updated with the state of the training to the 
+        dirty image
+    """
     logging.info("    Initializing model to dirty image")
 
     img, beam = imager.get_dirty_image(weighting="briggs",
