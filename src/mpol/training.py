@@ -204,7 +204,7 @@ class TrainTest:
                 loss += self._regularizers['TSV']['lambda'] * TSV(sky_cube)
 
         return loss
-
+        
 
     def train(self, model, dataset):
         r"""
@@ -250,7 +250,7 @@ class TrainTest:
                 )
 
             # check early-on whether the loss isn't evolving
-            if count == 10:# and self._scheduler is not None:
+            if count == 10:
                 loss_arr = np.array(losses)
                 if all(0.9 <= loss_arr[:-1] / loss_arr[1:]) and all(
                     loss_arr[:-1] / loss_arr[1:] <= 1.1
