@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
-from mpol.training import TrainTest
+from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
 
 
