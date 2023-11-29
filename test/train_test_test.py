@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
 from mpol.plot import train_diagnostics_fig
-from mpol.training import TrainTest
+from mpol.training import TrainTest, train_to_dirty_image
 from mpol.constants import *
 
 
