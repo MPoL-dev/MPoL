@@ -95,10 +95,10 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
-        self._model = None
-        self._diagnostics = None
         self._split_figure = None
-        self._train_figure = None
+
+        # used to collect objects across all kfolds
+        self._diagnostics = None
 
     def split_dataset(self, dataset):
         r"""
@@ -171,6 +171,7 @@ class CrossValidate:
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
+            model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
             if self._start_dirty_image is True:
                 if kk == 0:
                     if self._verbose:
@@ -185,6 +186,7 @@ class CrossValidate:
                     # create a new model for this kfold, initializing it to the model pretrained on the dirty image
                     model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
+            optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
             trainer = TrainTest( 
                 imager=self._imager,
                 optimizer=optimizer,
