@@ -376,9 +376,10 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
         Axes of the generated figure
     """
     fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8))
+    axes[1][1].remove()
 
-    fig.suptitle(train_state)
-
+    fig.suptitle(f"Pixel size {model.coords.cell_size * 1e3:.2f} mas, Npix {model.coords.npix}\nk-fold {kfold}, epoch {epoch}", fontsize=10)
+    
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
     extent = model.icube.coords.img_ext
