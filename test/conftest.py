@@ -213,7 +213,6 @@ def generic_parameters(tmp_path):
 
     train_pars = {"epochs":15, "convergence_tol":1e-3, 
                 "regularizers":regularizers, "train_diag_step":None, 
-                "scheduler":None,
                 "save_prefix":tmp_path, "verbose":True
                 }
     
