@@ -30,12 +30,9 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
         vmin = -vmax
 
     else:
-        vmax = image.max()
-
+        vmax, vmin = image.max(), image.min()
         if stretch == 'power':
             vmin = 0
-        elif stretch == 'asinh':     
-            vmin = max(0, image.min())
 
     if stretch == 'power':
         norm = mco.PowerNorm(gamma, vmin, vmax)    
