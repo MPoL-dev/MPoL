@@ -579,7 +579,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
         if not any(xzoom) and not any(yzoom):
             beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
         else:
-            beam_xy = (0.85 * axes[1][0].get_xlim()[0], 0.85 * axes[1][0].get_ylim()[0])
+            beam_xy = (0.85 * axes[1][0].get_xlim()[1], 0.85 * axes[1][0].get_ylim()[0])
 
         beam_ellipse = Ellipse(xy=beam_xy,
                             width=clean_beam[0], 
