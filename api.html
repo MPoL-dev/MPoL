@@ -504,6 +504,7 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.plot">Plotting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_image_cmap_norm"><code class="docutils literal notranslate"><span class="pre">get_image_cmap_norm()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_residual_image"><code class="docutils literal notranslate"><span class="pre">get_residual_image()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.plot_image"><code class="docutils literal notranslate"><span class="pre">plot_image()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
@@ -2589,6 +2590,35 @@ gamma=1.0 yields a linear colormap.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mpol.plot.get_residual_image">
+<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">get_residual_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#get_residual_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.get_residual_image" title="Permalink to this definition">#</a></dt>
+<dd><p>Get a dirty image and colormap normalization for residual visibilities,
+the difference of observed visibilities and an MPoL model sampled at the
+observed (u,v) points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – Instance of the <cite>mpol.precomposed.SimpleNet</cite> class. Contains model
+visibilities.</p></li>
+<li><p><strong>u</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
+<li><p><strong>v</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
+<li><p><strong>V</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy</em><em>]</em>) – Data visibility amplitudes</p></li>
+<li><p><strong>weights</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy^-2</em><em>]</em>) – Data weights</p></li>
+<li><p><strong>robust</strong> (<em>float</em><em>, </em><em>default=0.5</em>) – Robust weighting parameter used to create the dirty image of the
+residual visibilities</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>im_resid</strong> (<em>2D image array</em>) – The residual image</p></li>
+<li><p><strong>norm_resid</strong> (<em>Matplotlib colormap normalization</em>) – Symmetric, linear colormap for <cite>im_resid</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.plot_image">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">plot_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Jy</span> <span class="pre">arcsec$^{-2}$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\alpha</span> <span class="pre">\\cos</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#plot_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.plot_image" title="Permalink to this definition">#</a></dt>
 <dd><p>Wrapper for plt.imshow, with colorbar and colormap normalization.</p>
@@ -2930,6 +2960,7 @@ figure title and savefile name.</p></li>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.plot">Plotting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_image_cmap_norm"><code class="docutils literal notranslate"><span class="pre">get_image_cmap_norm()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_residual_image"><code class="docutils literal notranslate"><span class="pre">get_residual_image()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.plot_image"><code class="docutils literal notranslate"><span class="pre">plot_image()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
