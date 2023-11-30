@@ -475,6 +475,48 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                          title="",
                          channel=0, 
                          save_prefix=None):
+    """
+    Figure for comparison of MPoL model image to other image models. Plots: 
+    - dirty image
+    - MPoL model image
+    - MPoL residual visibilities imaged
+    - clean image (if a .fits file is supplied)
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    u, v : array, unit=[k\lambda]
+        Data u- and v-coordinates
+    V : array, unit=[Jy]
+        Data visibility amplitudes
+    weights : array, unit=[Jy^-2]
+        Data weights        
+    robust : float, default=0.5
+        Robust weighting parameter used to create the dirty image of the 
+        observed visibilities and separately of the MPoL residual visibilities  
+    clean_fits : str, default=None
+        Path to a clean .fits image
+    share_cscale : bool, default=False
+        Whether the MPoL model image, dirty image and clean image share the 
+        same colorscale
+    xzoom, yzoom : list of float, default = [None, None]
+        X- and y- axis limits to zoom the images to. `xzoom` and `yzoom` should 
+        both list values in ascending order (e.g. [-2, 3], not [3, -2])
+    title : str, default=""
+        Figure super-title
+    channel : int, default=0
+        Channel of the model to use to generate figure        
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+    """
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
 
     if share_cscale:
