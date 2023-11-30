@@ -319,19 +319,8 @@ document.write(`
 <span class="sd">        Instance of the `mpol.coordinates.GridCoords` class.</span>
 <span class="sd">    imager : `mpol.gridding.DirtyImager` object</span>
 <span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
-<span class="sd">    kfolds : int, default=5</span>
-<span class="sd">        Number of k-folds to use in cross-validation</span>
-<span class="sd">    split_method : str, default=&#39;random_cell&#39;</span>
-<span class="sd">        Method to split full dataset into train/test subsets</span>
-<span class="sd">    seed : int, default=None</span>
-<span class="sd">        Seed for random number generator used in splitting data</span>
-<span class="sd">    learn_rate : float, default=0.5</span>
-<span class="sd">        Neural network learning rate</span>
-<span class="sd">    epochs : int, default=10000</span>
-<span class="sd">        Number of training iterations</span>
-<span class="sd">    convergence_tol : float, default=1e-3</span>
-<span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
-<span class="sd">        loss function (suggested &lt;= 1e-3)</span>
+<span class="sd">    learn_rate : float, default=0.3</span>
+<span class="sd">        Initial learning rate  </span>
 <span class="sd">    regularizers : nested dict, default={}</span>
 <span class="sd">        Dictionary of image regularizers to use. For each, a dict of the </span>
 <span class="sd">        strength (&#39;lambda&#39;, float), whether to guess an initial value for lambda </span>
@@ -340,6 +329,14 @@ document.write(`
 <span class="sd">        {&quot;sparsity&quot;:{&quot;lambda&quot;:1e-3, &quot;guess&quot;:False},</span>
 <span class="sd">        &quot;entropy&quot;: {&quot;lambda&quot;:1e-3, &quot;guess&quot;:True, &quot;prior_intensity&quot;:1e-10}</span>
 <span class="sd">        }</span>
+<span class="sd">    epochs : int, default=10000</span>
+<span class="sd">        Number of training iterations</span>
+<span class="sd">    convergence_tol : float, default=1e-5</span>
+<span class="sd">        Tolerance for training iteration stopping criterion as assessed by</span>
+<span class="sd">        loss function (suggested &lt;= 1e-3)</span>
+<span class="sd">    schedule_factor : float, default=0.995</span>
+<span class="sd">        For the `torch.optim.lr_scheduler.ReduceLROnPlateau` scheduler, factor </span>
+<span class="sd">        to which the learning rate is reduced when learning rate stops decreasing</span>
 <span class="sd">    start_dirty_image : bool, default=False</span>
 <span class="sd">        Whether to start the RML optimization loop by initializing the model </span>
 <span class="sd">        image to a dirty image of the observed data. If False, the optimization</span>
@@ -347,6 +344,10 @@ document.write(`
 <span class="sd">    train_diag_step : int, default=None</span>
 <span class="sd">        Interval at which training diagnostics are output. If None, no</span>
 <span class="sd">        diagnostics will be generated.</span>
+<span class="sd">    kfolds : int, default=5</span>
+<span class="sd">        Number of k-folds to use in cross-validation</span>
+<span class="sd">    split_method : str, default=&#39;random_cell&#39;</span>
+<span class="sd">        Method to split full dataset into train/test subsets        </span>
 <span class="sd">    split_diag_fig : bool, default=False</span>
 <span class="sd">        Whether to generate a diagnostic figure of dataset splitting into</span>
 <span class="sd">        train/test sets.</span>
@@ -355,15 +356,18 @@ document.write(`
 <span class="sd">    save_prefix : str, default=None</span>
 <span class="sd">        Prefix (path) used for saved figure names. If None, figures won&#39;t be</span>
 <span class="sd">        saved</span>
-<span class="sd">    device : torch.device, default=None</span>
-<span class="sd">        Which hardware device to perform operations on (e.g., &#39;cuda:0&#39;).</span>
-<span class="sd">        &#39;None&#39; defaults to current device.</span>
 <span class="sd">    verbose : bool, default=True</span>
 <span class="sd">        Whether to print notification messages.</span>
+<span class="sd">    device : torch.device, default=None</span>
+<span class="sd">        Which hardware device to perform operations on (e.g., &#39;cuda:0&#39;).</span>
+<span class="sd">        &#39;None&#39; defaults to current device.        </span>
+<span class="sd">    seed : int, default=None</span>
+<span class="sd">        Seed for random number generator used in splitting data        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> 
-                <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> 
+                <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> 
+                <span class="n">schedule_factor</span><span class="o">=</span><span class="mf">0.995</span><span class="p">,</span>
                 <span class="n">start_dirty_image</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
                 <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="s2">&quot;random_cell&quot;</span><span class="p">,</span> 
                 <span class="n">split_diag_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">store_cv_diagnostics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
@@ -371,20 +375,21 @@ document.write(`
                 <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span> <span class="o">=</span> <span class="n">imager</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">=</span> <span class="n">split_method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_learn_rate</span> <span class="o">=</span> <span class="n">learn_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span> <span class="o">=</span> <span class="n">regularizers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">=</span> <span class="n">convergence_tol</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span> <span class="o">=</span> <span class="n">regularizers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_factor</span> <span class="o">=</span> <span class="n">schedule_factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_dirty_image</span> <span class="o">=</span> <span class="n">start_dirty_image</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">=</span> <span class="n">train_diag_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">=</span> <span class="n">split_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_diag_fig</span> <span class="o">=</span> <span class="n">split_diag_fig</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span> <span class="o">=</span> <span class="n">store_cv_diagnostics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">seed</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_figure</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -477,10 +482,17 @@ document.write(`
                     <span class="c1"># create a new model for this kfold, initializing it to the model pretrained on the dirty image</span>
                     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">+</span> <span class="s2">&quot;_dirty_image_model.pt&quot;</span><span class="p">))</span>
 
+            <span class="c1"># create a new optimizer and scheduler for this kfold</span>
             <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_learn_rate</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">scheduler</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ReduceLROnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schedule_factor</span><span class="p">)</span>
+
             <span class="n">trainer</span> <span class="o">=</span> <span class="n">TrainTest</span><span class="p">(</span> 
                 <span class="n">imager</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="p">,</span>
                 <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">scheduler</span><span class="o">=</span><span class="n">scheduler</span><span class="p">,</span>
                 <span class="n">epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">,</span>
                 <span class="n">convergence_tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span><span class="p">,</span>
                 <span class="n">regularizers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">,</span>

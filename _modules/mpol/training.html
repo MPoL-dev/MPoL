@@ -355,9 +355,7 @@ document.write(`
 <span class="sd">    Args:</span>
 <span class="sd">        imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.</span>
 <span class="sd">        optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.</span>
-<span class="sd">        epochs (int): Number of training iterations, default=10000</span>
-<span class="sd">        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by</span>
-<span class="sd">            loss function (suggested &lt;= 1e-3)</span>
+<span class="sd">        scheduler (:class:`torch.optim.lr_scheduler` object, default=None): Scheduler for adjusting learning rate during optimization.        </span>
 <span class="sd">        regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength (&#39;lambda&#39;, float), whether to guess an initial value for lambda (&#39;guess&#39;, bool), and other quantities needed to compute their loss term.</span>
 <span class="sd">            </span>
 <span class="sd">            Example:</span>
@@ -365,24 +363,30 @@ document.write(`
 <span class="sd">                &quot;entropy&quot;: {&quot;lambda&quot;:1e-3, &quot;guess&quot;:True, &quot;prior_intensity&quot;:1e-10}</span>
 <span class="sd">                }``</span>
 
+<span class="sd">        epochs (int): Number of training iterations, default=10000</span>
+<span class="sd">        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by</span>
+<span class="sd">            loss function (suggested &lt;= 1e-3)</span>
 <span class="sd">        train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.</span>
 <span class="sd">        kfold (int): The k-fold of the current training set (for diagnostics)        </span>
 <span class="sd">        save_prefix (str): Prefix (path) used for saved figure names. If None, figures won&#39;t be saved</span>
 <span class="sd">        verbose (bool): Whether to print notification messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> 
-                <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span> <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kfold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
-                <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>                 
+                <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                <span class="n">kfold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">):</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span> <span class="o">=</span> <span class="n">imager</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="o">=</span> <span class="n">scheduler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span> <span class="o">=</span> <span class="n">regularizers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">=</span> <span class="n">convergence_tol</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span> <span class="o">=</span> <span class="n">regularizers</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">=</span> <span class="n">train_diag_step</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span> <span class="o">=</span> <span class="n">kfold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_figure</span> <span class="o">=</span> <span class="kc">None</span>
@@ -491,7 +495,7 @@ document.write(`
                 <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TSV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">loss</span></div>
-
+        
 
 <div class="viewcode-block" id="TrainTest.train"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -518,7 +522,7 @@ document.write(`
 
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">learn_rates</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># guess initial strengths for regularizers in `self._regularizers`</span>
         <span class="c1"># that have &#39;guess&#39;:True</span>
@@ -537,7 +541,7 @@ document.write(`
                 <span class="p">)</span>
 
             <span class="c1"># check early-on whether the loss isn&#39;t evolving</span>
-            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
                 <span class="n">loss_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">&lt;=</span> <span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
                     <span class="n">loss_arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">loss_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="mf">1.1</span>
@@ -568,11 +572,9 @@ document.write(`
             <span class="c1"># update model parameters via gradient descent</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-            <span class="c1"># store current training parameter values</span>
-            <span class="c1"># TODO: store hyperpar values, access in crossval.py</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span><span class="p">[</span><span class="s2">&quot;kfold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span><span class="p">[</span><span class="s2">&quot;learn_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()[</span><span class="s1">&#39;param_groups&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">]</span>            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+                <span class="n">learn_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
 
             <span class="c1"># generate optional fit diagnostics</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))):</span>
