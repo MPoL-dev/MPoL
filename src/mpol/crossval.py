@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
-from mpol.training import TrainTest
+from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
 
 
@@ -49,6 +49,10 @@ class CrossValidate:
         {"sparsity":{"lambda":1e-3, "guess":False},
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
         }
+    start_dirty_image : bool, default=False
+        Whether to start the RML optimization loop by initializing the model 
+        image to a dirty image of the observed data. If False, the optimization
+        loop will start with a blank image.
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
@@ -67,11 +71,12 @@ class CrossValidate:
         Whether to print notification messages.
     """
 
-    def __init__(self, coords, imager, kfolds=5, split_method="random_cell",
-                seed=None, learn_rate=0.5, epochs=10000, convergence_tol=1e-3,
-                regularizers={}, train_diag_step=None, split_diag_fig=False, 
-                store_cv_diagnostics=False, save_prefix=None, device=None, 
-                verbose=True
+    def __init__(self, coords, imager, learn_rate=0.5, 
+                regularizers={}, epochs=10000, convergence_tol=1e-3, 
+                start_dirty_image=False, 
+                train_diag_step=None, kfolds=5, split_method="random_cell", 
+                split_diag_fig=False, store_cv_diagnostics=False, 
+                save_prefix=None, verbose=True, device=None, seed=None,
                 ):
         self._coords = coords
         self._imager = imager
@@ -82,6 +87,7 @@ class CrossValidate:
         self._epochs = epochs
         self._convergence_tol = convergence_tol
         self._regularizers = regularizers
+        self._start_dirty_image = start_dirty_image
         self._train_diag_step = train_diag_step
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
@@ -89,10 +95,10 @@ class CrossValidate:
         self._device = device
         self._verbose = verbose
 
-        self._model = None
-        self._diagnostics = None
         self._split_figure = None
-        self._train_figure = None
+
+        # used to collect objects across all kfolds
+        self._diagnostics = None
 
     def split_dataset(self, dataset):
         r"""
@@ -165,14 +171,23 @@ class CrossValidate:
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
-            # create a new model and optimizer for this k_fold
-            self._model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
-            # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
-            #     self._model = self._model.to(self._device)
+            model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+            if self._start_dirty_image is True:
+                if kk == 0:
+                    if self._verbose:
+                        logging.info(
+                            "\n  Pre-training to dirty image to initialize subsequent optimization loops"
+                        )
+                    # initial short training loop to get model image to approximate dirty image
+                    model_pretrained = train_to_dirty_image(model=model, imager=self._imager)
+                    # save the model to a state we can load in subsequent kfolds
+                    torch.save(model_pretrained.state_dict(), f=self._save_prefix + "_dirty_image_model.pt")
+                else:
+                    # create a new model for this kfold, initializing it to the model pretrained on the dirty image
+                    model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
-            optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learn_rate)
-
-            trainer = TrainTest(
+            optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
+            trainer = TrainTest( 
                 imager=self._imager,
                 optimizer=optimizer,
                 epochs=self._epochs,
@@ -185,8 +200,13 @@ class CrossValidate:
             )
 
             # run training 
-            loss, loss_history = trainer.train(self._model, train_set)
+            loss, loss_history = trainer.train(model, train_set)
 
+            # run testing
+            all_scores.append(trainer.test(model, test_set))
+
+            # store objects from the most recent kfold for diagnostics           
+            self._model = model
             if self._store_cv_diagnostics:
                 self._diagnostics["loss_histories"].append(loss_history)   
             # update regularizer strength values

@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from mpol import losses, precomposed
 from mpol.plot import train_diagnostics_fig
-from mpol.training import TrainTest
+from mpol.training import TrainTest, train_to_dirty_image
 from mpol.constants import *
 
 
@@ -134,6 +134,14 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
     )
     fig.savefig(tmp_path / "trained.png", dpi=300)
     plt.close("all")
+
+
+def test_train_to_dirty_image(coords, dataset, imager):
+    # run a training loop against a dirty image
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_to_dirty_image(model, imager, niter=10)
 
 
 def test_tensorboard(coords, dataset_cont, tmp_path):
