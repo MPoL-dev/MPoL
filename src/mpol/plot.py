@@ -82,8 +82,8 @@ def get_residual_image(model, u, v, V, weights, robust=0.5):
 
     resid_imager = DirtyImager(
         coords=model.coords,
-        uu=u / 1e3,
-        vv=v / 1e3,
+        uu=u,
+        vv=v,
         weight=weights,
         data_re=np.real(vis_resid),
         data_im=np.imag(vis_resid),
