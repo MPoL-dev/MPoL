@@ -295,6 +295,8 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">mpol.losses</span> <span class="kn">import</span> <span class="n">TSV</span><span class="p">,</span> <span class="n">TV_image</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">nll_gridded</span><span class="p">,</span> <span class="n">sparsity</span>
 <span class="kn">from</span> <span class="nn">mpol.plot</span> <span class="kn">import</span> <span class="n">train_diagnostics_fig</span>
+<span class="kn">from</span> <span class="nn">mpol.utils</span> <span class="kn">import</span> <span class="n">torch2npy</span>
+
 <div class="viewcode-block" id="train_to_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.training.train_to_dirty_image">[docs]</a><span class="k">def</span> <span class="nf">train_to_dirty_image</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Train against a dirty image of the observed visibilities using a loss function </span>
@@ -425,7 +427,10 @@ document.write(`
 
 <span class="sd">        The guesses update `lambda` values in `self._regularizers`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Updating regularizer strengths with automated &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;guessing. Initial values: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
         <span class="c1"># generate images of the data using two briggs robust values</span>
         <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -459,8 +464,11 @@ document.write(`
             <span class="n">loss_TSV1</span> <span class="o">=</span> <span class="n">TSV</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
             <span class="n">loss_TSV2</span> <span class="o">=</span> <span class="n">TSV</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
             <span class="n">guess_TSV</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">loss_TSV2</span> <span class="o">-</span> <span class="n">loss_TSV1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TSV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TSV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TSV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TSV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Updated values: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+                         
 
 <div class="viewcode-block" id="TrainTest.loss_eval"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_eval">[docs]</a>    <span class="k">def</span> <span class="nf">loss_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">sky_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -506,7 +514,7 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : `torch.nn.Module` object</span>
-<span class="sd">            A neural network; instance of the `mpol.precomposed.SimpleNet` class.</span>
+<span class="sd">            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.</span>
 <span class="sd">        dataset : PyTorch dataset object</span>
 <span class="sd">            Instance of the `mpol.datasets.GriddedDataset` class.</span>
 
@@ -517,12 +525,16 @@ document.write(`
 <span class="sd">        losses : list of float</span>
 <span class="sd">            Loss value at each iteration (epoch) in the loop</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># set model to training mode</span>
         <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">fluxes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">learn_rates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">old_mod_im</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">old_mod_epoch</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># guess initial strengths for regularizers in `self._regularizers`</span>
         <span class="c1"># that have &#39;guess&#39;:True</span>
@@ -562,6 +574,10 @@ document.write(`
             <span class="c1"># get predicted sky cube corresponding to model visibilities</span>
             <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
 
+            <span class="c1"># total flux in model image</span>
+            <span class="n">total_flux</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
+            <span class="n">fluxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch2npy</span><span class="p">(</span><span class="n">total_flux</span><span class="p">))</span>
+
             <span class="c1"># calculate loss between model visibilities and data</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_eval</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">sky_cube</span><span class="p">)</span>
             <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
@@ -579,10 +595,17 @@ document.write(`
             <span class="c1"># generate optional fit diagnostics</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))):</span>
                 <span class="n">train_fig</span><span class="p">,</span> <span class="n">train_axes</span> <span class="o">=</span> <span class="n">train_diagnostics_fig</span><span class="p">(</span>
-                    <span class="n">model</span><span class="p">,</span> <span class="n">losses</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span> <span class="n">train_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span><span class="p">,</span> 
+                    <span class="n">model</span><span class="p">,</span> <span class="n">losses</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span> <span class="n">learn_rates</span><span class="o">=</span><span class="n">learn_rates</span><span class="p">,</span> <span class="n">fluxes</span><span class="o">=</span><span class="n">fluxes</span><span class="p">,</span>
+                    <span class="n">old_model_image</span><span class="o">=</span><span class="n">old_mod_im</span><span class="p">,</span>
+                    <span class="n">old_model_epoch</span><span class="o">=</span><span class="n">old_mod_epoch</span><span class="p">,</span>
+                    <span class="n">kfold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
                     <span class="n">save_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span>
                     <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_train_figure</span> <span class="o">=</span> <span class="p">(</span><span class="n">train_fig</span><span class="p">,</span> <span class="n">train_axes</span><span class="p">)</span>
+
+                <span class="c1"># temporarily store the current model image for use in next call to `train_diagnostics_fig`</span>
+                <span class="n">old_mod_im</span> <span class="o">=</span> <span class="n">torch2npy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># TODO: support &#39;channel&#39; (in TrainTest)</span>
+                <span class="n">old_mod_epoch</span> <span class="o">=</span> <span class="n">count</span> <span class="o">*</span> <span class="mi">1</span>
 
             <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -605,7 +628,7 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : `torch.nn.Module` object</span>
-<span class="sd">            A neural network; instance of the `mpol.precomposed.SimpleNet` class.</span>
+<span class="sd">            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.</span>
 <span class="sd">        dataset : PyTorch dataset object</span>
 <span class="sd">            Instance of the `mpol.datasets.GriddedDataset` class.</span>
 
@@ -626,6 +649,7 @@ document.write(`
         <span class="c1"># return loss value</span>
         <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">regularizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dict containing regularizers used and their strengths&quot;&quot;&quot;</span>
@@ -634,12 +658,7 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">train_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;(fig, axes) of figure showing training diagnostics&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_figure</span>
-    
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">train_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dict containing parameters of interest in the training loop&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_state</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_figure</span></div>
 </pre></div>
 
                 </article>

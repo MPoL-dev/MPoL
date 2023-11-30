@@ -479,7 +479,6 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.test"><code class="docutils literal notranslate"><span class="pre">TrainTest.test()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.regularizers"><code class="docutils literal notranslate"><span class="pre">TrainTest.regularizers</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.train_figure"><code class="docutils literal notranslate"><span class="pre">TrainTest.train_figure</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.train_state"><code class="docutils literal notranslate"><span class="pre">TrainTest.train_state</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -490,9 +489,9 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.run_crossval"><code class="docutils literal notranslate"><span class="pre">CrossValidate.run_crossval()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.model"><code class="docutils literal notranslate"><span class="pre">CrossValidate.model</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.regularizers"><code class="docutils literal notranslate"><span class="pre">CrossValidate.regularizers</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.train_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.train_figure</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.RandomCellSplitGridded"><code class="docutils literal notranslate"><span class="pre">RandomCellSplitGridded</span></code></a></li>
@@ -2322,7 +2321,7 @@ PyTorch with gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network module; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
 <li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
 </ul>
 </dd>
@@ -2343,7 +2342,7 @@ PyTorch with gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network module; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
 <li><p><strong>dataset</strong> (<em>PyTorch dataset object</em>) – Instance of the <cite>mpol.datasets.GriddedDataset</cite> class.</p></li>
 </ul>
 </dd>
@@ -2366,12 +2365,6 @@ PyTorch with gradient descent.</p>
 <dt class="sig sig-object py" id="mpol.training.TrainTest.train_figure">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.training.TrainTest.train_figure" title="Permalink to this definition">#</a></dt>
 <dd><p>(fig, axes) of figure showing training diagnostics</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="mpol.training.TrainTest.train_state">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_state</span></span><a class="headerlink" href="#mpol.training.TrainTest.train_state" title="Permalink to this definition">#</a></dt>
-<dd><p>Dict containing parameters of interest in the training loop</p>
 </dd></dl>
 
 </dd></dl>
@@ -2462,19 +2455,19 @@ scores across all k-folds, and all raw scores</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="mpol.crossval.CrossValidate.model">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.model" title="Permalink to this definition">#</a></dt>
-<dd><p>SimpleNet class instance</p>
+<dd><p>For the most recent kfold, trained model (<cite>SimpleNet</cite> class instance)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="mpol.crossval.CrossValidate.regularizers">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">regularizers</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.regularizers" title="Permalink to this definition">#</a></dt>
-<dd><p>Dict containing regularizers used and their strengths</p>
+<dd><p>For the most recent kfold, dict containing regularizers used and their strengths</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.diagnostics">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagnostics</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.diagnostics" title="Permalink to this definition">#</a></dt>
-<dd><p>Dict containing diagnostics of the cross-validation loop</p>
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.train_figure">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.train_figure" title="Permalink to this definition">#</a></dt>
+<dd><p>For the most recent kfold, (fig, axes) showing training progress</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2484,9 +2477,14 @@ scores across all k-folds, and all raw scores</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.train_figure">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.train_figure" title="Permalink to this definition">#</a></dt>
-<dd><p>(fig, axes) of most recent training diagnostic figure</p>
+<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.diagnostics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diagnostics</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.diagnostics" title="Permalink to this definition">#</a></dt>
+<dd><p>models, regularizers, loss values, training figures</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict containing diagnostics of the cross-validation loop across all kfolds</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -2620,7 +2618,7 @@ residual visibilities</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.plot_image">
-<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">plot_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Jy</span> <span class="pre">arcsec$^{-2}$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\alpha</span> <span class="pre">\\cos</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#plot_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.plot_image" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">plot_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'I</span> <span class="pre">[Jy</span> <span class="pre">arcsec$^{-2}$]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\alpha</span> <span class="pre">\\cos</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$\\Delta</span> <span class="pre">\\delta$</span> <span class="pre">[${}^{\\prime\\prime}$]'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#plot_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.plot_image" title="Permalink to this definition">#</a></dt>
 <dd><p>Wrapper for plt.imshow, with colorbar and colormap normalization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2721,21 +2719,28 @@ are projected or deprojected.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.train_diagnostics_fig">
-<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">train_diagnostics_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#train_diagnostics_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.train_diagnostics_fig" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">train_diagnostics_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_rates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fluxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_model_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_model_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#train_diagnostics_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.train_diagnostics_fig" title="Permalink to this definition">#</a></dt>
 <dd><p>Figure for model diagnostics during an optimization loop. For a <cite>model</cite> in
 a given state, plots the current:
-- model image (both linear and arcsinh colormap normalization)
+- model image
+- flux of model image
 - gradient image
-- loss function</p>
+- difference image between <cite>old_model_image</cite> and current model image
+- loss function
+- learning rate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network module; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
 <li><p><strong>losses</strong> (<em>list</em>) – Loss value at each epoch in the training loop</p></li>
-<li><p><strong>train_state</strong> (<em>dict</em><em>, </em><em>default=None</em>) – Dictionary containing current training parameter values. Used for
-figure title and savefile name.</p></li>
+<li><p><strong>learn_rates</strong> (<em>list</em>) – Learning rate at each epoch in the training loop</p></li>
+<li><p><strong>fluxes</strong> (<em>list</em>) – Total flux in model image at each epoch in the training loop</p></li>
+<li><p><strong>old_model_image</strong> (<em>2D image array</em><em>, </em><em>default=None</em>) – Model image of a previous epoch for comparison to current image</p></li>
+<li><p><strong>old_model_epoch</strong> (<em>int</em>) – Epoch of <cite>old_model_image</cite></p></li>
+<li><p><strong>kfold</strong> (<em>int</em><em>, </em><em>default=None</em>) – Current cross-validation k-fold</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em>, </em><em>default=None</em>) – Current training epoch</p></li>
 <li><p><strong>channel</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel (of the datasets in <cite>splitter</cite>) to use to generate figure</p></li>
-<li><p><strong>save_prefix</strong> (<em>string</em><em>, </em><em>default = None</em>) – Prefix for saved figure name. If None, the figure won’t be saved</p></li>
+<li><p><strong>save_prefix</strong> (<em>str</em><em>, </em><em>default = None</em>) – Prefix for saved figure name. If None, the figure won’t be saved</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2935,7 +2940,6 @@ figure title and savefile name.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.test"><code class="docutils literal notranslate"><span class="pre">TrainTest.test()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.regularizers"><code class="docutils literal notranslate"><span class="pre">TrainTest.regularizers</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.train_figure"><code class="docutils literal notranslate"><span class="pre">TrainTest.train_figure</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.training.TrainTest.train_state"><code class="docutils literal notranslate"><span class="pre">TrainTest.train_state</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2946,9 +2950,9 @@ figure title and savefile name.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.run_crossval"><code class="docutils literal notranslate"><span class="pre">CrossValidate.run_crossval()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.model"><code class="docutils literal notranslate"><span class="pre">CrossValidate.model</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.regularizers"><code class="docutils literal notranslate"><span class="pre">CrossValidate.regularizers</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.train_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.train_figure</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.RandomCellSplitGridded"><code class="docutils literal notranslate"><span class="pre">RandomCellSplitGridded</span></code></a></li>
