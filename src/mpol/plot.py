@@ -533,3 +533,17 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
         plot_image(clean_im, extent=clean_im_ext, 
                     ax=axes[1][0], norm=norm_clean, xlab='', ylab='')
         
+        # add clean beam to plot
+        if not any(xzoom) and not any(yzoom):
+            beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
+        else:
+            beam_xy = (0.85 * axes[1][0].get_xlim()[0], 0.85 * axes[1][0].get_ylim()[0])
+
+        beam_ellipse = Ellipse(xy=beam_xy,
+                            width=clean_beam[0], 
+                            height=clean_beam[1], 
+                            angle=-clean_beam[2], 
+                            color='w'
+                            )
+        axes[1][0].add_artist(beam_ellipse)
+
