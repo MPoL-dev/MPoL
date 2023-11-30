@@ -515,3 +515,21 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
         norm_dirty = get_image_cmap_norm(dirty_im, stretch='asinh')
         if clean_fits is not None:
             norm_clean = get_image_cmap_norm(clean_im, stretch='asinh')
+    
+    # plot MPoL model image
+    plot_image(mod_im, extent=model.icube.coords.img_ext,
+                    ax=axes[0][1], norm=norm_mod, xlab='', ylab='')
+
+    # plot imaged MPoL residual visibilities
+    plot_image(im_resid, extent=model.icube.coords.img_ext, 
+                ax=axes[1][1], norm=norm_resid, cmap='RdBu_r', xlab='', ylab='')
+
+    # plot dirty image
+    plot_image(dirty_im, extent=model.icube.coords.img_ext,  
+                    ax=axes[0][0], norm=norm_dirty)
+    
+    # plot clean image
+    if clean_fits is not None:
+        plot_image(clean_im, extent=clean_im_ext, 
+                    ax=axes[1][0], norm=norm_clean, xlab='', ylab='')
+        
