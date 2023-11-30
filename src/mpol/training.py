@@ -4,6 +4,8 @@ import torch
 
 from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
+from mpol.utils import torch2npy
+
 def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):
     r"""
     Train against a dirty image of the observed visibilities using a loss function 
@@ -134,7 +136,10 @@ class TrainTest:
 
         The guesses update `lambda` values in `self._regularizers`.
         """
-
+        if self._verbose:
+            logging.info("    Updating regularizer strengths with automated "
+                         f"guessing. Initial values: {self._regularizers}")
+            
         # generate images of the data using two briggs robust values
         img1, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.0)
         img2, _ = self._imager.get_dirty_image(weighting='briggs', robust=0.5)
@@ -170,6 +175,9 @@ class TrainTest:
             guess_TSV = 1 / (loss_TSV2 - loss_TSV1)
             self._regularizers['TSV']['lambda'] = guess_TSV.numpy().item()
 
+        if self._verbose:
+            logging.info(f"    Updated values: {self._regularizers}")
+                         
 
     def loss_eval(self, vis, dataset, sky_cube=None):
         r"""
@@ -215,7 +223,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 
@@ -226,12 +234,16 @@ class TrainTest:
         losses : list of float
             Loss value at each iteration (epoch) in the loop
         """
+
         # set model to training mode
         model.train()
 
         count = 0
+        fluxes = []
         losses = []
         learn_rates = []
+        old_mod_im = None
+        old_mod_epoch = None
 
         # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
@@ -271,6 +283,10 @@ class TrainTest:
             # get predicted sky cube corresponding to model visibilities
             sky_cube = model.icube.sky_cube
 
+            # total flux in model image
+            total_flux = model.coords.cell_size ** 2 * torch.sum(sky_cube)
+            fluxes.append(torch2npy(total_flux))
+
             # calculate loss between model visibilities and data
             loss = self.loss_eval(vis, dataset, sky_cube)
             losses.append(loss.item())
@@ -288,10 +304,17 @@ class TrainTest:
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs or self.loss_convergence(np.array(losses))):
                 train_fig, train_axes = train_diagnostics_fig(
-                    model, losses=losses, train_state=self._train_state, 
+                    model, losses=losses, learn_rates=learn_rates, fluxes=fluxes,
+                    old_model_image=old_mod_im,
+                    old_model_epoch=old_mod_epoch,
+                    kfold=self._kfold, epoch=count,
                     save_prefix=self._save_prefix
                     )
                 self._train_figure = (train_fig, train_axes)
+
+                # temporarily store the current model image for use in next call to `train_diagnostics_fig`
+                old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
+                old_mod_epoch = count * 1
 
             count += 1
 
@@ -314,7 +337,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 
@@ -335,6 +358,7 @@ class TrainTest:
         # return loss value
         return loss.item()
 
+
     @property
     def regularizers(self):
         """Dict containing regularizers used and their strengths"""
@@ -344,8 +368,3 @@ class TrainTest:
     def train_figure(self):
         """(fig, axes) of figure showing training diagnostics"""
         return self._train_figure
-    
-    @property
-    def train_state(self):
-        """Dict containing parameters of interest in the training loop"""
-        return self._train_state

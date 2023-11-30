@@ -170,7 +170,7 @@ class CrossValidate:
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
                 logging.info(
-                    "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds)
+                    "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds - 1)
                 )
 
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
@@ -219,15 +219,14 @@ class CrossValidate:
 
             # store objects from the most recent kfold for diagnostics           
             self._model = model
+            self._train_figure = trainer.train_figure
+
+            # collect objects from this kfold to store
             if self._store_cv_diagnostics:
-                self._diagnostics["loss_histories"].append(loss_history)   
-            # update regularizer strength values
-            self._regularizers = trainer.regularizers
-            # store the most recent train figure for diagnostics
-            self._train_figure = trainer.train_figure 
-            
-            # run testing
-            all_scores.append(trainer.test(self._model, test_set))
+                self._diagnostics["models"].append(self._model)
+                self._diagnostics["regularizers"].append(self._regularizers)
+                self._diagnostics["loss_histories"].append(loss_history)                
+                self._diagnostics["train_figures"].append(self._train_figure)
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
@@ -236,33 +235,33 @@ class CrossValidate:
             "std": np.std(all_scores),
             "all": all_scores,
         }
-
+        
         return cv_score
-
+    
     @property
     def model(self):
-        """SimpleNet class instance"""
+        """For the most recent kfold, trained model (`SimpleNet` class instance)"""
         return self._model
 
     @property
     def regularizers(self):
-        """Dict containing regularizers used and their strengths"""
+        """For the most recent kfold, dict containing regularizers used and their strengths"""
         return self._regularizers
 
     @property
-    def diagnostics(self):
-        """Dict containing diagnostics of the cross-validation loop"""
-        return self._diagnostics
-
+    def train_figure(self):
+        """For the most recent kfold, (fig, axes) showing training progress"""
+        return self._train_figure
+        
     @property
     def split_figure(self):
         """(fig, axes) of train/test splitting diagnostic figure"""
         return self._split_figure
-
+    
     @property
-    def train_figure(self):
-        """(fig, axes) of most recent training diagnostic figure"""
-        return self._train_figure
+    def diagnostics(self):
+        """Dict containing diagnostics of the cross-validation loop across all kfolds: models, regularizers, loss values, training figures"""
+        return self._diagnostics
 
 
 class RandomCellSplitGridded:

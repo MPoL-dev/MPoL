@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
+import torch 
 
 from astropy.visualization.mpl_normalize import simple_norm
 
@@ -105,7 +106,7 @@ def get_residual_image(model, u, v, V, weights, robust=0.5):
 
 
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
-               clab=r"Jy arcsec$^{-2}$",
+               clab=r"I [Jy arcsec$^{-2}$]",
                xlab=r"$\Delta \alpha \cos \delta$ [${}^{\prime\prime}$]",
                ylab=r"$\Delta \delta$ [${}^{\prime\prime}$]",
                ):
@@ -154,7 +155,7 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
         norm=norm,
     )
 
-    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1)
+    cbar = plt.colorbar(im, ax=ax, location="right", pad=0.1, shrink=0.7)
     cbar.set_label(clab)
 
     ax.set_xlabel(xlab)
@@ -400,27 +401,41 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     return fig, axes
 
 
-def train_diagnostics_fig(model, losses=[], train_state=None, channel=0, 
-                        save_prefix=None):
+def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None, 
+                          old_model_image=None, old_model_epoch=None,
+                          kfold=None, epoch=None,
+                          channel=0, save_prefix=None):
     """
     Figure for model diagnostics during an optimization loop. For a `model` in 
     a given state, plots the current: 
-    - model image (both linear and arcsinh colormap normalization)
+    - model image
+    - flux of model image
     - gradient image
+    - difference image between `old_model_image` and current model image
     - loss function
+    - learning rate
 
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
     losses : list
         Loss value at each epoch in the training loop
-    train_state : dict, default=None
-        Dictionary containing current training parameter values. Used for 
-        figure title and savefile name.
+    learn_rates : list
+        Learning rate at each epoch in the training loop  
+    fluxes : list
+        Total flux in model image at each epoch in the training loop
+    old_model_image : 2D image array, default=None
+        Model image of a previous epoch for comparison to current image  
+    old_model_epoch : int
+        Epoch of `old_model_image`
+    kfold : int, default=None
+        Current cross-validation k-fold
+    epoch : int, default=None
+        Current training epoch
     channel : int, default=0
         Channel (of the datasets in `splitter`) to use to generate figure        
-    save_prefix : string, default = None
+    save_prefix : str, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
     Returns
@@ -431,39 +446,66 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
         Axes of the generated figure
     """
     fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8))
+    axes[1][1].remove()
 
-    fig.suptitle(train_state)
-
+    fig.suptitle(f"Pixel size {model.coords.cell_size * 1e3:.2f} mas, N_pix {model.coords.npix}\nk-fold {kfold}, epoch {epoch}", fontsize=10)
+    
     mod_im = torch2npy(model.icube.sky_cube[channel])
     mod_grad = torch2npy(packed_cube_to_sky_cube(model.bcube.base_cube.grad)[channel])
     extent = model.icube.coords.img_ext
 
     # model image (linear colormap)
-    ax = axes[0,0]
-    plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
-    ax.set_title("Model image")
+    # ax = axes[0,0]
+    # plot_image(mod_im, extent, ax=ax, xlab='', ylab='')
+    # ax.set_title("Model image")
 
     # model image (asinh colormap)
-    ax = axes[0,1]
-    plot_image(mod_im, extent, ax=ax, norm=get_image_cmap_norm(mod_im, stretch='asinh'))
-    ax.set_title("Model image (asinh stretch)")
+    ax = axes[0,0]
+    plot_image(mod_im, extent, ax=ax, xlab='', ylab='', norm=get_image_cmap_norm(mod_im, stretch='asinh'))
+    ax.set_title("Model image", fontsize=10)
 
     # gradient image
     ax = axes[1,0]
-    plot_image(mod_grad, extent, ax=ax, xlab='', ylab='')
-    ax.set_title("Gradient image")
+    plot_image(mod_grad, extent, ax=ax)
+    ax.set_title("Gradient image", fontsize=10)
 
-    # loss function
-    ax = axes[1,1]
-    ax.semilogy(losses, 'k')
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss')
-    ax.set_title("Loss function")
+    if old_model_image is not None:
+        # current model image - model image at last stored epoch
+        ax = axes[0,1]
+        diff_image = mod_im - old_model_image
+        diff_im_norm = get_image_cmap_norm(diff_image, symmetric=True)
+        plot_image(diff_image, extent, cmap='RdBu_r', ax=ax, xlab='', ylab='', norm=diff_im_norm)
+        ax.set_title(f"Difference (epoch {epoch} - {old_model_epoch})", fontsize=10)
+        
+    if losses is not None:
+        # loss function
+        ax = fig.add_subplot(426)
+        ax.semilogy(losses, 'k', label=f"{losses[-1]:.3f}")
+        ax.legend(loc='upper right')
+        ax.xaxis.set_tick_params(labelbottom=False)
+        ax.set_ylabel('Loss')
 
-    fig.subplots_adjust(wspace=0.25)
+    if learn_rates is not None:    
+        # learning rate
+        ax = fig.add_subplot(428)
+        ax.plot(learn_rates, 'k', label=f"{learn_rates[-1]:.3e}")
+        ax.legend(loc='upper right')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Learn rate')
+
+    plt.tight_layout()
+
+    if fluxes is not None:
+        # total flux in model image 
+        ax = fig.add_axes([0.08, 0.465, 0.3, 0.08])
+        ax.plot(fluxes, 'k', label=f"{fluxes[-1]:.4f}")
+        ax.legend(loc='upper right', fontsize=8)
+        ax.tick_params(labelsize=8)
+        # ax.set_xlabel('Epoch', fontsize=8)
+        ax.set_ylabel('Flux [Jy]', fontsize=8)
 
     if save_prefix is not None:
-        fig.savefig(save_prefix + '_train_diag_kfold{}_epoch{:05d}.png'.format(train_state["kfold"], train_state["epoch"]), dpi=300)
+        fig.savefig(save_prefix + f"_train_diag_kfold{kfold}_epoch{epoch:05d}.png", dpi=300)
     
     plt.close()
 
