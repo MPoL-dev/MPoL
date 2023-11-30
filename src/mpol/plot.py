@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mco 
+from matplotlib.patches import Ellipse
 
 from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.fourier import get_vis_residuals
 from mpol.gridding import DirtyImager
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
+from mpol.input_output import ProcessFitsImage
 
 def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetric=False):
     """
