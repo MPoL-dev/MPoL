@@ -79,8 +79,8 @@ def get_residual_image(model, u, v, V, weights, robust=0.5):
 
     resid_imager = DirtyImager(
         coords=model.coords,
-        uu=u / 1e3,
-        vv=v / 1e3,
+        uu=u,
+        vv=v,
         weight=weights,
         data_re=np.real(vis_resid),
         data_im=np.imag(vis_resid),
@@ -465,3 +465,12 @@ def train_diagnostics_fig(model, losses=[], train_state=None, channel=0,
     plt.close()
 
     return fig, axes
+
+
+def image_comparison_fig(model, u, v, V, weights, robust=0.5, 
+                         clean_fits=None, share_cscale=False, 
+                         xzoom=[None, None], yzoom=[None, None],
+                         title="",
+                         channel=0, 
+                         save_prefix=None):
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
