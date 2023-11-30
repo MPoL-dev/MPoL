@@ -474,3 +474,42 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                          channel=0, 
                          save_prefix=None):
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
+
+    if share_cscale:
+        title += "\nDirty and clean images use colorscale of MPoL image"
+    fig.suptitle(title)
+
+    # get MPoL model image
+    mod_im = torch2npy(model.icube.sky_cube[channel])
+    total_flux = model.coords.cell_size ** 2 * np.sum(mod_im)
+
+    # get imaged MPoL residual visibilities
+    im_resid, norm_resid = get_residual_image(model, u, v, V, weights, robust=robust)
+
+    # get dirty image
+    imager = DirtyImager(
+        coords=model.coords,
+        uu=u,
+        vv=v,
+        weight=weights,
+        data_re=V.real,
+        data_im=V.imag
+    )
+    dirty_im, dirty_beam = imager.get_dirty_image(weighting="briggs",
+                                        robust=robust,
+                                        unit="Jy/arcsec^2")
+    dirty_im = np.squeeze(dirty_im)
+
+    # get clean image and beam
+    if clean_fits is not None:
+        fits_obj = ProcessFitsImage(clean_fits)
+        clean_im, clean_im_ext, clean_beam = fits_obj.get_image(beam=True)
+
+    # set image colorscales
+    norm_mod = get_image_cmap_norm(mod_im, stretch='asinh')
+    if share_cscale:
+        norm_dirty = norm_clean = norm_mod
+    else:
+        norm_dirty = get_image_cmap_norm(dirty_im, stretch='asinh')
+        if clean_fits is not None:
+            norm_clean = get_image_cmap_norm(clean_im, stretch='asinh')
