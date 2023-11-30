@@ -28,19 +28,8 @@ class CrossValidate:
         Instance of the `mpol.coordinates.GridCoords` class.
     imager : `mpol.gridding.DirtyImager` object
         Instance of the `mpol.gridding.DirtyImager` class.
-    kfolds : int, default=5
-        Number of k-folds to use in cross-validation
-    split_method : str, default='random_cell'
-        Method to split full dataset into train/test subsets
-    seed : int, default=None
-        Seed for random number generator used in splitting data
-    learn_rate : float, default=0.5
-        Neural network learning rate
-    epochs : int, default=10000
-        Number of training iterations
-    convergence_tol : float, default=1e-3
-        Tolerance for training iteration stopping criterion as assessed by
-        loss function (suggested <= 1e-3)
+    learn_rate : float, default=0.3
+        Initial learning rate  
     regularizers : nested dict, default={}
         Dictionary of image regularizers to use. For each, a dict of the 
         strength ('lambda', float), whether to guess an initial value for lambda 
@@ -49,6 +38,14 @@ class CrossValidate:
         {"sparsity":{"lambda":1e-3, "guess":False},
         "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
         }
+    epochs : int, default=10000
+        Number of training iterations
+    convergence_tol : float, default=1e-5
+        Tolerance for training iteration stopping criterion as assessed by
+        loss function (suggested <= 1e-3)
+    schedule_factor : float, default=0.995
+        For the `torch.optim.lr_scheduler.ReduceLROnPlateau` scheduler, factor 
+        to which the learning rate is reduced when learning rate stops decreasing
     start_dirty_image : bool, default=False
         Whether to start the RML optimization loop by initializing the model 
         image to a dirty image of the observed data. If False, the optimization
@@ -56,6 +53,10 @@ class CrossValidate:
     train_diag_step : int, default=None
         Interval at which training diagnostics are output. If None, no
         diagnostics will be generated.
+    kfolds : int, default=5
+        Number of k-folds to use in cross-validation
+    split_method : str, default='random_cell'
+        Method to split full dataset into train/test subsets        
     split_diag_fig : bool, default=False
         Whether to generate a diagnostic figure of dataset splitting into
         train/test sets.
@@ -64,15 +65,18 @@ class CrossValidate:
     save_prefix : str, default=None
         Prefix (path) used for saved figure names. If None, figures won't be
         saved
-    device : torch.device, default=None
-        Which hardware device to perform operations on (e.g., 'cuda:0').
-        'None' defaults to current device.
     verbose : bool, default=True
         Whether to print notification messages.
+    device : torch.device, default=None
+        Which hardware device to perform operations on (e.g., 'cuda:0').
+        'None' defaults to current device.        
+    seed : int, default=None
+        Seed for random number generator used in splitting data        
     """
 
-    def __init__(self, coords, imager, learn_rate=0.5, 
-                regularizers={}, epochs=10000, convergence_tol=1e-3, 
+    def __init__(self, coords, imager, learn_rate=0.3, 
+                regularizers={}, epochs=10000, convergence_tol=1e-5, 
+                schedule_factor=0.995,
                 start_dirty_image=False, 
                 train_diag_step=None, kfolds=5, split_method="random_cell", 
                 split_diag_fig=False, store_cv_diagnostics=False, 
@@ -80,20 +84,21 @@ class CrossValidate:
                 ):
         self._coords = coords
         self._imager = imager
-        self._kfolds = kfolds
-        self._split_method = split_method
-        self._seed = seed
         self._learn_rate = learn_rate
+        self._regularizers = regularizers
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._regularizers = regularizers
+        self._schedule_factor = schedule_factor
         self._start_dirty_image = start_dirty_image
         self._train_diag_step = train_diag_step
+        self._kfolds = kfolds
+        self._split_method = split_method
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
         self._save_prefix = save_prefix
-        self._device = device
         self._verbose = verbose
+        self._device = device
+        self._seed = seed
 
         self._split_figure = None
 
@@ -186,10 +191,17 @@ class CrossValidate:
                     # create a new model for this kfold, initializing it to the model pretrained on the dirty image
                     model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
 
+            # create a new optimizer and scheduler for this kfold
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
+            if self._schedule_factor is None:
+                scheduler = None
+            else:
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=self._schedule_factor)
+
             trainer = TrainTest( 
                 imager=self._imager,
                 optimizer=optimizer,
+                scheduler=scheduler,
                 epochs=self._epochs,
                 convergence_tol=self._convergence_tol,
                 regularizers=self._regularizers,

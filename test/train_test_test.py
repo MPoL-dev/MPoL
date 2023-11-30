@@ -16,12 +16,33 @@ def test_traintestclass_training(coords, imager, dataset, generic_parameters):
     model = precomposed.SimpleNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
-    # bypass TrainTest.loss_lambda_guess
+    
+    # no regularizers
     train_pars["regularizers"] = {}
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
+    loss, loss_history = trainer.train(model, dataset)
+
+
+def test_traintestclass_training_scheduler(coords, imager, dataset, generic_parameters):
+    # using the TrainTest class, run a training loop with regularizers, 
+    # using the learning rate scheduler
+    nchan = dataset.nchan
+    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+
+    train_pars = generic_parameters["train_pars"]
+
+    learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
+
+    # use a scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.995)
+    train_pars["scheduler"] = scheduler
 
     trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
@@ -36,6 +57,8 @@ def test_traintestclass_training_guess(coords, imager, dataset, generic_paramete
     train_pars = generic_parameters["train_pars"] 
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
+
+    train_pars['regularizers']['entropy']['guess'] = True 
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
@@ -60,8 +83,9 @@ def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_p
     trainer = TrainTest(imager=imager, optimizer=optimizer, **train_pars)
     loss, loss_history = trainer.train(model, dataset)
 
-    train_state = trainer.train_state
-    train_fig, train_axes = train_diagnostics_fig(model, losses=loss_history, train_state=train_state)
+    train_fig, train_axes = train_diagnostics_fig(model, 
+                                                  losses=loss_history, 
+                                                  )
     train_fig.savefig(tmp_path / "train_diagnostics_fig.png", dpi=300)
     plt.close("all")
 

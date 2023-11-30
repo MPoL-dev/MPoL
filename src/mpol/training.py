@@ -64,9 +64,7 @@ class TrainTest:
     Args:
         imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.
         optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.
-        epochs (int): Number of training iterations, default=10000
-        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by
-            loss function (suggested <= 1e-3)
+        scheduler (:class:`torch.optim.lr_scheduler` object, default=None): Scheduler for adjusting learning rate during optimization.        
         regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength ('lambda', float), whether to guess an initial value for lambda ('guess', bool), and other quantities needed to compute their loss term.
             
             Example:
@@ -74,24 +72,30 @@ class TrainTest:
                 "entropy": {"lambda":1e-3, "guess":True, "prior_intensity":1e-10}
                 }``
 
+        epochs (int): Number of training iterations, default=10000
+        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by
+            loss function (suggested <= 1e-3)
         train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.
         kfold (int): The k-fold of the current training set (for diagnostics)        
         save_prefix (str): Prefix (path) used for saved figure names. If None, figures won't be saved
         verbose (bool): Whether to print notification messages
     """
 
-    def __init__(self, imager, optimizer, epochs=10000, convergence_tol=1e-3, 
-                regularizers={}, train_diag_step=None, kfold=None, 
-                save_prefix=None, verbose=True
-                ):
+    def __init__(self, imager, optimizer, scheduler=None, regularizers={},
+                epochs=10000, convergence_tol=1e-5,                 
+                train_diag_step=None, 
+                kfold=None, save_prefix=None, verbose=True
+                ): 
         self._imager = imager
-        self._optimizer = optimizer
+        self._optimizer = optimizer      
+        self._scheduler = scheduler
+        self._regularizers = regularizers
         self._epochs = epochs
         self._convergence_tol = convergence_tol
-        self._regularizers = regularizers
+        
         self._train_diag_step = train_diag_step
-        self._save_prefix = save_prefix
         self._kfold = kfold
+        self._save_prefix = save_prefix
         self._verbose = verbose
 
         self._train_figure = None
@@ -200,7 +204,7 @@ class TrainTest:
                 loss += self._regularizers['TSV']['lambda'] * TSV(sky_cube)
 
         return loss
-
+        
 
     def train(self, model, dataset):
         r"""
@@ -227,7 +231,7 @@ class TrainTest:
 
         count = 0
         losses = []
-        self._train_state = {}
+        learn_rates = []
 
         # guess initial strengths for regularizers in `self._regularizers`
         # that have 'guess':True
@@ -246,7 +250,7 @@ class TrainTest:
                 )
 
             # check early-on whether the loss isn't evolving
-            if count == 20:
+            if count == 10:
                 loss_arr = np.array(losses)
                 if all(0.9 <= loss_arr[:-1] / loss_arr[1:]) and all(
                     loss_arr[:-1] / loss_arr[1:] <= 1.1
@@ -277,11 +281,9 @@ class TrainTest:
             # update model parameters via gradient descent
             self._optimizer.step()
 
-            # store current training parameter values
-            # TODO: store hyperpar values, access in crossval.py
-            self._train_state["kfold"] = self._kfold 
-            self._train_state["epoch"] = count
-            self._train_state["learn_rate"] = self._optimizer.state_dict()['param_groups'][0]['lr']            
+            if self._scheduler is not None:
+                self._scheduler.step(loss)
+                learn_rates.append(self._optimizer.param_groups[0]['lr'])
 
             # generate optional fit diagnostics
             if self._train_diag_step is not None and (count % self._train_diag_step == 0 or count == self._epochs or self.loss_convergence(np.array(losses))):
