@@ -547,3 +547,23 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                             )
         axes[1][0].add_artist(beam_ellipse)
 
+    if not any(xzoom) and not any(yzoom):
+        for ii in [0,1]:
+            for jj in [0,1]:
+                axes[ii][jj].set_xlim(xzoom[1], xzoom[0])
+                axes[ii][jj].set_ylim(yzoom[0], yzoom[1])
+
+    axes[0][0].set_title(f"Dirty image (robust {robust})")
+    axes[0][1].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
+    if clean_fits is not None:
+        axes[1][0].set_title(f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)")
+    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")    
+
+    plt.tight_layout()
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + "_image_comparison.png", dpi=300)
+    
+    plt.close()
+
+    return fig, axes
