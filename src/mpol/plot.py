@@ -4,6 +4,8 @@ import matplotlib.colors as mco
 
 from astropy.visualization.mpl_normalize import simple_norm
 
+from mpol.fourier import get_vis_residuals
+from mpol.gridding import DirtyImager
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 
 def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetric=False):
@@ -46,6 +48,60 @@ def get_image_cmap_norm(image, stretch='power', gamma=1.0, asinh_a=0.02, symmetr
         raise ValueError("'stretch' must be one of 'asinh' or 'power'.")
     
     return norm
+
+
+def get_residual_image(model, u, v, V, weights, robust=0.5):
+    """ 
+    Get a dirty image and colormap normalization for residual visibilities,
+    the difference of observed visibilities and an MPoL model sampled at the 
+    observed (u,v) points.
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        Instance of the `mpol.precomposed.SimpleNet` class. Contains model
+        visibilities.
+    u, v : array, unit=[k\lambda]
+        Data u- and v-coordinates
+    V : array, unit=[Jy]
+        Data visibility amplitudes
+    weights : array, unit=[Jy^-2]
+        Data weights
+    robust : float, default=0.5
+        Robust weighting parameter used to create the dirty image of the 
+        residual visibilities
+
+    Returns
+    -------
+    im_resid : 2D image array
+        The residual image
+    norm_resid : Matplotlib colormap normalization
+        Symmetric, linear colormap for `im_resid`
+    """
+    vis_resid = get_vis_residuals(model, u, v, V)
+
+    resid_imager = DirtyImager(
+        coords=model.coords,
+        uu=u / 1e3,
+        vv=v / 1e3,
+        weight=weights,
+        data_re=np.real(vis_resid),
+        data_im=np.imag(vis_resid),
+    )
+    im_resid, _ = resid_imager.get_dirty_image(weighting="briggs", 
+                                               robust=robust, 
+                                               unit='Jy/arcsec^2'
+                                               )
+    # `get_vis_residuals` has already selected a single channel
+    im_resid = np.squeeze(im_resid)
+    
+    norm_resid = get_image_cmap_norm(im_resid, 
+                                     stretch='power', 
+                                     gamma=1, 
+                                     symmetric=True
+                                     )
+
+    return im_resid, norm_resid
 
 
 def plot_image(image, extent, cmap="inferno", norm=None, ax=None, 
