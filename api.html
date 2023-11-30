@@ -508,6 +508,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.train_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">train_diagnostics_fig()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.image_comparison_fig"><code class="docutils literal notranslate"><span class="pre">image_comparison_fig()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2753,6 +2754,46 @@ a given state, plots the current:
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.plot.image_comparison_fig">
+<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">image_comparison_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_fits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_cscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#image_comparison_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.image_comparison_fig" title="Permalink to this definition">#</a></dt>
+<dd><p>Figure for comparison of MPoL model image to other image models. Plots:
+- dirty image
+- MPoL model image
+- MPoL residual visibilities imaged
+- clean image (if a .fits file is supplied)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
+<li><p><strong>u</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
+<li><p><strong>v</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
+<li><p><strong>V</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy</em><em>]</em>) – Data visibility amplitudes</p></li>
+<li><p><strong>weights</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy^-2</em><em>]</em>) – Data weights</p></li>
+<li><p><strong>robust</strong> (<em>float</em><em>, </em><em>default=0.5</em>) – Robust weighting parameter used to create the dirty image of the
+observed visibilities and separately of the MPoL residual visibilities</p></li>
+<li><p><strong>clean_fits</strong> (<em>str</em><em>, </em><em>default=None</em>) – Path to a clean .fits image</p></li>
+<li><p><strong>share_cscale</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether the MPoL model image, dirty image and clean image share the
+same colorscale</p></li>
+<li><p><strong>xzoom</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>default =</em><em> [</em><em>None</em><em>, </em><em>None</em><em>]</em>) – X- and y- axis limits to zoom the images to. <cite>xzoom</cite> and <cite>yzoom</cite> should
+both list values in ascending order (e.g. [-2, 3], not [3, -2])</p></li>
+<li><p><strong>yzoom</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>default =</em><em> [</em><em>None</em><em>, </em><em>None</em><em>]</em>) – X- and y- axis limits to zoom the images to. <cite>xzoom</cite> and <cite>yzoom</cite> should
+both list values in ascending order (e.g. [-2, 3], not [3, -2])</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default=&quot;&quot;</em>) – Figure super-title</p></li>
+<li><p><strong>channel</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel of the model to use to generate figure</p></li>
+<li><p><strong>save_prefix</strong> (<em>string</em><em>, </em><em>default = None</em>) – Prefix for saved figure name. If None, the figure won’t be saved</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (Matplotlib <cite>.Figure</cite> instance) – The generated figure</p></li>
+<li><p><strong>axes</strong> (Matplotlib <cite>~.axes.Axes</cite> class) – Axes of the generated figure</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -2969,6 +3010,7 @@ a given state, plots the current:
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.train_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">train_diagnostics_fig()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.image_comparison_fig"><code class="docutils literal notranslate"><span class="pre">image_comparison_fig()</span></code></a></li>
 </ul>
 </li>
 </ul>
