@@ -312,9 +312,9 @@ class TrainTest:
                     )
                 self._train_figure = (train_fig, train_axes)
 
-            # temporarily store the current model image for use in next call to `train_diagnostics_fig`
-            old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
-            old_mod_epoch = count * 1
+                # temporarily store the current model image for use in next call to `train_diagnostics_fig`
+                old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
+                old_mod_epoch = count * 1
 
             count += 1
 
