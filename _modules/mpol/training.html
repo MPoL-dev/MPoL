@@ -295,6 +295,58 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">mpol.losses</span> <span class="kn">import</span> <span class="n">TSV</span><span class="p">,</span> <span class="n">TV_image</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">nll_gridded</span><span class="p">,</span> <span class="n">sparsity</span>
 <span class="kn">from</span> <span class="nn">mpol.plot</span> <span class="kn">import</span> <span class="n">train_diagnostics_fig</span>
+<div class="viewcode-block" id="train_to_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.training.train_to_dirty_image">[docs]</a><span class="k">def</span> <span class="nf">train_to_dirty_image</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train against a dirty image of the observed visibilities using a loss function </span>
+<span class="sd">    of the mean squared error between the RML model image pixel fluxes and the </span>
+<span class="sd">    dirty image pixel fluxes. Useful for initializing a separate RML optimization </span>
+<span class="sd">    loop at a reasonable starting image.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : `torch.nn.Module` object</span>
+<span class="sd">        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.</span>
+<span class="sd">    imager : :class:`mpol.gridding.DirtyImager` object</span>
+<span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
+<span class="sd">    robust : float, default=0.5</span>
+<span class="sd">        Robust weighting parameter used to create a dirty image. </span>
+<span class="sd">    learn_rate : float, default=100</span>
+<span class="sd">        Learning rate for optimization loop</span>
+<span class="sd">    niter : int, default=1000</span>
+<span class="sd">        Number of iterations for optimization loop</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : `torch.nn.Module` object</span>
+<span class="sd">        The input `model` updated with the state of the training to the </span>
+<span class="sd">        dirty image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Initializing model to dirty image&quot;</span><span class="p">)</span>
+
+    <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span>
+                                                <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span>
+                                                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">)</span>
+    <span class="n">dirty_image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learn_rate</span><span class="p">)</span>
+
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+        <span class="n">model</span><span class="p">()</span>
+
+        <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
+
+        <span class="n">lossfunc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>  
+        <span class="c1"># MSELoss calculates mean squared error (squared L2 norm), so sqrt it</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">lossfunc</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="n">dirty_image</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>            
+
+    <span class="k">return</span> <span class="n">model</span></div>
+
 
 <div class="viewcode-block" id="TrainTest"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest">[docs]</a><span class="k">class</span> <span class="nc">TrainTest</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
