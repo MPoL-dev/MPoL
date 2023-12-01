@@ -656,6 +656,64 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
 def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False, 
               bin_width=20e3, title="", channel=0, save_prefix=None):
+    """
+    Figure for comparison of 1D projected MPoL model visibilities and observed 
+    visibilities. Plots:
+    - Projected Re(V): observed and MPoL model 
+    - Projected residual Re(V): observed - MPoL model 
+    - Projected Im(V): observed and MPoL model 
+    - Projected residual Im(V): observed - MPoL model 
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    u, v : array, unit=[k\lambda]
+        Data u- and v-coordinates
+    V : array, unit=[Jy]
+        Data visibility amplitudes
+    weights : array, unit=[Jy^-2]
+        Data weights        
+    geom : dict
+        Dictionary of source geometry. If passed in, visibiliites will be 
+        deprojected prior to plotting. Keys:
+            "incl" : float, unit=[deg]
+                Inclination 
+            "Omega" : float, unit=[deg]
+                Position angle of the ascending node 
+            "omega" : float, unit=[deg]
+                Argument of periastron
+            "dRA" : float, unit=[arcsec]
+                Phase center offset in right ascension. Positive is west of north.
+            "dDec" : float, unit=[arcsec]
+                Phase center offset in declination.
+    rescale_flux : bool
+        If True, the visibility amplitudes are rescaled to account 
+        for the difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit.                 
+    bin_width : float, default=20e3
+        Bin size [klambda] for baselines
+    title : str, default=""
+        Figure super-title
+    channel : int, default=0
+        Channel of the model to use to generate figure        
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+
+    Notes
+    -----
+    This routine requires the `frank <https://github.com/discsim/frank>`_ package
+    """
     from frank.geometry import apply_phase_shift, deproject
     from frank.utilities import UVDataBinner
 
