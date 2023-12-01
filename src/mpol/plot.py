@@ -653,4 +653,26 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
     return fig, axes
 
+
+def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False, 
+              bin_width=20e3, title="", channel=0, save_prefix=None):
+    from frank.geometry import apply_phase_shift, deproject
+    from frank.utilities import UVDataBinner
+
+    # get MPoL residual and model visibilities
+    Vresid, Vmod = get_vis_residuals(model, u, v, V, return_Vmod=True)
+    # bin projected observed visibilities
+    # (`UVDataBinner` expects `u`, `v` in [lambda])
+    binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
+
+    # bin projected model and residual visibilities
+    binned_Vmod = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vmod, weights, bin_width)
+    binned_Vresid = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vresid, weights, bin_width)
+
+    # baselines [Mlambda]
+    qq = binned_Vtrue.uv / 1e6
+
+    amax_binVres_re = np.max(abs(binned_Vresid.V.real))
+    amax_binVres_im = np.max(abs(binned_Vresid.V.imag))
+
     return fig, axes
