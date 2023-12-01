@@ -156,6 +156,10 @@ class CrossValidate:
                 dataset, k=self._kfolds, dartboard=dartboard, seed=self._seed
             )
 
+            if self._verbose:
+                logging.info(f"    Max baseline in Fourier grid {self._coords.q_max} klambda")
+                logging.info(f"    Dartboard: baseline bin edges {dartboard.q_edges.tolist()} klambda")
+
         else:
             supported_methods = ["dartboard", "random_cell"]
             raise ValueError(
