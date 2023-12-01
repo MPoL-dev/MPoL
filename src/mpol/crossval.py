@@ -422,14 +422,21 @@ class DartboardSplitGridded:
         # create the full cell_list
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
 
-        # partition the cell_list into k pieces
+        # indices of cells in the smallest q bin that also have data
+        small_q_idx = [i for i,l in enumerate(self.cell_list) if l[0] == 0]
+        # cells in the smallest q bin
+        self.small_q = self.cell_list[:len(small_q_idx)]
+
+        # partition the cell_list into k pieces.
         # first, randomly permute the sequence to make sure
-        # we don't get structured radial/azimuthal patterns
+        # we don't get structured radial/azimuthal patterns.
+        # also exclude the cells belonging to the smallest q bin from all splits
+        # (we'll add these only to the training splits, as they're iterated through)
         if seed is not None:
             np.random.seed(seed)
 
         self.k_split_cell_list = np.array_split(
-            np.random.permutation(self.cell_list), k
+            np.random.permutation(self.cell_list[len(small_q_idx):]), k
         )
 
     @classmethod
