@@ -653,3 +653,5 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
     plt.close()
 
     return fig, axes
+
+    return fig, axes
