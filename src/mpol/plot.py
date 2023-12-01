@@ -661,6 +661,26 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
 
     # get MPoL residual and model visibilities
     Vresid, Vmod = get_vis_residuals(model, u, v, V, return_Vmod=True)
+
+    if geom is not None:    
+        # phase-shift the visibilities
+        V = apply_phase_shift(u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True)
+        Vmod = apply_phase_shift(u * 1e3, v * 1e3, Vmod, geom["dRA"], geom["dDec"], inverse=True)
+        Vresid = apply_phase_shift(u * 1e3, v * 1e3, Vresid, geom["dRA"], geom["dDec"], inverse=True)
+
+        # deproject the (u,v) points
+        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
+        # convert back to [k\lambda]
+        u /= 1e3
+        v /= 1e3
+
+        # if the source is optically thick, rescale the deprojected V(q)
+        if rescale_flux: 
+            V.real /= np.cos(geom["incl"] * np.pi / 180)
+            Vmod.real /= np.cos(geom["incl"] * np.pi / 180)
+            Vresid.real /= np.cos(geom["incl"] * np.pi / 180)
+            weights *= np.cos(geom["incl"] * np.pi / 180) ** 2
+
     # bin projected observed visibilities
     # (`UVDataBinner` expects `u`, `v` in [lambda])
     binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
