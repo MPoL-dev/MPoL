@@ -619,7 +619,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                     ax=axes[1][0], norm=norm_clean, xlab='', ylab='')
         
         # add clean beam to plot
-        if not any(xzoom) and not any(yzoom):
+        if any(xzoom) and any(yzoom):
             beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
         else:
             beam_xy = (0.85 * axes[1][0].get_xlim()[1], 0.85 * axes[1][0].get_ylim()[0])
@@ -632,7 +632,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                             )
         axes[1][0].add_artist(beam_ellipse)
 
-    if not any(xzoom) and not any(yzoom):
+    if any(xzoom) and any(yzoom):
         for ii in [0,1]:
             for jj in [0,1]:
                 axes[ii][jj].set_xlim(xzoom[1], xzoom[0])
@@ -640,9 +640,9 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
     axes[0][0].set_title(f"Dirty image (robust {robust})")
     axes[0][1].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
+    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")      
     if clean_fits is not None:
-        axes[1][0].set_title(f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)")
-    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")    
+        axes[1][0].set_title(f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)")  
 
     plt.tight_layout()
 
