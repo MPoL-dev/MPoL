@@ -132,8 +132,24 @@ class CrossValidate:
             )
 
         elif self._split_method == "dartboard":
-            # create a radial and azimuthal partition for the dataset
-            dartboard = Dartboard(coords=self._coords)
+            if self._dartboard_q_edges is None:
+                # create a radial partition for the dataset.
+                # this is the same as the default q_edges in `datasets.Dartboard`,
+                # except that the max baseline is set by (a padding factor times)
+                # the maximum baseline in the dataset, rather than by the largest
+                # baseline in the Fourier plane grid `coords.q_max` (which can
+                # often be a factor of >~2 larger than the longest baseline in
+                # the dataset).
+                stacked_mask = torch.any(dataset.mask, axis=0)
+                stacked_mask = stacked_mask.to('cpu') # TODO: remove
+                qs = dataset.coords.packed_q_centers_2D[stacked_mask]
+                pad_factor = 1.1
+                q_edges = loglinspace(0, qs.max() * pad_factor, N_log=8, M_linear=5)
+
+            dartboard = Dartboard(coords=self._coords, 
+                                  q_edges=q_edges, 
+                                  phi_edges=self._dartboard_phi_edges,
+                                  )
 
             # use 'dartboard' to split full dataset into train/test subsets
             split_iterator = DartboardSplitGridded(
