@@ -511,6 +511,7 @@ def get_vis_residuals(
     u_true: NDArray[floating[Any]],
     v_true: NDArray[floating[Any]],
     V_true: NDArray[complexfloating[Any, Any]],
+    return_Vmod : bool = False,
     channel: int = 0,
 ) -> NDArray[complexfloating[Any, Any]]:
     r"""
@@ -526,6 +527,9 @@ def get_vis_residuals(
         Data u- and v-coordinates
     V_true : array, unit=[Jy]
         Data visibility amplitudes
+    return_Vmod : bool, default=False
+        Whether to return just the residual visibilities, or additionally the 
+        loose model visibilities
     channel : int, default=0
         Channel (of `model`) to use to calculate residual visibilities
 
@@ -537,11 +541,13 @@ def get_vis_residuals(
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u_true, vv=v_true)
 
-    vis_model = nufft(model.icube())
+    vis_model = nufft(model.icube().to('cpu')) # TODO: remove 'to' call
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 
-    vis_resid: NDArray[complexfloating[Any, Any]]
     vis_resid = V_true - vis_model
 
+    if return_Vmod:
+        return vis_resid, vis_model
+    
     return vis_resid
