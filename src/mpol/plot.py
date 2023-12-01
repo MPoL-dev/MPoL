@@ -359,24 +359,22 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     """
     fig, axes = plt.subplots(nrows=2, ncols=splitter.k, figsize=(10,3))
 
-    kw = {"fontsize": 8}
+    cmap_train = mco.ListedColormap(['none', 'black'])
+    cmap_test = mco.ListedColormap(['none', 'red'])
+    
+    kw = {"fontsize":8}
+    image_kw = {"origin":"lower", "interpolation":"none"}
 
     fig.suptitle('Training data: black, test data: red', **kw)
 
     for ii, (train, test) in enumerate(splitter):
         train_mask = torch2npy(train.ground_mask[channel])
         test_mask = torch2npy(test.ground_mask[channel])
-        vis_ext = np.divide(train.coords.vis_ext, 1e3)
+        vis_ext = np.array(train.coords.vis_ext) / 1e3
 
-        cmap_train = mco.ListedColormap(['none', 'black'])
-        cmap_test = mco.ListedColormap(['none', 'red'])
-
-        axes[0, ii].imshow(train_mask / 1e3, origin="lower", extent=vis_ext, 
-            cmap=cmap_train, interpolation="none")      
-        axes[0, ii].imshow(test_mask / 1e3, origin="lower", extent=vis_ext, 
-            cmap=cmap_test, interpolation="none")     
-        axes[1, ii].imshow(test_mask / 1e3, origin="lower", extent=vis_ext, 
-            cmap=cmap_test, interpolation="none")            
+        axes[0, ii].imshow(train_mask, extent=vis_ext, cmap=cmap_train, **image_kw)
+        axes[0, ii].imshow(test_mask, extent=vis_ext, cmap=cmap_test, **image_kw)
+        axes[1, ii].imshow(test_mask, extent=vis_ext, cmap=cmap_test, **image_kw)
 
         axes[0, ii].set_title(f"k-fold {ii}", **kw)
 
