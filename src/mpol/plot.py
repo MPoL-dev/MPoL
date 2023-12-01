@@ -357,40 +357,42 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(6, 10))
+    fig, axes = plt.subplots(nrows=2, ncols=splitter.k, figsize=(10,3))
+
+    kw = {"fontsize": 8}
+
+    fig.suptitle('Training data: black, test data: red', **kw)
 
     for ii, (train, test) in enumerate(splitter):
         train_mask = torch2npy(train.ground_mask[channel])
         test_mask = torch2npy(test.ground_mask[channel])
-        vis_ext = train.coords.vis_ext
+        vis_ext = np.divide(train.coords.vis_ext, 1e3)
 
         cmap_train = mco.ListedColormap(['none', 'black'])
         cmap_test = mco.ListedColormap(['none', 'red'])
 
-        axes[ii, 0].imshow(train_mask, origin="lower", extent=vis_ext, 
+        axes[0, ii].imshow(train_mask / 1e3, origin="lower", extent=vis_ext, 
             cmap=cmap_train, interpolation="none")      
-        axes[ii, 0].imshow(test_mask, origin="lower", extent=vis_ext, 
+        axes[0, ii].imshow(test_mask / 1e3, origin="lower", extent=vis_ext, 
             cmap=cmap_test, interpolation="none")     
-        axes[ii, 1].imshow(test_mask, origin="lower", extent=vis_ext, 
+        axes[1, ii].imshow(test_mask / 1e3, origin="lower", extent=vis_ext, 
             cmap=cmap_test, interpolation="none")            
 
-        axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
-
-    axes[0, 0].set_title("Training set (black)\nTest set (red)")
-    axes[0, 1].set_title("Test set")
+        axes[0, ii].set_title(f"k-fold {ii}", **kw)
 
     for aa in axes.flatten()[:-1]:
+        aa.yaxis.set_ticks_position("both")
         aa.xaxis.set_ticklabels([])
         aa.yaxis.set_ticklabels([])
 
-    ax = axes[-1,1]
-    ax.set_xlabel(r'u [k$\lambda$]')
-    ax.set_ylabel(r'v [k$\lambda$]')
-    ax.yaxis.tick_right()
+    ax = axes[1,-1]
+    ax.set_xlabel(r'u [M$\lambda$]', **kw)
+    ax.set_ylabel(r'v [M$\lambda$]', **kw)
     ax.yaxis.set_ticks_position("both")
-    ax.yaxis.set_label_position("right")    
+    ax.yaxis.tick_right()    
+    ax.yaxis.set_label_position("right") 
 
-    fig.subplots_adjust(left=0.05, hspace=0.0, wspace=0.1, top=0.9, bottom=0.1)
+    fig.subplots_adjust(hspace=0.02, wspace=0, left=0.03, right=0.92, top=0.9, bottom=0.1)
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_split_diag.png', dpi=300)
