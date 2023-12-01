@@ -472,6 +472,8 @@ class DartboardSplitGridded:
 
             # put the remaining indices back into a full list
             cell_list_train = np.concatenate(k_list)
+            # add the smallest q bin cells into the train list
+            cell_list_train = np.append(cell_list_train, self.small_q, axis=0)
 
             # create the masks for each cell_list
             train_mask = self.dartboard.build_grid_mask_from_cells(cell_list_train)
