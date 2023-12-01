@@ -506,15 +506,7 @@ def make_fake_data(
     return vis_noise, vis_noiseless
 
 
-def get_vis_residuals(
-    model: MPoLModel,
-    u_true: NDArray[floating[Any]],
-    v_true: NDArray[floating[Any]],
-    V_true: NDArray[complexfloating[Any, Any]],
-    return_Vmod : bool = False,
-    channel: int = 0,
- ) -> tuple[NDArray[complexfloating[Any, Any]], NDArray[complexfloating[Any, Any]]]:
-
+def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=0):
     r"""
     Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
     (ungridded) data visiblities at data (u, v) coordinates
