@@ -561,6 +561,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
     """
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
 
+    title += f"\nMPoL pixel size {model.coords.cell_size * 1e3:.2f} mas, N_pix {model.coords.npix}"
     if share_cscale:
         title += "\nDirty and clean images use colorscale of MPoL image"
     fig.suptitle(title)
