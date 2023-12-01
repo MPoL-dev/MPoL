@@ -695,4 +695,56 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     amax_binVres_re = np.max(abs(binned_Vresid.V.real))
     amax_binVres_im = np.max(abs(binned_Vresid.V.imag))
 
+    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(10,8))
+
+    if geom is None:
+        title += "\nProjected visibilities"
+    else:
+        title += "\nDeprojected visibilities"
+        if rescale_flux:
+            title += "\nRe(V) and weights rescaled for optically thick source"
+    fig.suptitle(title)
+
+    # *projected* Re(V) -- observed and MPoL model
+    axes[0].plot(qq, binned_Vtrue.V.real * 1e3, 'k.', 
+                    label=f"Obs., {bin_width / 1e3:.2f} k$\\lambda$ bins")
+    axes[0].plot(qq, binned_Vmod.V.real * 1e3, 'r.', 
+                    label='MPoL')
+    axes[0].legend()
+
+    # *projected* Im(V) -- observed and MPoL model
+    axes[2].plot(qq, binned_Vtrue.V.imag * 1e3, 'k.')
+    axes[2].plot(qq, binned_Vmod.V.imag * 1e3, 'r.')
+
+    # *projected* residual Re(V) = observed - MPoL model
+    axes[1].plot(qq, binned_Vresid.V.real * 1e3, '.', c='#33C1FF',
+                    label=f"Mean {np.mean(binned_Vresid.V.real) * 1e3:.1e} mJy")
+    axes[1].legend()
+
+    # *projected* residual Im(V) = observed - MPoL model
+    axes[3].plot(qq, binned_Vresid.V.imag * 1e3, '.', c='#33C1FF',
+                    label=f"Mean {np.mean(binned_Vresid.V.imag) * 1e3:.1e} mJy")
+    axes[3].legend()
+
+    # y-lims on residual plots symmetric about 0
+    axes[1].set_ylim(-amax_binVres_re * 1e3, amax_binVres_re * 1e3)
+    axes[3].set_ylim(-amax_binVres_im * 1e3, amax_binVres_im * 1e3)
+    axes[1].axhline(y=0, ls='--', c='k')
+    axes[3].axhline(y=0, ls='--', c='k')
+
+    for ii in range(4):
+        axes[ii].set_xlim(-0.1, 1.1 * np.max(qq))
+        if ii < 3:
+            axes[ii].xaxis.set_tick_params(labelbottom=False)
+
+    axes[0].set_ylabel('Re(V) [mJy]')
+    axes[1].set_ylabel('Resid. Re(V) [mJy]')            
+    axes[2].set_ylabel('Im(V) [mJy]')
+    axes[3].set_ylabel('Resid. Im(V) [mJy]')
+    axes[3].set_xlabel(r'Baseline [M$\lambda$]')
+
+    plt.tight_layout()
+
+
     return fig, axes
+    
