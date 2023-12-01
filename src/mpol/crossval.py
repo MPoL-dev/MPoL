@@ -14,7 +14,7 @@ from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
-
+from mpol.utils import loglinspace
 
 class CrossValidate:
     r"""
@@ -55,8 +55,11 @@ class CrossValidate:
         diagnostics will be generated.
     kfolds : int, default=5
         Number of k-folds to use in cross-validation
-    split_method : str, default='random_cell'
-        Method to split full dataset into train/test subsets        
+    split_method : str, default='dartboard'
+        Method to split full dataset into train/test subsets
+    dartboard_q_edges, dartboard_phi_edges : list of float, default=None, unit=[klambda]
+        Radial and azimuthal bin edges of the cells used to split the dataset
+        if `split_method`==`dartboard` (see `datasets.Dartboard`)
     split_diag_fig : bool, default=False
         Whether to generate a diagnostic figure of dataset splitting into
         train/test sets.
@@ -78,7 +81,8 @@ class CrossValidate:
                 regularizers={}, epochs=10000, convergence_tol=1e-5, 
                 schedule_factor=0.995,
                 start_dirty_image=False, 
-                train_diag_step=None, kfolds=5, split_method="random_cell", 
+                train_diag_step=None, kfolds=5, split_method="dartboard",
+                dartboard_q_edges=None, dartboard_phi_edges=None,
                 split_diag_fig=False, store_cv_diagnostics=False, 
                 save_prefix=None, verbose=True, device=None, seed=None,
                 ):
@@ -93,6 +97,8 @@ class CrossValidate:
         self._train_diag_step = train_diag_step
         self._kfolds = kfolds
         self._split_method = split_method
+        self._dartboard_q_edges = dartboard_q_edges
+        self._dartboard_phi_edges = dartboard_phi_edges
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
         self._save_prefix = save_prefix
