@@ -745,6 +745,17 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
 
     plt.tight_layout()
 
+    if save_prefix is not None:
+        if geom is None:
+            suffix = "_projected_"
+        else:
+            suffix = "_deprojected_"
+            if rescale_flux is True:
+                suffix += "rescaled_"
+
+        fig.savefig(save_prefix + suffix + "vis.png", dpi=300)
+    
+    plt.close()
 
     return fig, axes
     
