@@ -295,6 +295,8 @@ class RandomCellSplitGridded:
     Treats `dataset` as a single-channel object with all data in `channel`.
 
     The splitting doesn't select (preserve) Hermitian pairs of visibilities.
+
+    All train splits have the highest 1% of cells by gridded weight
     """
 
     def __init__(self, dataset, k=5, seed=None, channel=0):
@@ -392,6 +394,10 @@ class DartboardSplitGridded:
     >>> ... # do operations with train dataset
     >>> ... # do operations with test dataset
 
+    Notes:
+        All train splits have the cells belonging to the shortest dartboard baseline bin.
+
+        The number of points in the splits is in general not equal.
     """
 
     def __init__(
