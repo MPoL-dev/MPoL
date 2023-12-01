@@ -513,7 +513,8 @@ def get_vis_residuals(
     V_true: NDArray[complexfloating[Any, Any]],
     return_Vmod : bool = False,
     channel: int = 0,
-) -> NDArray[complexfloating[Any, Any]]:
+ ) -> tuple[NDArray[complexfloating[Any, Any]], NDArray[complexfloating[Any, Any]]]:
+
     r"""
     Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
     (ungridded) data visiblities at data (u, v) coordinates
