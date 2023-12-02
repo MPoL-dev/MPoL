@@ -512,6 +512,27 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
 
 
 def crossval_diagnostics_fig(cv, title="", save_prefix=None):
+    """
+    Figure for model diagnostics of a cross-validation run. Plots: 
+    - loss evolution for each k-fold
+    - cross-validation score per k-fold
+
+    Parameters
+    ----------
+    cv : `mpol.crossval.CrossValidate` object
+        Instance of the `CrossValidate` class produced by a cross-validation loop
+    title : str, default=""
+        Figure super-title
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+    """
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(6,3))
 
     title += f"\nRegularizers {cv.regularizers}\nSplit method: {cv.split_method}, CV score {cv.score['mean']:.3f} +- {cv.score['std']:.3f}"
