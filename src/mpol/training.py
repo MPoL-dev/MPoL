@@ -245,16 +245,10 @@ class TrainTest:
         old_mod_im = None
         old_mod_epoch = None
 
-        run_loss_guess = False
-        for _,v in self._regularizers.items():
-             for i in v:
-                 if v[i] is True:
-                     run_loss_guess = True
-        if run_loss_guess:
-            # guess initial strengths for regularizers in `self._regularizers`
-            # that have 'guess':True
-            # (this updates `self._regularizers`) 
-            self.loss_lambda_guess()
+        # guess initial strengths for regularizers in `self._regularizers`
+        # that have 'guess':True
+        # (this updates `self._regularizers`) 
+        self.loss_lambda_guess()
 
         if self._verbose:
             logging.info("    Image regularizers: {}".format(self._regularizers))
@@ -319,7 +313,7 @@ class TrainTest:
                 self._train_figure = (train_fig, train_axes)
 
                 # temporarily store the current model image for use in next call to `train_diagnostics_fig`
-                old_mod_im = torch2npy(model.icube.sky_cube[0])
+                old_mod_im = torch2npy(model.icube.sky_cube[0]) # TODO: support 'channel' (in TrainTest)
                 old_mod_epoch = count * 1
 
             count += 1
