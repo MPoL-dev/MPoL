@@ -305,7 +305,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">mpol.precomposed</span> <span class="kn">import</span> <span class="n">SimpleNet</span>
 <span class="kn">from</span> <span class="nn">mpol.training</span> <span class="kn">import</span> <span class="n">TrainTest</span><span class="p">,</span> <span class="n">train_to_dirty_image</span>
 <span class="kn">from</span> <span class="nn">mpol.plot</span> <span class="kn">import</span> <span class="n">split_diagnostics_fig</span>
-
+<span class="kn">from</span> <span class="nn">mpol.utils</span> <span class="kn">import</span> <span class="n">loglinspace</span>
 
 <div class="viewcode-block" id="CrossValidate"><a class="viewcode-back" href="../../api.html#mpol.crossval.CrossValidate">[docs]</a><span class="k">class</span> <span class="nc">CrossValidate</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -346,8 +346,11 @@ document.write(`
 <span class="sd">        diagnostics will be generated.</span>
 <span class="sd">    kfolds : int, default=5</span>
 <span class="sd">        Number of k-folds to use in cross-validation</span>
-<span class="sd">    split_method : str, default=&#39;random_cell&#39;</span>
-<span class="sd">        Method to split full dataset into train/test subsets        </span>
+<span class="sd">    split_method : str, default=&#39;dartboard&#39;</span>
+<span class="sd">        Method to split full dataset into train/test subsets</span>
+<span class="sd">    dartboard_q_edges, dartboard_phi_edges : list of float, default=None, unit=[klambda]</span>
+<span class="sd">        Radial and azimuthal bin edges of the cells used to split the dataset</span>
+<span class="sd">        if `split_method`==`dartboard` (see `datasets.Dartboard`)</span>
 <span class="sd">    split_diag_fig : bool, default=False</span>
 <span class="sd">        Whether to generate a diagnostic figure of dataset splitting into</span>
 <span class="sd">        train/test sets.</span>
@@ -369,7 +372,8 @@ document.write(`
                 <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> 
                 <span class="n">schedule_factor</span><span class="o">=</span><span class="mf">0.995</span><span class="p">,</span>
                 <span class="n">start_dirty_image</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="s2">&quot;random_cell&quot;</span><span class="p">,</span> 
+                <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kfolds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="s2">&quot;dartboard&quot;</span><span class="p">,</span>
+                <span class="n">dartboard_q_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dartboard_phi_edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">split_diag_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">store_cv_diagnostics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
                 <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="p">):</span>
@@ -384,6 +388,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">=</span> <span class="n">train_diag_step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span> <span class="o">=</span> <span class="n">kfolds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">=</span> <span class="n">split_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dartboard_q_edges</span> <span class="o">=</span> <span class="n">dartboard_q_edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dartboard_phi_edges</span> <span class="o">=</span> <span class="n">dartboard_phi_edges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_diag_fig</span> <span class="o">=</span> <span class="n">split_diag_fig</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_store_cv_diagnostics</span> <span class="o">=</span> <span class="n">store_cv_diagnostics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
@@ -417,13 +423,33 @@ document.write(`
             <span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span> <span class="o">==</span> <span class="s2">&quot;dartboard&quot;</span><span class="p">:</span>
-            <span class="c1"># create a radial and azimuthal partition for the dataset</span>
-            <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dartboard_q_edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># create a radial partition for the dataset.</span>
+                <span class="c1"># this is the same as the default q_edges in `datasets.Dartboard`,</span>
+                <span class="c1"># except that the max baseline is set by (a padding factor times)</span>
+                <span class="c1"># the maximum baseline in the dataset, rather than by the largest</span>
+                <span class="c1"># baseline in the Fourier plane grid `coords.q_max` (which can</span>
+                <span class="c1"># often be a factor of &gt;~2 larger than the longest baseline in</span>
+                <span class="c1"># the dataset).</span>
+                <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">stacked_mask</span> <span class="o">=</span> <span class="n">stacked_mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="c1"># TODO: remove</span>
+                <span class="n">qs</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">packed_q_centers_2D</span><span class="p">[</span><span class="n">stacked_mask</span><span class="p">]</span>
+                <span class="n">pad_factor</span> <span class="o">=</span> <span class="mf">1.1</span>
+                <span class="n">q_edges</span> <span class="o">=</span> <span class="n">loglinspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">qs</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="n">pad_factor</span><span class="p">,</span> <span class="n">N_log</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+            <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">,</span> 
+                                  <span class="n">q_edges</span><span class="o">=</span><span class="n">q_edges</span><span class="p">,</span> 
+                                  <span class="n">phi_edges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dartboard_phi_edges</span><span class="p">,</span>
+                                  <span class="p">)</span>
 
             <span class="c1"># use &#39;dartboard&#39; to split full dataset into train/test subsets</span>
             <span class="n">split_iterator</span> <span class="o">=</span> <span class="n">DartboardSplitGridded</span><span class="p">(</span>
                 <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfolds</span><span class="p">,</span> <span class="n">dartboard</span><span class="o">=</span><span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
             <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Max baseline in Fourier grid </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">q_max</span><span class="si">}</span><span class="s2"> klambda&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Dartboard: baseline bin edges </span><span class="si">{</span><span class="n">dartboard</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2"> klambda&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">supported_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dartboard&quot;</span><span class="p">,</span> <span class="s2">&quot;random_cell&quot;</span><span class="p">]</span>
@@ -586,6 +612,8 @@ document.write(`
 <span class="sd">    Treats `dataset` as a single-channel object with all data in `channel`.</span>
 
 <span class="sd">    The splitting doesn&#39;t select (preserve) Hermitian pairs of visibilities.</span>
+
+<span class="sd">    All train splits have the highest 1% of cells by gridded weight</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -683,6 +711,10 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; ... # do operations with train dataset</span>
 <span class="sd">    &gt;&gt;&gt; ... # do operations with test dataset</span>
 
+<span class="sd">    Notes:</span>
+<span class="sd">        All train splits have the cells belonging to the shortest dartboard baseline bin.</span>
+
+<span class="sd">        The number of points in the splits is in general not equal.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -713,14 +745,21 @@ document.write(`
         <span class="c1"># create the full cell_list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">get_nonzero_cell_indices</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">)</span>
 
-        <span class="c1"># partition the cell_list into k pieces</span>
+        <span class="c1"># indices of cells in the smallest q bin that also have data</span>
+        <span class="n">small_q_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># cells in the smallest q bin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">small_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">small_q_idx</span><span class="p">)]</span>
+
+        <span class="c1"># partition the cell_list into k pieces.</span>
         <span class="c1"># first, randomly permute the sequence to make sure</span>
-        <span class="c1"># we don&#39;t get structured radial/azimuthal patterns</span>
+        <span class="c1"># we don&#39;t get structured radial/azimuthal patterns.</span>
+        <span class="c1"># also exclude the cells belonging to the smallest q bin from all splits</span>
+        <span class="c1"># (we&#39;ll add these only to the training splits, as they&#39;re iterated through)</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">k_split_cell_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">),</span> <span class="n">k</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">small_q_idx</span><span class="p">):]),</span> <span class="n">k</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="DartboardSplitGridded.from_dartboard_properties"><a class="viewcode-back" href="../../api.html#mpol.crossval.DartboardSplitGridded.from_dartboard_properties">[docs]</a>    <span class="nd">@classmethod</span>
@@ -756,6 +795,8 @@ document.write(`
 
             <span class="c1"># put the remaining indices back into a full list</span>
             <span class="n">cell_list_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">k_list</span><span class="p">)</span>
+            <span class="c1"># add the smallest q bin cells into the train list</span>
+            <span class="n">cell_list_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_list_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_q</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
             <span class="c1"># create the masks for each cell_list</span>
             <span class="n">train_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">build_grid_mask_from_cells</span><span class="p">(</span><span class="n">cell_list_train</span><span class="p">)</span>
