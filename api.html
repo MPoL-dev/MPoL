@@ -489,8 +489,6 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.run_crossval"><code class="docutils literal notranslate"><span class="pre">CrossValidate.run_crossval()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.model"><code class="docutils literal notranslate"><span class="pre">CrossValidate.model</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.regularizers"><code class="docutils literal notranslate"><span class="pre">CrossValidate.regularizers</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.score"><code class="docutils literal notranslate"><span class="pre">CrossValidate.score</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_method"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_method</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.train_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.train_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
@@ -510,9 +508,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.train_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">train_diagnostics_fig()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.crossval_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">crossval_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.image_comparison_fig"><code class="docutils literal notranslate"><span class="pre">image_comparison_fig()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_1d_fig"><code class="docutils literal notranslate"><span class="pre">vis_1d_fig()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2476,18 +2472,6 @@ scores across all k-folds, and all raw scores</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.score">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.score" title="Permalink to this definition">#</a></dt>
-<dd><p>Dict containing cross-val scores for all k-folds, and mean and standard deviation of these</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="mpol.crossval.CrossValidate.split_method">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">split_method</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.split_method" title="Permalink to this definition">#</a></dt>
-<dd><p>String of the method used to split the dataset into train/test sets</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="mpol.crossval.CrossValidate.train_figure">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_figure</span></span><a class="headerlink" href="#mpol.crossval.CrossValidate.train_figure" title="Permalink to this definition">#</a></dt>
 <dd><p>For the most recent kfold, (fig, axes) showing training progress</p>
@@ -2781,30 +2765,6 @@ a given state, plots the current:
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mpol.plot.crossval_diagnostics_fig">
-<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">crossval_diagnostics_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#crossval_diagnostics_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.crossval_diagnostics_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for model diagnostics of a cross-validation run. Plots:
-- loss evolution for each k-fold
-- cross-validation score per k-fold</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cv</strong> (<cite>mpol.crossval.CrossValidate</cite> object) – Instance of the <cite>CrossValidate</cite> class produced by a cross-validation loop</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default=&quot;&quot;</em>) – Figure super-title</p></li>
-<li><p><strong>save_prefix</strong> (<em>string</em><em>, </em><em>default = None</em>) – Prefix for saved figure name. If None, the figure won’t be saved</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>fig</strong> (Matplotlib <cite>.Figure</cite> instance) – The generated figure</p></li>
-<li><p><strong>axes</strong> (Matplotlib <cite>~.axes.Axes</cite> class) – Axes of the generated figure</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.image_comparison_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">image_comparison_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_fits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_cscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#image_comparison_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.image_comparison_fig" title="Permalink to this definition">#</a></dt>
 <dd><p>Figure for comparison of MPoL model image to other image models. Plots:
@@ -2842,67 +2802,6 @@ both list values in ascending order (e.g. [-2, 3], not [3, -2])</p></li>
 </p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mpol.plot.vis_1d_fig">
-<span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">vis_1d_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#vis_1d_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.vis_1d_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for comparison of 1D projected MPoL model visibilities and observed
-visibilities. Plots:
-- Projected Re(V): observed and MPoL model
-- Projected residual Re(V): observed - MPoL model
-- Projected Im(V): observed and MPoL model
-- Projected residual Im(V): observed - MPoL model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
-<li><p><strong>u</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
-<li><p><strong>v</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
-<li><p><strong>V</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy</em><em>]</em>) – Data visibility amplitudes</p></li>
-<li><p><strong>weights</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy^-2</em><em>]</em>) – Data weights</p></li>
-<li><p><strong>geom</strong> (<em>dict</em>) – <p>Dictionary of source geometry. If passed in, visibiliites will be
-deprojected prior to plotting. Keys:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>”incl”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Inclination</p>
-</dd>
-<dt>”Omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Position angle of the ascending node</p>
-</dd>
-<dt>”omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Argument of periastron</p>
-</dd>
-<dt>”dRA”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in right ascension. Positive is west of north.</p>
-</dd>
-<dt>”dDec”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in declination.</p>
-</dd>
-</dl>
-</div></blockquote>
-</p></li>
-<li><p><strong>rescale_flux</strong> (<em>bool</em>) – <p>If True, the visibility amplitudes are rescaled to account
-for the difference between the inclined (observed) brightness and the
-assumed face-on brightness, assuming the emission is optically thick.
-The source’s integrated (2D) flux is assumed to be:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.</p>
-</div></blockquote>
-<p>No rescaling would be appropriate in the optically thin limit.</p>
-</p></li>
-<li><p><strong>bin_width</strong> (<em>float</em><em>, </em><em>default=20e3</em>) – Bin size [klambda] for baselines</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default=&quot;&quot;</em>) – Figure super-title</p></li>
-<li><p><strong>channel</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel of the model to use to generate figure</p></li>
-<li><p><strong>save_prefix</strong> (<em>string</em><em>, </em><em>default = None</em>) – Prefix for saved figure name. If None, the figure won’t be saved</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>fig</strong> (Matplotlib <cite>.Figure</cite> instance) – The generated figure</p></li>
-<li><p><strong>axes</strong> (Matplotlib <cite>~.axes.Axes</cite> class) – Axes of the generated figure</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>This routine requires the <a class="reference external" href="https://github.com/discsim/frank">frank</a> package</p>
 </dd></dl>
 
 </section>
@@ -3102,8 +3001,6 @@ The source’s integrated (2D) flux is assumed to be:</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.run_crossval"><code class="docutils literal notranslate"><span class="pre">CrossValidate.run_crossval()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.model"><code class="docutils literal notranslate"><span class="pre">CrossValidate.model</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.regularizers"><code class="docutils literal notranslate"><span class="pre">CrossValidate.regularizers</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.score"><code class="docutils literal notranslate"><span class="pre">CrossValidate.score</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_method"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_method</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.train_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.train_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.split_figure"><code class="docutils literal notranslate"><span class="pre">CrossValidate.split_figure</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.CrossValidate.diagnostics"><code class="docutils literal notranslate"><span class="pre">CrossValidate.diagnostics</span></code></a></li>
@@ -3123,9 +3020,7 @@ The source’s integrated (2D) flux is assumed to be:</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_histogram_fig"><code class="docutils literal notranslate"><span class="pre">vis_histogram_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.split_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">split_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.train_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">train_diagnostics_fig()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.crossval_diagnostics_fig"><code class="docutils literal notranslate"><span class="pre">crossval_diagnostics_fig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.image_comparison_fig"><code class="docutils literal notranslate"><span class="pre">image_comparison_fig()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.vis_1d_fig"><code class="docutils literal notranslate"><span class="pre">vis_1d_fig()</span></code></a></li>
 </ul>
 </li>
 </ul>

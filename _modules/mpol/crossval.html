@@ -547,13 +547,13 @@ document.write(`
 
         <span class="c1"># average individual test scores to get the cross-val metric for chosen</span>
         <span class="c1"># hyperparameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cv_score</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">cv_score</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span>
             <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">all_scores</span><span class="p">),</span>
             <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="n">all_scores</span><span class="p">,</span>
         <span class="p">}</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cv_score</span></div>
+        <span class="k">return</span> <span class="n">cv_score</span></div>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -565,16 +565,6 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;For the most recent kfold, dict containing regularizers used and their strengths&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dict containing cross-val scores for all k-folds, and mean and standard deviation of these&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cv_score</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">split_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;String of the method used to split the dataset into train/test sets&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_method</span>
-    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">train_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;For the most recent kfold, (fig, axes) showing training progress&quot;&quot;&quot;</span>
