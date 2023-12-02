@@ -357,40 +357,40 @@ def split_diagnostics_fig(splitter, channel=0, save_prefix=None):
     No assumption or correction is made concerning whether the (u,v) distances 
     are projected or deprojected.
     """
-    fig, axes = plt.subplots(nrows=splitter.k, ncols=2, figsize=(6, 10))
+    fig, axes = plt.subplots(nrows=2, ncols=splitter.k, figsize=(10,3))
+
+    cmap_train = mco.ListedColormap(['none', 'black'])
+    cmap_test = mco.ListedColormap(['none', 'red'])
+    
+    kw = {"fontsize":8}
+    image_kw = {"origin":"lower", "interpolation":"none"}
+
+    fig.suptitle('Training data: black, test data: red', **kw)
 
     for ii, (train, test) in enumerate(splitter):
         train_mask = torch2npy(train.ground_mask[channel])
         test_mask = torch2npy(test.ground_mask[channel])
-        vis_ext = train.coords.vis_ext
+        vis_ext = np.array(train.coords.vis_ext) / 1e3
 
-        cmap_train = mco.ListedColormap(['none', 'black'])
-        cmap_test = mco.ListedColormap(['none', 'red'])
+        axes[0, ii].imshow(train_mask, extent=vis_ext, cmap=cmap_train, **image_kw)
+        axes[0, ii].imshow(test_mask, extent=vis_ext, cmap=cmap_test, **image_kw)
+        axes[1, ii].imshow(test_mask, extent=vis_ext, cmap=cmap_test, **image_kw)
 
-        axes[ii, 0].imshow(train_mask, origin="lower", extent=vis_ext, 
-            cmap=cmap_train, interpolation="none")      
-        axes[ii, 0].imshow(test_mask, origin="lower", extent=vis_ext, 
-            cmap=cmap_test, interpolation="none")     
-        axes[ii, 1].imshow(test_mask, origin="lower", extent=vis_ext, 
-            cmap=cmap_test, interpolation="none")            
-
-        axes[ii, 0].set_ylabel("k-fold {:}".format(ii))
-
-    axes[0, 0].set_title("Training set (black)\nTest set (red)")
-    axes[0, 1].set_title("Test set")
+        axes[0, ii].set_title(f"k-fold {ii}", **kw)
 
     for aa in axes.flatten()[:-1]:
+        aa.yaxis.set_ticks_position("both")
         aa.xaxis.set_ticklabels([])
         aa.yaxis.set_ticklabels([])
 
-    ax = axes[-1,1]
-    ax.set_xlabel(r'u [k$\lambda$]')
-    ax.set_ylabel(r'v [k$\lambda$]')
-    ax.yaxis.tick_right()
+    ax = axes[1,-1]
+    ax.set_xlabel(r'u [M$\lambda$]', **kw)
+    ax.set_ylabel(r'v [M$\lambda$]', **kw)
     ax.yaxis.set_ticks_position("both")
-    ax.yaxis.set_label_position("right")    
+    ax.yaxis.tick_right()    
+    ax.yaxis.set_label_position("right") 
 
-    fig.subplots_adjust(left=0.05, hspace=0.0, wspace=0.1, top=0.9, bottom=0.1)
+    fig.subplots_adjust(hspace=0.02, wspace=0, left=0.03, right=0.92, top=0.9, bottom=0.1)
 
     if save_prefix is not None:
         fig.savefig(save_prefix + '_split_diag.png', dpi=300)
@@ -561,6 +561,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
     """
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
 
+    title += f"\nMPoL pixel size {model.coords.cell_size * 1e3:.2f} mas, N_pix {model.coords.npix}"
     if share_cscale:
         title += "\nDirty and clean images use colorscale of MPoL image"
     fig.suptitle(title)
@@ -600,19 +601,19 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
         if clean_fits is not None:
             norm_clean = get_image_cmap_norm(clean_im, stretch='asinh')
     
-    # plot MPoL model image
+    # MPoL model image
     plot_image(mod_im, extent=model.icube.coords.img_ext,
                     ax=axes[0][1], norm=norm_mod, xlab='', ylab='')
 
-    # plot imaged MPoL residual visibilities
+    # imaged MPoL residual visibilities
     plot_image(im_resid, extent=model.icube.coords.img_ext, 
                 ax=axes[1][1], norm=norm_resid, cmap='RdBu_r', xlab='', ylab='')
 
-    # plot dirty image
+    # dirty image
     plot_image(dirty_im, extent=model.icube.coords.img_ext,  
                     ax=axes[0][0], norm=norm_dirty)
     
-    # plot clean image
+    # clean image
     if clean_fits is not None:
         plot_image(clean_im, extent=clean_im_ext, 
                     ax=axes[1][0], norm=norm_clean, xlab='', ylab='')
@@ -649,5 +650,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
         fig.savefig(save_prefix + "_image_comparison.png", dpi=300)
     
     plt.close()
+
+    return fig, axes
 
     return fig, axes

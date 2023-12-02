@@ -14,7 +14,7 @@ from mpol.datasets import Dartboard, GriddedDataset
 from mpol.precomposed import SimpleNet
 from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
-
+from mpol.utils import loglinspace
 
 class CrossValidate:
     r"""
@@ -55,8 +55,11 @@ class CrossValidate:
         diagnostics will be generated.
     kfolds : int, default=5
         Number of k-folds to use in cross-validation
-    split_method : str, default='random_cell'
-        Method to split full dataset into train/test subsets        
+    split_method : str, default='dartboard'
+        Method to split full dataset into train/test subsets
+    dartboard_q_edges, dartboard_phi_edges : list of float, default=None, unit=[klambda]
+        Radial and azimuthal bin edges of the cells used to split the dataset
+        if `split_method`==`dartboard` (see `datasets.Dartboard`)
     split_diag_fig : bool, default=False
         Whether to generate a diagnostic figure of dataset splitting into
         train/test sets.
@@ -78,7 +81,8 @@ class CrossValidate:
                 regularizers={}, epochs=10000, convergence_tol=1e-5, 
                 schedule_factor=0.995,
                 start_dirty_image=False, 
-                train_diag_step=None, kfolds=5, split_method="random_cell", 
+                train_diag_step=None, kfolds=5, split_method="dartboard",
+                dartboard_q_edges=None, dartboard_phi_edges=None,
                 split_diag_fig=False, store_cv_diagnostics=False, 
                 save_prefix=None, verbose=True, device=None, seed=None,
                 ):
@@ -93,6 +97,8 @@ class CrossValidate:
         self._train_diag_step = train_diag_step
         self._kfolds = kfolds
         self._split_method = split_method
+        self._dartboard_q_edges = dartboard_q_edges
+        self._dartboard_phi_edges = dartboard_phi_edges
         self._split_diag_fig = split_diag_fig
         self._store_cv_diagnostics = store_cv_diagnostics
         self._save_prefix = save_prefix
@@ -126,13 +132,33 @@ class CrossValidate:
             )
 
         elif self._split_method == "dartboard":
-            # create a radial and azimuthal partition for the dataset
-            dartboard = Dartboard(coords=self._coords)
+            if self._dartboard_q_edges is None:
+                # create a radial partition for the dataset.
+                # this is the same as the default q_edges in `datasets.Dartboard`,
+                # except that the max baseline is set by (a padding factor times)
+                # the maximum baseline in the dataset, rather than by the largest
+                # baseline in the Fourier plane grid `coords.q_max` (which can
+                # often be a factor of >~2 larger than the longest baseline in
+                # the dataset).
+                stacked_mask = torch.any(dataset.mask, axis=0)
+                stacked_mask = stacked_mask.to('cpu') # TODO: remove
+                qs = dataset.coords.packed_q_centers_2D[stacked_mask]
+                pad_factor = 1.1
+                q_edges = loglinspace(0, qs.max() * pad_factor, N_log=8, M_linear=5)
+
+            dartboard = Dartboard(coords=self._coords, 
+                                  q_edges=q_edges, 
+                                  phi_edges=self._dartboard_phi_edges,
+                                  )
 
             # use 'dartboard' to split full dataset into train/test subsets
             split_iterator = DartboardSplitGridded(
                 dataset, k=self._kfolds, dartboard=dartboard, seed=self._seed
             )
+
+            if self._verbose:
+                logging.info(f"    Max baseline in Fourier grid {self._coords.q_max} klambda")
+                logging.info(f"    Dartboard: baseline bin edges {dartboard.q_edges.tolist()} klambda")
 
         else:
             supported_methods = ["dartboard", "random_cell"]
@@ -295,6 +321,8 @@ class RandomCellSplitGridded:
     Treats `dataset` as a single-channel object with all data in `channel`.
 
     The splitting doesn't select (preserve) Hermitian pairs of visibilities.
+
+    All train splits have the highest 1% of cells by gridded weight
     """
 
     def __init__(self, dataset, k=5, seed=None, channel=0):
@@ -392,6 +420,10 @@ class DartboardSplitGridded:
     >>> ... # do operations with train dataset
     >>> ... # do operations with test dataset
 
+    Notes:
+        All train splits have the cells belonging to the shortest dartboard baseline bin.
+
+        The number of points in the splits is in general not equal.
     """
 
     def __init__(
@@ -422,14 +454,21 @@ class DartboardSplitGridded:
         # create the full cell_list
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
 
-        # partition the cell_list into k pieces
+        # indices of cells in the smallest q bin that also have data
+        small_q_idx = [i for i,l in enumerate(self.cell_list) if l[0] == 0]
+        # cells in the smallest q bin
+        self.small_q = self.cell_list[:len(small_q_idx)]
+
+        # partition the cell_list into k pieces.
         # first, randomly permute the sequence to make sure
-        # we don't get structured radial/azimuthal patterns
+        # we don't get structured radial/azimuthal patterns.
+        # also exclude the cells belonging to the smallest q bin from all splits
+        # (we'll add these only to the training splits, as they're iterated through)
         if seed is not None:
             np.random.seed(seed)
 
         self.k_split_cell_list = np.array_split(
-            np.random.permutation(self.cell_list), k
+            np.random.permutation(self.cell_list[len(small_q_idx):]), k
         )
 
     @classmethod
@@ -465,6 +504,8 @@ class DartboardSplitGridded:
 
             # put the remaining indices back into a full list
             cell_list_train = np.concatenate(k_list)
+            # add the smallest q bin cells into the train list
+            cell_list_train = np.append(cell_list_train, self.small_q, axis=0)
 
             # create the masks for each cell_list
             train_mask = self.dartboard.build_grid_mask_from_cells(cell_list_train)
