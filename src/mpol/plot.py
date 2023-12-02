@@ -511,59 +511,6 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
     return fig, axes
 
 
-def crossval_diagnostics_fig(cv, title="", save_prefix=None):
-    """
-    Figure for model diagnostics of a cross-validation run. Plots: 
-    - loss evolution for each k-fold
-    - cross-validation score per k-fold
-
-    Parameters
-    ----------
-    cv : `mpol.crossval.CrossValidate` object
-        Instance of the `CrossValidate` class produced by a cross-validation loop
-    title : str, default=""
-        Figure super-title
-    save_prefix : string, default = None
-        Prefix for saved figure name. If None, the figure won't be saved
-
-    Returns
-    -------
-    fig : Matplotlib `.Figure` instance
-        The generated figure
-    axes : Matplotlib `~.axes.Axes` class
-        Axes of the generated figure
-    """
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(6,3))
-
-    title += f"\nRegularizers {cv.regularizers}\nSplit method: {cv.split_method}, CV score {cv.score['mean']:.3f} +- {cv.score['std']:.3f}"
-    fig.suptitle(title, fontsize=6)
-
-    axes[0].plot(cv.score['all'], 'k.')
-    axes[0].axhline(y=cv.score['mean'], c='r', ls='--', label=r'$\mu$')
-    axes[0].axhline(y=cv.score['mean'] + cv.score['std'], c='c', ls=':', label=r'$\pm 1 \sigma$')
-    axes[0].axhline(y=cv.score['mean'] - cv.score['std'], c='c', ls=':')
-
-    for i,l in enumerate(cv.diagnostics['loss_histories']):
-        axes[1].loglog(l, label=f"k-fold {i}")
-    
-    axes[0].legend(fontsize=6)
-    axes[0].set_xlabel("k-fold")
-    axes[0].set_ylabel("Score")
-
-    axes[1].legend(fontsize=6)
-    axes[1].set_xlabel("Epoch")
-    axes[1].set_ylabel("Loss")
-    
-    plt.tight_layout()
-
-    if save_prefix is not None:
-        fig.savefig(save_prefix + "_crossval_diagnostics.png", dpi=300)
-    
-    plt.close()
-
-    return fig, axes
-
-
 def image_comparison_fig(model, u, v, V, weights, robust=0.5, 
                          clean_fits=None, share_cscale=False, 
                          xzoom=[None, None], yzoom=[None, None],
@@ -672,7 +619,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                     ax=axes[1][0], norm=norm_clean, xlab='', ylab='')
         
         # add clean beam to plot
-        if any(xzoom) and any(yzoom):
+        if not any(xzoom) and not any(yzoom):
             beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
         else:
             beam_xy = (0.85 * axes[1][0].get_xlim()[1], 0.85 * axes[1][0].get_ylim()[0])
@@ -685,7 +632,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                             )
         axes[1][0].add_artist(beam_ellipse)
 
-    if any(xzoom) and any(yzoom):
+    if not any(xzoom) and not any(yzoom):
         for ii in [0,1]:
             for jj in [0,1]:
                 axes[ii][jj].set_xlim(xzoom[1], xzoom[0])
@@ -693,9 +640,9 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
     axes[0][0].set_title(f"Dirty image (robust {robust})")
     axes[0][1].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
-    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")      
     if clean_fits is not None:
-        axes[1][0].set_title(f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)")  
+        axes[1][0].set_title(f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)")
+    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")    
 
     plt.tight_layout()
 
@@ -706,167 +653,4 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
     return fig, axes
 
-
-def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False, 
-              bin_width=20e3, title="", channel=0, save_prefix=None):
-    """
-    Figure for comparison of 1D projected MPoL model visibilities and observed 
-    visibilities. Plots:
-    - Projected Re(V): observed and MPoL model 
-    - Projected residual Re(V): observed - MPoL model 
-    - Projected Im(V): observed and MPoL model 
-    - Projected residual Im(V): observed - MPoL model 
-
-    Parameters
-    ----------
-    model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
-    u, v : array, unit=[k\lambda]
-        Data u- and v-coordinates
-    V : array, unit=[Jy]
-        Data visibility amplitudes
-    weights : array, unit=[Jy^-2]
-        Data weights        
-    geom : dict
-        Dictionary of source geometry. If passed in, visibiliites will be 
-        deprojected prior to plotting. Keys:
-            "incl" : float, unit=[deg]
-                Inclination 
-            "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
-            "omega" : float, unit=[deg]
-                Argument of periastron
-            "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north.
-            "dDec" : float, unit=[arcsec]
-                Phase center offset in declination.
-    rescale_flux : bool
-        If True, the visibility amplitudes are rescaled to account 
-        for the difference between the inclined (observed) brightness and the 
-        assumed face-on brightness, assuming the emission is optically thick. 
-        The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
-        No rescaling would be appropriate in the optically thin limit.                 
-    bin_width : float, default=20e3
-        Bin size [klambda] for baselines
-    title : str, default=""
-        Figure super-title
-    channel : int, default=0
-        Channel of the model to use to generate figure        
-    save_prefix : string, default = None
-        Prefix for saved figure name. If None, the figure won't be saved
-
-    Returns
-    -------
-    fig : Matplotlib `.Figure` instance
-        The generated figure
-    axes : Matplotlib `~.axes.Axes` class
-        Axes of the generated figure
-
-    Notes
-    -----
-    This routine requires the `frank <https://github.com/discsim/frank>`_ package
-    """
-    from frank.geometry import apply_phase_shift, deproject
-    from frank.utilities import UVDataBinner
-
-    # get MPoL residual and model visibilities
-    Vresid, Vmod = get_vis_residuals(model, u, v, V, return_Vmod=True)
-
-    if geom is not None:    
-        # phase-shift the visibilities
-        V = apply_phase_shift(u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True)
-        Vmod = apply_phase_shift(u * 1e3, v * 1e3, Vmod, geom["dRA"], geom["dDec"], inverse=True)
-        Vresid = apply_phase_shift(u * 1e3, v * 1e3, Vresid, geom["dRA"], geom["dDec"], inverse=True)
-
-        # deproject the (u,v) points
-        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
-        # convert back to [k\lambda]
-        u /= 1e3
-        v /= 1e3
-
-        # if the source is optically thick, rescale the deprojected V(q)
-        if rescale_flux: 
-            V.real /= np.cos(geom["incl"] * np.pi / 180)
-            Vmod.real /= np.cos(geom["incl"] * np.pi / 180)
-            Vresid.real /= np.cos(geom["incl"] * np.pi / 180)
-            weights *= np.cos(geom["incl"] * np.pi / 180) ** 2
-
-    # bin projected observed visibilities
-    # (`UVDataBinner` expects `u`, `v` in [lambda])
-    binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
-
-    # bin projected model and residual visibilities
-    binned_Vmod = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vmod, weights, bin_width)
-    binned_Vresid = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vresid, weights, bin_width)
-
-    # baselines [Mlambda]
-    qq = binned_Vtrue.uv / 1e6
-
-    amax_binVres_re = np.max(abs(binned_Vresid.V.real))
-    amax_binVres_im = np.max(abs(binned_Vresid.V.imag))
-
-    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(10,8))
-
-    if geom is None:
-        title += "\nProjected visibilities"
-    else:
-        title += "\nDeprojected visibilities"
-        if rescale_flux:
-            title += "\nRe(V) and weights rescaled for optically thick source"
-    fig.suptitle(title)
-
-    # *projected* Re(V) -- observed and MPoL model
-    axes[0].plot(qq, binned_Vtrue.V.real * 1e3, 'k.', 
-                    label=f"Obs., {bin_width / 1e3:.2f} k$\\lambda$ bins")
-    axes[0].plot(qq, binned_Vmod.V.real * 1e3, 'r.', 
-                    label='MPoL')
-    axes[0].legend()
-
-    # *projected* Im(V) -- observed and MPoL model
-    axes[2].plot(qq, binned_Vtrue.V.imag * 1e3, 'k.')
-    axes[2].plot(qq, binned_Vmod.V.imag * 1e3, 'r.')
-
-    # *projected* residual Re(V) = observed - MPoL model
-    axes[1].plot(qq, binned_Vresid.V.real * 1e3, '.', c='#33C1FF',
-                    label=f"Mean {np.mean(binned_Vresid.V.real) * 1e3:.1e} mJy")
-    axes[1].legend()
-
-    # *projected* residual Im(V) = observed - MPoL model
-    axes[3].plot(qq, binned_Vresid.V.imag * 1e3, '.', c='#33C1FF',
-                    label=f"Mean {np.mean(binned_Vresid.V.imag) * 1e3:.1e} mJy")
-    axes[3].legend()
-
-    # y-lims on residual plots symmetric about 0
-    axes[1].set_ylim(-amax_binVres_re * 1e3, amax_binVres_re * 1e3)
-    axes[3].set_ylim(-amax_binVres_im * 1e3, amax_binVres_im * 1e3)
-    axes[1].axhline(y=0, ls='--', c='k')
-    axes[3].axhline(y=0, ls='--', c='k')
-
-    for ii in range(4):
-        axes[ii].set_xlim(-0.1, 1.1 * np.max(qq))
-        if ii < 3:
-            axes[ii].xaxis.set_tick_params(labelbottom=False)
-
-    axes[0].set_ylabel('Re(V) [mJy]')
-    axes[1].set_ylabel('Resid. Re(V) [mJy]')            
-    axes[2].set_ylabel('Im(V) [mJy]')
-    axes[3].set_ylabel('Resid. Im(V) [mJy]')
-    axes[3].set_xlabel(r'Baseline [M$\lambda$]')
-
-    plt.tight_layout()
-
-    if save_prefix is not None:
-        if geom is None:
-            suffix = "_projected_"
-        else:
-            suffix = "_deprojected_"
-            if rescale_flux is True:
-                suffix += "rescaled_"
-
-        fig.savefig(save_prefix + suffix + "vis.png", dpi=300)
-    
-    plt.close()
-
     return fig, axes
-    
