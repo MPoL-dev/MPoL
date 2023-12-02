@@ -511,6 +511,38 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
     return fig, axes
 
 
+def crossval_diagnostics_fig(cv, title="", save_prefix=None):
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(6,3))
+
+    title += f"\nRegularizers {cv.regularizers}\nSplit method: {cv.split_method}, CV score {cv.score['mean']:.3f} +- {cv.score['std']:.3f}"
+    fig.suptitle(title, fontsize=6)
+
+    axes[0].plot(cv.score['all'], 'k.')
+    axes[0].axhline(y=cv.score['mean'], c='r', ls='--', label=r'$\mu$')
+    axes[0].axhline(y=cv.score['mean'] + cv.score['std'], c='c', ls=':', label=r'$\pm 1 \sigma$')
+    axes[0].axhline(y=cv.score['mean'] - cv.score['std'], c='c', ls=':')
+
+    for i,l in enumerate(cv.diagnostics['loss_histories']):
+        axes[1].loglog(l, label=f"k-fold {i}")
+    
+    axes[0].legend(fontsize=6)
+    axes[0].set_xlabel("k-fold")
+    axes[0].set_ylabel("Score")
+
+    axes[1].legend(fontsize=6)
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("Loss")
+    
+    plt.tight_layout()
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + "_crossval_diagnostics.png", dpi=300)
+    
+    plt.close()
+
+    return fig, axes
+
+
 def image_comparison_fig(model, u, v, V, weights, robust=0.5, 
                          clean_fits=None, share_cscale=False, 
                          xzoom=[None, None], yzoom=[None, None],
