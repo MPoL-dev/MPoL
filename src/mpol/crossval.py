@@ -256,13 +256,13 @@ class CrossValidate:
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
-        cv_score = {
+        self._cv_score = {
             "mean": np.mean(all_scores),
             "std": np.std(all_scores),
             "all": all_scores,
         }
         
-        return cv_score
+        return self._cv_score
     
     @property
     def model(self):
@@ -273,6 +273,11 @@ class CrossValidate:
     def regularizers(self):
         """For the most recent kfold, dict containing regularizers used and their strengths"""
         return self._regularizers
+
+    @property
+    def score(self):
+        """Dict containing cross-val scores for all k-folds, and mean and standard deviation of these"""
+        return self._cv_score
 
     @property
     def train_figure(self):
