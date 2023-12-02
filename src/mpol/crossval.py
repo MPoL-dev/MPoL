@@ -280,6 +280,11 @@ class CrossValidate:
         return self._cv_score
 
     @property
+    def split_method(self):
+        """String of the method used to split the dataset into train/test sets"""
+        return self._split_method
+    
+    @property
     def train_figure(self):
         """For the most recent kfold, (fig, axes) showing training progress"""
         return self._train_figure
