@@ -252,7 +252,7 @@ class CrossValidate:
                 self._diagnostics["models"].append(self._model)
                 self._diagnostics["regularizers"].append(self._regularizers)
                 self._diagnostics["loss_histories"].append(loss_history)                
-                self._diagnostics["train_figures"].append(self._train_figure)
+                # self._diagnostics["train_figures"].append(self._train_figure)
 
         # average individual test scores to get the cross-val metric for chosen
         # hyperparameters
@@ -296,7 +296,7 @@ class CrossValidate:
     
     @property
     def diagnostics(self):
-        """Dict containing diagnostics of the cross-validation loop across all kfolds: models, regularizers, loss values, training figures"""
+        """Dict containing diagnostics of the cross-validation loop across all kfolds: models, regularizers, loss values"""
         return self._diagnostics
 
 
@@ -510,7 +510,14 @@ class DartboardSplitGridded:
     def __next__(self) -> tuple[GriddedDataset, GriddedDataset]:
         if self.n < self.k:
             k_list = self.k_split_cell_list.copy()
-            cell_list_test = k_list.pop(self.n)
+            if self.k == 1:
+                # number of cells ~equal to 20% of full cell list
+                ntest = round(0.2 * len(k_list[0]))
+                cell_list_test = k_list[0][:ntest]
+                # remove cells place in test set from train set
+                k_list[0] = np.delete(k_list[0], range(ntest), axis=0)
+            else:
+                cell_list_test = k_list.pop(self.n)
 
             # put the remaining indices back into a full list
             cell_list_train = np.concatenate(k_list)
