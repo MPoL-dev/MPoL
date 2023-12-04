@@ -8,6 +8,7 @@ from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.fourier import get_vis_residuals
 from mpol.gridding import DirtyImager
+from mpol.onedim import radialI, radialV
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 from mpol.input_output import ProcessFitsImage
 
@@ -728,7 +729,7 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     weights : array, unit=[Jy^-2]
         Data weights        
     geom : dict
-        Dictionary of source geometry. If passed in, visibiliites will be 
+        Dictionary of source geometry. If passed in, visibilities will be 
         deprojected prior to plotting. Keys:
             "incl" : float, unit=[deg]
                 Inclination 
@@ -864,7 +865,12 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
             if rescale_flux is True:
                 suffix += "rescaled_"
 
-        fig.savefig(save_prefix + suffix + "vis.png", dpi=300)
+        fig.savefig(save_prefix + suffix + "visibilities.png", dpi=300)
+
+    plt.close()
+
+    return fig, axes
+    
     
     plt.close()
 
