@@ -111,6 +111,9 @@ class CrossValidate:
         # used to collect objects across all kfolds
         self._diagnostics = None
 
+        if self._verbose:
+            logging.info("\nCross-validation")
+
     def split_dataset(self, dataset):
         r"""
         Split a dataset into training and test subsets.
@@ -157,8 +160,8 @@ class CrossValidate:
             )
 
             if self._verbose:
-                logging.info(f"    Max baseline in Fourier grid {self._coords.q_max} klambda")
-                logging.info(f"    Dartboard: baseline bin edges {dartboard.q_edges.tolist()} klambda")
+                logging.info(f"  Max baseline in Fourier grid {self._coords.q_max:.0f} klambda")
+                logging.info(f"    Dartboard: baseline bin edges {dartboard.q_edges.tolist():.0f} klambda")
 
         else:
             supported_methods = ["dartboard", "random_cell"]
@@ -195,9 +198,7 @@ class CrossValidate:
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
             if self._verbose:
-                logging.info(
-                    "\nCross-validation: k-fold {} of {}".format(kk, self._kfolds - 1)
-                )
+                logging.info("\n  k-fold {} of {}".format(kk, self._kfolds - 1))
 
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
