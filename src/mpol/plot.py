@@ -875,6 +875,27 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
 def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None, 
                rescale_flux=False, bin_width=20e3, title="", channel=0, 
                save_prefix=None):
+    if not any(x is None for x in [u, v, V, weights]):
+        from frank.geometry import apply_phase_shift, deproject
+        from frank.utilities import UVDataBinner
+
+        # phase-shift the observed visibilities
+        V = apply_phase_shift(u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True)
+
+        # deproject the observed (u,v) points
+        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
+        # convert back to [k\lambda]
+        u /= 1e3
+        v /= 1e3
+
+        # if the source is optically thick, rescale the deprojected V(q)
+        if rescale_flux: 
+            V.real /= np.cos(geom["incl"] * np.pi / 180)
+            weights *= np.cos(geom["incl"] * np.pi / 180) ** 2
+
+        # bin observed visibilities
+        # (`UVDataBinner` expects `u`, `v` in [lambda])
+        binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
 
     # model radial image profile
     rs, Is = radialI(model.icube, geom)
