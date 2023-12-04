@@ -877,8 +877,8 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     
 
 def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None, 
-               rescale_flux=False, bin_width=20e3, title="", channel=0, 
-               save_prefix=None):
+               rescale_flux=False, bin_width=20e3, q_logx=True, title="", 
+               channel=0, save_prefix=None):
     """
     Figure for analysis of 1D (radial) brightness profile of MPoL model image,
     using a user-supplied geometry. Plots:
@@ -922,6 +922,8 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
         No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] in which to bin observed visibility points
+    q_logx : bool, default=True
+        Whether to plot visibilities in log-baseline
     title : str, default=""
         Figure super-title
     channel : int, default=0
@@ -1005,11 +1007,13 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
     axes[3].plot(q_mod / 1e3, V_mod.imag * 1e3, 'r.-')
 
     for ii in [1,3]:
+        if q_logx:
+            axes[ii].set_xscale('log')
         if not any(x is None for x in [u, v]):
             q_obs = np.hypot(u, v)
-            axes[ii].set_xlim(-0.1, 1.1 * np.max(q_obs) / 1e3)
+            axes[ii].set_xlim(right=1.1 * np.max(q_obs) / 1e3)
         else:
-            axes[ii].set_xlim(-0.1, 1.1 * np.max(q_mod) / 1e3)
+            axes[ii].set_xlim(right=1.1 * np.max(q_mod) / 1e3)
 
     axes[0].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
     axes[2].set_ylabel(r'I [Jy / arcsec$^2$]')
