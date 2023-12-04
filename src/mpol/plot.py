@@ -876,12 +876,13 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
                rescale_flux=False, bin_width=20e3, title="", channel=0, 
                save_prefix=None):
     """
-    Figure for comparison of 1D projected MPoL model visibilities and observed 
-    visibilities. Plots:
-    - Projected Re(V): observed and MPoL model 
-    - Projected residual Re(V): observed - MPoL model 
-    - Projected Im(V): observed and MPoL model 
-    - Projected residual Im(V): observed - MPoL model 
+    Figure for analysis of 1D (radial) brightness profile of MPoL model image,
+    using a user-supplied geometry. Plots:
+    - MPoL model image
+    - 1D (radial) brightness profile extracted from MPoL image 
+      (supply `dist` to show second x-axis in [AU])
+    - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
+    - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
 
     Parameters
     ----------
