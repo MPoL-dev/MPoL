@@ -97,7 +97,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination
     rescale_flux : bool
-        If True, the visibility amplitudes and weights are rescaled to account 
+        If True, the visibility amplitudes are rescaled to account 
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
         The source's integrated (2D) flux is assumed to be:
@@ -127,7 +127,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     uu, vv = fcube.coords.sky_u_centers_2D, fcube.coords.sky_v_centers_2D
 
     # visibilities 
-    V = torch2npy(fcube.ground_cube[chan]).ravel()
+    V = torch2npy(fcube.ground_vis[chan]).ravel()
 
     # phase-shift the visibilities
     Vp = apply_phase_shift(uu.ravel() * 1e3, vv.ravel() * 1e3, V, geom["dRA"], 
