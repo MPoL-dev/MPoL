@@ -29,4 +29,4 @@ def test_image_comparison_fig(coords, tmp_path):
                             xzoom=[-2, 2], yzoom=[-2, 2],
                             title="test",
                             save_prefix=None,                            
-                            )    
+                            )

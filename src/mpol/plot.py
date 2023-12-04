@@ -8,6 +8,7 @@ from astropy.visualization.mpl_normalize import simple_norm
 
 from mpol.fourier import get_vis_residuals
 from mpol.gridding import DirtyImager
+from mpol.onedim import radialI, radialV
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
 from mpol.input_output import ProcessFitsImage
 
@@ -708,14 +709,14 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
 
 def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False, 
-              bin_width=20e3, title="", channel=0, save_prefix=None):
+              bin_width=20e3, q_logx=True, title="", channel=0, save_prefix=None):
     """
     Figure for comparison of 1D projected MPoL model visibilities and observed 
     visibilities. Plots:
-    - Projected Re(V): observed and MPoL model 
-    - Projected residual Re(V): observed - MPoL model 
-    - Projected Im(V): observed and MPoL model 
-    - Projected residual Im(V): observed - MPoL model 
+    - Re(V): observed and MPoL model (projected unless `geom` is supplied)
+    - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)
+    - Im(V): observed and MPoL model (projected unless `geom` is supplied)
+    - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)
 
     Parameters
     ----------
@@ -728,7 +729,7 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     weights : array, unit=[Jy^-2]
         Data weights        
     geom : dict
-        Dictionary of source geometry. If passed in, visibiliites will be 
+        Dictionary of source geometry. If passed in, visibilities will be 
         deprojected prior to plotting. Keys:
             "incl" : float, unit=[deg]
                 Inclination 
@@ -749,6 +750,8 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
         No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] for baselines
+    q_logx : bool, default=True
+        Whether to plot visibilities in log-baseline
     title : str, default=""
         Figure super-title
     channel : int, default=0
@@ -844,7 +847,9 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     axes[3].axhline(y=0, ls='--', c='k')
 
     for ii in range(4):
-        axes[ii].set_xlim(-0.1, 1.1 * np.max(qq))
+        axes[ii].set_xlim(0.9 * np.min(qq), 1.1 * np.max(qq))
+        if q_logx:
+            axes[ii].set_xscale('log')
         if ii < 3:
             axes[ii].xaxis.set_tick_params(labelbottom=False)
 
@@ -864,7 +869,171 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
             if rescale_flux is True:
                 suffix += "rescaled_"
 
-        fig.savefig(save_prefix + suffix + "vis.png", dpi=300)
+        fig.savefig(save_prefix + suffix + "visibilities.png", dpi=300)
+
+    plt.close()
+
+    return fig, axes
+    
+
+def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None, 
+               rescale_flux=False, bin_width=20e3, q_logx=True, title="", 
+               channel=0, save_prefix=None):
+    """
+    Figure for analysis of 1D (radial) brightness profile of MPoL model image,
+    using a user-supplied geometry. Plots:
+    - MPoL model image
+    - 1D (radial) brightness profile extracted from MPoL image 
+      (supply `dist` to show second x-axis in [AU])
+    - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
+    - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
+
+    Parameters
+    ----------
+    model : `torch.nn.Module` object
+        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+    geom : dict
+        Dictionary of source geometry. Used to deproject image and visibilities.
+        Keys:
+            "incl" : float, unit=[deg]
+                Inclination 
+            "Omega" : float, unit=[deg]
+                Position angle of the ascending node 
+            "omega" : float, unit=[deg]
+                Argument of periastron
+            "dRA" : float, unit=[arcsec]
+                Phase center offset in right ascension. Positive is west of north.
+            "dDec" : float, unit=[arcsec]
+                Phase center offset in declination.
+    u, v : array, optional, unit=[k\lambda], default=None
+        Data u- and v-coordinates
+    V : array, optional, unit=[Jy], default=None
+        Data visibility amplitudes
+    weights : array, optional, unit=[Jy^-2], default=None
+        Data weights        
+    dist : float, optional, unit = [AU], default = None
+        Distance to source, used to show second x-axis for I(r) in [AU]                  
+    rescale_flux : bool
+        If True, the visibility amplitudes are rescaled to account 
+        for the difference between the inclined (observed) brightness and the 
+        assumed face-on brightness, assuming the emission is optically thick. 
+        The source's integrated (2D) flux is assumed to be:
+            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit.                 
+    bin_width : float, default=20e3
+        Bin size [klambda] in which to bin observed visibility points
+    q_logx : bool, default=True
+        Whether to plot visibilities in log-baseline
+    title : str, default=""
+        Figure super-title
+    channel : int, default=0
+        Channel of the model to use to generate figure        
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    axes : Matplotlib `~.axes.Axes` class
+        Axes of the generated figure
+
+    Notes
+    -----
+    This routine requires the `frank <https://github.com/discsim/frank>`_ package
+    """
+    if not any(x is None for x in [u, v, V, weights]):
+        from frank.geometry import apply_phase_shift, deproject
+        from frank.utilities import UVDataBinner
+
+        # phase-shift the observed visibilities
+        V = apply_phase_shift(u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True)
+
+        # deproject the observed (u,v) points
+        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
+        # convert back to [k\lambda]
+        u /= 1e3
+        v /= 1e3
+
+        # if the source is optically thick, rescale the deprojected V(q)
+        if rescale_flux: 
+            V.real /= np.cos(geom["incl"] * np.pi / 180)
+            weights *= np.cos(geom["incl"] * np.pi / 180) ** 2
+
+        # bin observed visibilities
+        # (`UVDataBinner` expects `u`, `v` in [lambda])
+        binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
+
+    # model radial image profile
+    rs, Is = radialI(model.icube, geom)
+
+    # model radial visibility profile
+    q_mod, V_mod = radialV(model.fcube, geom, rescale_flux=rescale_flux)
+
+    # MPoL model image
+    mod_im = torch2npy(model.icube.sky_cube[channel])
+    total_flux = model.coords.cell_size ** 2 * np.sum(mod_im)
+
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
+    axes = axes.ravel()
+
+    title += f"\nGeometry (units: deg, arcsec):\n{geom}"
+    fig.suptitle(title)
+
+    # MPoL model image
+    norm_mod = get_image_cmap_norm(mod_im, stretch='asinh')    
+    plot_image(mod_im, extent=model.icube.coords.img_ext, ax=axes[0], norm=norm_mod)
+    
+    # MPoL model I(r_arcsec)
+    axes[2].plot(rs, Is, 'r-', label='MPoL')
+    axes[2].legend()
+
+    # I(r_AU) 
+    if dist is not None:
+        ax2top = axes[2].twiny()
+        ax2top.plot(rs * dist, Is, 'r-')
+
+    # Re(V) -- observed and MPoL model
+    if not any(x is None for x in [u, v, V, weights]):
+        axes[1].plot(binned_Vtrue.uv / 1e6, binned_Vtrue.V.real * 1e3, 'k.', 
+                    label=f"Obs., {bin_width / 1e3:.2f} k$\\lambda$ bins")
+    axes[1].plot(q_mod / 1e3, V_mod.real * 1e3, 'r.-', label='MPoL')
+    axes[1].legend()
+
+    # Im(V) -- observed and MPoL model
+    if not any(x is None for x in [u, v, V, weights]):
+        axes[3].plot(binned_Vtrue.uv / 1e6, binned_Vtrue.V.imag * 1e3, 'k.')
+    axes[3].plot(q_mod / 1e3, V_mod.imag * 1e3, 'r.-')
+
+    for ii in [1,3]:
+        if q_logx:
+            axes[ii].set_xscale('log')
+        if not any(x is None for x in [u, v]):
+            q_obs = np.hypot(u, v)
+            axes[ii].set_xlim(right=1.1 * np.max(q_obs) / 1e3)
+        else:
+            axes[ii].set_xlim(right=1.1 * np.max(q_mod) / 1e3)
+
+    axes[0].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
+    axes[2].set_ylabel(r'I [Jy / arcsec$^2$]')
+    axes[2].set_xlabel(r'r [arcsec]')
+    if dist is not None:
+        ax2top.spines['top'].set_color('#1A9E46')
+        ax2top.tick_params(axis='x', which='both', colors='#1A9E46')
+        ax2top.set_xlabel('r [AU]', color='#1A9E46')
+        xlims = axes[2].get_xlim()
+        ax2top.set_xlim(np.multiply(xlims, dist))
+        
+    axes[1].xaxis.set_tick_params(labelbottom=False)
+    axes[1].set_ylabel('Re(V) [mJy]')
+    axes[3].set_ylabel('Im(V) [mJy]')
+    axes[3].set_xlabel(r'Baseline [M$\lambda$]')
+
+    plt.tight_layout()
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + "_radial_profiles.png", dpi=300)
     
     plt.close()
 

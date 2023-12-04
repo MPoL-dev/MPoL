@@ -157,29 +157,40 @@ def mock_1d_image_model(mock_1d_archive):
 @pytest.fixture
 def mock_1d_vis_model(mock_1d_archive):
     m = mock_1d_archive
-    Vtrue = m['vis']
-    Vtrue_dep = m['vis_dep']
-    q_dep = m['baselines_dep']
+    i2dtrue = m['i2dtrue']
+    xmax = m['xmax']
     geom = m['geometry']
     geom = geom[()]
 
-    xmax = m['xmax']
-    i2dtrue = m['i2dtrue']
+    Vtrue = m['vis']
+    Vtrue_dep = m['vis_dep']
+    q_dep = m['baselines_dep']
 
-    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0],
+    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
                                     npix=i2dtrue.shape[0])
+    
+    # the center of the array is already at the center of the image -->
+    # undo this as expected by input to ImageCube
+    i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
 
-    # create a FourierCube
-    packed_cube = np.broadcast_to(Vtrue, (1, len(Vtrue))).copy()
+    # pack the numpy image array into an ImageCube
+    packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
     packed_tensor = torch.from_numpy(packed_cube)
-    cube_true = fourier.FourierCube(coords=coords)
+    cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
+    
+    # create a FourierCube
+    fcube_true = fourier.FourierCube(coords=coords)    
 
+    # take FT of icube to populate fcube
+    fcube_true.forward(cube_true.sky_cube)
+    
     # insert the vis tensor into the FourierCube ('vis' would typically be 
     # populated by taking the FFT of an image)
-    cube_true.ground_cube = packed_tensor
+    # packed_fcube = np.broadcast_to(Vtrue, (1, len(Vtrue))).copy()
+    # packed_ftensor = torch.from_numpy(packed_cube)    
+    # fcube_true.ground_cube = packed_tensor
 
-    return cube_true, Vtrue_dep, q_dep, geom
-
+    return fcube_true, Vtrue_dep, q_dep, geom
 
 
 @pytest.fixture
