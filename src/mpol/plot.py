@@ -709,7 +709,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
 
 def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False, 
-              bin_width=20e3, title="", channel=0, save_prefix=None):
+              bin_width=20e3, q_logx=True, title="", channel=0, save_prefix=None):
     """
     Figure for comparison of 1D projected MPoL model visibilities and observed 
     visibilities. Plots:
@@ -750,6 +750,8 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
         No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] for baselines
+    q_logx : bool, default=True
+        Whether to plot visibilities in log-baseline
     title : str, default=""
         Figure super-title
     channel : int, default=0
@@ -845,7 +847,9 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     axes[3].axhline(y=0, ls='--', c='k')
 
     for ii in range(4):
-        axes[ii].set_xlim(-0.1, 1.1 * np.max(qq))
+        axes[ii].set_xlim(0.9 * np.min(qq), 1.1 * np.max(qq))
+        if q_logx:
+            axes[ii].set_xscale('log')
         if ii < 3:
             axes[ii].xaxis.set_tick_params(labelbottom=False)
 
