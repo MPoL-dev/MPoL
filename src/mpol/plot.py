@@ -871,7 +871,20 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
 
     return fig, axes
     
-    
+
+def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None, 
+               rescale_flux=False, bin_width=20e3, title="", channel=0, 
+               save_prefix=None):
+
+    # model radial image profile
+    rs, Is = radialI(model.icube, geom)
+
+    # model radial visibility profile
+    q_mod, V_mod = radialV(model.fcube, geom, rescale_flux=rescale_flux)
+
+    # MPoL model image
+    mod_im = torch2npy(model.icube.sky_cube[channel])
+    total_flux = model.coords.cell_size ** 2 * np.sum(mod_im)
     plt.close()
 
     return fig, axes
