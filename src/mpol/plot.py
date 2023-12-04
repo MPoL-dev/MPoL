@@ -164,6 +164,26 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
     return im, cbar
 
 
+def uv_dist_fig(u, v, V, cmap="inferno", title="", save_prefix=None):
+
+    fig, ax = plt.subplots()    
+    fig.suptitle(title)
+
+    scat = plt.scatter(u / 1e3, v / 1e3, s=0.1, marker='.', c=V.real * 1e3, 
+                       cmap=cmap, rasterized=True)
+    cbar = plt.colorbar(scat, ax=ax, location="right", pad=0.1)
+
+    cbar.set_label("Re(V) [mJy]")
+
+    ax.set_xlabel(r'u [M$\lambda$]')
+    ax.set_ylabel(r'v [M$\lambda$]')
+    
+    if save_prefix is not None:
+        fig.savefig(save_prefix + '_uv_dist.png', dpi=300)
+    
+    plt.close()
+
+    return fig, ax
 def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
     phi_edges=None, q_edges1d=None, show_datapoints=False, save_prefix=None):
     r"""
