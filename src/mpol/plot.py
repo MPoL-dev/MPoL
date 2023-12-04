@@ -713,10 +713,10 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
     """
     Figure for comparison of 1D projected MPoL model visibilities and observed 
     visibilities. Plots:
-    - Projected Re(V): observed and MPoL model 
-    - Projected residual Re(V): observed - MPoL model 
-    - Projected Im(V): observed and MPoL model 
-    - Projected residual Im(V): observed - MPoL model 
+    - Re(V): observed and MPoL model (projected unless `geom` is supplied)
+    - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)
+    - Im(V): observed and MPoL model (projected unless `geom` is supplied)
+    - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)
 
     Parameters
     ----------
