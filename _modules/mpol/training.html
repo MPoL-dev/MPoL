@@ -552,7 +552,7 @@ document.write(`
 
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="nb">print</span><span class="p">(</span>
                     <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">  Training: epoch </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">),</span>
                     <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                     <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
