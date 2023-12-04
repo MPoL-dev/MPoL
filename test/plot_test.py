@@ -28,7 +28,5 @@ def test_image_comparison_fig(coords, tmp_path):
                             share_cscale=False, 
                             xzoom=[-2, 2], yzoom=[-2, 2],
                             title="test",
-                            save_prefix=tmp_path,                            
-                            )    
-    
-                            )    
+                            save_prefix=None,                            
+                            )
