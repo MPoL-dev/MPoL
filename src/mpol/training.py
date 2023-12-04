@@ -261,7 +261,7 @@ class TrainTest:
 
         while not self.loss_convergence(np.array(losses)) and count <= self._epochs:
             if self._verbose:
-                logging.info(
+                print(
                     "\r  Training: epoch {} of {}".format(count, self._epochs),
                     end="",
                     flush=True,
