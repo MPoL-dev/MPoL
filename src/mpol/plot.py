@@ -165,6 +165,30 @@ def plot_image(image, extent, cmap="inferno", norm=None, ax=None,
 
 
 def uv_dist_fig(u, v, V, cmap="inferno", title="", save_prefix=None):
+    """
+    Figure showing the (u,v) distribution of a dataset, with points colored by
+    the Re(V) amplitude.
+
+    Parameters
+    ----------
+    u, v : array, optional, unit=[k\lambda], default=None
+        Data u- and v-coordinates
+    V : array, optional, unit=[Jy], default=None
+        Data visibility amplitudes
+    cmap : str, default="inferno"
+        Colormap
+    title : str, default=""
+        Figure super-title
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : Matplotlib `.Figure` instance
+        The generated figure
+    ax : Matplotlib `~.axes.Axes` class
+        Axis of the generated figure
+    """
 
     fig, ax = plt.subplots()    
     fig.suptitle(title)
@@ -184,6 +208,8 @@ def uv_dist_fig(u, v, V, cmap="inferno", title="", save_prefix=None):
     plt.close()
 
     return fig, ax
+    
+
 def vis_histogram_fig(dataset, bin_quantity='count', bin_label=None, q_edges=None, 
     phi_edges=None, q_edges1d=None, show_datapoints=False, save_prefix=None):
     r"""
