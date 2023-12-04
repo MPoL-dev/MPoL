@@ -906,6 +906,66 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
     # MPoL model image
     mod_im = torch2npy(model.icube.sky_cube[channel])
     total_flux = model.coords.cell_size ** 2 * np.sum(mod_im)
+
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
+    axes = axes.ravel()
+
+    title += f"\nGeometry (units: deg, arcsec):\n{geom}"
+    fig.suptitle(title)
+
+    # MPoL model image
+    norm_mod = get_image_cmap_norm(mod_im, stretch='asinh')    
+    plot_image(mod_im, extent=model.icube.coords.img_ext, ax=axes[0], norm=norm_mod)
+    
+    # MPoL model I(r_arcsec)
+    axes[2].plot(rs, Is, 'r-', label='MPoL')
+    axes[2].legend()
+
+    # I(r_AU) 
+    if dist is not None:
+        ax2top = axes[2].twiny()
+        ax2top.plot(rs * dist, Is, 'r-')
+
+    # Re(V) -- observed and MPoL model
+    if not any(x is None for x in [u, v, V, weights]):
+        axes[1].plot(binned_Vtrue.uv / 1e6, binned_Vtrue.V.real * 1e3, 'k.', 
+                    label=f"Obs., {bin_width / 1e3:.2f} k$\\lambda$ bins")
+    axes[1].plot(q_mod / 1e3, V_mod.real * 1e3, 'r.-', label='MPoL')
+    axes[1].legend()
+
+    # Im(V) -- observed and MPoL model
+    if not any(x is None for x in [u, v, V, weights]):
+        axes[3].plot(binned_Vtrue.uv / 1e6, binned_Vtrue.V.imag * 1e3, 'k.')
+    axes[3].plot(q_mod / 1e3, V_mod.imag * 1e3, 'r.-')
+
+    for ii in [1,3]:
+        if not any(x is None for x in [u, v]):
+            q_obs = np.hypot(u, v)
+            axes[ii].set_xlim(-0.1, 1.1 * np.max(q_obs) / 1e3)
+        else:
+            axes[ii].set_xlim(-0.1, 1.1 * np.max(q_mod) / 1e3)
+
+    axes[0].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
+    axes[2].set_ylabel(r'I [Jy / arcsec$^2$]')
+    axes[2].set_xlabel(r'r [arcsec]')
+    if dist is not None:
+        ax2top.spines['top'].set_color('#1A9E46')
+        ax2top.tick_params(axis='x', which='both', colors='#1A9E46')
+        ax2top.set_xlabel('r [AU]', color='#1A9E46')
+        xlims = axes[2].get_xlim()
+        ax2top.set_xlim(np.multiply(xlims, dist))
+        
+    axes[1].xaxis.set_tick_params(labelbottom=False)
+    axes[1].set_ylabel('Re(V) [mJy]')
+    axes[3].set_ylabel('Im(V) [mJy]')
+    axes[3].set_xlabel(r'Baseline [M$\lambda$]')
+
+    plt.tight_layout()
+
+    if save_prefix is not None:
+        fig.savefig(save_prefix + "_radial_profiles.png", dpi=300)
+    
     plt.close()
 
     return fig, axes
