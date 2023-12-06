@@ -22,6 +22,27 @@ def test_crossvalclass_split_dartboard(coords, imager, dataset, generic_paramete
     cross_validator.split_dataset(dataset)
 
 
+def test_crossvalclass_split_dartboard_1kfold(coords, imager, dataset, generic_parameters):
+    # using the CrossValidate class, split a dataset into train/test subsets 
+    # using 'dartboard' splitter with only 1 k-fold; check that the train set
+    # has ~80% of the model visibilities
+
+    crossval_pars = generic_parameters["crossval_pars"]
+    crossval_pars["split_method"] = "dartboard"
+    crossval_pars['kfolds'] = 1
+
+    cross_validator = CrossValidate(coords, imager, **crossval_pars)
+    split_iterator = cross_validator.split_dataset(dataset)
+
+    for (train_set, test_set) in split_iterator:
+        ntrain = len(train_set.vis_indexed)
+        ntest = len(test_set.vis_indexed)
+    
+    ratio = ntrain / (ntrain + ntest)
+
+    np.testing.assert_allclose(ratio, 0.8, atol=0.05)
+
+
 def test_crossvalclass_split_randomcell(coords, imager, dataset, generic_parameters):
     # using the CrossValidate class, split a dataset into train/test subsets 
     # using 'random_cell' splitter
