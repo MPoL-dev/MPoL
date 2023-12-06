@@ -12,7 +12,7 @@ Documentation and installation instructions: [https://mpol-dev.github.io/MPoL/](
 
 ## Citation
 
-If you use this package or derivatives of it, please cite
+If you use this package or derivatives of it, please cite the following two references:
 
     @software{mpol,
     author       = {Ian Czekala and
@@ -33,6 +33,27 @@ If you use this package or derivatives of it, please cite
     version      = {v0.2.0},
     doi          = {10.5281/zenodo.3594081},
     url          = {https://doi.org/10.5281/zenodo.3594081}
+    }
+
+and 
+
+    @ARTICLE{2023PASP..135f4503Z,
+        author = {{Zawadzki}, Brianna and {Czekala}, Ian and {Loomis}, Ryan A. and {Quinn}, Tyler and {Grzybowski}, Hannah and {Frazier}, Robert C. and {Jennings}, Jeff and {Nizam}, Kadri M. and {Jian}, Yina},
+            title = "{Regularized Maximum Likelihood Image Synthesis and Validation for ALMA Continuum Observations of Protoplanetary Disks}",
+        journal = {\pasp},
+        keywords = {Protoplanetary disks, Submillimeter astronomy, Radio interferometry, Deconvolution, Open source software, 1300, 1647, 1346, 1910, 1866, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics},
+            year = 2023,
+            month = jun,
+        volume = {135},
+        number = {1048},
+            eid = {064503},
+            pages = {064503},
+            doi = {10.1088/1538-3873/acdf84},
+    archivePrefix = {arXiv},
+        eprint = {2209.11813},
+    primaryClass = {astro-ph.EP},
+        adsurl = {https://ui.adsabs.harvard.edu/abs/2023PASP..135f4503Z},
+        adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
 
 ---
