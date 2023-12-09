@@ -597,21 +597,39 @@ class DirtyImager(GridderBase):
         # make sure we still fit into the grid
         self.coords.check_data_fit(uu, vv)
 
-        # expand the vectors to include complex conjugates
-        uu_full = np.concatenate([uu, -uu], axis=1)
-        vv_full = np.concatenate([vv, -vv], axis=1)
+        # initialize base objects 
+        # Hermitian conjugates taken care of by @property below
+        self.uu_base = uu
+        self.vv_base = vv
+        self.weight_base = weight
+        self.data_re_base = data_re
+        self.data_im_base = data_im
 
         # make sure we still fit into the grid (with expansion)
-        self.coords.check_data_fit(uu_full, vv_full)
-
-        self.uu = uu_full
-        self.vv = vv_full
-        self.weight = np.concatenate([weight, weight], axis=1)
-        self.data_re = np.concatenate([data_re, data_re], axis=1)
-        self.data_im = np.concatenate([data_im, -data_im], axis=1)
+        self.coords.check_data_fit(self.uu, self.vv)
 
         # and register cell indices against data
         self._create_cell_indices()
+
+    @property
+    def uu(self):
+        return np.concatenate([self.uu_base, -self.uu_base], axis=1)
+
+    @property
+    def vv(self):
+        return np.concatenate([self.vv_base, -self.vv_base], axis=1)
+
+    @property
+    def weight(self):
+        return np.concatenate([self.weight_base, self.weight_base], axis=1)
+
+    @property
+    def data_re(self):
+        return np.concatenate([self.data_re_base, self.data_re_base], axis=1)
+
+    @property
+    def data_im(self):
+        return np.concatenate([self.data_im_base, -self.data_im_base], axis=1)
 
     def _grid_visibilities(
         self,
