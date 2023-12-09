@@ -248,7 +248,7 @@ class NuFFT(nn.Module):
         cell_size: float,
         npix: int,
         nchan: int = 1,
-    ) -> NuFFT:
+    ):
         """
         Instantiate a :class:`mpol.fourier.NuFFT` object from image properties rather than a :meth:`mpol.coordinates.GridCoords` instance.
 
@@ -464,9 +464,7 @@ class NuFFT(nn.Module):
             )
 
         else:
-            output: torch.Tensor = self.coords.cell_size**2 * self.nufft_ob(
-                expanded, k_traj
-            )
+            output = self.coords.cell_size**2 * self.nufft_ob(expanded, k_traj)
 
         # squeezed shape: [nchan, npix, npix]
         output = torch.squeeze(output, dim=altered_dimension)
@@ -554,17 +552,17 @@ class NuFFTCached(NuFFT):
     @classmethod
     def from_image_properties(
         cls,
-        cell_size: float,
-        npix: int,
-        uu: NDArray[floating[Any]],
-        vv: NDArray[floating[Any]],
-        nchan: int = 1,
-        sparse_matrices: bool = True,
-    ) -> NuFFT:
+        cell_size,
+        npix,
+        uu,
+        vv,
+        nchan= 1,
+        sparse_matrices= True,
+    ):
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, nchan, sparse_matrices)
 
-    def forward(self, cube: torch.Tensor) -> torch.Tensor:
+    def forward(self, cube):
         r"""
         Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as set by the shape of the ``uu`` and ``vv`` points.
 
@@ -650,7 +648,7 @@ def make_fake_data(
 
     # instantiate a NuFFT object based on the ImageCube
     # OK if uu shape (nvis,)
-    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan, uu=uu, vv=vv)
+    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan)
 
     # make into a multi-channel dataset, even if only a single-channel provided
     if uu.ndim == 1:
@@ -660,7 +658,7 @@ def make_fake_data(
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
     vis_noiseless: NDArray[complexfloating[Any, Any]]
-    vis_noiseless = nufft(image_cube()).detach().numpy()
+    vis_noiseless = nufft(image_cube(), uu, vv).detach().numpy()
 
     # generate complex noise
     sigma = 1 / np.sqrt(weight)
