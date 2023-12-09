@@ -213,98 +213,39 @@ def safe_baseline_constant_kilolambda(
     return max_diff < delta_uv
 
 
+# static image dimensions
+# potentially different uu and vv values with each forward call
+# forward call looks like .forward(image, uu, vv)
+# returns model @ those points
+# NuFFT
 class NuFFT(nn.Module):
-    r"""
-    This layer translates input from an :class:`mpol.images.ImageCube` directly to loose, ungridded samples of the Fourier plane, directly corresponding to the :math:`u,v` locations of the data. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or 'NuFFT' to interpolate directly to discrete :math:`u,v` locations that need not correspond to grid cell centers. This is implemented using the KbNufft routines of the `TorchKbNufft <https://torchkbnufft.readthedocs.io/en/stable/index.html>`_ package.
-
-    **Dimensionality**: One consideration when using this layer is the dimensionality of your image and your visibility samples. If your image has multiple channels (``nchan > 1``), there is the possibility that the :math:`u,v` sample locations corresponding to each channel may be different. In ALMA/VLA applications, this can arise when continuum observations are taken over significant bandwidth, since the spatial frequency sampled by any pair of antennas is wavelength-dependent
-
-    .. math::
-
-        u = \frac{D}{\lambda},
-
-    where :math:`D` is the projected baseline (measured in, say, meters) and :math:`\lambda` is the observing wavelength. In this application, the image-plane model could be the same for each channel, or it may vary with channel (necessary if the spectral slope of the source is significant).
-
-    On the other hand, with spectral line observations it will usually be the case that the total bandwidth of the observations is small enough such that the :math:`u,v` sample locations could be considered as the same for each channel. In spectral line applications, the image-plane model usually varies substantially with each channel.
-
-    This layer will determine whether the spatial frequencies are treated as constant based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
-
-    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel (and will invoke parallelization across the image cube ``nchan`` dimension using the 'coil' dimension of the TorchKbNufft package).
-    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used (and will invoke parallelization across the image cube ``nchan`` dimension using the 'batch' dimension of the TorchKbNufft package).
-
-    Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.
-
-    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the 'batch' dimension --- this will result in a warning.
-
-    Args:
-        cell_size (float): the width of an image-plane pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.
-        uu (np.array): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]
-        vv (np.array): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]
-
-    """
-
     def __init__(
         self,
         coords: GridCoords,
-        uu: NDArray[floating[Any]],
-        vv: NDArray[floating[Any]],
         nchan: int = 1,
-        sparse_matrices: bool = True,
     ):
         super().__init__()
 
-        if not (same_uv := uu.ndim == 1 and vv.ndim == 1) and sparse_matrices:
-            import warnings
-
-            warnings.warn(
-                "Provided uu and vv arrays are multi-dimensional, suggesting an "
-                "intent to parallelize using the 'batch' dimension. This feature "
-                "is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix "
-                "interpolation (sparse_matrices=True), therefore we are proceeding "
-                "with table interpolation (sparse_matrices=False).",
-                category=RuntimeWarning,
-            )
-            sparse_matrices = False
-            self.interp_mat = None
-
         self.coords = coords
         self.nchan = nchan
-        self.sparse_matrices = sparse_matrices
-        self.same_uv = same_uv
 
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
             im_size=(self.coords.npix, self.coords.npix)
         )
 
-        self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
-        self.k_traj: torch.Tensor
-
-        if self.sparse_matrices:
-            # precompute the sparse interpolation matrices
-            real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
-                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
-            )
-            self.register_buffer("real_interp_mat", real_interp_mat)
-            self.register_buffer("imag_interp_mat", imag_interp_mat)
-            self.real_interp_mat: torch.Tensor
-            self.imag_interp_mat: torch.Tensor
-
     @classmethod
     def from_image_properties(
         cls,
         cell_size: float,
         npix: int,
-        uu: NDArray[floating[Any]],
-        vv: NDArray[floating[Any]],
         nchan: int = 1,
-        sparse_matrices: bool = True,
     ) -> NuFFT:
         coords = GridCoords(cell_size, npix)
-        return cls(coords, uu, vv, nchan, sparse_matrices)
+        return cls(
+            coords,
+            nchan,
+        )
 
     def _klambda_to_radpix(
         self, klambda: float | NDArray[floating[Any]]
@@ -395,6 +336,171 @@ class NuFFT(nn.Module):
         # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension
 
         return k_traj
+
+    def forward(self, cube: torch.Tensor, uu, vv) -> torch.Tensor:
+        r"""
+        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.
+
+        Args:
+            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube should be a "prepacked" image cube, for example, from :meth:`mpol.images.ImageCube.forward`
+
+        Returns:
+            torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated corresponding to the ``uu``, ``vv`` points set at initialization.
+        """
+
+        # make sure that the nchan assumptions for the ImageCube and the NuFFT
+        # setup are the same
+        if cube.size(0) != self.nchan:
+            raise DimensionMismatchError(
+                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+            )
+
+        # "unpack" the cube, but leave it flipped
+        # NuFFT routine expects a "normal" cube, not an fftshifted one
+        shifted = torch.fft.fftshift(cube, dim=(1, 2))
+
+        # convert the cube to a complex type, since this is required by TorchKbNufft
+        complexed = shifted.type(torch.complex128)
+
+        k_traj = self._assemble_ktraj(uu, vv)
+
+
+        # TODO: Decide how to call the NuFFT in this instance.
+
+
+        # Consider how the similarity of the spatial frequency samples should be
+        # treated. We already took care of this on the k_traj side, since we set
+        # the shapes. But this also needs to be taken care of on the image side.
+        #   * If we plan to parallelize with the coil dimension, then we need an
+        #     image with shape (1, nchan, npix, npix).
+        #   * If we plan to parallelize using the batch dimension, then we need
+        #     an image with shape (nchan, 1, npix, npix).
+
+        if self.same_uv:
+            # we want to unsqueeze/squeeze at dim=0 to parallelize over the coil
+            # dimension
+            # unsquezee shape: [1, nchan, npix, npix]
+            altered_dimension = 0
+        else:
+            # we want to unsqueeze/squeeze at dim=1 to parallelize over the
+            # batch dimension
+            # unsquezee shape: [nchan, 1, npix, npix]
+            altered_dimension = 1
+
+        expanded = complexed.unsqueeze(altered_dimension)
+
+        # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
+        output: torch.Tensor = self.coords.cell_size**2 * self.nufft_ob(
+            expanded,
+            k_traj,
+            interp_mats=(
+                (self.real_interp_mat, self.imag_interp_mat)
+                if self.sparse_matrices
+                else None
+            ),
+        )
+
+        # squeezed shape: [nchan, npix, npix]
+        output = torch.squeeze(output, dim=altered_dimension)
+
+        return output
+
+
+# static image dimensions
+# static uu and vv values from initialization
+# forward call looks like .forward(image)
+# returns model @ static uu, vv points
+# NuFFTCached
+
+
+# just forward and init should be different between each, which is good
+
+
+class NuFFTCached(NuFFT):
+    r"""
+    This layer translates input from an :class:`mpol.images.ImageCube` directly to loose, ungridded samples of the Fourier plane, directly corresponding to the :math:`u,v` locations of the data. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or 'NuFFT' to interpolate directly to discrete :math:`u,v` locations that need not correspond to grid cell centers. This is implemented using the KbNufft routines of the `TorchKbNufft <https://torchkbnufft.readthedocs.io/en/stable/index.html>`_ package.
+
+    **Dimensionality**: One consideration when using this layer is the dimensionality of your image and your visibility samples. If your image has multiple channels (``nchan > 1``), there is the possibility that the :math:`u,v` sample locations corresponding to each channel may be different. In ALMA/VLA applications, this can arise when continuum observations are taken over significant bandwidth, since the spatial frequency sampled by any pair of antennas is wavelength-dependent
+
+    .. math::
+
+        u = \frac{D}{\lambda},
+
+    where :math:`D` is the projected baseline (measured in, say, meters) and :math:`\lambda` is the observing wavelength. In this application, the image-plane model could be the same for each channel, or it may vary with channel (necessary if the spectral slope of the source is significant).
+
+    On the other hand, with spectral line observations it will usually be the case that the total bandwidth of the observations is small enough such that the :math:`u,v` sample locations could be considered as the same for each channel. In spectral line applications, the image-plane model usually varies substantially with each channel.
+
+    This layer will determine whether the spatial frequencies are treated as constant based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
+
+    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel (and will invoke parallelization across the image cube ``nchan`` dimension using the 'coil' dimension of the TorchKbNufft package).
+    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used (and will invoke parallelization across the image cube ``nchan`` dimension using the 'batch' dimension of the TorchKbNufft package).
+
+    Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.
+
+    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the 'batch' dimension --- this will result in a warning.
+
+    Args:
+        cell_size (float): the width of an image-plane pixel [arcseconds]
+        npix (int): the number of pixels per image side
+        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.
+        uu (np.array): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]
+        vv (np.array): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]
+
+    """
+
+    def __init__(
+        self,
+        coords: GridCoords,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
+    ):
+        super().__init__(coords, nchan)
+
+        if not (same_uv := uu.ndim == 1 and vv.ndim == 1) and sparse_matrices:
+            import warnings
+
+            warnings.warn(
+                "Provided uu and vv arrays are multi-dimensional, suggesting an "
+                "intent to parallelize using the 'batch' dimension. This feature "
+                "is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix "
+                "interpolation (sparse_matrices=True), therefore we are proceeding "
+                "with table interpolation (sparse_matrices=False).",
+                category=RuntimeWarning,
+            )
+            sparse_matrices = False
+            self.interp_mat = None
+
+        self.sparse_matrices = sparse_matrices
+        self.same_uv = same_uv
+
+        self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
+        self.k_traj: torch.Tensor
+
+        if self.sparse_matrices:
+            # precompute the sparse interpolation matrices
+            real_interp_mat, imag_interp_mat = torchkbnufft.calc_tensor_spmatrix(
+                self.k_traj, im_size=(self.coords.npix, self.coords.npix)
+            )
+            self.register_buffer("real_interp_mat", real_interp_mat)
+            self.register_buffer("imag_interp_mat", imag_interp_mat)
+            self.real_interp_mat: torch.Tensor
+            self.imag_interp_mat: torch.Tensor
+
+    @classmethod
+    def from_image_properties(
+        cls,
+        cell_size: float,
+        npix: int,
+        uu: NDArray[floating[Any]],
+        vv: NDArray[floating[Any]],
+        nchan: int = 1,
+        sparse_matrices: bool = True,
+    ) -> NuFFT:
+        coords = GridCoords(cell_size, npix)
+        return cls(coords, uu, vv, nchan, sparse_matrices)
 
     def forward(self, cube: torch.Tensor) -> torch.Tensor:
         r"""
@@ -521,7 +627,7 @@ def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=
     V_true : array, unit=[Jy]
         Data visibility amplitudes
     return_Vmod : bool, default=False
-        Whether to return just the residual visibilities, or additionally the 
+        Whether to return just the residual visibilities, or additionally the
         loose model visibilities
     channel : int, default=0
         Channel (of `model`) to use to calculate residual visibilities
@@ -534,7 +640,7 @@ def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan, uu=u_true, vv=v_true)
 
-    vis_model = nufft(model.icube().to('cpu')) # TODO: remove 'to' call
+    vis_model = nufft(model.icube().to("cpu"))  # TODO: remove 'to' call
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 
@@ -542,5 +648,5 @@ def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=
 
     if return_Vmod:
         return vis_resid, vis_model
-    
+
     return vis_resid
