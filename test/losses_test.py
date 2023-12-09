@@ -50,8 +50,8 @@ def loose_visibilities(mock_visibility_data, image_cube):
     uu_chan = uu[chan]
     vv_chan = vv[chan]
 
-    nufft = fourier.NuFFT(coords=image_cube.coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
-    return nufft(image_cube())
+    nufft = fourier.NuFFT(coords=image_cube.coords, nchan=nchan)
+    return nufft(image_cube(), uu_chan, vv_chan)
 
 
 @pytest.fixture

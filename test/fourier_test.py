@@ -97,37 +97,39 @@ def test_fourier_cube_grad(coords):
 
     loss.backward()
 
+def test_instantiate_nufft(coords):
+    fourier.NuFFT(coords=coords, nchan=1)
 
-def test_instantiate_nufft_single_chan(coords, mock_visibility_data_cont):
+def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont):
 
     # load some data
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
     # should assume everything is the same_uv
-    layer = fourier.NuFFT(coords=coords, nchan=1, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(coords=coords, nchan=1, uu=uu, vv=vv, sparse_matrices=False)
     assert layer.same_uv
 
     # should assume everything is the same_uv. Uses sparse_matrices as default
-    layer = fourier.NuFFT(coords=coords, nchan=1, uu=uu, vv=vv)
+    layer = fourier.NuFFTCached(coords=coords, nchan=1, uu=uu, vv=vv)
     assert layer.same_uv
 
 
-def test_instantiate_nufft_multi_chan(coords, mock_visibility_data_cont):
+def test_instantiate_nufft_cached_multi_chan(coords, mock_visibility_data_cont):
 
     # load some data
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
     # should still assume that the uv is the same, since uu and vv are single-channel
-    layer = fourier.NuFFT(coords=coords, nchan=10, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(coords=coords, nchan=10, uu=uu, vv=vv, sparse_matrices=False)
     assert layer.same_uv
 
     # should still assume that the uv is the same, since uu and vv are single-channel
     # should use sparse_matrices as default
-    layer = fourier.NuFFT(coords=coords, nchan=10, uu=uu, vv=vv)
+    layer = fourier.NuFFTCached(coords=coords, nchan=10, uu=uu, vv=vv)
     assert layer.same_uv
 
 
-def test_predict_vis_nufft(coords, mock_visibility_data_cont):
+def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
     # just see that we can load the layer and get something through without error
     # for a very simple blank function
 
@@ -142,7 +144,7 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
     # we have a multi-channel cube, but only sent single-channel uu and vv
     # coordinates. The expectation is that TorchKbNufft will parallelize these
 
-    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
+    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # predict the values of the cube at the u,v locations
     output = layer(imagecube())
@@ -155,7 +157,7 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
         np.zeros((nchan, len(uu)), dtype=np.complex128)
     )
 
-def test_nufft_predict_GPU(coords, mock_visibility_data_cont):
+def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
 
     if not torch.cuda.is_available():
         pass 
@@ -176,7 +178,7 @@ def test_nufft_predict_GPU(coords, mock_visibility_data_cont):
         # we have a multi-channel cube, but only sent single-channel uu and vv
         # coordinates. The expectation is that TorchKbNufft will parallelize these
 
-        layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv).to(device=device)
+        layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv).to(device=device)
 
         # predict the values of the cube at the u,v locations
         output = layer(imagecube())
@@ -189,7 +191,7 @@ def test_nufft_predict_GPU(coords, mock_visibility_data_cont):
             np.zeros((nchan, len(uu)), dtype=np.complex128)
         )
 
-def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
+def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
 
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
@@ -200,7 +202,7 @@ def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path)
     nchan = 1
 
     # create a NuFFT layer to perform interpolations to these points
-    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
+    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # a sky Gaussian
     kw = {
@@ -258,7 +260,7 @@ def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path)
     assert num_output == approx(an_output, abs=2e-8)
 
 
-def test_nufft_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
+def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
     
     # create a multi-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
@@ -271,7 +273,7 @@ def test_nufft_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
     # create a NuFFT layer to perform interpolations to these points
     # since image is multi-channel but uu and vv are single-channel visibilities, 
     # this should use the coil dimension of NuFFT to do the broadcasting
-    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv)
+    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # a sky Gaussian
     kw = {
@@ -303,7 +305,7 @@ def test_nufft_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
         # should be < 2e-8, based on plot for single-channel
         assert num_output[i] == approx(an_output, abs=2e-8)
 
-def test_nufft_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
+def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
     
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
@@ -316,7 +318,7 @@ def test_nufft_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
     # create a NuFFT layer to perform interpolations to these points
     # uu and vv are multidimensional, so we should set `sparse_matrices=False`
     # to avoid triggering a warning
-    layer = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False)
 
     # a sky Gaussian
     kw = {
