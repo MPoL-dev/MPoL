@@ -888,21 +888,39 @@ document.write(`
         <span class="c1"># make sure we still fit into the grid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">check_data_fit</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span>
 
-        <span class="c1"># expand the vectors to include complex conjugates</span>
-        <span class="n">uu_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">uu</span><span class="p">,</span> <span class="o">-</span><span class="n">uu</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">vv_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">vv</span><span class="p">,</span> <span class="o">-</span><span class="n">vv</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># initialize base objects </span>
+        <span class="c1"># Hermitian conjugates taken care of by @property below</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uu_base</span> <span class="o">=</span> <span class="n">uu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vv_base</span> <span class="o">=</span> <span class="n">vv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_base</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_re_base</span> <span class="o">=</span> <span class="n">data_re</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_im_base</span> <span class="o">=</span> <span class="n">data_im</span>
 
         <span class="c1"># make sure we still fit into the grid (with expansion)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">check_data_fit</span><span class="p">(</span><span class="n">uu_full</span><span class="p">,</span> <span class="n">vv_full</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">uu</span> <span class="o">=</span> <span class="n">uu_full</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vv</span> <span class="o">=</span> <span class="n">vv_full</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">weight</span><span class="p">,</span> <span class="n">weight</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_re</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">data_re</span><span class="p">,</span> <span class="n">data_re</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">data_im</span><span class="p">,</span> <span class="o">-</span><span class="n">data_im</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">check_data_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vv</span><span class="p">)</span>
 
         <span class="c1"># and register cell indices against data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_cell_indices</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">uu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">uu_base</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">uu_base</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vv_base</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">vv_base</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_base</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_re</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_re_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_re_base</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_im</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_im_base</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">data_im_base</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_grid_visibilities</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
