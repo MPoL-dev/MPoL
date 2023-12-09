@@ -97,16 +97,19 @@ def test_fourier_cube_grad(coords):
 
     loss.backward()
 
+
 def test_instantiate_nufft(coords):
     fourier.NuFFT(coords=coords, nchan=1)
 
-def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont):
 
+def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont):
     # load some data
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
     # should assume everything is the same_uv
-    layer = fourier.NuFFTCached(coords=coords, nchan=1, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(
+        coords=coords, nchan=1, uu=uu, vv=vv, sparse_matrices=False
+    )
     assert layer.same_uv
 
     # should assume everything is the same_uv. Uses sparse_matrices as default
@@ -115,18 +118,48 @@ def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont)
 
 
 def test_instantiate_nufft_cached_multi_chan(coords, mock_visibility_data_cont):
-
     # load some data
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
     # should still assume that the uv is the same, since uu and vv are single-channel
-    layer = fourier.NuFFTCached(coords=coords, nchan=10, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(
+        coords=coords, nchan=10, uu=uu, vv=vv, sparse_matrices=False
+    )
     assert layer.same_uv
 
     # should still assume that the uv is the same, since uu and vv are single-channel
     # should use sparse_matrices as default
     layer = fourier.NuFFTCached(coords=coords, nchan=10, uu=uu, vv=vv)
     assert layer.same_uv
+
+
+def test_predict_vis_nufft(coords, mock_visibility_data_cont):
+    # just see that we can load the layer and get something through without error
+    # for a very simple blank function
+
+    # load some data
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+
+    nchan = 10
+
+    # instantiate an ImageCube layer filled with zeros
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
+
+    # we have a multi-channel cube, but only sent single-channel uu and vv
+    # coordinates. The expectation is that TorchKbNufft will parallelize these
+
+    layer = fourier.NuFFT(coords=coords, nchan=nchan)
+
+    # predict the values of the cube at the u,v locations
+    output = layer(imagecube(), uu, vv)
+
+    # make sure we got back the number of visibilities we expected
+    assert output.shape == (nchan, len(uu))
+
+    # if the image cube was filled with zeros, then we should make sure this is true
+    assert output.detach().numpy() == approx(
+        np.zeros((nchan, len(uu)), dtype=np.complex128)
+    )
 
 
 def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
@@ -141,7 +174,7 @@ def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
     # instantiate an ImageCube layer filled with zeros
     imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
-    # we have a multi-channel cube, but only sent single-channel uu and vv
+    # we have a multi-channel cube, but sent only single-channel uu and vv
     # coordinates. The expectation is that TorchKbNufft will parallelize these
 
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
@@ -157,13 +190,13 @@ def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
         np.zeros((nchan, len(uu)), dtype=np.complex128)
     )
 
-def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
 
+def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
     if not torch.cuda.is_available():
-        pass 
+        pass
     else:
         device = torch.device("cuda:0")
-    
+
         # just see that we can load the layer and get something through without error
         # for a very simple blank function
 
@@ -178,7 +211,9 @@ def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
         # we have a multi-channel cube, but only sent single-channel uu and vv
         # coordinates. The expectation is that TorchKbNufft will parallelize these
 
-        layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv).to(device=device)
+        layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv).to(
+            device=device
+        )
 
         # predict the values of the cube at the u,v locations
         output = layer(imagecube())
@@ -191,8 +226,76 @@ def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
             np.zeros((nchan, len(uu)), dtype=np.complex128)
         )
 
-def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
 
+def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
+    # create a single-channel ImageCube using a function we know the true FT analytically
+    # use NuFFT to FT and sample that image
+    # assert that the NuFFT samples and the analytic FT samples are close
+
+    # load some data
+    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    nchan = 1
+
+    # create a NuFFT layer to perform interpolations to these points
+    layer = fourier.NuFFT(coords=coords, nchan=nchan)
+
+    # a sky Gaussian
+    kw = {
+        "a": 1,
+        "delta_x": 0.02,  # arcsec
+        "delta_y": -0.01,
+        "sigma_x": 0.02,
+        "sigma_y": 0.01,
+        "Omega": 20,  # degrees
+    }
+
+    img_packed = utils.sky_gaussian_arcsec(
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+    )
+    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
+
+    # use the NuFFT to predict the values of the cube at the u,v locations
+    num_output = (
+        layer(img_packed_tensor, uu, vv)[0].detach().numpy()
+    )  # take the channel dim out
+
+    # calculate the values analytically
+    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
+
+    # find max difference
+    diff = num_output - an_output
+    max_diff = np.max(np.abs(diff))
+    max = np.max(np.abs(num_output))
+    print(max_diff, max)
+
+    # collapse the function into 1D by doing q
+    qq = np.hypot(uu, vv)
+
+    fig, ax = plt.subplots(nrows=4, sharex=True)
+    ax[0].scatter(qq, an_output.real, s=3, label="analytic")
+    ax[0].scatter(qq, num_output.real, s=1, label="NuFFT")
+    ax[0].set_ylabel("Real")
+    ax[0].legend()
+
+    ax[1].scatter(qq, diff.real, s=1, c="k")
+    ax[1].set_ylabel("diff Real")
+
+    ax[2].scatter(qq, an_output.imag, s=3)
+    ax[2].scatter(qq, num_output.imag, s=1)
+    ax[2].set_ylabel("Imag")
+
+    ax[3].scatter(qq, diff.imag, s=1, c="k")
+    ax[3].set_ylabel("diff Imag")
+    ax[3].set_xlabel(r"$q$ [k lambda]")
+
+    fig.suptitle("NuFFT Accuracy compared to analytic")
+    fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
+
+    # should be < 2e-8, based on plot
+    assert num_output == approx(an_output, abs=2e-8)
+
+
+def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
@@ -220,12 +323,12 @@ def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tm
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor)[0].detach().numpy() # take the channel dim out
+    num_output = (
+        layer(img_packed_tensor)[0].detach().numpy()
+    )  # take the channel dim out
 
     # calculate the values analytically
-    an_output = utils.fourier_gaussian_klambda_arcsec(
-        uu, vv, **kw
-    )
+    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
 
     # find max difference
     diff = num_output - an_output
@@ -244,24 +347,23 @@ def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tm
 
     ax[1].scatter(qq, diff.real, s=1, c="k")
     ax[1].set_ylabel("diff Real")
-    
+
     ax[2].scatter(qq, an_output.imag, s=3)
     ax[2].scatter(qq, num_output.imag, s=1)
     ax[2].set_ylabel("Imag")
-    
+
     ax[3].scatter(qq, diff.imag, s=1, c="k")
     ax[3].set_ylabel("diff Imag")
     ax[3].set_xlabel(r"$q$ [k lambda]")
-    
+
     fig.suptitle("NuFFT Accuracy compared to analytic")
-    fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
+    fig.savefig(tmp_path / "nufft_cached_comparison.png", dpi=300)
 
     # should be < 2e-8, based on plot
     assert num_output == approx(an_output, abs=2e-8)
 
 
 def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
-    
     # create a multi-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
@@ -271,7 +373,7 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont)
     nchan = 5
 
     # create a NuFFT layer to perform interpolations to these points
-    # since image is multi-channel but uu and vv are single-channel visibilities, 
+    # since image is multi-channel but uu and vv are single-channel visibilities,
     # this should use the coil dimension of NuFFT to do the broadcasting
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
@@ -290,23 +392,24 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont)
     )
 
     # broadcast to 5 channels -- the image will be the same for each
-    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)), requires_grad=True)
+    img_packed_tensor = torch.tensor(
+        img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)),
+        requires_grad=True,
+    )
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor).detach().numpy() 
+    num_output = layer(img_packed_tensor).detach().numpy()
 
     # calculate the values analytically, for a single channel
-    an_output = utils.fourier_gaussian_klambda_arcsec(
-        uu, vv, **kw
-    )
+    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
 
     # loop through each channel and assert that things are the same
     for i in range(nchan):
         # should be < 2e-8, based on plot for single-channel
         assert num_output[i] == approx(an_output, abs=2e-8)
 
+
 def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
-    
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
@@ -318,7 +421,9 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp
     # create a NuFFT layer to perform interpolations to these points
     # uu and vv are multidimensional, so we should set `sparse_matrices=False`
     # to avoid triggering a warning
-    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False)
+    layer = fourier.NuFFTCached(
+        coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False
+    )
 
     # a sky Gaussian
     kw = {
@@ -335,20 +440,21 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp
     )
 
     # broadcast to all channels -- the image will be the same for each
-    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)), requires_grad=True)
+    img_packed_tensor = torch.tensor(
+        img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)),
+        requires_grad=True,
+    )
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor).detach().numpy() 
+    num_output = layer(img_packed_tensor).detach().numpy()
 
     # plot a single channel, to check
     ichan = 3
 
     qq = np.hypot(uu[ichan], vv[ichan])
-    an_output = utils.fourier_gaussian_klambda_arcsec(
-            uu[ichan], vv[ichan], **kw
-        )
+    an_output = utils.fourier_gaussian_klambda_arcsec(uu[ichan], vv[ichan], **kw)
     diff = num_output[ichan] - an_output
-    
+
     fig, ax = plt.subplots(nrows=4, sharex=True)
     ax[0].scatter(qq, an_output.real, s=3, label="analytic")
     ax[0].scatter(qq, num_output[ichan].real, s=1, label="NuFFT")
@@ -357,25 +463,22 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp
 
     ax[1].scatter(qq, diff.real, s=1, c="k")
     ax[1].set_ylabel("diff Real")
-    
+
     ax[2].scatter(qq, an_output.imag, s=3)
     ax[2].scatter(qq, num_output[ichan].imag, s=1)
     ax[2].set_ylabel("Imag")
-    
+
     ax[3].scatter(qq, diff.imag, s=1, c="k")
     ax[3].set_ylabel("diff Imag")
     ax[3].set_xlabel(r"$q$ [k lambda]")
-    
+
     fig.suptitle("NuFFT Accuracy compared to analytic")
     fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
 
-    
     # loop through each channel and assert that things are the same
     for i in range(nchan):
         # calculate the values analytically for this channel
-        an_output = utils.fourier_gaussian_klambda_arcsec(
-            uu[i], vv[i], **kw
-        )
+        an_output = utils.fourier_gaussian_klambda_arcsec(uu[i], vv[i], **kw)
 
         # using table-based interpolation, so the accuracy bar is lower
         # should be < 3e-6, based on plot for single-channel
