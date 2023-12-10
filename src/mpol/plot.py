@@ -515,9 +515,11 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
 
 def crossval_diagnostics_fig(cv, title="", save_prefix=None):
     """
-    Figure for model diagnostics of a cross-validation run. Plots: 
-    - loss evolution for each k-fold
-    - cross-validation score per k-fold
+    Figure for model diagnostics of a cross-validation run. 
+    
+    Plots: 
+        - loss evolution for each k-fold
+        - cross-validation score per k-fold
 
     Parameters
     ----------
