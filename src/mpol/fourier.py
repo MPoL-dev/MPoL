@@ -357,7 +357,7 @@ class NuFFT(nn.Module):
         cube: torch.Tensor,
         uu,
         vv,
-        sparse_matrices: bool = True,
+        sparse_matrices: bool = False,
     ) -> torch.Tensor:
         r"""
         Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points. In general, you probably do not want to provide baselines that include Hermitian pairs.
@@ -366,7 +366,7 @@ class NuFFT(nn.Module):
             cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube should be a "prepacked" image cube, for example, from :meth:`mpol.images.ImageCube.forward`
             uu (array-like): array of the u (East-West) spatial frequency coordinate [klambda].
             vv (array-like): array of the v (North-South) spatial frequency coordinate [klambda] (must be the same shape as uu)
-            sparse_matrices (bool): If True, use TorchKbNuFFT sparse matrices. If False, use the default table-based interpolation of TorchKbNufft. Note that sparse matrices are incompatible with multi-channel `uu` and `vv` arrays (see below).
+            sparse_matrices (bool): If False, use the default table-based interpolation of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally slower but more accurate).  Note that sparse matrices are incompatible with multi-channel `uu` and `vv` arrays (see below).
 
         Returns:
             torch.complex tensor: Fourier samples of shape ``(nchan, nvis)``, evaluated at the ``uu``, ``vv`` points
@@ -388,7 +388,7 @@ class NuFFT(nn.Module):
 
         Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.
 
-        **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the 'batch' dimension --- this will result in a warning.
+        **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. If ``sparse_matrices=True``, the routine will calculate sparse matrices (which can be stored for later operations, as in {class}`~mpol.fourier.NuFFTCached`) and use them for the interpolation. This approach is likely to be more accurate but also slower. If Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the 'batch' dimension --- this will result in a warning. For most applications, we anticipate the accuracy of the table-based interpolation to be sufficiently accurate, but this could change depending on your problem.
         """
 
         # permit numpy, but prefer tensor
@@ -556,8 +556,8 @@ class NuFFTCached(NuFFT):
         npix,
         uu,
         vv,
-        nchan= 1,
-        sparse_matrices= True,
+        nchan=1,
+        sparse_matrices=True,
     ):
         coords = GridCoords(cell_size, npix)
         return cls(coords, uu, vv, nchan, sparse_matrices)
