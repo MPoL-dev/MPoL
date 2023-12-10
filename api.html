@@ -503,6 +503,11 @@ document.write(`
 </li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.onedim">Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.onedim.radialI"><code class="docutils literal notranslate"><span class="pre">radialI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.onedim.radialV"><code class="docutils literal notranslate"><span class="pre">radialV()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.plot">Plotting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_image_cmap_norm"><code class="docutils literal notranslate"><span class="pre">get_image_cmap_norm()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.plot.get_residual_image"><code class="docutils literal notranslate"><span class="pre">get_residual_image()</span></code></a></li>
@@ -2594,6 +2599,97 @@ verbose (bool): whether to print notification messages</p>
 </dd></dl>
 
 </section>
+<section id="module-mpol.onedim">
+<span id="analysis"></span><h2>Analysis<a class="headerlink" href="#module-mpol.onedim" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.onedim.radialI">
+<span class="sig-prename descclassname"><span class="pre">mpol.onedim.</span></span><span class="sig-name descname"><span class="pre">radialI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/onedim.html#radialI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.onedim.radialI" title="Permalink to this definition">#</a></dt>
+<dd><p>Obtain a 1D (radial) brightness profile I(r) from an image cube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>icube</strong> (<cite>mpol.images.ImageCube</cite> object) – Instance of the MPoL <cite>images.ImageCube</cite> class</p></li>
+<li><p><strong>geom</strong> (<em>dict</em>) – <dl class="simple">
+<dt>Dictionary of source geometry. Keys:</dt><dd><dl class="simple">
+<dt>”incl”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Inclination</p>
+</dd>
+<dt>”Omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Position angle of the ascending node</p>
+</dd>
+<dt>”omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Argument of periastron</p>
+</dd>
+<dt>”dRA”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in right ascension. Positive is west of north.</p>
+</dd>
+<dt>”dDec”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in declination.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>chan</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel of the image cube corresponding to the desired image</p></li>
+<li><p><strong>bins</strong> (<em>array</em><em>, </em><em>default=None</em><em>, </em><em>unit=</em><em>[</em><em>arcsec</em><em>]</em>) – Radial bin edges to use in calculating I(r). If None, bins will span
+the full image, with widths equal to the hypotenuse of the pixels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>bin_centers</strong> (<em>array, unit=[arcsec]</em>) – Radial coordinates of image at center of <cite>bins</cite></p></li>
+<li><p><strong>Is</strong> (array, unit=[Jy / arcsec^2] (if <cite>image</cite> has these units)) – Azimuthally averaged pixel brightness at <cite>rs</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.onedim.radialV">
+<span class="sig-prename descclassname"><span class="pre">mpol.onedim.</span></span><span class="sig-name descname"><span class="pre">radialV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/onedim.html#radialV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.onedim.radialV" title="Permalink to this definition">#</a></dt>
+<dd><p>Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL
+image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fcube</strong> (<cite>~mpol.fourier.FourierCube</cite> object) – Instance of the MPoL <cite>fourier.FourierCube</cite> class</p></li>
+<li><p><strong>geom</strong> (<em>dict</em>) – <dl class="simple">
+<dt>Dictionary of source geometry. Keys:</dt><dd><dl class="simple">
+<dt>”incl”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Inclination</p>
+</dd>
+<dt>”Omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Position angle of the ascending node</p>
+</dd>
+<dt>”omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Argument of periastron</p>
+</dd>
+<dt>”dRA”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in right ascension. Positive is west of north.</p>
+</dd>
+<dt>”dDec”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in declination</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>rescale_flux</strong> (<em>bool</em>) – If True, the visibility amplitudes are rescaled to account
+for the difference between the inclined (observed) brightness and the
+assumed face-on brightness, assuming the emission is optically thick.
+The source’s integrated (2D) flux is assumed to be:
+<span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.
+No rescaling would be appropriate in the optically thin limit.</p></li>
+<li><p><strong>chan</strong> (<em>int</em><em>, </em><em>default=0</em>) – Channel of the image cube corresponding to the desired image</p></li>
+<li><p><strong>bins</strong> (<em>array</em><em>, </em><em>default=None</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Baseline bin edges to use in calculating V(q). If None, bins will span
+the model baseline distribution, with widths equal to the hypotenuse of
+the (u, v) coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>bin_centers</strong> (array, unit=:math:[<cite>klambda</cite>]) – Baselines corresponding to <cite>u</cite> and <cite>v</cite></p></li>
+<li><p><strong>Vs</strong> (<em>array, unit=[Jy]</em>) – Visibility amplitudes at <cite>q</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This routine requires the <a class="reference external" href="https://github.com/discsim/frank">frank</a> package</p>
+</dd></dl>
+
+</section>
 <section id="module-mpol.plot">
 <span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-mpol.plot" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
@@ -2749,14 +2845,18 @@ are projected or deprojected.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.train_diagnostics_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">train_diagnostics_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_rates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fluxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_model_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_model_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#train_diagnostics_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.train_diagnostics_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for model diagnostics during an optimization loop. For a <cite>model</cite> in
-a given state, plots the current:
-- model image
-- flux of model image
-- gradient image
-- difference image between <cite>old_model_image</cite> and current model image
-- loss function
-- learning rate</p>
+<dd><p>Figure for model diagnostics at a given model state during an optimization loop.</p>
+<dl class="simple">
+<dt>Plots:</dt><dd><ul class="simple">
+<li><p>model image</p></li>
+<li><p>flux of model image</p></li>
+<li><p>gradient image</p></li>
+<li><p>difference image between <cite>old_model_image</cite> and current model image</p></li>
+<li><p>loss function</p></li>
+<li><p>learning rate</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2785,9 +2885,14 @@ a given state, plots the current:
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.crossval_diagnostics_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">crossval_diagnostics_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#crossval_diagnostics_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.crossval_diagnostics_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for model diagnostics of a cross-validation run. Plots:
-- loss evolution for each k-fold
-- cross-validation score per k-fold</p>
+<dd><p>Figure for model diagnostics of a cross-validation run.</p>
+<dl class="simple">
+<dt>Plots:</dt><dd><ul class="simple">
+<li><p>loss evolution for each k-fold</p></li>
+<li><p>cross-validation score per k-fold</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2809,11 +2914,16 @@ a given state, plots the current:
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.image_comparison_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">image_comparison_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_fits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_cscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[None,</span> <span class="pre">None]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#image_comparison_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.image_comparison_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for comparison of MPoL model image to other image models. Plots:
-- dirty image
-- MPoL model image
-- MPoL residual visibilities imaged
-- clean image (if a .fits file is supplied)</p>
+<dd><p>Figure for comparison of MPoL model image to other image models.</p>
+<dl class="simple">
+<dt>Plots:</dt><dd><ul class="simple">
+<li><p>dirty image</p></li>
+<li><p>MPoL model image</p></li>
+<li><p>MPoL residual visibilities imaged</p></li>
+<li><p>clean image (if a .fits file is supplied)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2849,12 +2959,17 @@ both list values in ascending order (e.g. [-2, 3], not [3, -2])</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="mpol.plot.vis_1d_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">vis_1d_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_logx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#vis_1d_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.vis_1d_fig" title="Permalink to this definition">#</a></dt>
-<dd><p>Figure for comparison of 1D projected MPoL model visibilities and observed
-visibilities. Plots:
-- Re(V): observed and MPoL model (projected unless <cite>geom</cite> is supplied)
-- Residual Re(V): observed - MPoL model (projected unless <cite>geom</cite> is supplied)
-- Im(V): observed and MPoL model (projected unless <cite>geom</cite> is supplied)
-- Residual Im(V): observed - MPoL model (projected unless <cite>geom</cite> is supplied)</p>
+<dd><dl class="simple">
+<dt>Figure for comparison of 1D projected MPoL model visibilities and observed</dt><dd><p>visibilities.</p>
+</dd>
+<dt>Plots:</dt><dd><ul class="simple">
+<li><p>Re(V): observed and MPoL model (projected unless <cite>geom</cite> is supplied)</p></li>
+<li><p>Residual Re(V): observed - MPoL model (projected unless <cite>geom</cite> is supplied)</p></li>
+<li><p>Im(V): observed and MPoL model (projected unless <cite>geom</cite> is supplied)</p></li>
+<li><p>Residual Im(V): observed - MPoL model (projected unless <cite>geom</cite> is supplied)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2863,10 +2978,9 @@ visibilities. Plots:
 <li><p><strong>v</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em>) – Data u- and v-coordinates</p></li>
 <li><p><strong>V</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy</em><em>]</em>) – Data visibility amplitudes</p></li>
 <li><p><strong>weights</strong> (<em>array</em><em>, </em><em>unit=</em><em>[</em><em>Jy^-2</em><em>]</em>) – Data weights</p></li>
-<li><p><strong>geom</strong> (<em>dict</em>) – <p>Dictionary of source geometry. If passed in, visibilities will be
-deprojected prior to plotting. Keys:</p>
-<blockquote>
-<div><dl class="simple">
+<li><p><strong>geom</strong> (<em>dict</em>) – <dl class="simple">
+<dt>Dictionary of source geometry. If passed in, visibilities will be</dt><dd><dl class="simple">
+<dt>deprojected prior to plotting. Keys:</dt><dd><dl class="simple">
 <dt>”incl”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Inclination</p>
 </dd>
 <dt>”Omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Position angle of the ascending node</p>
@@ -2878,16 +2992,19 @@ deprojected prior to plotting. Keys:</p>
 <dt>”dDec”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in declination.</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
 </p></li>
-<li><p><strong>rescale_flux</strong> (<em>bool</em>) – <p>If True, the visibility amplitudes are rescaled to account
-for the difference between the inclined (observed) brightness and the
+<li><p><strong>rescale_flux</strong> (<em>bool</em>) – <dl class="simple">
+<dt>If True, the visibility amplitudes are rescaled to account</dt><dd><p>for the difference between the inclined (observed) brightness and the
 assumed face-on brightness, assuming the emission is optically thick.
-The source’s integrated (2D) flux is assumed to be:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.</p>
-</div></blockquote>
-<p>No rescaling would be appropriate in the optically thin limit.</p>
+The source’s integrated (2D) flux is assumed to be:
+<span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.
+No rescaling would be appropriate in the optically thin limit.</p>
+</dd>
+</dl>
 </p></li>
 <li><p><strong>bin_width</strong> (<em>float</em><em>, </em><em>default=20e3</em>) – Bin size [klambda] for baselines</p></li>
 <li><p><strong>q_logx</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to plot visibilities in log-baseline</p></li>
@@ -2912,24 +3029,23 @@ The source’s integrated (2D) flux is assumed to be:</p>
 <dt class="sig sig-object py" id="mpol.plot.radial_fig">
 <span class="sig-prename descclassname"><span class="pre">mpol.plot.</span></span><span class="sig-name descname"><span class="pre">radial_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_logx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/plot.html#radial_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.plot.radial_fig" title="Permalink to this definition">#</a></dt>
 <dd><p>Figure for analysis of 1D (radial) brightness profile of MPoL model image,
-using a user-supplied geometry. Plots:
-- MPoL model image
-- 1D (radial) brightness profile extracted from MPoL image</p>
-<blockquote>
-<div><p>(supply <cite>dist</cite> to show second x-axis in [AU])</p>
-</div></blockquote>
-<ul class="simple">
+using a user-supplied geometry.</p>
+<dl class="simple">
+<dt>Plots:</dt><dd><ul class="simple">
+<li><p>MPoL model image</p></li>
+<li><p>1D (radial) brightness profile extracted from MPoL image (supply <cite>dist</cite> to show second x-axis in [AU])</p></li>
 <li><p>Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)</p></li>
 <li><p>Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)</p></li>
 </ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<cite>torch.nn.Module</cite> object) – A neural network; instance of the <cite>mpol.precomposed.SimpleNet</cite> class.</p></li>
-<li><p><strong>geom</strong> (<em>dict</em>) – <p>Dictionary of source geometry. Used to deproject image and visibilities.
-Keys:</p>
-<blockquote>
-<div><dl class="simple">
+<li><p><strong>geom</strong> (<em>dict</em>) – <dl class="simple">
+<dt>Dictionary of source geometry. Used to deproject image and visibilities.</dt><dd><dl class="simple">
+<dt>Keys:</dt><dd><dl class="simple">
 <dt>”incl”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Inclination</p>
 </dd>
 <dt>”Omega”<span class="classifier">float, unit=[deg]</span></dt><dd><p>Position angle of the ascending node</p>
@@ -2941,22 +3057,22 @@ Keys:</p>
 <dt>”dDec”<span class="classifier">float, unit=[arcsec]</span></dt><dd><p>Phase center offset in declination.</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
 </p></li>
 <li><p><strong>u</strong> (<em>array</em><em>, </em><em>optional</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em><em>, </em><em>default=None</em>) – Data u- and v-coordinates</p></li>
 <li><p><strong>v</strong> (<em>array</em><em>, </em><em>optional</em><em>, </em><em>unit=</em><em>[</em><em>klambda</em><em>]</em><em>, </em><em>default=None</em>) – Data u- and v-coordinates</p></li>
 <li><p><strong>V</strong> (<em>array</em><em>, </em><em>optional</em><em>, </em><em>unit=</em><em>[</em><em>Jy</em><em>]</em><em>, </em><em>default=None</em>) – Data visibility amplitudes</p></li>
 <li><p><strong>weights</strong> (<em>array</em><em>, </em><em>optional</em><em>, </em><em>unit=</em><em>[</em><em>Jy^-2</em><em>]</em><em>, </em><em>default=None</em>) – Data weights</p></li>
 <li><p><strong>dist</strong> (<em>float</em><em>, </em><em>optional</em><em>, </em><em>unit =</em><em> [</em><em>AU</em><em>]</em><em>, </em><em>default = None</em>) – Distance to source, used to show second x-axis for I(r) in [AU]</p></li>
-<li><p><strong>rescale_flux</strong> (<em>bool</em>) – <p>If True, the visibility amplitudes are rescaled to account
+<li><p><strong>rescale_flux</strong> (<em>bool</em>) – If True, the visibility amplitudes are rescaled to account
 for the difference between the inclined (observed) brightness and the
 assumed face-on brightness, assuming the emission is optically thick.
-The source’s integrated (2D) flux is assumed to be:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.</p>
-</div></blockquote>
-<p>No rescaling would be appropriate in the optically thin limit.</p>
-</p></li>
+The source’s integrated (2D) flux is assumed to be:
+<span class="math notranslate nohighlight">\(F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}\)</span>.
+No rescaling would be appropriate in the optically thin limit.</p></li>
 <li><p><strong>bin_width</strong> (<em>float</em><em>, </em><em>default=20e3</em>) – Bin size [klambda] in which to bin observed visibility points</p></li>
 <li><p><strong>q_logx</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to plot visibilities in log-baseline</p></li>
 <li><p><strong>title</strong> (<em>str</em><em>, </em><em>default=&quot;&quot;</em>) – Figure super-title</p></li>
@@ -3185,6 +3301,11 @@ The source’s integrated (2D) flux is assumed to be:</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.crossval.DartboardSplitGridded.from_dartboard_properties"><code class="docutils literal notranslate"><span class="pre">DartboardSplitGridded.from_dartboard_properties()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.onedim">Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.onedim.radialI"><code class="docutils literal notranslate"><span class="pre">radialI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.onedim.radialV"><code class="docutils literal notranslate"><span class="pre">radialV()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.plot">Plotting</a><ul class="nav section-nav flex-column">

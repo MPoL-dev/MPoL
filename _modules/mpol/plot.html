@@ -697,14 +697,15 @@ document.write(`
                           <span class="n">kfold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Figure for model diagnostics during an optimization loop. For a `model` in </span>
-<span class="sd">    a given state, plots the current: </span>
-<span class="sd">    - model image</span>
-<span class="sd">    - flux of model image</span>
-<span class="sd">    - gradient image</span>
-<span class="sd">    - difference image between `old_model_image` and current model image</span>
-<span class="sd">    - loss function</span>
-<span class="sd">    - learning rate</span>
+<span class="sd">    Figure for model diagnostics at a given model state during an optimization loop. </span>
+<span class="sd">    </span>
+<span class="sd">    Plots:</span>
+<span class="sd">        - model image</span>
+<span class="sd">        - flux of model image</span>
+<span class="sd">        - gradient image</span>
+<span class="sd">        - difference image between `old_model_image` and current model image</span>
+<span class="sd">        - loss function</span>
+<span class="sd">        - learning rate</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -805,9 +806,11 @@ document.write(`
 
 <div class="viewcode-block" id="crossval_diagnostics_fig"><a class="viewcode-back" href="../../api.html#mpol.plot.crossval_diagnostics_fig">[docs]</a><span class="k">def</span> <span class="nf">crossval_diagnostics_fig</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Figure for model diagnostics of a cross-validation run. Plots: </span>
-<span class="sd">    - loss evolution for each k-fold</span>
-<span class="sd">    - cross-validation score per k-fold</span>
+<span class="sd">    Figure for model diagnostics of a cross-validation run. </span>
+<span class="sd">    </span>
+<span class="sd">    Plots: </span>
+<span class="sd">        - loss evolution for each k-fold</span>
+<span class="sd">        - cross-validation score per k-fold</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -863,11 +866,13 @@ document.write(`
                          <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
                          <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Figure for comparison of MPoL model image to other image models. Plots: </span>
-<span class="sd">    - dirty image</span>
-<span class="sd">    - MPoL model image</span>
-<span class="sd">    - MPoL residual visibilities imaged</span>
-<span class="sd">    - clean image (if a .fits file is supplied)</span>
+<span class="sd">    Figure for comparison of MPoL model image to other image models. </span>
+<span class="sd">    </span>
+<span class="sd">    Plots: </span>
+<span class="sd">        - dirty image</span>
+<span class="sd">        - MPoL model image</span>
+<span class="sd">        - MPoL residual visibilities imaged</span>
+<span class="sd">        - clean image (if a .fits file is supplied)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -993,7 +998,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">save_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_prefix</span> <span class="o">+</span> <span class="s2">&quot;_image_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-    
+
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span></div>
@@ -1003,11 +1008,13 @@ document.write(`
               <span class="n">bin_width</span><span class="o">=</span><span class="mf">20e3</span><span class="p">,</span> <span class="n">q_logx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Figure for comparison of 1D projected MPoL model visibilities and observed </span>
-<span class="sd">    visibilities. Plots:</span>
-<span class="sd">    - Re(V): observed and MPoL model (projected unless `geom` is supplied)</span>
-<span class="sd">    - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)</span>
-<span class="sd">    - Im(V): observed and MPoL model (projected unless `geom` is supplied)</span>
-<span class="sd">    - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)</span>
+<span class="sd">        visibilities. </span>
+<span class="sd">    </span>
+<span class="sd">    Plots:</span>
+<span class="sd">        - Re(V): observed and MPoL model (projected unless `geom` is supplied)</span>
+<span class="sd">        - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)</span>
+<span class="sd">        - Im(V): observed and MPoL model (projected unless `geom` is supplied)</span>
+<span class="sd">        - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1021,24 +1028,24 @@ document.write(`
 <span class="sd">        Data weights        </span>
 <span class="sd">    geom : dict</span>
 <span class="sd">        Dictionary of source geometry. If passed in, visibilities will be </span>
-<span class="sd">        deprojected prior to plotting. Keys:</span>
-<span class="sd">            &quot;incl&quot; : float, unit=[deg]</span>
-<span class="sd">                Inclination </span>
-<span class="sd">            &quot;Omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Position angle of the ascending node </span>
-<span class="sd">            &quot;omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Argument of periastron</span>
-<span class="sd">            &quot;dRA&quot; : float, unit=[arcsec]</span>
-<span class="sd">                Phase center offset in right ascension. Positive is west of north.</span>
-<span class="sd">            &quot;dDec&quot; : float, unit=[arcsec]</span>
-<span class="sd">                Phase center offset in declination.</span>
+<span class="sd">            deprojected prior to plotting. Keys:</span>
+<span class="sd">                &quot;incl&quot; : float, unit=[deg]</span>
+<span class="sd">                    Inclination </span>
+<span class="sd">                &quot;Omega&quot; : float, unit=[deg]</span>
+<span class="sd">                    Position angle of the ascending node </span>
+<span class="sd">                &quot;omega&quot; : float, unit=[deg]</span>
+<span class="sd">                    Argument of periastron</span>
+<span class="sd">                &quot;dRA&quot; : float, unit=[arcsec]</span>
+<span class="sd">                    Phase center offset in right ascension. Positive is west of north.</span>
+<span class="sd">                &quot;dDec&quot; : float, unit=[arcsec]</span>
+<span class="sd">                    Phase center offset in declination.</span>
 <span class="sd">    rescale_flux : bool</span>
 <span class="sd">        If True, the visibility amplitudes are rescaled to account </span>
-<span class="sd">        for the difference between the inclined (observed) brightness and the </span>
-<span class="sd">        assumed face-on brightness, assuming the emission is optically thick. </span>
-<span class="sd">        The source&#39;s integrated (2D) flux is assumed to be:</span>
+<span class="sd">            for the difference between the inclined (observed) brightness and the </span>
+<span class="sd">            assumed face-on brightness, assuming the emission is optically thick. </span>
+<span class="sd">            The source&#39;s integrated (2D) flux is assumed to be:</span>
 <span class="sd">            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.</span>
-<span class="sd">        No rescaling would be appropriate in the optically thin limit.                 </span>
+<span class="sd">            No rescaling would be appropriate in the optically thin limit.                 </span>
 <span class="sd">    bin_width : float, default=20e3</span>
 <span class="sd">        Bin size [klambda] for baselines</span>
 <span class="sd">    q_logx : bool, default=True</span>
@@ -1172,12 +1179,13 @@ document.write(`
                <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Figure for analysis of 1D (radial) brightness profile of MPoL model image,</span>
-<span class="sd">    using a user-supplied geometry. Plots:</span>
-<span class="sd">    - MPoL model image</span>
-<span class="sd">    - 1D (radial) brightness profile extracted from MPoL image </span>
-<span class="sd">      (supply `dist` to show second x-axis in [AU])</span>
-<span class="sd">    - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)</span>
-<span class="sd">    - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)</span>
+<span class="sd">    using a user-supplied geometry. </span>
+<span class="sd">    </span>
+<span class="sd">    Plots:</span>
+<span class="sd">        - MPoL model image</span>
+<span class="sd">        - 1D (radial) brightness profile extracted from MPoL image (supply `dist` to show second x-axis in [AU])</span>
+<span class="sd">        - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)</span>
+<span class="sd">        - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1185,17 +1193,17 @@ document.write(`
 <span class="sd">        A neural network; instance of the `mpol.precomposed.SimpleNet` class.</span>
 <span class="sd">    geom : dict</span>
 <span class="sd">        Dictionary of source geometry. Used to deproject image and visibilities.</span>
-<span class="sd">        Keys:</span>
-<span class="sd">            &quot;incl&quot; : float, unit=[deg]</span>
-<span class="sd">                Inclination </span>
-<span class="sd">            &quot;Omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Position angle of the ascending node </span>
-<span class="sd">            &quot;omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Argument of periastron</span>
-<span class="sd">            &quot;dRA&quot; : float, unit=[arcsec]</span>
-<span class="sd">                Phase center offset in right ascension. Positive is west of north.</span>
-<span class="sd">            &quot;dDec&quot; : float, unit=[arcsec]</span>
-<span class="sd">                Phase center offset in declination.</span>
+<span class="sd">            Keys:</span>
+<span class="sd">                &quot;incl&quot; : float, unit=[deg]</span>
+<span class="sd">                    Inclination </span>
+<span class="sd">                &quot;Omega&quot; : float, unit=[deg]</span>
+<span class="sd">                    Position angle of the ascending node </span>
+<span class="sd">                &quot;omega&quot; : float, unit=[deg]</span>
+<span class="sd">                    Argument of periastron</span>
+<span class="sd">                &quot;dRA&quot; : float, unit=[arcsec]</span>
+<span class="sd">                    Phase center offset in right ascension. Positive is west of north.</span>
+<span class="sd">                &quot;dDec&quot; : float, unit=[arcsec]</span>
+<span class="sd">                    Phase center offset in declination.</span>
 <span class="sd">    u, v : array, optional, unit=[k\lambda], default=None</span>
 <span class="sd">        Data u- and v-coordinates</span>
 <span class="sd">    V : array, optional, unit=[Jy], default=None</span>
@@ -1209,7 +1217,7 @@ document.write(`
 <span class="sd">        for the difference between the inclined (observed) brightness and the </span>
 <span class="sd">        assumed face-on brightness, assuming the emission is optically thick. </span>
 <span class="sd">        The source&#39;s integrated (2D) flux is assumed to be:</span>
-<span class="sd">            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.</span>
+<span class="sd">        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.</span>
 <span class="sd">        No rescaling would be appropriate in the optically thin limit.                 </span>
 <span class="sd">    bin_width : float, default=20e3</span>
 <span class="sd">        Bin size [klambda] in which to bin observed visibility points</span>
