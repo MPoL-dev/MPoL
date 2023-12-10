@@ -888,12 +888,13 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
                channel=0, save_prefix=None):
     """
     Figure for analysis of 1D (radial) brightness profile of MPoL model image,
-    using a user-supplied geometry. Plots:
-    - MPoL model image
-    - 1D (radial) brightness profile extracted from MPoL image 
-      (supply `dist` to show second x-axis in [AU])
-    - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
-    - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
+    using a user-supplied geometry. 
+    
+    Plots:
+        - MPoL model image
+        - 1D (radial) brightness profile extracted from MPoL image (supply `dist` to show second x-axis in [AU])
+        - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
+        - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
 
     Parameters
     ----------
@@ -901,17 +902,17 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
         A neural network; instance of the `mpol.precomposed.SimpleNet` class.
     geom : dict
         Dictionary of source geometry. Used to deproject image and visibilities.
-        Keys:
-            "incl" : float, unit=[deg]
-                Inclination 
-            "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
-            "omega" : float, unit=[deg]
-                Argument of periastron
-            "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north.
-            "dDec" : float, unit=[arcsec]
-                Phase center offset in declination.
+            Keys:
+                "incl" : float, unit=[deg]
+                    Inclination 
+                "Omega" : float, unit=[deg]
+                    Position angle of the ascending node 
+                "omega" : float, unit=[deg]
+                    Argument of periastron
+                "dRA" : float, unit=[arcsec]
+                    Phase center offset in right ascension. Positive is west of north.
+                "dDec" : float, unit=[arcsec]
+                    Phase center offset in declination.
     u, v : array, optional, unit=[k\lambda], default=None
         Data u- and v-coordinates
     V : array, optional, unit=[Jy], default=None
@@ -925,7 +926,7 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
         The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
         No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] in which to bin observed visibility points
