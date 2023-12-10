@@ -406,14 +406,15 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
                           kfold=None, epoch=None,
                           channel=0, save_prefix=None):
     """
-    Figure for model diagnostics during an optimization loop. For a `model` in 
-    a given state, plots the current: 
-    - model image
-    - flux of model image
-    - gradient image
-    - difference image between `old_model_image` and current model image
-    - loss function
-    - learning rate
+    Figure for model diagnostics at a given model state during an optimization loop. 
+    
+    Plots:
+        - model image
+        - flux of model image
+        - gradient image
+        - difference image between `old_model_image` and current model image
+        - loss function
+        - learning rate
 
     Parameters
     ----------
@@ -514,9 +515,11 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
 
 def crossval_diagnostics_fig(cv, title="", save_prefix=None):
     """
-    Figure for model diagnostics of a cross-validation run. Plots: 
-    - loss evolution for each k-fold
-    - cross-validation score per k-fold
+    Figure for model diagnostics of a cross-validation run. 
+    
+    Plots: 
+        - loss evolution for each k-fold
+        - cross-validation score per k-fold
 
     Parameters
     ----------
@@ -572,11 +575,13 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                          channel=0, 
                          save_prefix=None):
     """
-    Figure for comparison of MPoL model image to other image models. Plots: 
-    - dirty image
-    - MPoL model image
-    - MPoL residual visibilities imaged
-    - clean image (if a .fits file is supplied)
+    Figure for comparison of MPoL model image to other image models. 
+    
+    Plots: 
+        - dirty image
+        - MPoL model image
+        - MPoL residual visibilities imaged
+        - clean image (if a .fits file is supplied)
 
     Parameters
     ----------
@@ -702,7 +707,7 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
 
     if save_prefix is not None:
         fig.savefig(save_prefix + "_image_comparison.png", dpi=300)
-    
+
     plt.close()
 
     return fig, axes
@@ -712,11 +717,13 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
               bin_width=20e3, q_logx=True, title="", channel=0, save_prefix=None):
     """
     Figure for comparison of 1D projected MPoL model visibilities and observed 
-    visibilities. Plots:
-    - Re(V): observed and MPoL model (projected unless `geom` is supplied)
-    - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)
-    - Im(V): observed and MPoL model (projected unless `geom` is supplied)
-    - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)
+        visibilities. 
+    
+    Plots:
+        - Re(V): observed and MPoL model (projected unless `geom` is supplied)
+        - Residual Re(V): observed - MPoL model (projected unless `geom` is supplied)
+        - Im(V): observed and MPoL model (projected unless `geom` is supplied)
+        - Residual Im(V): observed - MPoL model (projected unless `geom` is supplied)
 
     Parameters
     ----------
@@ -730,24 +737,24 @@ def vis_1d_fig(model, u, v, V, weights, geom=None, rescale_flux=False,
         Data weights        
     geom : dict
         Dictionary of source geometry. If passed in, visibilities will be 
-        deprojected prior to plotting. Keys:
-            "incl" : float, unit=[deg]
-                Inclination 
-            "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
-            "omega" : float, unit=[deg]
-                Argument of periastron
-            "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north.
-            "dDec" : float, unit=[arcsec]
-                Phase center offset in declination.
+            deprojected prior to plotting. Keys:
+                "incl" : float, unit=[deg]
+                    Inclination 
+                "Omega" : float, unit=[deg]
+                    Position angle of the ascending node 
+                "omega" : float, unit=[deg]
+                    Argument of periastron
+                "dRA" : float, unit=[arcsec]
+                    Phase center offset in right ascension. Positive is west of north.
+                "dDec" : float, unit=[arcsec]
+                    Phase center offset in declination.
     rescale_flux : bool
         If True, the visibility amplitudes are rescaled to account 
-        for the difference between the inclined (observed) brightness and the 
-        assumed face-on brightness, assuming the emission is optically thick. 
-        The source's integrated (2D) flux is assumed to be:
+            for the difference between the inclined (observed) brightness and the 
+            assumed face-on brightness, assuming the emission is optically thick. 
+            The source's integrated (2D) flux is assumed to be:
             :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
-        No rescaling would be appropriate in the optically thin limit.                 
+            No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] for baselines
     q_logx : bool, default=True
@@ -881,12 +888,13 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
                channel=0, save_prefix=None):
     """
     Figure for analysis of 1D (radial) brightness profile of MPoL model image,
-    using a user-supplied geometry. Plots:
-    - MPoL model image
-    - 1D (radial) brightness profile extracted from MPoL image 
-      (supply `dist` to show second x-axis in [AU])
-    - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
-    - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
+    using a user-supplied geometry. 
+    
+    Plots:
+        - MPoL model image
+        - 1D (radial) brightness profile extracted from MPoL image (supply `dist` to show second x-axis in [AU])
+        - Deprojectd Re(V): binned MPoL model and observations (if u, v, V, weights supplied)
+        - Deprojected Im(V): binned MPoL model and observations (if u, v, V, weights supplied)
 
     Parameters
     ----------
@@ -894,17 +902,17 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
         A neural network; instance of the `mpol.precomposed.SimpleNet` class.
     geom : dict
         Dictionary of source geometry. Used to deproject image and visibilities.
-        Keys:
-            "incl" : float, unit=[deg]
-                Inclination 
-            "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
-            "omega" : float, unit=[deg]
-                Argument of periastron
-            "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north.
-            "dDec" : float, unit=[arcsec]
-                Phase center offset in declination.
+            Keys:
+                "incl" : float, unit=[deg]
+                    Inclination 
+                "Omega" : float, unit=[deg]
+                    Position angle of the ascending node 
+                "omega" : float, unit=[deg]
+                    Argument of periastron
+                "dRA" : float, unit=[arcsec]
+                    Phase center offset in right ascension. Positive is west of north.
+                "dDec" : float, unit=[arcsec]
+                    Phase center offset in declination.
     u, v : array, optional, unit=[k\lambda], default=None
         Data u- and v-coordinates
     V : array, optional, unit=[Jy], default=None
@@ -918,7 +926,7 @@ def radial_fig(model, geom, u=None, v=None, V=None, weights=None, dist=None,
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
         The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
         No rescaling would be appropriate in the optically thin limit.                 
     bin_width : float, default=20e3
         Bin size [klambda] in which to bin observed visibility points

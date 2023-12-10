@@ -68,6 +68,12 @@ Cross-validation
 .. automodule:: mpol.crossval
 
 
+Analysis
+--------
+
+.. automodule:: mpol.onedim
+
+
 Plotting
 --------
 

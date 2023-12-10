@@ -101,7 +101,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
         for the difference between the inclined (observed) brightness and the 
         assumed face-on brightness, assuming the emission is optically thick. 
         The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
         No rescaling would be appropriate in the optically thin limit. 
     chan : int, default=0
         Channel of the image cube corresponding to the desired image        
