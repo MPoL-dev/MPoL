@@ -573,9 +573,10 @@ class VisibilityModel(PyroModule):
         self.flayer = fourier.FourierCube(coords=coords)
 
         # create a NuFFT, but only use it for predicting samples
-        self.nufft = fourier.NuFFT(
-            coords=self.coords, nchan=self.nchan, uu=uu, vv=vv, sparse_matrices=False
-        )
+        # store the uu and vv points we might use 
+        self.uu = uu 
+        self.vv = vv
+        self.nufft = fourier.NuFFT(coords=self.coords, nchan=self.nchan)
 
 
     def forward(self, predictive=True):
@@ -592,7 +593,7 @@ class VisibilityModel(PyroModule):
 
         if predictive:
             # use the NuFFT to produce and store samples
-            vis_nufft = self.nufft(img)[0]
+            vis_nufft = self.nufft(img, self.uu, self.vv)[0]
             
             pyro.deterministic("vis_real", torch.real(vis_nufft))
             pyro.deterministic("vis_imag", torch.imag(vis_nufft))
