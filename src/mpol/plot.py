@@ -406,14 +406,15 @@ def train_diagnostics_fig(model, losses=None, learn_rates=None, fluxes=None,
                           kfold=None, epoch=None,
                           channel=0, save_prefix=None):
     """
-    Figure for model diagnostics during an optimization loop. For a `model` in 
-    a given state, plots the current: 
-    - model image
-    - flux of model image
-    - gradient image
-    - difference image between `old_model_image` and current model image
-    - loss function
-    - learning rate
+    Figure for model diagnostics at a given model state during an optimization loop. 
+    
+    Plots:
+        - model image
+        - flux of model image
+        - gradient image
+        - difference image between `old_model_image` and current model image
+        - loss function
+        - learning rate
 
     Parameters
     ----------
