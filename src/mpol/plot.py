@@ -575,11 +575,13 @@ def image_comparison_fig(model, u, v, V, weights, robust=0.5,
                          channel=0, 
                          save_prefix=None):
     """
-    Figure for comparison of MPoL model image to other image models. Plots: 
-    - dirty image
-    - MPoL model image
-    - MPoL residual visibilities imaged
-    - clean image (if a .fits file is supplied)
+    Figure for comparison of MPoL model image to other image models. 
+    
+    Plots: 
+        - dirty image
+        - MPoL model image
+        - MPoL residual visibilities imaged
+        - clean image (if a .fits file is supplied)
 
     Parameters
     ----------
