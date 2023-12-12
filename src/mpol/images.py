@@ -3,12 +3,14 @@ r"""The ``images`` module provides the core functionality of MPoL via :class:`mp
 from __future__ import annotations
 
 import numpy as np
+from scipy.special import j1
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
 
 from . import utils
 from .coordinates import GridCoords
+
 
 
 class BaseCube(nn.Module):
