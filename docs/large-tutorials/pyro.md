@@ -5,7 +5,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.15.2
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -27,7 +27,23 @@ In this tutorial, we will explore how we can use MPoL with a probabilistic progr
 
 In this tutorial, we will use [Stochastic Variational Inference](http://pyro.ai/examples/svi_part_i.html) algorithms to obtain the posterior distribution of the model parameters. These algorithms are quick to implement in Pyro and--important for this tutorial--quick to run. Pyro also has full support for MCMC algorithms like Hamiltonian Monte Carlo and the No U-Turn Sampler (NUTS) ([for example](http://pyro.ai/examples/bayesian_regression_ii.html#HMC)) that are relatively straightforward to use in an extension from this model. However, because their run times are significantly longer than SVI algorithms, more computational resources are needed beyond the scope of this tutorial.
 
-+++
+If the following output says `Using cuda`, then this tutorial was executed on a GPU. We found that it took about 5 minutes to converge the SVI, which is pretty exciting. You may be able to run this on CPU-only machine, but expect the runtime to take significantly longer. You may want to shorten the number of iterations and reduce the number of predictive samples to get a sense that the routine will in fact execute, but be aware that your solution may not fully converge.
+
+```{code-cell} ipython3
+import torch
+if torch.cuda.is_available():
+    device = torch.device('cuda')                   
+else:                                                       
+    device = torch.device('cpu')   
+
+print(f"Using {device}.")    
+    
+```
+
+```{code-cell} ipython3
+# import arviz now, to check UTF-8 loading issue.
+import arviz as az
+```
 
 ## MPoL and models
 
@@ -244,7 +260,6 @@ We also recommend reading Gelman et al. 2020's paper on [Bayesian Workflow](http
 There are many ways to build a Pyro model. In this tutorial we will take a class-based approach and use the [PyroModule](http://pyro.ai/examples/modules.html) construct, but models can just as easily be built using function definitions (for [example](http://pyro.ai/examples/intro_long.html#Models-in-Pyro)).
 
 ```{code-cell} ipython3
-import torch
 from torch import nn
 from mpol import geometry, gridding, images, fourier, utils
 from mpol.constants import deg
@@ -574,8 +589,8 @@ class VisibilityModel(PyroModule):
 
         # create a NuFFT, but only use it for predicting samples
         # store the uu and vv points we might use 
-        self.uu = uu 
-        self.vv = vv
+        self.uu = torch.as_tensor(uu, device=device)
+        self.vv = torch.as_tensor(vv, device=device)
         self.nufft = fourier.NuFFT(coords=self.coords, nchan=self.nchan)
 
 
@@ -624,14 +639,9 @@ As we described in the [NuFFT](../ci-tutorials/loose-visibilities.md) tutorial, 
 
 When visualizing model or residual visibility values, it is often far more useful to work with the loose visibility values produced from the NuFFT. This is because the loose visibilities can be gridded using a weighting scheme like Briggs robust weighting, which can dramatically increase the sensitivity of the resulting image. So that is why our `VisibilityModel` uses a {class}`~mpol.fourier.NuFFT` layer to produce model visibilities when working in a predictive mode but otherwise uses a more efficient {class}`~mpol.fourier.FourierCube` layer to produce model visibilities when working in a likelihood evaluation loop.
 
-Now we'll do a predictive check with the `VisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU, if the device is available.
+Now we'll do a predictive check with the `VisibilityModel` using the same disk values found by Guzmán et al. 2018. We will also place it on the GPU with the `.to` call, if the device is available.
 
 ```{code-cell} ipython3
-if torch.cuda.is_available():
-    device = torch.device('cuda')                   
-else:                                                       
-    device = torch.device('cpu')   
-
 # we will use this object throghout the rest of the tutorial, so we'll just call it 'model'
 model = VisibilityModel(coords=coords, distance=distance, uu=uu, vv=vv, weight=weight, data=data, device=device)
 model.to(device);
@@ -800,8 +810,7 @@ guide = AutoNormal(model, init_loc_fn=init_to_sample)
 adam = pyro.optim.Adam({"lr": 0.02})
 svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
-#num_iterations = 15000
-num_iterations = 1000
+num_iterations = 15000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
 
@@ -1041,7 +1050,7 @@ ax.set_xlabel("radius [au]")
 ax.set_ylabel(r"$I_\nu$ [Jy $\mathrm{arcsec}^{-2}$]");
 ```
 
-We see that there is a slightly larger scatter in the draws compared to the `AutoNormal` guide, especially around 40 au. This is because the `AutoMultivariateNormal` guide captured more of the covariance between parameters, resulting in a greater dispersion of draws.
+We see that there is a *slightly* larger scatter in the draws compared to the `AutoNormal` guide, most noticeable around 40 au. This is because the `AutoMultivariateNormal` guide captured more of the covariance between parameters, resulting in a greater dispersion of draws.
 
 Encouragingly, both our image and 1D profile results compare favorably with those found by [Guzmán et al. 2018](https://ui.adsabs.harvard.edu/abs/2018ApJ...869L..48G/abstract) (compare their Figures 2 & 4). 
 
