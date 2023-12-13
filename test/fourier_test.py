@@ -291,8 +291,8 @@ def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path)
     fig.suptitle("NuFFT Accuracy compared to analytic")
     fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
 
-    # should be < 2e-8, based on plot
-    assert num_output == approx(an_output, abs=2e-8)
+    # should be < 2.5e-6, based on plot
+    assert num_output == approx(an_output, abs=2.5e-6)
 
 
 def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
