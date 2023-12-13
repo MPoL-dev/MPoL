@@ -312,14 +312,14 @@ $$
 For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but basically we instantiate the NuFFT layer relative to some image dimensions and $u,v$ locations 
 
 ```{code-cell} ipython3
-nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan, uu=uu, vv=vv)
+nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan)
 ```
 
 and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since {meth}`mpol.fourier.NuFFT.forward` returns a Pytorch tensor, we'll need to detach it and convert it to numpy. We'll also remove the channel dimension.
 
 ```{code-cell} ipython3
 # note the NuFFT expects a "packed image cube," as output from ImageCube.forward()
-vis_model = nufft(rml.icube())
+vis_model = nufft(rml.icube(), uu, vv)
 # convert from Pytorch to numpy, remove channel dimension
 vis_model = np.squeeze(vis_model.detach().numpy())
 ```

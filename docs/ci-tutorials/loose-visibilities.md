@@ -97,10 +97,10 @@ uu_chan = uu[chan]
 vv_chan = vv[chan]
 ```
 
-and then use these values to initialize a {class}`mpol.fourier.NuFFT` object
+Now, we'll initialize a {class}`mpol.fourier.NuFFT` object
 
 ```{code-cell}
-nufft = fourier.NuFFT(coords=coords, nchan=nchan, uu=uu_chan, vv=vv_chan)
+nufft = fourier.NuFFT(coords=coords, nchan=nchan)
 ```
 
 Now let's put the NuFFT aside for a moment while we initialize the {class}`mpol.gridding.DataAverager` object and create an image for use in the forward model.
@@ -163,7 +163,7 @@ icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.
 
 ```{code-cell}
-vis_model_loose = nufft(icube())
+vis_model_loose = nufft(icube(), uu_chan, vv_chan)
 print("Loose model visibilities from the NuFFT have shape {:}".format(vis_model_loose.shape))
 print("The original loose data visibilities have shape {:}".format(data.shape))
 ```

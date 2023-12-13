@@ -2,6 +2,10 @@
 
 # Changelog
 
+## v0.2.1
+
+- Changed API of {class}`~mpol.fourier.NuFFT`. Previous signature took `uu` and `vv` points at initialization (`__init__`), and the `.forward` method took only an image cube. This behaviour is preserved in a new class {class}`~mpol.fourier.NuFFTCached`. The updated signature of {class}`~mpol.fourier.NuFFT` *does not* take `uu` and `vv` at initialization. Rather, its `forward` method is modified to take an image cube and the `uu` and `vv` points. This allows an instance of this class to be used with new `uu` and `vv` points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new `x`) and the pattern of the TorchKbNuFFT package itself. It is expected that the new `NuFFT` will be the default routine and `NuFFTCached` will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by #232.
+
 ## v0.2.0
 
 - Moved docs build out of combined and into standalone test workflow
