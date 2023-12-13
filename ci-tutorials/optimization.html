@@ -574,7 +574,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f71d8925700&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f84aff3ebe0&gt;
 </pre></div>
 </div>
 <img alt="../_images/a22504f6df41e5156e9d931c07df951232ae52bc8134c7f62371b347bbeabf5e.png" src="../_images/a22504f6df41e5156e9d931c07df951232ae52bc8134c7f62371b347bbeabf5e.png" />
@@ -671,7 +671,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f71d4104b20&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f84ac678580&gt;
 </pre></div>
 </div>
 <img alt="../_images/cc08ac013e4d1302828d6182b0cbdc8e1bd0b754c201d23e801394ac99050b6e.png" src="../_images/cc08ac013e4d1302828d6182b0cbdc8e1bd0b754c201d23e801394ac99050b6e.png" />
@@ -728,7 +728,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f71ccf979a0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f84ac591460&gt;
 </pre></div>
 </div>
 <img alt="../_images/87d3f9f450266b13d76a233cc18fdbd414d36639350fafb5d5dce309c3cee5c5.png" src="../_images/87d3f9f450266b13d76a233cc18fdbd414d36639350fafb5d5dce309c3cee5c5.png" />
@@ -765,8 +765,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 19.2 s, sys: 2.83 s, total: 22 s
-Wall time: 11.8 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 19.2 s, sys: 3.05 s, total: 22.2 s
+Wall time: 12 s
 </pre></div>
 </div>
 </div>
@@ -811,7 +811,7 @@ Wall time: 11.8 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f71d6b3bc10&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7f84ae07f3d0&gt;
 </pre></div>
 </div>
 <img alt="../_images/d6504f8658d9cebd116783bd607d36f77ef3f2041afe8be9145eaa160a5afcd9.png" src="../_images/d6504f8658d9cebd116783bd607d36f77ef3f2041afe8be9145eaa160a5afcd9.png" />
@@ -830,13 +830,7 @@ Wall time: 11.8 s
 <p>For speed reasons, the <a class="reference internal" href="../api.html#mpol.precomposed.SimpleNet" title="mpol.precomposed.SimpleNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.precomposed.SimpleNet</span></code></a> does not work with the original data visibilities directly, but instead uses an averaged version of them in <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. To calculate model visibilities corresponding to the original <span class="math notranslate nohighlight">\(u,v\)</span> points of the dataset, we will need to use the <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> layer. More detail on this object is in the <a class="reference internal" href="loose-visibilities.html"><span class="doc std std-doc">Loose Visibilities tutorial</span></a>, but basically we instantiate the NuFFT layer relative to some image dimensions and <span class="math notranslate nohighlight">\(u,v\)</span> locations</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/torchkbnufft/_nufft/spmat.py:101: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:605.)
-  torch.sparse.FloatTensor(inds, real_vals, torch.Size(shape)),  # type: ignore
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">dset</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -845,7 +839,7 @@ Wall time: 11.8 s
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note the NuFFT expects a &quot;packed image cube,&quot; as output from ImageCube.forward()</span>
-<span class="n">vis_model</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">icube</span><span class="p">())</span>
+<span class="n">vis_model</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">rml</span><span class="o">.</span><span class="n">icube</span><span class="p">(),</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span>
 <span class="c1"># convert from Pytorch to numpy, remove channel dimension</span>
 <span class="n">vis_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">vis_model</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
@@ -910,7 +904,7 @@ Wall time: 11.8 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/9df07af73401198f700b7c51b955cc3f13b174d54b1c461d87774f26df6d61ac.png" src="../_images/9df07af73401198f700b7c51b955cc3f13b174d54b1c461d87774f26df6d61ac.png" />
+<img alt="../_images/31bb2de4bf4f1f56677238704c6f755214094a454189136faa7a28cd965af940.png" src="../_images/31bb2de4bf4f1f56677238704c6f755214094a454189136faa7a28cd965af940.png" />
 </div>
 </div>
 <p>If our model is good, we would expect it to fit the signal contained in the data and the residuals contain only noise. As far as this plot is concerned, it appears as though we might have achieved this. However, most radio interferometric visibilities will be noise-dominated (even for high-signal to noise sources), and so a balanced residual scatter is easier to achieve than you might think. If the residuals were significantly over- or under-dispersed relative to their theoretical standard deviation, though, we should examine the calibration of the data (in particular, the calculation of the visibility weights).</p>
@@ -946,7 +940,7 @@ Wall time: 11.8 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/09e4bda8d2671986abd957459fc0f250e0a8ad834fb000527979a81f6e109097.png" src="../_images/09e4bda8d2671986abd957459fc0f250e0a8ad834fb000527979a81f6e109097.png" />
+<img alt="../_images/c1271afe83dccadd15027693d521e8846a2f8097ed3c3d6c633a7143b7d86450.png" src="../_images/c1271afe83dccadd15027693d521e8846a2f8097ed3c3d6c633a7143b7d86450.png" />
 </div>
 </div>
 <p>We see that the residual image appears to be mostly noise, though with some low-frequency spatial structure to the image. This suggests that our model has done a reasonable job of capturing the <em>signal</em> in the data. But, there is still obvious room for improvement in regularizing some of the noiser features. In the following tutorials we’ll examine how to set up additional regularizer terms that will yield more desireable image characteristics.</p>

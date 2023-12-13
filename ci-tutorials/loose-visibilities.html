@@ -470,16 +470,10 @@ document.write(`
 </div>
 </div>
 </div>
-<p>and then use these values to initialize a <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> object</p>
+<p>Now, we’ll initialize a <a class="reference internal" href="../api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a> object</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu_chan</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv_chan</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/torchkbnufft/_nufft/spmat.py:101: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:605.)
-  torch.sparse.FloatTensor(inds, real_vals, torch.Size(shape)),  # type: ignore
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nufft</span> <span class="o">=</span> <span class="n">fourier</span><span class="o">.</span><span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">nchan</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -551,7 +545,7 @@ document.write(`
 <p>The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_loose</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">icube</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_model_loose</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">icube</span><span class="p">(),</span> <span class="n">uu_chan</span><span class="p">,</span> <span class="n">vv_chan</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loose model visibilities from the NuFFT have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis_model_loose</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The original loose data visibilities have shape </span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 </pre></div>
@@ -677,8 +671,8 @@ Gridded data visibilities have shape torch.Size([9, 800, 800])
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Chi squared tensor(5847303.7855, dtype=torch.float64, grad_fn=&lt;SumBackward0&gt;)
-Log likelihood tensor(14577405.9755, dtype=torch.float64, grad_fn=&lt;AddBackward0&gt;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Chi squared tensor(5847303.7843, dtype=torch.float64, grad_fn=&lt;SumBackward0&gt;)
+Log likelihood tensor(14577405.9749, dtype=torch.float64, grad_fn=&lt;AddBackward0&gt;)
 </pre></div>
 </div>
 </div>

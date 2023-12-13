@@ -504,7 +504,266 @@ document.write(`
     <span class="k">return</span> <span class="n">max_diff</span> <span class="o">&lt;</span> <span class="n">delta_uv</span></div>
 
 
+<span class="c1"># static image dimensions</span>
+<span class="c1"># potentially different uu and vv values with each forward call</span>
+<span class="c1"># forward call looks like .forward(image, uu, vv)</span>
+<span class="c1"># returns model @ those points</span>
+<span class="c1"># NuFFT</span>
 <div class="viewcode-block" id="NuFFT"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT">[docs]</a><span class="k">class</span> <span class="nc">NuFFT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This layer translates input from an :class:`mpol.images.ImageCube` to loose, ungridded samples of the Fourier plane, corresponding to the :math:`u,v` locations provided. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or &#39;NuFFT&#39; to interpolate directly to discrete :math:`u,v` locations. This is implemented using the KbNufft routines of the `TorchKbNufft &lt;https://torchkbnufft.readthedocs.io/en/stable/index.html&gt;`_ package.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
+
+        <span class="c1"># initialize the non-uniform FFT object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">KbNufft</span><span class="p">(</span>
+            <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="NuFFT.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate a :class:`mpol.fourier.NuFFT` object from image properties rather than a :meth:`mpol.coordinates.GridCoords` instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cell_size (float): the width of an image-plane pixel [arcseconds]</span>
+<span class="sd">            npix (int): the number of pixels per image side</span>
+<span class="sd">            nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an instance of the :class:`mpol.fourier.NuFFT`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">coords</span><span class="p">,</span>
+            <span class="n">nchan</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            klambda (torch.Tensor): spatial frequency in units of klambda.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: spatial frequency measured in units of radian per sky pixel</span>
+
+<span class="sd">        These concepts can be a little confusing because there are two angular measures at play.</span>
+
+<span class="sd">        1. The first is the normal angular sky coordinate, normally measured in arcseconds for typical sources observed by ALMA or the VLA. Arcseconds, being an angular coordinate, can equivalently be expressed in units of radians. To avoid confusion, we will call this angular measurement &#39;sky radians.&#39; Alternatively, for a given image grid, this same sky coordinate could be expressed in units of sky pixels.</span>
+<span class="sd">        2. The second is the spatial frequency of some image-plane function, :math:`I_\nu(l,m)`, which we could quote in units of &#39;cycles per arcsecond&#39; or &#39;cycles per sky pixel,&#39; for example. With a radio interferometer, spatial frequencies are typically quoted in units of the observing wavelength, i.e., lambda or kilo-lambda. If the field of view of the image is small, thanks to the small-angle approximation, units of lambda are directly equivalent to &#39;cycles per sky radian.&#39; The second angular measure comes about when converting the spatial frequency from a linear measure of frequency &#39;cycles per sky radian&#39; to an angular measure of frequency &#39;radians per sky radian&#39; or &#39;radians per sky pixel.&#39;</span>
+
+<span class="sd">        The TorchKbNufft package expects k-trajectory vectors in units of &#39;radians per sky pixel.&#39; This routine helps convert spatial frequencies from their default unit (kilolambda) into &#39;radians per sky pixel&#39; using the pixel cell_size as provided by ``self.coords.dl``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># convert from kilolambda to cycles per sky radian</span>
+        <span class="n">u_lam</span> <span class="o">=</span> <span class="n">klambda</span> <span class="o">*</span> <span class="mf">1e3</span>  <span class="c1"># [lambda, or cycles/radian]</span>
+
+        <span class="c1"># convert from &#39;cycles per sky radian&#39; to &#39;radians per sky radian&#39;</span>
+        <span class="n">u_rad_per_rad</span> <span class="o">=</span> <span class="n">u_lam</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c1"># [radians / sky radian]</span>
+
+        <span class="c1"># size of pixel in radians</span>
+        <span class="c1"># self.coords.dl  # [sky radians/pixel]</span>
+
+        <span class="c1"># convert from &#39;radians per sky radian&#39; to &#39;radians per sky pixel&#39;</span>
+        <span class="n">u_rad_per_pix</span> <span class="o">=</span> <span class="n">u_rad_per_rad</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">dl</span>  <span class="c1"># [radians / pixel]</span>
+
+        <span class="k">return</span> <span class="n">u_rad_per_pix</span>
+
+    <span class="k">def</span> <span class="nf">_assemble_ktraj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">vv</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.</span>
+
+<span class="sd">        * If ``uu`` and ``vv`` have a 1D shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This will result in a ``k_traj`` vector that has shape (``2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the &#39;coil&#39; dimension of the TorchKbNufft package.</span>
+<span class="sd">        * If the ``uu`` and ``vv`` have a 2D shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used. This will result in a ``k_traj`` vector that has shape (``nchan, 2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the &#39;batch&#39; dimension of the TorchKbNufft package.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uu (1D or 2D torch.Tensor array): u (East-West) spatial frequency coordinate [klambda]</span>
+<span class="sd">            vv (1D or 2D torch.Tensor array): v (North-South) spatial frequency coordinate [klambda]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            k_traj (torch.Tensor): a k-trajectory vector with shape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if uu and vv are 1D dimension, then we assume &#39;same_uv&#39;</span>
+        <span class="n">same_uv</span> <span class="o">=</span> <span class="p">(</span><span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">uu_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+        <span class="n">vv_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+
+        <span class="c1"># torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme</span>
+        <span class="c1"># same_uv will parallelize across the coil dimension.</span>
+        <span class="k">if</span> <span class="n">same_uv</span><span class="p">:</span>
+            <span class="c1"># k-trajectory needs to be packed the way the image is packed (y,x), so</span>
+            <span class="c1"># the trajectory needs to be packed (v, u)</span>
+            <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (2, nvis), it will parallelize across the coil dimension, assuming</span>
+            <span class="c1"># that the k-traj is the same for all coils/channels.</span>
+            <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
+            <span class="c1"># k_traj = torch.tensor(np.array([vv_radpix, uu_radpix]))</span>
+            <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">vv_radpix</span><span class="p">,</span> <span class="n">uu_radpix</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">k_traj</span>
+
+        <span class="c1"># !same_uv will parallelize across the batch dimension.</span>
+        <span class="c1"># in this case, we are given two tensors of shape (nchan, nvis)</span>
+        <span class="c1"># first, augment each tensor individually to create a (nbatch, 1, nvis) tensor,</span>
+        <span class="c1"># where nbatch == nchan</span>
+        <span class="c1"># then, concatenate the tensors along the axis=1 dimension.</span>
+        <span class="k">if</span> <span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of uu (</span><span class="si">{</span><span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of vv (</span><span class="si">{</span><span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">uu_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">vv_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension</span>
+        <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">vv_radpix_aug</span><span class="p">,</span> <span class="n">uu_radpix_aug</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">k_traj</span>
+
+<div class="viewcode-block" id="NuFFT.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">uu</span><span class="p">,</span>
+        <span class="n">vv</span><span class="p">,</span>
+        <span class="n">sparse_matrices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points. In general, you probably do not want to provide baselines that include Hermitian pairs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube should be a &quot;prepacked&quot; image cube, for example, from :meth:`mpol.images.ImageCube.forward`</span>
+<span class="sd">            uu (array-like): array of the u (East-West) spatial frequency coordinate [klambda].</span>
+<span class="sd">            vv (array-like): array of the v (North-South) spatial frequency coordinate [klambda] (must be the same shape as uu)</span>
+<span class="sd">            sparse_matrices (bool): If False, use the default table-based interpolation of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally slower but more accurate).  Note that sparse matrices are incompatible with multi-channel `uu` and `vv` arrays (see below).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.complex tensor: Fourier samples of shape ``(nchan, nvis)``, evaluated at the ``uu``, ``vv`` points</span>
+
+<span class="sd">        **Dimensionality**: You should consider the dimensionality of your image and your visibility samples when using this method. If your image has multiple channels (``nchan &gt; 1``), there is the possibility that the :math:`u,v` sample locations corresponding to each channel may be different. In ALMA/VLA applications, this can arise when continuum observations are taken over significant bandwidth, since the spatial frequency sampled by any pair of antennas is wavelength-dependent</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            u = \frac{D}{\lambda},</span>
+
+<span class="sd">        where :math:`D` is the projected baseline (measured in, say, meters) and :math:`\lambda` is the observing wavelength. In this application, the image-plane model could be the same for each channel, or it may vary with channel (necessary if the spectral slope of the source is significant).</span>
+
+<span class="sd">        On the other hand, with spectral line observations it will usually be the case that the total bandwidth of the observations is small enough such that the :math:`u,v` sample locations could be considered as the same for each channel. In spectral line applications, the image-plane model usually varies substantially with each channel.</span>
+
+<span class="sd">        This routine will determine whether the spatial frequencies are treated as constant based upon the dimensionality of the ``uu`` and ``vv`` input arguments.</span>
+
+<span class="sd">        * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel (and will invoke parallelization across the image cube ``nchan`` dimension using the &#39;coil&#39; dimension of the TorchKbNufft package).</span>
+<span class="sd">        * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used (and will invoke parallelization across the image cube ``nchan`` dimension using the &#39;batch&#39; dimension of the TorchKbNufft package).</span>
+
+<span class="sd">        Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.</span>
+
+<span class="sd">        **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. If ``sparse_matrices=True``, the routine will calculate sparse matrices (which can be stored for later operations, as in {class}`~mpol.fourier.NuFFTCached`) and use them for the interpolation. This approach is likely to be more accurate but also slower. If Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the &#39;batch&#39; dimension --- this will result in a warning. For most applications, we anticipate the accuracy of the table-based interpolation to be sufficiently accurate, but this could change depending on your problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># permit numpy, but prefer tensor</span>
+        <span class="n">uu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+        <span class="n">vv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+
+        <span class="c1"># make sure that the nchan assumptions for the ImageCube and the NuFFT</span>
+        <span class="c1"># setup are the same</span>
+        <span class="k">if</span> <span class="n">cube</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nchan of ImageCube (</span><span class="si">{</span><span class="n">cube</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">) is different than that used to initialize NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># &quot;unpack&quot; the cube, but leave it flipped</span>
+        <span class="c1"># NuFFT routine expects a &quot;normal&quot; cube, not an fftshifted one</span>
+        <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># convert the cube to a complex type, since this is required by TorchKbNufft</span>
+        <span class="n">complexed</span> <span class="o">=</span> <span class="n">shifted</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+        <span class="n">k_traj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_ktraj</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span>
+
+        <span class="c1"># if uu and vv are 1D dimension, then we assume &#39;same_uv&#39;</span>
+        <span class="n">same_uv</span> <span class="o">=</span> <span class="p">(</span><span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme</span>
+        <span class="c1"># same_uv will parallelize across the coil dimension.</span>
+
+        <span class="c1"># Consider how the similarity of the spatial frequency samples should be</span>
+        <span class="c1"># treated. We already took care of this on the k_traj side, since we set</span>
+        <span class="c1"># the shapes. But this also needs to be taken care of on the image side.</span>
+        <span class="c1">#   * If we plan to parallelize with the coil dimension, then we need an</span>
+        <span class="c1">#     image with shape (1, nchan, npix, npix).</span>
+        <span class="c1">#   * If we plan to parallelize using the batch dimension, then we need</span>
+        <span class="c1">#     an image with shape (nchan, 1, npix, npix).</span>
+
+        <span class="k">if</span> <span class="n">same_uv</span><span class="p">:</span>
+            <span class="c1"># we want to unsqueeze/squeeze at dim=0 to parallelize over the coil</span>
+            <span class="c1"># dimension</span>
+            <span class="c1"># unsquezee shape: [1, nchan, npix, npix]</span>
+            <span class="n">altered_dimension</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># we want to unsqueeze/squeeze at dim=1 to parallelize over the</span>
+            <span class="c1"># batch dimension</span>
+            <span class="c1"># unsquezee shape: [nchan, 1, npix, npix]</span>
+            <span class="n">altered_dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">expanded</span> <span class="o">=</span> <span class="n">complexed</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">altered_dimension</span><span class="p">)</span>
+
+        <span class="c1"># check that the user is following the documentation</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">same_uv</span> <span class="ow">and</span> <span class="n">sparse_matrices</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Provided uu and vv arrays are multi-dimensional, suggesting an &quot;</span>
+                <span class="s2">&quot;intent to parallelize using the &#39;batch&#39; dimension. This feature &quot;</span>
+                <span class="s2">&quot;is not yet available in TorchKbNuFFT v1.4.0 with sparse matrix &quot;</span>
+                <span class="s2">&quot;interpolation (sparse_matrices=True), therefore we are proceeding &quot;</span>
+                <span class="s2">&quot;with table interpolation (sparse_matrices=False). You may wish to &quot;</span>
+                <span class="s2">&quot;fix your function call, because this warning slows down your code.&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># calculate the sparse_matrices, if requested</span>
+        <span class="k">if</span> <span class="n">sparse_matrices</span><span class="p">:</span>
+            <span class="n">real_interp_mat</span><span class="p">,</span> <span class="n">imag_interp_mat</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">calc_tensor_spmatrix</span><span class="p">(</span>
+                <span class="n">k_traj</span><span class="p">,</span> <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">output</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span>
+                <span class="n">expanded</span><span class="p">,</span> <span class="n">k_traj</span><span class="p">,</span> <span class="n">interp_mats</span><span class="o">=</span><span class="p">((</span><span class="n">real_interp_mat</span><span class="p">,</span> <span class="n">imag_interp_mat</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="n">k_traj</span><span class="p">)</span>
+
+        <span class="c1"># squeezed shape: [nchan, npix, npix]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">altered_dimension</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span></div></div>
+
+
+<div class="viewcode-block" id="NuFFTCached"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFTCached">[docs]</a><span class="k">class</span> <span class="nc">NuFFTCached</span><span class="p">(</span><span class="n">NuFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This layer translates input from an :class:`mpol.images.ImageCube` directly to loose, ungridded samples of the Fourier plane, directly corresponding to the :math:`u,v` locations of the data. This layer is different than a :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like output from an FFT routine, it utilizes the non-uniform FFT or &#39;NuFFT&#39; to interpolate directly to discrete :math:`u,v` locations that need not correspond to grid cell centers. This is implemented using the KbNufft routines of the `TorchKbNufft &lt;https://torchkbnufft.readthedocs.io/en/stable/index.html&gt;`_ package.</span>
 
@@ -523,7 +782,7 @@ document.write(`
 <span class="sd">    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel (and will invoke parallelization across the image cube ``nchan`` dimension using the &#39;coil&#39; dimension of the TorchKbNufft package).</span>
 <span class="sd">    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used (and will invoke parallelization across the image cube ``nchan`` dimension using the &#39;batch&#39; dimension of the TorchKbNufft package).</span>
 
-<span class="sd">    Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points points.</span>
+<span class="sd">    Note that there is no straightforward, computationally efficient way to proceed if there are a different number of spatial frequencies for each channel. The best approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points to have the same length ``nvis``, and you create a boolean mask to keep track of which points are valid. Then, when this routine returns data points of shape (``nchan, nvis``), you can use that boolean mask to select only the valid :math:`u,v` points.</span>
 
 <span class="sd">    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft uses under the hood by changing the boolean value of ``sparse_matrices``. For repeated evaluations of this layer (as might exist within an optimization loop), ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If ``sparse_matrices=False``, this routine will use the default table-based interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet available when parallelizing using the &#39;batch&#39; dimension --- this will result in a warning.</span>
 
@@ -532,20 +791,20 @@ document.write(`
 <span class="sd">        npix (int): the number of pixels per image side</span>
 <span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the :class:`mpol.images.ImageCube`. Default = 1.</span>
-<span class="sd">        uu (np.array): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]</span>
-<span class="sd">        vv (np.array): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]</span>
+<span class="sd">        uu (array-like): a length ``nvis`` array (not including Hermitian pairs) of the u (East-West) spatial frequency coordinate [klambda]</span>
+<span class="sd">        vv (array-like): a length ``nvis`` array (not including Hermitian pairs) of the v (North-South) spatial frequency coordinate [klambda]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">coords</span><span class="p">:</span> <span class="n">GridCoords</span><span class="p">,</span>
-        <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">uu</span><span class="p">,</span>
+        <span class="n">vv</span><span class="p">,</span>
         <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">sparse_matrices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">same_uv</span> <span class="o">:=</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">vv</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sparse_matrices</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">warnings</span>
@@ -561,15 +820,12 @@ document.write(`
             <span class="n">sparse_matrices</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">interp_mat</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nchan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sparse_matrices</span> <span class="o">=</span> <span class="n">sparse_matrices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span> <span class="o">=</span> <span class="n">same_uv</span>
 
-        <span class="c1"># initialize the non-uniform FFT object</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nufft_ob</span> <span class="o">=</span> <span class="n">torchkbnufft</span><span class="o">.</span><span class="n">KbNufft</span><span class="p">(</span>
-            <span class="n">im_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">npix</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="c1"># permit numpy, but prefer tensor</span>
+        <span class="n">uu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
+        <span class="n">vv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;k_traj&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_ktraj</span><span class="p">(</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k_traj</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
@@ -584,112 +840,22 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">real_interp_mat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">imag_interp_mat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NuFFTCached.from_image_properties"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFTCached.from_image_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_image_properties</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-        <span class="n">nchan</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">sparse_matrices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NuFFT</span><span class="p">:</span>
+        <span class="n">cell_size</span><span class="p">,</span>
+        <span class="n">npix</span><span class="p">,</span>
+        <span class="n">uu</span><span class="p">,</span>
+        <span class="n">vv</span><span class="p">,</span>
+        <span class="n">nchan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">sparse_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">GridCoords</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">sparse_matrices</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_klambda_to_radpix</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">klambda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a spatial frequency in units of klambda to &#39;radians/sky pixel,&#39; using the pixel cell_size provided by ``self.coords.dl``.</span>
-
-<span class="sd">        These concepts can be a little confusing because there are two angular measures at play.</span>
-
-<span class="sd">        1. The first is the normal angular sky coordinate, normally measured in arcseconds for typical sources observed by ALMA or the VLA. Arcseconds, being an angular coordinate, can equivalently be expressed in units of radians. To avoid confusion, we will call this angular measurement &#39;sky radians.&#39; Alternatively, for a given image grid, this same sky coordinate could be expressed in units of sky pixels.</span>
-<span class="sd">        2. The second is the spatial frequency of some image-plane function, :math:`I_\nu(l,m)`, which we could quote in units of &#39;cycles per arcsecond&#39; or &#39;cycles per sky pixel,&#39; for example. With a radio interferometer, spatial frequencies are typically quoted in units of the observing wavelength, i.e., lambda or kilo-lambda. If the field of view of the image is small, thanks to the small-angle approximation, units of lambda are directly equivalent to &#39;cycles per sky radian.&#39; The second angular measure comes about when converting the spatial frequency from a linear measure of frequency &#39;cycles per sky radian&#39; to an angular measure of frequency &#39;radians per sky radian&#39; or &#39;radians per sky pixel.&#39;</span>
-
-<span class="sd">        The TorchKbNufft package expects k-trajectory vectors in units of &#39;radians per sky pixel.&#39; This routine helps convert spatial frequencies from their default unit (kilolambda) into &#39;radians per sky pixel&#39; using the pixel cell_size as provided by ``self.coords.dl``.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            klambda (float): spatial frequency in units of kilolambda</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            float: spatial frequency measured in units of radian per sky pixel</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># convert from kilolambda to cycles per sky radian</span>
-        <span class="n">u_lam</span> <span class="o">=</span> <span class="n">klambda</span> <span class="o">*</span> <span class="mf">1e3</span>  <span class="c1"># [lambda, or cycles/radian]</span>
-
-        <span class="c1"># convert from &#39;cycles per sky radian&#39; to &#39;radians per sky radian&#39;</span>
-        <span class="n">u_rad_per_rad</span> <span class="o">=</span> <span class="n">u_lam</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c1"># [radians / sky radian]</span>
-
-        <span class="c1"># size of pixel in radians</span>
-        <span class="c1"># self.coords.dl  # [sky radians/pixel]</span>
-
-        <span class="c1"># convert from &#39;radians per sky radian&#39; to &#39;radians per sky pixel&#39;</span>
-        <span class="n">u_rad_per_pix</span> <span class="o">=</span> <span class="n">u_rad_per_rad</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">dl</span>  <span class="c1"># [radians / pixel]</span>
-
-        <span class="k">return</span> <span class="n">u_rad_per_pix</span>
-
-    <span class="k">def</span> <span class="nf">_assemble_ktraj</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">vv</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">floating</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="NuFFTCached.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFTCached.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This routine converts a series of :math:`u, v` coordinates into a k-trajectory vector for the torchkbnufft routines. The dimensionality of the k-trajectory vector will influence how TorchKbNufft will perform the operations.</span>
-
-<span class="sd">        * If ``uu`` and ``vv`` have a 1D shape of (``nvis``), then it will be assumed that the spatial frequencies can be treated as constant with channel. This will result in a ``k_traj`` vector that has shape (``2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the &#39;coil&#39; dimension of the TorchKbNufft package.</span>
-<span class="sd">        * If the ``uu`` and ``vv`` have a 2D shape of (``nchan, nvis``), then it will be assumed that the spatial frequencies are different for each channel, and the spatial frequencies provided for each channel will be used. This will result in a ``k_traj`` vector that has shape (``nchan, 2, nvis``), such that parallelization will be across the image cube ``nchan`` dimension using the &#39;batch&#39; dimension of the TorchKbNufft package.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            uu (1D or 2D numpy array): u (East-West) spatial frequency coordinate [klambda]</span>
-<span class="sd">            vv (1D or 2D numpy array): v (North-South) spatial frequency coordinate [klambda]</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            k_traj (torch tensor): a k-trajectory vector with shape</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">uu_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">uu</span><span class="p">)</span>
-        <span class="n">vv_radpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_klambda_to_radpix</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-
-        <span class="c1"># if uu and vv are 1D dimension, then we can assume that we will parallelize across the coil dimension.</span>
-        <span class="c1"># otherwise, we assume that we will parallelize across the batch dimension.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_uv</span><span class="p">:</span>
-            <span class="c1"># k-trajectory needs to be packed the way the image is packed (y,x), so</span>
-            <span class="c1"># the trajectory needs to be packed (v, u)</span>
-            <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (2, nvis), it will parallelize across the coil dimension, assuming</span>
-            <span class="c1"># that the k-traj is the same for all coils/channels.</span>
-            <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
-            <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vv_radpix</span><span class="p">,</span> <span class="n">uu_radpix</span><span class="p">]))</span>
-            <span class="k">return</span> <span class="n">k_traj</span>
-
-        <span class="c1"># in this case, we are given two tensors of shape (nchan, nvis)</span>
-        <span class="c1"># first, augment each tensor individually to create a (nbatch, 1, nvis) tensor</span>
-        <span class="c1"># then, concatenate the tensors along the axis=1 dimension.</span>
-
-        <span class="k">if</span> <span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;nchan of uu (</span><span class="si">{</span><span class="n">uu_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DimensionMismatchError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;nchan of vv (</span><span class="si">{</span><span class="n">vv_radpix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) is more than one but different than that used to initialize the NuFFT layer (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nchan</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">uu_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">uu_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">vv_radpix_aug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">vv_radpix</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># interim convert to numpy array because of torch warning about speed</span>
-        <span class="n">k_traj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">vv_radpix_aug</span><span class="p">,</span> <span class="n">uu_radpix_aug</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will parallelize across the batch dimension</span>
-
-        <span class="k">return</span> <span class="n">k_traj</span>
-
-<div class="viewcode-block" id="NuFFT.forward"><a class="viewcode-back" href="../../api.html#mpol.fourier.NuFFT.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as indicated by the shape of the ``uu`` and ``vv`` points.</span>
+<span class="sd">        Perform the FFT of the image cube for each channel and interpolate to the ``uu`` and ``vv`` points set at layer initialization. This call should automatically take the best parallelization option as set by the shape of the ``uu`` and ``vv`` points.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube should be a &quot;prepacked&quot; image cube, for example, from :meth:`mpol.images.ImageCube.forward`</span>
@@ -773,7 +939,7 @@ document.write(`
 
     <span class="c1"># instantiate a NuFFT object based on the ImageCube</span>
     <span class="c1"># OK if uu shape (nvis,)</span>
-    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">)</span>
+    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">image_cube</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
 
     <span class="c1"># make into a multi-channel dataset, even if only a single-channel provided</span>
     <span class="k">if</span> <span class="n">uu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -783,7 +949,7 @@ document.write(`
 
     <span class="c1"># carry it forward to the visibilities, which will be (nchan, nvis)</span>
     <span class="n">vis_noiseless</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">complexfloating</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
-    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">image_cube</span><span class="p">())</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">vis_noiseless</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">image_cube</span><span class="p">(),</span> <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
     <span class="c1"># generate complex noise</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
@@ -812,7 +978,7 @@ document.write(`
 <span class="sd">    V_true : array, unit=[Jy]</span>
 <span class="sd">        Data visibility amplitudes</span>
 <span class="sd">    return_Vmod : bool, default=False</span>
-<span class="sd">        Whether to return just the residual visibilities, or additionally the </span>
+<span class="sd">        Whether to return just the residual visibilities, or additionally the</span>
 <span class="sd">        loose model visibilities</span>
 <span class="sd">    channel : int, default=0</span>
 <span class="sd">        Channel (of `model`) to use to calculate residual visibilities</span>
@@ -823,9 +989,9 @@ document.write(`
 <span class="sd">        Model loose residual visibility amplitudes of the form</span>
 <span class="sd">        Re(V) + 1j * Im(V)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">nchan</span><span class="p">,</span> <span class="n">uu</span><span class="o">=</span><span class="n">u_true</span><span class="p">,</span> <span class="n">vv</span><span class="o">=</span><span class="n">v_true</span><span class="p">)</span>
+    <span class="n">nufft</span> <span class="o">=</span> <span class="n">NuFFT</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">nchan</span><span class="p">)</span>
 
-    <span class="n">vis_model</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span> <span class="c1"># TODO: remove &#39;to&#39; call</span>
+    <span class="n">vis_model</span> <span class="o">=</span> <span class="n">nufft</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span> <span class="n">u_true</span><span class="p">,</span> <span class="n">v_true</span><span class="p">)</span>  <span class="c1"># TODO: remove &#39;to&#39; call</span>
     <span class="c1"># convert to numpy, select channel</span>
     <span class="n">vis_model</span> <span class="o">=</span> <span class="n">vis_model</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="n">channel</span><span class="p">]</span>
 
@@ -833,7 +999,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">return_Vmod</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">vis_resid</span><span class="p">,</span> <span class="n">vis_model</span>
-    
+
     <span class="k">return</span> <span class="n">vis_resid</span></div>
 </pre></div>
 
