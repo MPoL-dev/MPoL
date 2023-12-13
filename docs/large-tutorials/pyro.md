@@ -800,7 +800,8 @@ guide = AutoNormal(model, init_loc_fn=init_to_sample)
 adam = pyro.optim.Adam({"lr": 0.02})
 svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
-num_iterations = 15000
+#num_iterations = 15000
+num_iterations = 1000
 pyro.clear_param_store()
 loss_tracker = np.empty(num_iterations)
 
@@ -1047,7 +1048,7 @@ Encouragingly, both our image and 1D profile results compare favorably with thos
 The true uncertainty in the radial profile may still be underestimated. As we discussed, one source could be the parameterization of the model. In reality, the disk rings are not perfect Gaussian shapes, and so, as currently implemented, our model could never capture the true intensity profile. 
 
 
-In our opinion, SVI is a very useful inference technique because of its speed and scalability. There is the risk, though, that your guide distribution does not fully capture complex covariances of your posterior distributions. Perhaps some parameter posteriors are significantly non-Gaussian or banana-shaped, and therefore not able to be captured by the multivariate Normal guide. This risk can be hard to assess from SVI fits alone, though there are steps you can take by trying out more [complex guides](https://docs.pyro.ai/en/stable/infer.autoguide.html#) or [writing your own](https://pyro.ai/examples/svi_part_i.html#Guide), parameterized around anticipated covariances. 
+In our opinion, SVI is a very useful inference technique because of its speed and scalability. There is the risk, though, that your guide distribution does not fully capture complex covariances of your posterior distributions. Perhaps some parameter posteriors are significantly non-Gaussian or banana-shaped, and therefore not able to be captured by the multivariate Normal guide. This risk can be hard to assess from SVI fits alone, though there are steps you can take by trying out more [complex guides](https://docs.pyro.ai/en/stable/infer.autoguide.html#) or [writing your own](https://pyro.ai/examples/svi_part_i.html#Guide), parameterized around anticipated covariances.
 
 +++
 
