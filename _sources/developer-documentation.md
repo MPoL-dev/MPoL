@@ -10,6 +10,8 @@ If you are new to contributing to an open source project, we recommend a quick r
 
 The MPoL project values stable software, and so we place a special emphasis on writing and running tests to ensure the code works reliably for as many users as possible. It is our intent that the `main` branch of the github repository always reflects a stable version of the code that passes all tests. After significant new functionality has been introduced, a tagged release (e.g., `v0.1.1`) is generated from the main branch and pushed to PyPI.
 
+See further below ({ref}`releasing-new-version-label`) for information on how to tag a new version using the GitHub and Zenodo workflows.
+
 ## Setting up your development environment
 
 ### Forking MPoL and cloning from Github
@@ -111,19 +113,26 @@ And then use your favorite web browser to open `htmlcov/index.html` and view the
 
 For more information on code coverage, see the [coverage.py documentation](https://coverage.readthedocs.io/en/coverage-5.5/). A worthy goal is to reach 100% code coverage with the testing suite. However, 100% coverage *doesn't mean the code is free of bugs*. More important than complete coverage is writing tests that properly probe program functionality.
 
+(documentation-build-reference-label)=
 ## Documentation
 
 MPoL documentation is written as docstrings attached to MPoL classes and functions and as individual `.rst` or `.md` files located in the `docs/` folder. The documentation is built using the [Sphinx](https://www.sphinx-doc.org/en/master/) Python documentation generator, with the [MyST-NB](https://myst-nb.readthedocs.io/en/latest/index.html) plugin.
 
-### Dependencies
+### Versions and Dependencies
 
-If you are only interested in building the documentation, you can install the more limited set of documentation package dependencies via
+After you've cloned the repository and changed to its root, you can optionally switch to a different package version or branch if needed. E.g., do 
 
+```
+git fetch --tags
+git checkout tags/v0.2.0
+```
+
+Otherwise, proceed directly with installing the build dependencies for the documentation with 
 ```
 $ pip install ".[docs]"
 ```
 
-after you've cloned the repository and changed to the root of the repository. Otherwise, we recommend following the development environment instructions above, since the `[dev]` list is a superset of the `[docs]` list.
+Alternatively, you could start from `[dev]` list, since it is a superset of `[docs]`.
 
 ### Building the Documentation
 
@@ -217,3 +226,24 @@ When done, add a reference to your tutorial in the documentation table of conten
 Tutorials should be self-contained. If the tutorial requires a dataset, the dataset should be publicly available and downloaded at the beginning of the script. If the dataset requires significant preprocessing (e.g., some multi-configuration ALMA datasets), those preprocessing steps should be in the tutorial. If the steps are tedious, one solution is to upload a preprocessed dataset to Zenodo and have the tutorial download the data product from there (the preprocessing scripts/steps should still be documented in the Zenodo repo and/or as part of the [mpoldatasets repository](https://github.com/MPoL-dev/mpoldatasets)). The guiding principle is that other developers should be able to successfully build the tutorial from start to finish without relying on any locally provided resources or datasets.
 
 If you're thinking about contributing a tutorial and would like guidance on form or scope, please raise an [issue](https://github.com/MPoL-dev/MPoL/issues) or [discussion](https://github.com/MPoL-dev/MPoL/discussions) on the github repository.
+
+
+(releasing-new-version-label)=
+## Releasing a new version of MPoL
+
+To release a new version of MPoL, follow these steps in order:
+
+1. Ensure all tests are passing on your PR
+    * If tests are passing locally and failing in the GitHub Actions workflows, compare the code dependencies in `setup.py` with your local versions
+2. Ensure the docs build locally without errors or warnings
+3. Update the code version in `__init__`
+4. Update the version history in `changelog.md`
+5. Update the contributors in `CONTRIBUTORS.md`
+6. Update the copyright year and citation in `README.md`
+    * In the citation, update all fields except 'Zenodo', 'doi', and 'url' (the current DOI will cite all versions and the URL will direct to the most recent version)
+7. Merge your PR into `main`
+    * Ensure all tests triggered by the merge pass
+8. Publish a pre-release
+    * Ensure the `pre-release.yml` workflow passes
+9. Publish a (true) release, which will be automatically uploaded to PyPI and archived on Zenodo
+    * Verify this by ensuring the `package.yml` workflow passes

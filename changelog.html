@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Changelog &#8212; MPoL 0.2.0 documentation</title>
+    <title>Changelog &#8212; MPoL 0.2.1 documentation</title>
   
   
   
@@ -55,7 +55,8 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Parametric Inference with Pyro" href="large-tutorials/pyro.html" />
+    <link rel="next" title="Introduction to PyTorch: Tensors and Gradient Descent" href="ci-tutorials/PyTorch.html" />
+    <link rel="prev" title="API" href="api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -142,8 +143,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.0 documentation - Home"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.0 documentation - Home"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -156,6 +157,9 @@
 <li class="toctree-l1"><a class="reference internal" href="units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-documentation.html">Developer Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="nav bd-sidenav">
@@ -170,9 +174,6 @@
 <li class="toctree-l1"><a class="reference internal" href="large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ci-tutorials/fakedata.html">Making a Mock Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="large-tutorials/pyro.html">Parametric Inference with Pyro</a></li>
-</ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Changelog</a></li>
 </ul>
 
     </div>
@@ -361,7 +362,8 @@ document.write(`
 <section id="v0-2-1">
 <h2>v0.2.1<a class="headerlink" href="#v0-2-1" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Changed API of <a class="reference internal" href="api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFT</span></code></a>. Previous signature took <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points at initialization (<code class="docutils literal notranslate"><span class="pre">__init__</span></code>), and the <code class="docutils literal notranslate"><span class="pre">.forward</span></code> method took only an image cube. This behaviour is preserved in a new class <a class="reference internal" href="api.html#mpol.fourier.NuFFTCached" title="mpol.fourier.NuFFTCached"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFTCached</span></code></a>. The updated signature of <a class="reference internal" href="api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFT</span></code></a> <em>does not</em> take <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> at initialization. Rather, its <code class="docutils literal notranslate"><span class="pre">forward</span></code> method is modified to take an image cube and the <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points. This allows an instance of this class to be used with new <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new <code class="docutils literal notranslate"><span class="pre">x</span></code>) and the pattern of the TorchKbNuFFT package itself. It is expected that the new <code class="docutils literal notranslate"><span class="pre">NuFFT</span></code> will be the default routine and <code class="docutils literal notranslate"><span class="pre">NuFFTCached</span></code> will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by #232.</p></li>
+<li><p>Changed API of <a class="reference internal" href="api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFT</span></code></a>. Previous signature took <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points at initialization (<code class="docutils literal notranslate"><span class="pre">__init__</span></code>), and the <code class="docutils literal notranslate"><span class="pre">.forward</span></code> method took only an image cube. This behaviour is preserved in a new class <a class="reference internal" href="api.html#mpol.fourier.NuFFTCached" title="mpol.fourier.NuFFTCached"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFTCached</span></code></a>. The updated signature of <a class="reference internal" href="api.html#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">NuFFT</span></code></a> <em>does not</em> take <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> at initialization. Rather, its <code class="docutils literal notranslate"><span class="pre">forward</span></code> method is modified to take an image cube and the <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points. This allows an instance of this class to be used with new <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new <code class="docutils literal notranslate"><span class="pre">x</span></code>) and the pattern of the TorchKbNuFFT package itself. It is expected that the new <code class="docutils literal notranslate"><span class="pre">NuFFT</span></code> will be the default routine and <code class="docutils literal notranslate"><span class="pre">NuFFTCached</span></code> will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by <a class="reference external" href="https://github.com/MPoL-dev/MPoL/pull/232">#232</a>.</p></li>
+<li><p>Moved “Releasing a new version of MPoL” from the wiki to the Developer Documentation (<a class="reference internal" href="developer-documentation.html#releasing-new-version-label"><span class="std std-ref">Releasing a new version of MPoL</span></a>).</p></li>
 </ul>
 </section>
 <section id="v0-2-0">
@@ -477,13 +479,22 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="large-tutorials/pyro.html"
+       href="api.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Parametric Inference with Pyro</p>
+        <p class="prev-next-title">API</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="ci-tutorials/PyTorch.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Introduction to PyTorch: Tensors and Gradient Descent</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
