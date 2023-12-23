@@ -398,7 +398,6 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.GriddedDataset.ground_mask"><code class="docutils literal notranslate"><span class="pre">GriddedDataset.ground_mask</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.UVDataset"><code class="docutils literal notranslate"><span class="pre">UVDataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard"><code class="docutils literal notranslate"><span class="pre">Dartboard</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard.from_image_properties"><code class="docutils literal notranslate"><span class="pre">Dartboard.from_image_properties()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard.get_polar_histogram"><code class="docutils literal notranslate"><span class="pre">Dartboard.get_polar_histogram()</span></code></a></li>
@@ -1365,28 +1364,6 @@ F_2(u, v) = F_1(u', m')\end{split}\]</div>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="mpol.datasets.UVDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.datasets.</span></span><span class="sig-name descname"><span class="pre">UVDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mpol/datasets.html#UVDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.datasets.UVDataset" title="Permalink to this definition">#</a></dt>
-<dd><p>Container for loose interferometric visibilities.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>uu</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of u spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
-<li><p><strong>vv</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of v spatial frequency coordinates. Units of [<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>]</p></li>
-<li><p><strong>data_re</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the real part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
-<li><p><strong>data_im</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of the imaginary part of the visibility measurements. Units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}\)</span>]</p></li>
-<li><p><strong>weights</strong> (<em>2d numpy array</em>) – (nchan, nvis) length array of thermal weights. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>]</p></li>
-<li><p><strong>cell_size</strong> (<em>float</em>) – the image pixel size in arcsec. Defaults to None, but if both <cite>cell_size</cite> and <cite>npix</cite> are set, the visibilities will be pre-gridded to the RFFT output dimensions.</p></li>
-<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels per image side (square images only). Defaults to None, but if both <cite>cell_size</cite> and <cite>npix</cite> are set, the visibilities will be pre-gridded to the RFFT output dimensions.</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em>) – the desired device of the dataset. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defalts to current device.</p></li>
-</ul>
-</dd>
-</dl>
-<p>If both <cite>cell_size</cite> and <cite>npix</cite> are set, the dataset will be automatically pre-gridded to the RFFT output grid. This will greatly speed up performance.</p>
-<p>If you have just a single channel, you can pass 1D numpy arrays for <cite>uu</cite>, <cite>vv</cite>, <cite>weights</cite>, <cite>data_re</cite>, and <cite>data_im</cite> and they will automatically be promoted to 2D with a leading dimension of 1 (i.e., <code class="docutils literal notranslate"><span class="pre">nchan=1</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
@@ -3288,7 +3265,6 @@ No rescaling would be appropriate in the optically thin limit.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.GriddedDataset.ground_mask"><code class="docutils literal notranslate"><span class="pre">GriddedDataset.ground_mask</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.UVDataset"><code class="docutils literal notranslate"><span class="pre">UVDataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard"><code class="docutils literal notranslate"><span class="pre">Dartboard</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard.from_image_properties"><code class="docutils literal notranslate"><span class="pre">Dartboard.from_image_properties()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.datasets.Dartboard.get_polar_histogram"><code class="docutils literal notranslate"><span class="pre">Dartboard.get_polar_histogram()</span></code></a></li>
