@@ -4,6 +4,7 @@
 
 ## v0.2.1
 
+- Removed custom `spheroidal_gridding` routines, tests, and the `UVDataset` object that used them. These have been superseded by the TorchKbNuFFT package. For reference, the old routines (including the tricky `corrfun` math) is preserved in a Gist [here](https://gist.github.com/iancze/f3d2769005a9e2c6731ee6977f166a83).
 - Changed API of {class}`~mpol.fourier.NuFFT`. Previous signature took `uu` and `vv` points at initialization (`__init__`), and the `.forward` method took only an image cube. This behaviour is preserved in a new class {class}`~mpol.fourier.NuFFTCached`. The updated signature of {class}`~mpol.fourier.NuFFT` *does not* take `uu` and `vv` at initialization. Rather, its `forward` method is modified to take an image cube and the `uu` and `vv` points. This allows an instance of this class to be used with new `uu` and `vv` points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new `x`) and the pattern of the TorchKbNuFFT package itself. It is expected that the new `NuFFT` will be the default routine and `NuFFTCached` will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by [#232](https://github.com/MPoL-dev/MPoL/pull/232).
 - Moved "Releasing a new version of MPoL" from the wiki to the Developer Documentation ({ref}`releasing-new-version-label`).
 
