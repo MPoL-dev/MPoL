@@ -42,6 +42,11 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    api.rst
 
 .. toctree::
+   :hidden:
+
+   changelog.md
+
+.. toctree::
    :maxdepth: 2
    :caption: Tutorials
 
@@ -56,11 +61,6 @@ If you'd like to help build the MPoL package, please check out the :ref:`develop
    large-tutorials/HD143006_part_2
    ci-tutorials/fakedata
    large-tutorials/pyro
-
-.. toctree::
-   :hidden:
-
-   changelog.md
 
 * :ref:`genindex`
 * :ref:`changelog-reference-label`
