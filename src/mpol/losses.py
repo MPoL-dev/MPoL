@@ -1,8 +1,8 @@
 r"""The following loss functions are available to use in imaging. Many of the 
-definitions follow those in Appendix A of `EHT-IV 2019 
-<https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the 
-regularization strength, which aspires to be similar across all terms, providing at 
-least a starting point for tuning multiple loss functions.
+definitions follow those in Appendix A of 
+`EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, 
+including the regularization strength, which aspires to be similar across all terms, 
+providing at least a starting point for tuning multiple loss functions.
 
 If you don't see a loss function you need, it's easy to write your own directly within 
 your optimization script. If you like it, please consider opening a pull request!
@@ -279,8 +279,8 @@ def TV_channel(cube, epsilon=1e-10):
     Args:
         cube (any 3D tensor): the image cube array :math:`I_{lmv}`
         epsilon (float): a softening parameter in 
-        [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel 
-        variations greater than this parameter will have a significant penalty.
+            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel 
+            variations greater than this parameter will have a significant penalty.
 
     Returns:
         torch.double: total variation loss
@@ -328,8 +328,8 @@ def sparsity(cube, mask=None):
     Args:
         cube (nchan, npix, npix): tensor image cube
         mask (boolean): tensor array the same shape as ``cube``. The sparsity prior 
-        will be applied to those pixels where the mask is ``True``. Default is to apply 
-        prior to all pixels.
+            will be applied to those pixels where the mask is ``True``. Default is 
+            to apply prior to all pixels.
 
     Returns:
         torch.double: sparsity loss calculated where ``mask == True``

@@ -29,7 +29,7 @@ class GriddedDataset(torch.nn.Module):
         mask (torch boolean): a boolean mask to index the non-zero locations of 
             ``vis_gridded`` and ``weight_gridded`` in their packed format.
         nchan (int): the number of channels in the image (default = 1).
-        device (torch.device) : the desired device of the dataset. If ``None``, 
+        device (torch.device): the desired device of the dataset. If ``None``, 
             defaults to current device.
 
     After initialization, the GriddedDataset provides the non-zero cells of the 
@@ -38,7 +38,7 @@ class GriddedDataset(torch.nn.Module):
 
     :ivar vis_indexed: 1D complex tensor of visibility data
     :ivar weight_indexed: 1D tensor of weight values
-
+    
     If you index the output of the Fourier layer in the same manner using ``self.mask``,
     then the model and data visibilities can be directly compared using a loss function.
     """
@@ -118,7 +118,7 @@ class GriddedDataset(torch.nn.Module):
 
         Args:
             mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to 
-            apply to dataset. Assumes input will be broadcast across all channels.
+                apply to dataset. Assumes input will be broadcast across all channels.
         """
 
         new_2D_mask = torch.Tensor(mask).detach()
@@ -144,12 +144,12 @@ class GriddedDataset(torch.nn.Module):
         """
         Args:
             modelVisibilityCube (complex torch.tensor): with shape 
-            ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in 
-            output from :meth:`mpol.fourier.FourierCube.forward()`
+                ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in 
+                output from :meth:`mpol.fourier.FourierCube.forward()`
 
         Returns:
             torch complex tensor:  1d torch tensor of indexed model samples collapsed 
-            across cube dimensions.
+                across cube dimensions.
         """
 
         assert (
@@ -278,7 +278,7 @@ class Dartboard:
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same 
-            length as qs)
+                length as qs)
 
         Returns:
             2d integer numpy array of cell counts, i.e., how many datapoints fell into 
@@ -304,7 +304,7 @@ class Dartboard:
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same 
-            length as qs)
+                length as qs)
 
         Returns:
             list of cell indices where cell contains at least one datapoint.
@@ -327,7 +327,7 @@ class Dartboard:
 
         Args:
             cell_index_list (list): list or iterable containing [q_cell, phi_cell] index
-            pairs to include in the mask.
+                pairs to include in the mask.
 
         Returns: (numpy array) 2D boolean mask in packed format.
         """

@@ -444,9 +444,9 @@ class RandomCellSplitGridded:
 class DartboardSplitGridded:
     r"""
     Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned
-      by a Dartboard. Inherit the properties of the GriddedDataset. This object creates
-      an iterator providing a (train, test) pair of
-      :class:`~mpol.datasets.GriddedDataset` for each k-fold.
+    by a Dartboard. Inherit the properties of the GriddedDataset. This object creates
+    an iterator providing a (train, test) pair of
+    :class:`~mpol.datasets.GriddedDataset` for each k-fold.
 
     Args:
         griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the
@@ -541,21 +541,21 @@ class DartboardSplitGridded:
         Alternative method to initialize a DartboardSplitGridded object from
         Dartboard parameters.
 
-         Args:
-             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the
+        Args:
+            griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the
                 gridded dataset
-             k (int): the number of subpartitions of the dataset
-             q_edges (1D numpy array): an array of radial bin edges to set the
+            k (int): the number of subpartitions of the dataset
+                q_edges (1D numpy array): an array of radial bin edges to set the
                 dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults
                 to 12 log-linearly radial bins stretching from 0 to the
                 :math:`q_\mathrm{max}` represented by ``coords``.
-             phi_edges (1D numpy array): an array of azimuthal bin edges to set the
+            phi_edges (1D numpy array): an array of azimuthal bin edges to set the
                 dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced
                 azimuthal bins stretched from :math:`0` to :math:`\pi`.
-             seed (int): (optional) numpy random seed to use for the permutation,
+                seed (int): (optional) numpy random seed to use for the permutation,
                 for reproducibility
-             verbose (bool): whether to print notification messages
-        """
+            verbose (bool): whether to print notification messages
+    """
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
         return cls(gridded_dataset, k, dartboard, seed, verbose)
 

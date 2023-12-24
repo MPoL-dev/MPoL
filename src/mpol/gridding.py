@@ -74,12 +74,12 @@ def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
     storage space). This routine attempts to determine if the dataset contains 
     Hermitian pairs or not by choosing one data point at a time and then searching the 
     dataset to see if its Hermitian pair exists. The routine will declare that a dataset
-      contains Hermitian pairs or not after it has searched ``test_vis`` number of data 
-      points. If 0 Hermitian pairs have been found for all ``test_vis`` points, then 
-      the dataset will be declared to have no Hermitian pairs. If ``test_vis`` Hermitian
-        pairs were found for ``test_vis`` points searched, then the dataset will be 
-        declared to have Hermitian pairs. If more than 0 but fewer than ``test_vis`` 
-        Hermitian pairs were found for ``test_vis`` points, an error will be raised.
+    contains Hermitian pairs or not after it has searched ``test_vis`` number of data 
+    points. If 0 Hermitian pairs have been found for all ``test_vis`` points, then 
+    the dataset will be declared to have no Hermitian pairs. If ``test_vis`` Hermitian
+    pairs were found for ``test_vis`` points searched, then the dataset will be 
+    declared to have Hermitian pairs. If more than 0 but fewer than ``test_vis`` 
+    Hermitian pairs were found for ``test_vis`` points, an error will be raised.
 
     Gridding objects like :class:`mpol.gridding.DirtyImager` will naturally augment an 
     input dataset to include the Hermitian pairs, so that images of :math:`I_\nu` 
@@ -178,8 +178,8 @@ class GridderBase:
     ``npix`` arguments) to define a corresponding Fourier plane grid as a 
     :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in 
     lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied
-      at once. For more details on the properties of the grid that is created, see the 
-      :class:`.GridCoords` documentation.
+    at once. For more details on the properties of the grid that is created, see the 
+    :class:`.GridCoords` documentation.
 
     Subclasses will accept "loose" *ungridded* visibility data and store the arrays to 
     the object as instance attributes. The input visibility data should be the set of 
@@ -508,16 +508,16 @@ class DataAverager(GridderBase):
     ``npix`` arguments) to define a corresponding Fourier plane grid as a 
     :class:`.GridCoords` object. A pre-computed :class:`.GridCoords` can be supplied in 
     lieu of ``cell_size`` and ``npix``, but all three arguments should never be supplied
-      at once. For more details on the properties of the grid that is created, see the 
-      :class:`.GridCoords` documentation.
+    at once. For more details on the properties of the grid that is created, see the 
+    :class:`.GridCoords` documentation.
 
     The :class:`.DataAverager` object accepts "loose" *ungridded* visibility data and 
     stores the arrays to the object as instance attributes. The input visibility data 
     should be the set of visibilities over the full :math:`[-u,u]` and :math:`[-v,v]` 
     domain, and should not contain Hermitian pairs (an error will be raised, if they are
-      encountered). (Note that, unlike :class:`~mpol.gridding.DirtyImager`, this class 
-      *will not* augment the dataset to include Hermitian pairs. This is by design, 
-      since Hermitian pairs should not be used in likelihood calculations).
+    encountered). (Note that, unlike :class:`~mpol.gridding.DirtyImager`, this class 
+    *will not* augment the dataset to include Hermitian pairs. This is by design, 
+    since Hermitian pairs should not be used in likelihood calculations).
 
     The input visibilities can be 1d for a single continuum channel, or 2d for image 
     cube. If 1d, visibilities will be converted to 2d arrays of shape ``(1, nvis)``. 

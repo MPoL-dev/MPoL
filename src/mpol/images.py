@@ -269,11 +269,11 @@ class ImageCube(nn.Module):
         r"""
         If the ImageCube object was initialized with ``passthrough=True``, the ``cube``
         argument is required. ``forward`` essentially just passes this on as an identity
-          operation.
+        operation.
 
         If the ImageCube object was initialized with ``passthrough=False``, the ``cube``
-          argument is not permitted, and ``forward`` passes on the stored
-          ``nn.Parameter`` cube as an identity operation.
+        argument is not permitted, and ``forward`` passes on the stored
+        ``nn.Parameter`` cube as an identity operation.
 
         Args:
             cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if

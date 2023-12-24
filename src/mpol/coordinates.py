@@ -204,16 +204,12 @@ class GridCoords:
 
         if np.max(np.abs(uu)) > self.max_grid:
             raise CellSizeError(
-                f"Dataset contains uu spatial frequency measurements larger than those 
-                in the proposed model image. Decrease cell_size 
-                below {max_cell_size} arcsec."
+                f"Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
             )
 
         if np.max(np.abs(vv)) > self.max_grid:
             raise CellSizeError(
-                f"Dataset contains vv spatial frequency measurements larger than those 
-                in the proposed model image. Decrease cell_size below {max_cell_size} 
-                arcsec."
+                f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
             )
 
     def __eq__(self, other: Any) -> bool:
