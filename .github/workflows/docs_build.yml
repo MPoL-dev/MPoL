@@ -38,7 +38,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
       - name: Install doc dependencies
         run: |
-          pip install .[docs]
+          pip install .[dev]
       - name: Install Pandoc dependency
         run: |
           sudo apt-get install pandoc
