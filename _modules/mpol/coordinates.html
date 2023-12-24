@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.coordinates &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.coordinates &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -305,40 +305,67 @@ document.write(`
 
 <div class="viewcode-block" id="GridCoords"><a class="viewcode-back" href="../../api.html#mpol.coordinates.GridCoords">[docs]</a><span class="k">class</span> <span class="nc">GridCoords</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid.</span>
+<span class="sd">    The GridCoords object uses desired image dimensions (via the ``cell_size`` and </span>
+<span class="sd">    ``npix`` arguments) to define a corresponding Fourier plane grid.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): width of a single square pixel in [arcsec]</span>
 <span class="sd">        npix (int): number of pixels in the width of the image</span>
 
-<span class="sd">    The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is implementation simplicity.</span>
+<span class="sd">    The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even </span>
+<span class="sd">    though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to</span>
+<span class="sd">    :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is </span>
+<span class="sd">    implementation simplicity.</span>
 
-<span class="sd">    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).</span>
+<span class="sd">    Images (and their corresponding Fourier transform quantities) are represented as </span>
+<span class="sd">    two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an </span>
+<span class="sd">    image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier </span>
+<span class="sd">    grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` </span>
+<span class="sd">    representation assumes the Fourier grid (and thus image) are laid out as one might </span>
+<span class="sd">    normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).</span>
 
 <span class="sd">    After the object is initialized, instance variables can be accessed, for example</span>
 
 <span class="sd">    &gt;&gt;&gt; myCoords = GridCoords(cell_size=0.005, 512)</span>
 <span class="sd">    &gt;&gt;&gt; myCoords.img_ext</span>
 
-<span class="sd">    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]</span>
+<span class="sd">    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) </span>
+<span class="sd">        [radians]</span>
 <span class="sd">    :ivar dm: image-plane cell spacing in DEC direction [radians]</span>
-<span class="sd">    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin=&#39;lower&#39;``. Units of [arcsec]</span>
-<span class="sd">    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</span>
-<span class="sd">    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.</span>
-<span class="sd">    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image [arcseconds]. l coordinate increases to the left (as on sky).</span>
-<span class="sd">    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image [arcseconds]. </span>
-<span class="sd">    :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">    :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].</span>
-<span class="sd">    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`].</span>
-<span class="sd">    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`].</span>
-<span class="sd">    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines </span>
+<span class="sd">        like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming </span>
+<span class="sd">        ``origin=&#39;lower&#39;``. Units of [arcsec]</span>
+<span class="sd">    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied </span>
+<span class="sd">        [arcseconds]. Useful for directly evaluating some function to create a </span>
+<span class="sd">        packed cube.</span>
+<span class="sd">    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied </span>
+<span class="sd">        [arcseconds]. Useful for directly evaluating some function to create a </span>
+<span class="sd">        packed cube.</span>
+<span class="sd">    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image </span>
+<span class="sd">        [arcseconds]. l coordinate increases to the left (as on sky).</span>
+<span class="sd">    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image </span>
+<span class="sd">        [arcseconds]. </span>
+<span class="sd">    :ivar du: Fourier-plane cell spacing in East-West direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">    :ivar dv: Fourier-plane cell spacing in North-South direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">    :ivar u_centers: 1D array of cell centers in East-West direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar v_centers: 1D array of cell centers in North-West direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar u_edges: 1D array of cell edges in East-West direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">    :ivar v_edges: 1D array of cell edges in North-South direction </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`].</span>
 <span class="sd">    :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    :ivar v_bin_max: maximum v edge [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin=&#39;lower&#39;``. Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid </span>
+<span class="sd">        [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines </span>
+<span class="sd">        like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming </span>
+<span class="sd">        ``origin=&#39;lower&#39;``. Units of [:math:`\mathrm{k}\lambda`]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">npix</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -445,14 +472,19 @@ document.write(`
 
 <div class="viewcode-block" id="GridCoords.check_data_fit"><a class="viewcode-back" href="../../api.html#mpol.coordinates.GridCoords.check_data_fit">[docs]</a>    <span class="k">def</span> <span class="nf">check_data_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uu</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">vv</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.</span>
+<span class="sd">        Test whether loose data visibilities fit within the Fourier grid defined by </span>
+<span class="sd">        cell_size and npix.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            uu (np.array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]</span>
-<span class="sd">            vv (np.array): array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">            uu (np.array): array of u spatial frequency coordinates. </span>
+<span class="sd">                Units of [:math:`\mathrm{k}\lambda`]</span>
+<span class="sd">            vv (np.array): array of v spatial frequency coordinates. </span>
+<span class="sd">                Units of [:math:`\mathrm{k}\lambda`]</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            ``True`` if all visibilities fit within the Fourier grid defined by ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an ``AssertionError`` is raised on the first violated boundary.</span>
+<span class="sd">            ``True`` if all visibilities fit within the Fourier grid defined by </span>
+<span class="sd">            ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an </span>
+<span class="sd">            ``AssertionError`` is raised on the first violated boundary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># max freq in dataset</span>
@@ -476,8 +508,8 @@ document.write(`
             <span class="c1"># don&#39;t attempt to compare against different types</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
-        <span class="c1"># GridCoords objects are considered equal if they have the same cell_size and npix, since</span>
-        <span class="c1"># all other attributes are derived from these two core properties.</span>
+        <span class="c1"># GridCoords objects are considered equal if they have the same cell_size and </span>
+        <span class="c1"># npix, since all other attributes are derived from these two core properties.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">cell_size</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">npix</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">npix</span></div>
 </pre></div>
 

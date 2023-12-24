@@ -4,6 +4,10 @@
 
 ## v0.2.1
 
+- Manually line wrapped many docstrings to conform to 88 characters per line or less. Ian thought `black` would do this by default, but actually that [doesn't seem to be the case](https://github.com/psf/black/issues/2865).
+- Fully leaned into the `pyproject.toml` setup to modernize build via [hatch](https://github.com/pypa/hatch). This centralizes the project dependencies and derives package versioning directly from git tags. Intermediate packages built from commits after the latest tag (e.g., `0.2.0`) will have an extra long string, e.g., `0.2.1.dev178+g16cfc3e.d20231223` where the version is a guess at the next version and the hash gives reference to the commit. This means that developers bump versions entirely by tagging a new version with git (or more likely by drafting a new release on the [GitHub release page](https://github.com/MPoL-dev/MPoL/releases)).
+- Removed `setup.py`.
+- TOML does not support adding keyed entries, so creating layered build environments of default, `docs`, `test`, and `dev` as we used to with `setup.py` is laborious and repetitive with `pyproject.toml`. We have simplified the list to be default (key dependencies), `test` (minimal necessary for test-suite), and `dev` (covering everything needed to build the docs and actively develop the package).
 - Removed custom `spheroidal_gridding` routines, tests, and the `UVDataset` object that used them. These have been superseded by the TorchKbNuFFT package. For reference, the old routines (including the tricky `corrfun` math) is preserved in a Gist [here](https://gist.github.com/iancze/f3d2769005a9e2c6731ee6977f166a83).
 - Changed API of {class}`~mpol.fourier.NuFFT`. Previous signature took `uu` and `vv` points at initialization (`__init__`), and the `.forward` method took only an image cube. This behaviour is preserved in a new class {class}`~mpol.fourier.NuFFTCached`. The updated signature of {class}`~mpol.fourier.NuFFT` *does not* take `uu` and `vv` at initialization. Rather, its `forward` method is modified to take an image cube and the `uu` and `vv` points. This allows an instance of this class to be used with new `uu` and `vv` points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new `x`) and the pattern of the TorchKbNuFFT package itself. It is expected that the new `NuFFT` will be the default routine and `NuFFTCached` will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by [#232](https://github.com/MPoL-dev/MPoL/pull/232).
 - Moved "Releasing a new version of MPoL" from the wiki to the Developer Documentation ({ref}`releasing-new-version-label`).
@@ -16,7 +20,7 @@
 - Reorganized some of the docs API
 - Expanded discussion and demonstration in `optimzation.md` tutorial
 - Localized harcoded Zenodo record reference to single instance, and created new external Zenodo record from which to draw
-- Added [Parametric inference with Pyro tutorial](large-tutorials/pyro.md) 
+- Added [Parametric inference with Pyro tutorial](large-tutorials/pyro.md)
 - Updated some discussion and notation in `rml_intro.md` tutorial
 - Added `mypy` static type checks
 - Added `frank` as a 'test' and 'analysis' extras dependency
@@ -27,7 +31,7 @@
 - Moved and rescoped {class}`~mpol.datasets.KFoldCrossValidatorGridded` to {class}`~mpol.crossval.DartboardSplitGridded` with some syntax changes
 - Altered {class}`~mpol.datasets.GriddedDataset` to subclass from `torch.nn.Module`, altered its args, added PyTorch buffers to it, added {func}`mpol.datasets.GriddedDataset.forward` to it
 - Added class method `from_image_properties` to various classes including {class}`~mpol.images.BaseCube` and {class}`~mpol.images.ImageCube`
-- Altered {class}`~mpol.datasets.UVDataset` to subclass from `torch.utils.data.Dataset`, altered its initialization signature, added new properties 
+- Altered {class}`~mpol.datasets.UVDataset` to subclass from `torch.utils.data.Dataset`, altered its initialization signature, added new properties
 - Altered {class}`~mpol.fourier.FourierCube` args and initialization signature, added PyTorch buffers to it
 - Added {func}`~mpol.fourier.get_vis_residuals`
 - Added new program `mpol.geometry` with new {func}`~mpol.geometry.flat_to_observer` and {func}`~mpol.geometry.observer_to_flat`

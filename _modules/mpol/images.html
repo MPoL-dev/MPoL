@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.images &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.images &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -289,7 +289,8 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for mpol.images</h1><div class="highlight"><pre>
-<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`.&quot;&quot;&quot;</span>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The ``images`` module provides the core functionality of MPoL via </span>
+<span class="sd">:class:`mpol.images.ImageCube`.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
@@ -304,21 +305,31 @@ document.write(`
 
 <div class="viewcode-block" id="BaseCube"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube">[docs]</a><span class="k">class</span> <span class="nc">BaseCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube domain.</span>
+<span class="sd">    A base cube of the same dimensions as the image cube. Designed to use a pixel</span>
+<span class="sd">    mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube</span>
+<span class="sd">    domain.</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        I = f_\mathrm{map}(b)</span>
 
-<span class="sd">    The ``base_cube`` pixel values are set as PyTorch `parameters &lt;https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html&gt;`_.</span>
+<span class="sd">    The ``base_cube`` pixel values are set as PyTorch `parameters</span>
+<span class="sd">    &lt;https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html&gt;`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
 <span class="sd">        npix (int): the number of pixels per image side</span>
-<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class.</span>
+<span class="sd">            If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the base cube. Default = 1.</span>
-<span class="sd">        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus() &lt;https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus&gt;`_. Output of the function should be in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
-<span class="sd">        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``. See :ref:`cube-orientation-label` for more information on the expectations of the orientation of the input image.</span>
+<span class="sd">        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel</span>
+<span class="sd">            representation to the cube representation. If `None`, defaults to</span>
+<span class="sd">            `torch.nn.Softplus()`. Output of the function should be in units of</span>
+<span class="sd">            [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+<span class="sd">        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize</span>
+<span class="sd">            the model with. If None, assumes ``torch.zeros``. See</span>
+<span class="sd">            :ref:`cube-orientation-label` for more information on the expectations of</span>
+<span class="sd">            the orientation of the input image.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -367,7 +378,8 @@ document.write(`
 
 <div class="viewcode-block" id="BaseCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.BaseCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculate the image representation from the ``base_cube`` using the pixel mapping</span>
+<span class="sd">        Calculate the image representation from the ``base_cube`` using the pixel</span>
+<span class="sd">        mapping</span>
 
 <span class="sd">        .. math::</span>
 
@@ -391,9 +403,16 @@ document.write(`
 <span class="sd">        0.0625 &amp; 0.1250 &amp; 0.0625 \\</span>
 <span class="sd">        \end{bmatrix}</span>
 
-<span class="sd">    which is the 2D version of the discretely-sampled response function corresponding to a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a convolutional kernel in the image plane, and so effectively acts as apodization by a Hann window function in the Fourier domain. For more information, see the following Wikipedia articles on `Window Functions &lt;https://en.wikipedia.org/wiki/Window_function&gt;`_ in general and the `Hann Window &lt;https://en.wikipedia.org/wiki/Hann_function&gt;`_ specifically.</span>
+<span class="sd">    which is the 2D version of the discretely-sampled response function corresponding to</span>
+<span class="sd">    a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a </span>
+<span class="sd">    convolutional kernel in the image plane, and so effectively acts as apodization </span>
+<span class="sd">    by a Hann window function in the Fourier domain. For more information, see the </span>
+<span class="sd">    following Wikipedia articles on `Window Functions </span>
+<span class="sd">    &lt;https://en.wikipedia.org/wiki/Window_function&gt;`_ in general and the `Hann Window </span>
+<span class="sd">    &lt;https://en.wikipedia.org/wiki/Hann_function&gt;`_ specifically.</span>
 
-<span class="sd">    The idea is that this layer would help naturally attenuate high spatial frequency artifacts by baking in a natural apodization in the Fourier plane.</span>
+<span class="sd">    The idea is that this layer would help naturally attenuate high spatial frequency </span>
+<span class="sd">    artifacts by baking in a natural apodization in the Fourier plane.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        nchan (int): number of channels</span>
@@ -434,12 +453,15 @@ document.write(`
 
 <div class="viewcode-block" id="HannConvCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.HannConvCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Args:</span>
-<span class="sd">            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()</span>
+<span class="sd">            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked</span>
+<span class="sd">            image cube, for example, from ImageCube.forward()</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.complex tensor: the FFT of the image cube, in packed format and of shape ``(nchan, npix, npix)``</span>
+<span class="sd">            torch.complex tensor: the FFT of the image cube, in packed format and of</span>
+<span class="sd">            shape ``(nchan, npix, npix)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Conv2d is designed to work on batches, so some extra unsqueeze/squeezing action is required.</span>
+        <span class="c1"># Conv2d is designed to work on batches, so some extra unsqueeze/squeezing</span>
+        <span class="c1"># action is required.</span>
         <span class="c1"># Additionally, the convolution must be done on the *sky-oriented* cube</span>
         <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
 
@@ -460,17 +482,33 @@ document.write(`
 
 <div class="viewcode-block" id="ImageCube"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube">[docs]</a><span class="k">class</span> <span class="nc">ImageCube</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
+<span class="sd">    The parameter set is the pixel values of the image cube itself. The pixels are</span>
+<span class="sd">    assumed to represent samples of the specific intensity and are given in units of</span>
+<span class="sd">    [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].</span>
 
-<span class="sd">    All keyword arguments are required unless noted. The passthrough argument is essential for specifying whether the ImageCube object is the set of root parameters (``passthrough==False``) or if its simply a passthrough layer (``pasthrough==True``). In either case, ImageCube is essentially an identity layer, since no transformations are applied to the ``cube`` tensor. The main purpose of the ImageCube layer is to provide useful functionality around the ``cube`` tensor, such as returning a sky_cube representation and providing FITS writing functionility. In the case of ``passthrough==False``, the ImageCube layer also acts as a container for the trainable parameters.</span>
+<span class="sd">    All keyword arguments are required unless noted. The passthrough argument is</span>
+<span class="sd">    essential for specifying whether the ImageCube object is the set of root parameters</span>
+<span class="sd">    (``passthrough==False``) or if its simply a passthrough layer</span>
+<span class="sd">    (``pasthrough==True``). In either case, ImageCube is essentially an identity layer,</span>
+<span class="sd">    since no transformations are applied to the ``cube`` tensor. The main purpose of</span>
+<span class="sd">    the ImageCube layer is to provide useful functionality around the ``cube`` tensor,</span>
+<span class="sd">    such as returning a sky_cube representation and providing FITS writing</span>
+<span class="sd">    functionility. In the case of ``passthrough==False``, the ImageCube layer also acts</span>
+<span class="sd">    as a container for the trainable parameters.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
 <span class="sd">        npix (int): the number of pixels per image side</span>
-<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class.</span>
+<span class="sd">            If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the image</span>
-<span class="sd">        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.</span>
-<span class="sd">        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. See :ref:`cube-orientation-label` for more information on the expectations of the orientation of the input image.</span>
+<span class="sd">        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed</span>
+<span class="sd">            to parameter base.</span>
+<span class="sd">        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a</span>
+<span class="sd">            prepacked image cube to initialize the model with in units of</span>
+<span class="sd">            [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting</span>
+<span class="sd">            ``cube`` is ``torch.zeros``. See :ref:`cube-orientation-label` for more</span>
+<span class="sd">            information on the expectations of the orientation of the input image.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -520,14 +558,20 @@ document.write(`
 
 <div class="viewcode-block" id="ImageCube.forward"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If the ImageCube object was initialized with ``passthrough=True``, the ``cube`` argument is required. ``forward`` essentially just passes this on as an identity operation.</span>
+<span class="sd">        If the ImageCube object was initialized with ``passthrough=True``, the ``cube``</span>
+<span class="sd">        argument is required. ``forward`` essentially just passes this on as an identity</span>
+<span class="sd">        operation.</span>
 
-<span class="sd">        If the ImageCube object was initialized with ``passthrough=False``, the ``cube`` argument is not permitted, and ``forward`` passes on the stored ``nn.Parameter`` cube as an identity operation.</span>
+<span class="sd">        If the ImageCube object was initialized with ``passthrough=False``, the ``cube``</span>
+<span class="sd">        argument is not permitted, and ``forward`` passes on the stored</span>
+<span class="sd">        ``nn.Parameter`` cube as an identity operation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if the ImageCube object was initialized with ``passthrough=True``.</span>
+<span class="sd">            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if</span>
+<span class="sd">            the ImageCube object was initialized with ``passthrough=True``.</span>
 
-<span class="sd">        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity operation</span>
+<span class="sd">        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity</span>
+<span class="sd">        operation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">cube</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -555,15 +599,16 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The spatially-integrated flux of the image. Returns a &#39;spectrum&#39; with the flux in each channel in units of Jy.</span>
+<span class="sd">        The spatially-integrated flux of the image. Returns a &#39;spectrum&#39; with the flux</span>
+<span class="sd">        in each channel in units of Jy.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.double: a 1D tensor of length ``(nchan)`` </span>
+<span class="sd">            torch.double: a 1D tensor of length ``(nchan)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># convert from Jy/arcsec^2 to Jy/pixel using area of a pixel</span>
         <span class="c1"># multiply by arcsec^2/pixel</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ImageCube.to_FITS"><a class="viewcode-back" href="../../api.html#mpol.images.ImageCube.to_FITS">[docs]</a>    <span class="k">def</span> <span class="nf">to_FITS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;cube.fits&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

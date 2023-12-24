@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.onedim &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.onedim &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -289,8 +289,9 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for mpol.onedim</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">mpol.utils</span> <span class="kn">import</span> <span class="n">torch2npy</span>
+
 
 <div class="viewcode-block" id="radialI"><a class="viewcode-back" href="../../api.html#mpol.onedim.radialI">[docs]</a><span class="k">def</span> <span class="nf">radialI</span><span class="p">(</span><span class="n">icube</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">chan</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -300,12 +301,12 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    icube : `mpol.images.ImageCube` object</span>
 <span class="sd">        Instance of the MPoL `images.ImageCube` class</span>
-<span class="sd">    geom : dict </span>
+<span class="sd">    geom : dict</span>
 <span class="sd">        Dictionary of source geometry. Keys:</span>
 <span class="sd">            &quot;incl&quot; : float, unit=[deg]</span>
-<span class="sd">                Inclination </span>
+<span class="sd">                Inclination</span>
 <span class="sd">            &quot;Omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Position angle of the ascending node </span>
+<span class="sd">                Position angle of the ascending node</span>
 <span class="sd">            &quot;omega&quot; : float, unit=[deg]</span>
 <span class="sd">                Argument of periastron</span>
 <span class="sd">            &quot;dRA&quot; : float, unit=[arcsec]</span>
@@ -315,7 +316,7 @@ document.write(`
 <span class="sd">    chan : int, default=0</span>
 <span class="sd">        Channel of the image cube corresponding to the desired image</span>
 <span class="sd">    bins : array, default=None, unit=[arcsec]</span>
-<span class="sd">        Radial bin edges to use in calculating I(r). If None, bins will span </span>
+<span class="sd">        Radial bin edges to use in calculating I(r). If None, bins will span</span>
 <span class="sd">        the full image, with widths equal to the hypotenuse of the pixels</span>
 
 <span class="sd">    Returns</span>
@@ -350,12 +351,12 @@ document.write(`
     <span class="n">bin_counts</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">rr</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># cumulative binned brightness in each annulus</span>
-    <span class="n">Is</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">rr</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> 
-                         <span class="n">weights</span><span class="o">=</span><span class="n">torch2npy</span><span class="p">(</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span><span class="p">[</span><span class="n">chan</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-                         <span class="p">)</span>
+    <span class="n">Is</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+        <span class="n">a</span><span class="o">=</span><span class="n">rr</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">torch2npy</span><span class="p">(</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span><span class="p">[</span><span class="n">chan</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="p">)</span>
 
     <span class="c1"># mask empty bins</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_counts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">bin_counts</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="n">Is</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">Is</span><span class="p">)</span>
 
     <span class="c1"># average binned brightness in each annulus</span>
@@ -368,44 +369,44 @@ document.write(`
 
 <div class="viewcode-block" id="radialV"><a class="viewcode-back" href="../../api.html#mpol.onedim.radialV">[docs]</a><span class="k">def</span> <span class="nf">radialV</span><span class="p">(</span><span class="n">fcube</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rescale_flux</span><span class="p">,</span> <span class="n">chan</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL </span>
-<span class="sd">    image. </span>
+<span class="sd">    Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL</span>
+<span class="sd">    image.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    fcube : `~mpol.fourier.FourierCube` object</span>
 <span class="sd">        Instance of the MPoL `fourier.FourierCube` class</span>
-<span class="sd">    geom : dict </span>
+<span class="sd">    geom : dict</span>
 <span class="sd">        Dictionary of source geometry. Keys:</span>
 <span class="sd">            &quot;incl&quot; : float, unit=[deg]</span>
-<span class="sd">                Inclination </span>
+<span class="sd">                Inclination</span>
 <span class="sd">            &quot;Omega&quot; : float, unit=[deg]</span>
-<span class="sd">                Position angle of the ascending node </span>
+<span class="sd">                Position angle of the ascending node</span>
 <span class="sd">            &quot;omega&quot; : float, unit=[deg]</span>
 <span class="sd">                Argument of periastron</span>
 <span class="sd">            &quot;dRA&quot; : float, unit=[arcsec]</span>
-<span class="sd">                Phase center offset in right ascension. Positive is west of north. </span>
+<span class="sd">                Phase center offset in right ascension. Positive is west of north.</span>
 <span class="sd">            &quot;dDec&quot; : float, unit=[arcsec]</span>
 <span class="sd">                Phase center offset in declination</span>
 <span class="sd">    rescale_flux : bool</span>
-<span class="sd">        If True, the visibility amplitudes are rescaled to account </span>
-<span class="sd">        for the difference between the inclined (observed) brightness and the </span>
-<span class="sd">        assumed face-on brightness, assuming the emission is optically thick. </span>
+<span class="sd">        If True, the visibility amplitudes are rescaled to account</span>
+<span class="sd">        for the difference between the inclined (observed) brightness and the</span>
+<span class="sd">        assumed face-on brightness, assuming the emission is optically thick.</span>
 <span class="sd">        The source&#39;s integrated (2D) flux is assumed to be:</span>
 <span class="sd">        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.</span>
-<span class="sd">        No rescaling would be appropriate in the optically thin limit. </span>
+<span class="sd">        No rescaling would be appropriate in the optically thin limit.</span>
 <span class="sd">    chan : int, default=0</span>
-<span class="sd">        Channel of the image cube corresponding to the desired image        </span>
+<span class="sd">        Channel of the image cube corresponding to the desired image</span>
 <span class="sd">    bins : array, default=None, unit=[k\lambda]</span>
-<span class="sd">        Baseline bin edges to use in calculating V(q). If None, bins will span </span>
-<span class="sd">        the model baseline distribution, with widths equal to the hypotenuse of </span>
+<span class="sd">        Baseline bin edges to use in calculating V(q). If None, bins will span</span>
+<span class="sd">        the model baseline distribution, with widths equal to the hypotenuse of</span>
 <span class="sd">        the (u, v) coordinates</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bin_centers : array, unit=:math:[`k\lambda`]</span>
 <span class="sd">        Baselines corresponding to `u` and `v`</span>
-<span class="sd">    Vs : array, unit=[Jy] </span>
+<span class="sd">    Vs : array, unit=[Jy]</span>
 <span class="sd">        Visibility amplitudes at `q`</span>
 
 <span class="sd">    Notes</span>
@@ -417,19 +418,21 @@ document.write(`
     <span class="c1"># projected model (u,v) points [k\lambda]</span>
     <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span> <span class="o">=</span> <span class="n">fcube</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">sky_u_centers_2D</span><span class="p">,</span> <span class="n">fcube</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">sky_v_centers_2D</span>
 
-    <span class="c1"># visibilities </span>
+    <span class="c1"># visibilities</span>
     <span class="n">V</span> <span class="o">=</span> <span class="n">torch2npy</span><span class="p">(</span><span class="n">fcube</span><span class="o">.</span><span class="n">ground_vis</span><span class="p">[</span><span class="n">chan</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
     <span class="c1"># phase-shift the visibilities</span>
-    <span class="n">Vp</span> <span class="o">=</span> <span class="n">apply_phase_shift</span><span class="p">(</span><span class="n">uu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">vv</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;dRA&quot;</span><span class="p">],</span> 
-                           <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;dDec&quot;</span><span class="p">],</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
+    <span class="n">Vp</span> <span class="o">=</span> <span class="n">apply_phase_shift</span><span class="p">(</span>
+        <span class="n">uu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">vv</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;dRA&quot;</span><span class="p">],</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;dDec&quot;</span><span class="p">],</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
     <span class="c1"># deproject the (u,v) points</span>
-    <span class="n">up</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">deproject</span><span class="p">(</span><span class="n">uu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">vv</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;incl&quot;</span><span class="p">],</span> 
-                          <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;Omega&quot;</span><span class="p">])</span>
+    <span class="n">up</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">deproject</span><span class="p">(</span>
+        <span class="n">uu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">vv</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;incl&quot;</span><span class="p">],</span> <span class="n">geom</span><span class="p">[</span><span class="s2">&quot;Omega&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="c1"># if the source is optically thick, rescale the deprojected V(q)</span>
-    <span class="k">if</span> <span class="n">rescale_flux</span><span class="p">:</span> 
+    <span class="k">if</span> <span class="n">rescale_flux</span><span class="p">:</span>
         <span class="n">Vp</span><span class="o">.</span><span class="n">real</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">geom</span><span class="p">[</span><span class="s2">&quot;incl&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
 
     <span class="c1"># convert back to [k\lambda]</span>
@@ -437,7 +440,7 @@ document.write(`
     <span class="n">vp</span> <span class="o">/=</span> <span class="mf">1e3</span>
 
     <span class="c1"># deprojected baselines</span>
-    <span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span> 
+    <span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">bins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># choose sensible bin size and range</span>
@@ -450,12 +453,12 @@ document.write(`
     <span class="n">Vs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">qq</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">Vp</span><span class="p">)</span>
 
     <span class="c1"># mask empty bins</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_counts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">bin_counts</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="n">Vs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">Vs</span><span class="p">)</span>
 
     <span class="c1"># average binned visibility amplitude in each annulus</span>
     <span class="n">Vs</span> <span class="o">/=</span> <span class="n">bin_counts</span>
-    
+
     <span class="n">bin_centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">/</span> <span class="mi">2</span>
 
     <span class="k">return</span> <span class="n">bin_centers</span><span class="p">,</span> <span class="n">Vs</span></div>

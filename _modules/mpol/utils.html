@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.utils &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.utils &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -303,13 +303,17 @@ document.write(`
 
 <div class="viewcode-block" id="ground_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.ground_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">ground_cube_to_packed_cube</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. </span>
+<span class="sd">    See Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+<span class="sd">        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor </span>
+<span class="sd">        of shape ``(nchan, npix, npix)``))</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Packed Visibility Cube.</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting </span>
+<span class="sd">            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a </span>
+<span class="sd">            Packed Visibility Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">ground_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">shifted</span></div>
@@ -317,13 +321,17 @@ document.write(`
 
 <div class="viewcode-block" id="packed_cube_to_ground_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_ground_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_ground_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See </span>
+<span class="sd">    Units and Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+<span class="sd">        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor </span>
+<span class="sd">        of shape ``(nchan, npix, npix)``))</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a Ground Cube.</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting </span>
+<span class="sd">            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a </span>
+<span class="sd">            Ground Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
     <span class="n">shifted</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
@@ -333,13 +341,17 @@ document.write(`
 
 <div class="viewcode-block" id="sky_cube_to_packed_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_cube_to_packed_cube">[docs]</a><span class="k">def</span> <span class="nf">sky_cube_to_packed_cube</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and </span>
+<span class="sd">    Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sky_cube: a previously initialized Sky Cube object with RA increasing to the *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+<span class="sd">        sky_cube: a previously initialized Sky Cube object with RA increasing to the </span>
+<span class="sd">            *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Packed Image Cube.</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting </span>
+<span class="sd">            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the </span>
+<span class="sd">            RA axis; i.e Returns a Packed Image Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">flipped</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -348,13 +360,17 @@ document.write(`
 
 <div class="viewcode-block" id="packed_cube_to_sky_cube"><a class="viewcode-back" href="../../api.html#mpol.utils.packed_cube_to_sky_cube">[docs]</a><span class="k">def</span> <span class="nf">packed_cube_to_sky_cube</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and Conventions for more details.</span>
+<span class="sd">    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and </span>
+<span class="sd">    Conventions for more details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch tensor of shape ``(nchan, npix, npix)``))</span>
+<span class="sd">        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch </span>
+<span class="sd">        tensor of shape ``(nchan, npix, npix)``))</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the RA axis; i.e Returns a Sky Cube.</span>
+<span class="sd">        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting </span>
+<span class="sd">            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the </span>
+<span class="sd">            RA axis; i.e Returns a Sky Cube.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># fftshift the image cube to the correct quadrants</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">packed_cube</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -365,7 +381,8 @@ document.write(`
 
 <div class="viewcode-block" id="get_Jy_arcsec2"><a class="viewcode-back" href="../../api.html#mpol.utils.get_Jy_arcsec2">[docs]</a><span class="k">def</span> <span class="nf">get_Jy_arcsec2</span><span class="p">(</span><span class="n">T_b</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">230e9</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate specific intensity from the brightness temperature, using the Rayleigh-Jeans definition.</span>
+<span class="sd">    Calculate specific intensity from the brightness temperature, using the </span>
+<span class="sd">    Rayleigh-Jeans definition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        T_b : brightness temperature in [:math:`K`]</span>
@@ -402,7 +419,10 @@ document.write(`
 
 <div class="viewcode-block" id="loglinspace"><a class="viewcode-back" href="../../api.html#mpol.utils.loglinspace">[docs]</a><span class="k">def</span> <span class="nf">loglinspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">N_log</span><span class="p">,</span> <span class="n">M_linear</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a logspaced array of bin edges, with the first ``M_linear`` cells being equal width. There is a one-cell overlap between the linear and logarithmic stretches of the array, since the last linear cell is also the first logarithmic cell, which means the total number of cells is ``M_linear + N_log - 1``.</span>
+<span class="sd">    Return a logspaced array of bin edges, with the first ``M_linear`` cells being </span>
+<span class="sd">    equal width. There is a one-cell overlap between the linear and logarithmic </span>
+<span class="sd">    stretches of the array, since the last linear cell is also the first logarithmic </span>
+<span class="sd">    cell, which means the total number of cells is ``M_linear + N_log - 1``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        start (float): starting cell left edge</span>
@@ -429,7 +449,9 @@ document.write(`
 
 
 <div class="viewcode-block" id="fftspace"><a class="viewcode-back" href="../../api.html#mpol.utils.fftspace">[docs]</a><span class="k">def</span> <span class="nf">fftspace</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements </span>
+<span class="sd">    (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle </span>
+<span class="sd">    point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        width (float): the width of the array</span>
@@ -497,7 +519,8 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        (1D array nvis): baselines in [klambda]</span>
 <span class="sd">    Notes:</span>
-<span class="sd">        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be broadcast-able.</span>
+<span class="sd">        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be </span>
+<span class="sd">        broadcast-able.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">wle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">wle</span> <span class="ow">and</span> <span class="n">freq</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Exactly one of &#39;freq&#39; or &#39;wle&#39; must be supplied.&quot;</span><span class="p">)</span>
@@ -541,7 +564,8 @@ document.write(`
 
 <div class="viewcode-block" id="get_max_spatial_freq"><a class="viewcode-back" href="../../api.html#mpol.utils.get_max_spatial_freq">[docs]</a><span class="k">def</span> <span class="nf">get_max_spatial_freq</span><span class="p">(</span><span class="n">cell_size</span><span class="p">,</span> <span class="n">npix</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the maximum spatial frequency that the image can represent and still satisfy the Nyquist Sampling theorem.</span>
+<span class="sd">    Calculate the maximum spatial frequency that the image can represent and still </span>
+<span class="sd">    satisfy the Nyquist Sampling theorem.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): the pixel size in arcseconds</span>
@@ -560,10 +584,12 @@ document.write(`
 
 <div class="viewcode-block" id="get_maximum_cell_size"><a class="viewcode-back" href="../../api.html#mpol.utils.get_maximum_cell_size">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_cell_size</span><span class="p">(</span><span class="n">uu_vv_point</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the maximum possible cell_size that will still Nyquist sample the uu or vv point. Note: not q point.</span>
+<span class="sd">    Calculate the maximum possible cell_size that will still Nyquist sample the uu or </span>
+<span class="sd">    vv point. Note: not q point.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        uu_vv_point (float): a single spatial frequency. Units of [:math:`\mathrm{k}\lambda`].</span>
+<span class="sd">        uu_vv_point (float): a single spatial frequency. Units of </span>
+<span class="sd">            [:math:`\mathrm{k}\lambda`].</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        cell_size (in arcsec)</span>
@@ -622,7 +648,9 @@ document.write(`
 
 <div class="viewcode-block" id="sky_gaussian_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_radians">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_radians</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is rotated ``Omega`` degrees East of North.</span>
+<span class="sd">    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is </span>
+<span class="sd">    centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is </span>
+<span class="sd">    rotated ``Omega`` degrees East of North.</span>
 
 <span class="sd">    To evaluate the Gaussian, internally first we translate to center</span>
 
@@ -671,7 +699,9 @@ document.write(`
 
 <div class="viewcode-block" id="sky_gaussian_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.sky_gaussian_arcsec">[docs]</a><span class="k">def</span> <span class="nf">sky_gaussian_arcsec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts from arcsec to radians.</span>
+<span class="sd">    Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience</span>
+<span class="sd">    wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts </span>
+<span class="sd">    from arcsec to radians.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x: equivalent to l, but in units of [arcsec]</span>
@@ -701,7 +731,12 @@ document.write(`
 
 <div class="viewcode-block" id="fourier_gaussian_lambda_radians"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_lambda_radians">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_lambda_radians</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_l</span><span class="p">,</span> <span class="n">delta_m</span><span class="p">,</span> <span class="n">sigma_l</span><span class="p">,</span> <span class="n">sigma_m</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.</span>
+<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the </span>
+<span class="sd">    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in </span>
+<span class="sd">    :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The </span>
+<span class="sd">    Fourier Gaussian is parameterized using the sky plane centroid </span>
+<span class="sd">    (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). </span>
+<span class="sd">    Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        u: l in units of [lambda]</span>
@@ -716,9 +751,13 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        2D Gaussian evaluated at input args</span>
 
-<span class="sd">    The following is a description of how we derived the analytical relationships. In what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units of :math:`\lambda`.</span>
+<span class="sd">    The following is a description of how we derived the analytical relationships. In </span>
+<span class="sd">    what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units </span>
+<span class="sd">    of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units </span>
+<span class="sd">    of :math:`\lambda`.</span>
 
-<span class="sd">    We start from Fourier dual relationships in Bracewell&#39;s `The Fourier Transform and Its Applications &lt;https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract&gt;`_</span>
+<span class="sd">    We start from Fourier dual relationships in Bracewell&#39;s `The Fourier Transform and </span>
+<span class="sd">    Its Applications &lt;https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract&gt;`_</span>
 
 <span class="sd">    .. math::</span>
 
@@ -738,7 +777,9 @@ document.write(`
 
 <span class="sd">    respectively. The sky-plane Gaussian has a maximum value of :math:`a`.</span>
 
-<span class="sd">    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into :math:`F_\mathrm{g}(u,v)`.</span>
+<span class="sd">    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into </span>
+<span class="sd">    a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into </span>
+<span class="sd">    :math:`F_\mathrm{g}(u,v)`.</span>
 
 <span class="sd">    The similarity theorem states that (in 1D)</span>
 
@@ -752,7 +793,8 @@ document.write(`
 
 <span class="sd">        f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 + \left( \frac{m}{\sigma_m} \right)^2 \right] \right).</span>
 
-<span class="sd">    i.e., something we might call a normalized Gaussian function. Phrased in terms of :math:`f_0`, :math:`f_1` is</span>
+<span class="sd">    i.e., something we might call a normalized Gaussian function. Phrased in terms of </span>
+<span class="sd">    :math:`f_0`, :math:`f_1` is</span>
 
 <span class="sd">    .. math::</span>
 
@@ -770,7 +812,9 @@ document.write(`
 
 <span class="sd">        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + \sigma_m^2 v^2] \right).</span>
 
-<span class="sd">    Next, we rotate the Gaussian to match the sky plane rotation. A rotation :math:`\Omega` in the sky plane is carried out in the same direction in the Fourier plane,</span>
+<span class="sd">    Next, we rotate the Gaussian to match the sky plane rotation. A rotation </span>
+<span class="sd">    :math:`\Omega` in the sky plane is carried out in the same direction in the </span>
+<span class="sd">    Fourier plane,</span>
 
 <span class="sd">    .. math::</span>
 
@@ -784,7 +828,9 @@ document.write(`
 <span class="sd">        f_2(l, m) = f_1(l&#39;, m&#39;) \\</span>
 <span class="sd">        F_2(u, v) = F_1(u&#39;, m&#39;)</span>
 
-<span class="sd">    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. The image plane translation is</span>
+<span class="sd">    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, </span>
+<span class="sd">    :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. </span>
+<span class="sd">    The image plane translation is</span>
 
 <span class="sd">    .. math::</span>
 
@@ -802,7 +848,8 @@ document.write(`
 
 <span class="sd">        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u&#39;^2 + \sigma_m^2 v&#39;^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).</span>
 
-<span class="sd">    N.B. that we have mixed primed (:math:`u&#39;`) and unprimed (:math:`u`) coordinates in the same equation for brevity.</span>
+<span class="sd">    N.B. that we have mixed primed (:math:`u&#39;`) and unprimed (:math:`u`) coordinates in </span>
+<span class="sd">    the same equation for brevity.</span>
 
 <span class="sd">    Finally, the same Fourier dual relationship holds</span>
 
@@ -833,7 +880,12 @@ document.write(`
 
 <div class="viewcode-block" id="fourier_gaussian_klambda_arcsec"><a class="viewcode-back" href="../../api.html#mpol.utils.fourier_gaussian_klambda_arcsec">[docs]</a><span class="k">def</span> <span class="nf">fourier_gaussian_klambda_arcsec</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">Omega</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.</span>
+<span class="sd">    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the </span>
+<span class="sd">    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in </span>
+<span class="sd">    :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier</span>
+<span class="sd">    Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), </span>
+<span class="sd">    widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in </span>
+<span class="sd">    units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        u: l in units of [klambda]</span>

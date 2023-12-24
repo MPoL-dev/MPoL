@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.geometry &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.geometry &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -297,9 +297,12 @@ document.write(`
 
 
 <div class="viewcode-block" id="flat_to_observer"><a class="viewcode-back" href="../../api.html#mpol.geometry.flat_to_observer">[docs]</a><span class="k">def</span> <span class="nf">flat_to_observer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the frame to convert a point in the flat (x,y,z) frame to observer frame (X,Y,Z).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the frame to convert a point in the flat (x,y,z) frame to observer frame </span>
+<span class="sd">    (X,Y,Z).</span>
 
-<span class="sd">    It is assumed that the +Z axis points *towards* the observer. It is assumed that the model is flat in the (x,y) frame (like a flat disk), and so the operations involving ``z`` are neglected. But the model lives in 3D Cartesian space.</span>
+<span class="sd">    It is assumed that the +Z axis points *towards* the observer. It is assumed that the</span>
+<span class="sd">      model is flat in the (x,y) frame (like a flat disk), and so the operations </span>
+<span class="sd">      involving ``z`` are neglected. But the model lives in 3D Cartesian space.</span>
 
 <span class="sd">    In order,</span>
 
@@ -307,21 +310,30 @@ document.write(`
 <span class="sd">    2. rotate about the x1 axis by an amount -incl -&gt; x2, y2, z2</span>
 <span class="sd">    3. rotate about the z2 axis by an amount Omega -&gt; x3, y3, z3 = X, Y, Z</span>
 
-<span class="sd">    Inspired by `exoplanet/keplerian.py &lt;https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py&gt;`_</span>
+<span class="sd">    Inspired by `exoplanet/keplerian.py </span>
+<span class="sd">    &lt;https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py&gt;`_</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x (torch tensor): A tensor representing the x coordinate in the plane of the orbit.</span>
-<span class="sd">        y (torch tensor): A tensor representing the y coordinate in the plane of the orbit.</span>
-<span class="sd">        omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.</span>
-<span class="sd">        incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.</span>
-<span class="sd">        Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0</span>
+<span class="sd">        x (torch tensor): A tensor representing the x coordinate in the plane of </span>
+<span class="sd">            the orbit.</span>
+<span class="sd">        y (torch tensor): A tensor representing the y coordinate in the plane of </span>
+<span class="sd">            the orbit.</span>
+<span class="sd">        omega (torch float tensor): A tensor representing an argument of periastron </span>
+<span class="sd">            [radians] Default 0.0.</span>
+<span class="sd">        incl (torch float tensor): A tensor representing an inclination value [radians].</span>
+<span class="sd">            Default 0.0.</span>
+<span class="sd">        Omega (torch float tensor): A tensor representing the position angle of the </span>
+<span class="sd">            ascending node in [radians]. Default 0.0</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Two tensors representing ``(X, Y)`` in the observer frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.</span>
-    <span class="c1"># For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.</span>
-    <span class="c1"># A vector in the coordinate system will appear as though it has been rotated counter-clockwise.</span>
+    <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, </span>
+    <span class="c1"># as defined using the righthand rule.</span>
+    <span class="c1"># For example, looking down the z-axis, </span>
+    <span class="c1"># a positive angle will rotate the x,y axes clockwise.</span>
+    <span class="c1"># A vector in the coordinate system will appear as though it has been </span>
+    <span class="c1"># rotated counter-clockwise.</span>
 
     <span class="c1"># 1) rotate about the z0 axis by omega</span>
     <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -360,9 +372,11 @@ document.write(`
 
 
 <div class="viewcode-block" id="observer_to_flat"><a class="viewcode-back" href="../../api.html#mpol.geometry.observer_to_flat">[docs]</a><span class="k">def</span> <span class="nf">observer_to_flat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the frame to convert a point in the observer frame (X,Y,Z) to the flat (x,y,z) frame.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate the frame to convert a point in the observer frame (X,Y,Z) to the </span>
+<span class="sd">    flat (x,y,z) frame.</span>
 
-<span class="sd">    It is assumed that the +Z axis points *towards* the observer. The rotation operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.</span>
+<span class="sd">    It is assumed that the +Z axis points *towards* the observer. The rotation </span>
+<span class="sd">    operations are the inverse of the :func:`~mpol.geometry.flat_to_observer` operations.</span>
 
 <span class="sd">    In order,</span>
 
@@ -370,21 +384,30 @@ document.write(`
 <span class="sd">    2. inverse rotation about the x2 axis by an amount -incl -&gt; x1, y1, z1</span>
 <span class="sd">    3. inverse rotation about the z1 axis by an amount omega -&gt; x, y, z</span>
 
-<span class="sd">    Inspired by `exoplanet/keplerian.py &lt;https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py&gt;`_</span>
+<span class="sd">    Inspired by `exoplanet/keplerian.py </span>
+<span class="sd">    &lt;https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py&gt;`_</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X (torch tensor): A tensor representing the x coodinate in the plane of the orbit.</span>
-<span class="sd">        Y (torch.tensor): A tensor representing the y coodinate in the plane of the orbit.</span>
-<span class="sd">        omega (torch float tensor): A tensor representing an argument of periastron [radians] Default 0.0.</span>
-<span class="sd">        incl (torch float tensor): A tensor representing an inclination value [radians]. Default 0.0.</span>
-<span class="sd">        Omega (torch float tensor): A tensor representing the position angle of the ascending node in [radians]. Default 0.0</span>
+<span class="sd">        X (torch tensor): A tensor representing the x coodinate in the plane of </span>
+<span class="sd">            the orbit.</span>
+<span class="sd">        Y (torch.tensor): A tensor representing the y coodinate in the plane of </span>
+<span class="sd">            the orbit.</span>
+<span class="sd">        omega (torch float tensor): A tensor representing an argument of periastron </span>
+<span class="sd">            [radians] Default 0.0.</span>
+<span class="sd">        incl (torch float tensor): A tensor representing an inclination value [radians].</span>
+<span class="sd">            Default 0.0.</span>
+<span class="sd">        Omega (torch float tensor): A tensor representing the position angle of the </span>
+<span class="sd">            ascending node in [radians]. Default 0.0</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Two tensors representing ``(x, y)`` in the flat frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, as defined using the righthand rule.</span>
-    <span class="c1"># For example, looking down the z-axis, a positive angle will rotate the x,y axes clockwise.</span>
-    <span class="c1"># A vector in the coordinate system will appear as though it has been rotated counter-clockwise.</span>
+    <span class="c1"># Rotation matrices result in a *clockwise* rotation of the axes, </span>
+    <span class="c1"># as defined using the righthand rule.</span>
+    <span class="c1"># For example, looking down the z-axis, a positive angle will rotate the </span>
+    <span class="c1"># x,y axes clockwise.</span>
+    <span class="c1"># A vector in the coordinate system will appear as though it has been </span>
+    <span class="c1"># rotated counter-clockwise.</span>
 
     <span class="c1"># 1) inverse rotation about Z axis by Omega -&gt; x2, y2, z2</span>
     <span class="k">if</span> <span class="n">Omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

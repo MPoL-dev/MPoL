@@ -127,12 +127,10 @@ git fetch --tags
 git checkout tags/v0.2.0
 ```
 
-Otherwise, proceed directly with installing the build dependencies for the documentation with 
+Otherwise, proceed directly with installing the development dependencies
 ```
-$ pip install ".[docs]"
+$ pip install ".[dev]"
 ```
-
-Alternatively, you could start from `[dev]` list, since it is a superset of `[docs]`.
 
 ### Building the Documentation
 
@@ -202,7 +200,7 @@ To write a tutorial, we suggest copying and rename one of the existing `.md` fil
 
 When done, add a reference to your tutorial in the table of contents in `docs/index.rst`. E.g., if your contribution is the `ci-tutorials/gridder.md` file, add a `ci-tutorials/gridder.md` line. Then, you should be able to build the documentation as normal (i.e., `make html`) and your tutorial will be included in the documentation. The MyST-NB plugin is doing the work behind the scenes.
 
-If your tutorial requires any extra build dependencies, please add them to the `EXTRA_REQUIRES['docs']` list in `setup.py`.
+If your tutorial requires any extra build dependencies, please add them to the `[project.optional-dependencies]["dev"]` list in `pyproject.toml`.
 
 #### Larger tutorials requiring substantial computational resources
 
@@ -231,19 +229,18 @@ If you're thinking about contributing a tutorial and would like guidance on form
 (releasing-new-version-label)=
 ## Releasing a new version of MPoL
 
-To release a new version of MPoL, follow these steps in order:
+To release a new version of MPoL, follow this checklist in order:
 
-1. Ensure all tests are passing on your PR
-    * If tests are passing locally and failing in the GitHub Actions workflows, compare the code dependencies in `setup.py` with your local versions
-2. Ensure the docs build locally without errors or warnings
-3. Update the code version in `__init__`
-4. Update the version history in `changelog.md`
-5. Update the contributors in `CONTRIBUTORS.md`
-6. Update the copyright year and citation in `README.md`
+1. Ensure *all* tests are passing on your PR, both locally and via GitHub Actions.
+    * If tests pass locally but fail in the GitHub Actions workflows, inspect the GitHub Actions workflow logs for clues about missing packages or outdated dependencies.
+2. Ensure the docs build locally without errors or warnings. Check output by opening `docs/_build/html/index.html` with your web browser.
+3. Perform final round of edits documenting the changes since last version in `changelog.md`. If any changes are potentially breaking, suggest how users might change their workflow to incorporate updates.
+4. Check contributors in `CONTRIBUTORS.md` up to date.
+5. Update the copyright year and citation in `README.md`
     * In the citation, update all fields except 'Zenodo', 'doi', and 'url' (the current DOI will cite all versions and the URL will direct to the most recent version)
-7. Merge your PR into `main`
-    * Ensure all tests triggered by the merge pass
-8. Publish a pre-release
-    * Ensure the `pre-release.yml` workflow passes
-9. Publish a (true) release, which will be automatically uploaded to PyPI and archived on Zenodo
-    * Verify this by ensuring the `package.yml` workflow passes
+6. Merge your PR into `main` using the GitHub interface.
+    * A new round of tests will be triggered by the merge. Make sure *all* of these pass.
+7. Go to the [Releases](https://github.com/MPoL-dev/MPoL/releases) page, draft release notes, and publish a pre-release
+    * Ensure the `pre-release.yml` workflow passes.
+8. Publish the true release. GitHub actions will automatically uploaded the built package to PyPI and archive it on Zenodo
+    * Verify this has worked by checking the `package.yml` workflow passed.

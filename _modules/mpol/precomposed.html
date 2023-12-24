@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.precomposed &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.precomposed &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -303,9 +303,11 @@ document.write(`
 <span class="sd">    Args:</span>
 <span class="sd">        cell_size (float): the width of a pixel [arcseconds]</span>
 <span class="sd">        npix (int): the number of pixels per image side</span>
-<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.</span>
+<span class="sd">        coords (GridCoords): an object already instantiated from the GridCoords class. </span>
+<span class="sd">            If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">        nchan (int): the number of channels in the base cube. Default = 1.</span>
-<span class="sd">        base_cube : a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``.</span>
+<span class="sd">        base_cube : a pre-packed base cube to initialize the model with. If </span>
+<span class="sd">            None, assumes ``torch.zeros``.</span>
 
 <span class="sd">    After the object is initialized, instance variables can be accessed, for example</span>
 
@@ -313,9 +315,11 @@ document.write(`
 <span class="sd">    :ivar icube: the :class:`~mpol.images.ImageCube` instance</span>
 <span class="sd">    :ivar fcube: the :class:`~mpol.fourier.FourierCube` instance</span>
 
-<span class="sd">    For example, you&#39;ll likely want to access the ``self.icube.sky_model`` at some point.</span>
+<span class="sd">    For example, you&#39;ll likely want to access the ``self.icube.sky_model`` </span>
+<span class="sd">    at some point.</span>
 
-<span class="sd">    The idea is that :class:`~mpol.precomposed.SimpleNet` can save you some keystrokes composing models by connecting the most commonly used layers together.</span>
+<span class="sd">    The idea is that :class:`~mpol.precomposed.SimpleNet` can save you some keystrokes </span>
+<span class="sd">    composing models by connecting the most commonly used layers together.</span>
 
 <span class="sd">    .. mermaid:: _static/mmd/src/SimpleNet.mmd</span>
 
@@ -350,7 +354,10 @@ document.write(`
 
 <div class="viewcode-block" id="SimpleNet.forward"><a class="viewcode-back" href="../../api.html#mpol.precomposed.SimpleNet.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Feed forward to calculate the model visibilities. In this step, a :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` is fed to a :class:`~mpol.images.ImageCube` is fed to a :class:`~mpol.fourier.FourierCube` to produce the visibility cube.</span>
+<span class="sd">        Feed forward to calculate the model visibilities. In this step, a </span>
+<span class="sd">        :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube` </span>
+<span class="sd">        is fed to a :class:`~mpol.images.ImageCube` is fed to a </span>
+<span class="sd">        :class:`~mpol.fourier.FourierCube` to produce the visibility cube.</span>
 
 <span class="sd">        Returns: 1D complex torch tensor of model visibilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

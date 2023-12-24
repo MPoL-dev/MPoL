@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.training &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.training &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -297,11 +297,12 @@ document.write(`
 <span class="kn">from</span> <span class="nn">mpol.plot</span> <span class="kn">import</span> <span class="n">train_diagnostics_fig</span>
 <span class="kn">from</span> <span class="nn">mpol.utils</span> <span class="kn">import</span> <span class="n">torch2npy</span>
 
+
 <div class="viewcode-block" id="train_to_dirty_image"><a class="viewcode-back" href="../../api.html#mpol.training.train_to_dirty_image">[docs]</a><span class="k">def</span> <span class="nf">train_to_dirty_image</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Train against a dirty image of the observed visibilities using a loss function </span>
-<span class="sd">    of the mean squared error between the RML model image pixel fluxes and the </span>
-<span class="sd">    dirty image pixel fluxes. Useful for initializing a separate RML optimization </span>
+<span class="sd">    Train against a dirty image of the observed visibilities using a loss function</span>
+<span class="sd">    of the mean squared error between the RML model image pixel fluxes and the</span>
+<span class="sd">    dirty image pixel fluxes. Useful for initializing a separate RML optimization</span>
 <span class="sd">    loop at a reasonable starting image.</span>
 
 <span class="sd">    Parameters</span>
@@ -311,7 +312,7 @@ document.write(`
 <span class="sd">    imager : :class:`mpol.gridding.DirtyImager` object</span>
 <span class="sd">        Instance of the `mpol.gridding.DirtyImager` class.</span>
 <span class="sd">    robust : float, default=0.5</span>
-<span class="sd">        Robust weighting parameter used to create a dirty image. </span>
+<span class="sd">        Robust weighting parameter used to create a dirty image.</span>
 <span class="sd">    learn_rate : float, default=100</span>
 <span class="sd">        Learning rate for optimization loop</span>
 <span class="sd">    niter : int, default=1000</span>
@@ -320,14 +321,14 @@ document.write(`
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    model : `torch.nn.Module` object</span>
-<span class="sd">        The input `model` updated with the state of the training to the </span>
+<span class="sd">        The input `model` updated with the state of the training to the</span>
 <span class="sd">        dirty image</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Initializing model to dirty image&quot;</span><span class="p">)</span>
 
-    <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span>
-                                                <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span>
-                                                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span><span class="p">)</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
+        <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;Jy/arcsec^2&quot;</span>
+    <span class="p">)</span>
     <span class="n">dirty_image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learn_rate</span><span class="p">)</span>
 
@@ -339,13 +340,13 @@ document.write(`
 
         <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
 
-        <span class="n">lossfunc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>  
+        <span class="n">lossfunc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
         <span class="c1"># MSELoss calculates mean squared error (squared L2 norm), so sqrt it</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">lossfunc</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="n">dirty_image</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
         <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>            
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">model</span></div>
 
@@ -357,9 +358,9 @@ document.write(`
 <span class="sd">    Args:</span>
 <span class="sd">        imager (:class:`mpol.gridding.DirtyImager` object): Instance of the `mpol.gridding.DirtyImager` class.</span>
 <span class="sd">        optimizer (:class:`torch.optim` object): PyTorch optimizer class for the training loop.</span>
-<span class="sd">        scheduler (:class:`torch.optim.lr_scheduler` object, default=None): Scheduler for adjusting learning rate during optimization.        </span>
+<span class="sd">        scheduler (:class:`torch.optim.lr_scheduler` object, default=None): Scheduler for adjusting learning rate during optimization.</span>
 <span class="sd">        regularizers (nested dict): Dictionary of image regularizers to use. For each, a dict of the strength (&#39;lambda&#39;, float), whether to guess an initial value for lambda (&#39;guess&#39;, bool), and other quantities needed to compute their loss term.</span>
-<span class="sd">            </span>
+
 <span class="sd">            Example:</span>
 <span class="sd">                ``{&quot;sparsity&quot;:{&quot;lambda&quot;:1e-3, &quot;guess&quot;:False},</span>
 <span class="sd">                &quot;entropy&quot;: {&quot;lambda&quot;:1e-3, &quot;guess&quot;:True, &quot;prior_intensity&quot;:1e-10}</span>
@@ -369,23 +370,31 @@ document.write(`
 <span class="sd">        convergence_tol (float): Tolerance for training iteration stopping criterion as assessed by</span>
 <span class="sd">            loss function (suggested &lt;= 1e-3)</span>
 <span class="sd">        train_diag_step (int): Interval at which training diagnostics are output. If None, no diagnostics will be generated.</span>
-<span class="sd">        kfold (int): The k-fold of the current training set (for diagnostics)        </span>
+<span class="sd">        kfold (int): The k-fold of the current training set (for diagnostics)</span>
 <span class="sd">        save_prefix (str): Prefix (path) used for saved figure names. If None, figures won&#39;t be saved</span>
 <span class="sd">        verbose (bool): Whether to print notification messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imager</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span>
-                <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>                 
-                <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                <span class="n">kfold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
-                <span class="p">):</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">imager</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">,</span>
+        <span class="n">scheduler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">regularizers</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">train_diag_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kfold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span> <span class="o">=</span> <span class="n">imager</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="o">=</span> <span class="n">scheduler</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span> <span class="o">=</span> <span class="n">regularizers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span> <span class="o">=</span> <span class="n">convergence_tol</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">=</span> <span class="n">train_diag_step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span> <span class="o">=</span> <span class="n">kfold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span> <span class="o">=</span> <span class="n">save_prefix</span>
@@ -419,7 +428,6 @@ document.write(`
             <span class="n">ratios</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergence_tol</span>
         <span class="p">)</span></div>
 
-
 <div class="viewcode-block" id="TrainTest.loss_lambda_guess"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_lambda_guess">[docs]</a>    <span class="k">def</span> <span class="nf">loss_lambda_guess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set an initial guess for regularizer strengths :math:`\lambda_{x}` by</span>
@@ -428,47 +436,48 @@ document.write(`
 <span class="sd">        The guesses update `lambda` values in `self._regularizers`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;    Updating regularizer strengths with automated &quot;</span>
-                         <span class="sa">f</span><span class="s2">&quot;guessing. Initial values: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;    Updating regularizer strengths with automated &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;guessing. Initial values: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># generate images of the data using two briggs robust values</span>
-        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">img1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">img2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span><span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;briggs&quot;</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">img1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img1</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="n">img2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img2</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entropy&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;guess&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;guess&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># force negative pixel values to small positive value</span>
             <span class="n">img1_nn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">img1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="n">img1</span><span class="p">)</span>
             <span class="n">img2_nn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">img2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="n">img2</span><span class="p">)</span>
 
-            <span class="n">loss_e1</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">img1_nn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">][</span><span class="s1">&#39;prior_intensity&#39;</span><span class="p">])</span>
-            <span class="n">loss_e2</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">img2_nn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">][</span><span class="s1">&#39;prior_intensity&#39;</span><span class="p">])</span>
+            <span class="n">loss_e1</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">img1_nn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">][</span><span class="s2">&quot;prior_intensity&quot;</span><span class="p">])</span>
+            <span class="n">loss_e2</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span><span class="n">img2_nn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">][</span><span class="s2">&quot;prior_intensity&quot;</span><span class="p">])</span>
             <span class="n">guess_e</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">loss_e2</span> <span class="o">-</span> <span class="n">loss_e1</span><span class="p">)</span>
             <span class="c1"># update stored value</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_e</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_e</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sparsity&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;guess&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sparsity&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;guess&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">loss_s1</span> <span class="o">=</span> <span class="n">sparsity</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
             <span class="n">loss_s2</span> <span class="o">=</span> <span class="n">sparsity</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
             <span class="n">guess_s</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">loss_s2</span> <span class="o">-</span> <span class="n">loss_s1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;sparsity&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_s</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;sparsity&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_s</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TV&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;guess&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">loss_TV1</span> <span class="o">=</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TV&#39;</span><span class="p">][</span><span class="s1">&#39;epsilon&#39;</span><span class="p">])</span>
-            <span class="n">loss_TV2</span> <span class="o">=</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TV&#39;</span><span class="p">][</span><span class="s1">&#39;epsilon&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TV&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;guess&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">loss_TV1</span> <span class="o">=</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TV&quot;</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">])</span>
+            <span class="n">loss_TV2</span> <span class="o">=</span> <span class="n">TV_image</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TV&quot;</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">])</span>
             <span class="n">guess_TV</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">loss_TV2</span> <span class="o">-</span> <span class="n">loss_TV1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TV&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TSV&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;guess&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TSV&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;guess&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">loss_TSV1</span> <span class="o">=</span> <span class="n">TSV</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
             <span class="n">loss_TSV2</span> <span class="o">=</span> <span class="n">TSV</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
             <span class="n">guess_TSV</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">loss_TSV2</span> <span class="o">-</span> <span class="n">loss_TSV1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TSV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TSV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TSV&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_TSV</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Updated values: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-                         
 
 <div class="viewcode-block" id="TrainTest.loss_eval"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.loss_eval">[docs]</a>    <span class="k">def</span> <span class="nf">loss_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">sky_cube</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -491,19 +500,20 @@ document.write(`
 
         <span class="c1"># regularizers</span>
         <span class="k">if</span> <span class="n">sky_cube</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;entropy&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lambda&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">entropy</span><span class="p">(</span>
-                    <span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">][</span><span class="s1">&#39;prior_intensity&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sparsity&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lambda&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;sparsity&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sparsity</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TV&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lambda&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">TV_image</span><span class="p">(</span>
-                    <span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TV&#39;</span><span class="p">][</span><span class="s1">&#39;epsilon&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TSV&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lambda&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s1">&#39;TSV&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">entropy</span><span class="p">(</span>
+                    <span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">][</span><span class="s2">&quot;prior_intensity&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sparsity&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;sparsity&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sparsity</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TV&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TV&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">TV_image</span><span class="p">(</span>
+                    <span class="n">sky_cube</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TV&quot;</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TSV&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="p">[</span><span class="s2">&quot;TSV&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">loss</span></div>
-        
 
 <div class="viewcode-block" id="TrainTest.train"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -537,14 +547,14 @@ document.write(`
         <span class="n">old_mod_epoch</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">run_loss_guess</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
-                 <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                     <span class="n">run_loss_guess</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularizers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">run_loss_guess</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">run_loss_guess</span><span class="p">:</span>
             <span class="c1"># guess initial strengths for regularizers in `self._regularizers`</span>
             <span class="c1"># that have &#39;guess&#39;:True</span>
-            <span class="c1"># (this updates `self._regularizers`) </span>
+            <span class="c1"># (this updates `self._regularizers`)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loss_lambda_guess</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
@@ -581,7 +591,7 @@ document.write(`
             <span class="n">sky_cube</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">icube</span><span class="o">.</span><span class="n">sky_cube</span>
 
             <span class="c1"># total flux in model image</span>
-            <span class="n">total_flux</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
+            <span class="n">total_flux</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">cell_size</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">)</span>
             <span class="n">fluxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch2npy</span><span class="p">(</span><span class="n">total_flux</span><span class="p">))</span>
 
             <span class="c1"># calculate loss between model visibilities and data</span>
@@ -596,17 +606,25 @@ document.write(`
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-                <span class="n">learn_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
+                <span class="n">learn_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lr&quot;</span><span class="p">])</span>
 
             <span class="c1"># generate optional fit diagnostics</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">count</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_diag_step</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="ow">or</span> <span class="n">count</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_convergence</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">losses</span><span class="p">))</span>
+            <span class="p">):</span>
                 <span class="n">train_fig</span><span class="p">,</span> <span class="n">train_axes</span> <span class="o">=</span> <span class="n">train_diagnostics_fig</span><span class="p">(</span>
-                    <span class="n">model</span><span class="p">,</span> <span class="n">losses</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span> <span class="n">learn_rates</span><span class="o">=</span><span class="n">learn_rates</span><span class="p">,</span> <span class="n">fluxes</span><span class="o">=</span><span class="n">fluxes</span><span class="p">,</span>
+                    <span class="n">model</span><span class="p">,</span>
+                    <span class="n">losses</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span>
+                    <span class="n">learn_rates</span><span class="o">=</span><span class="n">learn_rates</span><span class="p">,</span>
+                    <span class="n">fluxes</span><span class="o">=</span><span class="n">fluxes</span><span class="p">,</span>
                     <span class="n">old_model_image</span><span class="o">=</span><span class="n">old_mod_im</span><span class="p">,</span>
                     <span class="n">old_model_epoch</span><span class="o">=</span><span class="n">old_mod_epoch</span><span class="p">,</span>
-                    <span class="n">kfold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
-                    <span class="n">save_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span>
-                    <span class="p">)</span>
+                    <span class="n">kfold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_kfold</span><span class="p">,</span>
+                    <span class="n">epoch</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+                    <span class="n">save_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_prefix</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_train_figure</span> <span class="o">=</span> <span class="p">(</span><span class="n">train_fig</span><span class="p">,</span> <span class="n">train_axes</span><span class="p">)</span>
 
                 <span class="c1"># temporarily store the current model image for use in next call to `train_diagnostics_fig`</span>
@@ -617,15 +635,20 @@ document.write(`
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    Loss function convergence criterion met at epoch &quot;</span>
-                                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    Loss function convergence criterion met at epoch &quot;</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    Loss function convergence criterion not met; &quot;</span>
-                                <span class="s2">&quot;training stopped at specified maximum epochs, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    Loss function convergence criterion not met; &quot;</span>
+                    <span class="s2">&quot;training stopped at specified maximum epochs, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
 
-        <span class="c1"># return loss value    </span>
+        <span class="c1"># return loss value</span>
         <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">losses</span></div>
-
 
 <div class="viewcode-block" id="TrainTest.test"><a class="viewcode-back" href="../../api.html#mpol.training.TrainTest.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -654,7 +677,6 @@ document.write(`
 
         <span class="c1"># return loss value</span>
         <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">regularizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

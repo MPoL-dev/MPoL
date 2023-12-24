@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.losses &#8212; MPoL 0.2.1 documentation</title>
+    <title>mpol.losses &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -140,8 +140,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -289,9 +289,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for mpol.losses</h1><div class="highlight"><pre>
-<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, including the regularization strength, which aspires to be similar across all terms, providing at least a starting point for tuning multiple loss functions.</span>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The following loss functions are available to use in imaging. Many of the </span>
+<span class="sd">definitions follow those in Appendix A of </span>
+<span class="sd">`EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, </span>
+<span class="sd">including the regularization strength, which aspires to be similar across all terms, </span>
+<span class="sd">providing at least a starting point for tuning multiple loss functions.</span>
 
-<span class="sd">If you don&#39;t see a loss function you need, it&#39;s easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!</span>
+<span class="sd">If you don&#39;t see a loss function you need, it&#39;s easy to write your own directly within </span>
+<span class="sd">your optimization script. If you like it, please consider opening a pull request!</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -303,16 +308,21 @@ document.write(`
 
 <div class="viewcode-block" id="chi_squared"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared">[docs]</a><span class="k">def</span> <span class="nf">chi_squared</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
+<span class="sd">    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model</span>
+<span class="sd">      :math:`M` visibilities using</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}</span>
 
-<span class="sd">    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases. We recommend not including the Hermitian conjugates.</span>
+<span class="sd">    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. </span>
+<span class="sd">    This function is agnostic as to whether the sum should include the Hermitian </span>
+<span class="sd">    conjugate visibilities, but be aware that the answer returned will be different </span>
+<span class="sd">    between the two cases. We recommend not including the Hermitian conjugates.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing </span>
+<span class="sd">            :math:`\boldsymbol{V}`</span>
 <span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
 <span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
 
@@ -329,7 +339,8 @@ document.write(`
 
 <div class="viewcode-block" id="log_likelihood"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
+<span class="sd">    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data </span>
+<span class="sd">    :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
 
 <span class="sd">    .. math::</span>
 
@@ -337,10 +348,14 @@ document.write(`
 
 <span class="sd">    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.</span>
 
-<span class="sd">    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the normalization of the answer returned will be different between the two cases. Inference of the parameter values should be unaffected. We recommend not including the Hermitian conjugates.</span>
+<span class="sd">    This function is agnostic as to whether the sum should include the Hermitian </span>
+<span class="sd">    conjugate visibilities, but be aware that the normalization of the answer returned </span>
+<span class="sd">    will be different between the two cases. Inference of the parameter values should </span>
+<span class="sd">    be unaffected. We recommend not including the Hermitian conjugates.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing </span>
+<span class="sd">            :math:`\boldsymbol{V}`</span>
 <span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
 <span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
 
@@ -362,19 +377,34 @@ document.write(`
 
 <div class="viewcode-block" id="nll"><a class="viewcode-back" href="../../api.html#mpol.losses.nll">[docs]</a><span class="k">def</span> <span class="nf">nll</span><span class="p">(</span><span class="n">model_vis</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; loss between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
+<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; loss between the complex data </span>
+<span class="sd">    :math:`\boldsymbol{V}` and model :math:`M` visibilities using</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        L_\mathrm{nll} = \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta})</span>
 
-<span class="sd">    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`. Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
-<span class="sd">    a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum. This means that this normalized negative log likelihood loss function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the prefactor strengths of other regularizers *relative* to this value.</span>
+<span class="sd">    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`. </span>
+<span class="sd">    Visibilities may be any shape as long as all quantities have the same shape. </span>
+<span class="sd">    Following `EHT-IV 2019 </span>
+<span class="sd">    &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_, we apply</span>
+<span class="sd">    a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The </span>
+<span class="sd">    factor of 2 comes in because we must count real and imaginaries in the </span>
+<span class="sd">    :math:`\chi^2` sum. This means that this normalized negative log likelihood loss </span>
+<span class="sd">    function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}}) </span>
+<span class="sd">    \approx 1$ for a well-fit model (regardless of the number of data points), making </span>
+<span class="sd">    it easier to set the prefactor strengths of other regularizers *relative* to this </span>
+<span class="sd">    value.</span>
 
-<span class="sd">    Note that this function should only be used in an optimization or point estimate situation. If it is used in any situation where uncertainties on parameter values are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to parameter value is incorrect.</span>
+<span class="sd">    Note that this function should only be used in an optimization or point estimate </span>
+<span class="sd">    situation. If it is used in any situation where uncertainties on parameter values </span>
+<span class="sd">    are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. </span>
+<span class="sd">    This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to </span>
+<span class="sd">    parameter value is incorrect.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`</span>
+<span class="sd">        model_vis (PyTorch complex): array tuple of the model representing </span>
+<span class="sd">            :math:`\boldsymbol{V}`</span>
 <span class="sd">        data_vis (PyTorch complex): array of the data values representing :math:`M`</span>
 <span class="sd">        weight (PyTorch real): array of weight values representing :math:`w_i`</span>
 
@@ -390,10 +420,14 @@ document.write(`
 
 <div class="viewcode-block" id="chi_squared_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.chi_squared_gridded">[docs]</a><span class="k">def</span> <span class="nf">chi_squared_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) using gridded data and model visibilities.</span>
+<span class="sd">    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) </span>
+<span class="sd">    using gridded data and model visibilities.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape </span>
+<span class="sd">            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from </span>
+<span class="sd">            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; </span>
+<span class="sd">            as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
 <span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
@@ -414,10 +448,14 @@ document.write(`
 
 <div class="viewcode-block" id="log_likelihood_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.log_likelihood_gridded">[docs]</a><span class="k">def</span> <span class="nf">log_likelihood_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.</span>
+<span class="sd">    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to </span>
+<span class="sd">    :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        modelVisibilityCube (torch complex tensor): torch tensor with shape </span>
+<span class="sd">            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from </span>
+<span class="sd">            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as </span>
+<span class="sd">            in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
 <span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
@@ -437,10 +475,15 @@ document.write(`
 
 <div class="viewcode-block" id="nll_gridded"><a class="viewcode-back" href="../../api.html#mpol.losses.nll_gridded">[docs]</a><span class="k">def</span> <span class="nf">nll_gridded</span><span class="p">(</span><span class="n">modelVisibilityCube</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; (corresponding to :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will return the same value regardless of whether Hermitian pairs are included.</span>
+<span class="sd">    Calculate a normalized &quot;negative log likelihood&quot; (corresponding to </span>
+<span class="sd">    :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will </span>
+<span class="sd">    return the same value regardless of whether Hermitian pairs are included.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is &quot;pre-packed,&quot; as in output from :meth:`mpol.fourier.FourierCube.forward()`.</span>
+<span class="sd">        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to </span>
+<span class="sd">            be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. </span>
+<span class="sd">            Assumes tensor is &quot;pre-packed,&quot; as in output from </span>
+<span class="sd">            :meth:`mpol.fourier.FourierCube.forward()`.</span>
 <span class="sd">        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object</span>
 
 <span class="sd">    Returns:</span>
@@ -453,12 +496,16 @@ document.write(`
 
 <div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../api.html#mpol.losses.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">,</span> <span class="n">tot_flux</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
+<span class="sd">    Calculate the entropy loss of a set of pixels following the definition in </span>
+<span class="sd">    `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        cube (any tensor): pixel values must be positive :math:`I_i &gt; 0` for all :math:`i`</span>
-<span class="sd">        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy against. Could be a single constant or an array the same shape as image.</span>
-<span class="sd">        tot_flux (float): a fixed normalization factor; the user-defined target total flux density</span>
+<span class="sd">        cube (any tensor): pixel values must be positive :math:`I_i &gt; 0` </span>
+<span class="sd">            for all :math:`i`</span>
+<span class="sd">        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy </span>
+<span class="sd">            against. Could be a single constant or an array the same shape as image.</span>
+<span class="sd">        tot_flux (float): a fixed normalization factor; the user-defined target total </span>
+<span class="sd">            flux density</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: entropy loss</span>
@@ -479,11 +526,20 @@ document.write(`
 
 <div class="viewcode-block" id="TV_image"><a class="viewcode-back" href="../../api.html#mpol.losses.TV_image">[docs]</a><span class="k">def</span> <span class="nf">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.</span>
+<span class="sd">    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). </span>
+<span class="sd">    Following the definition in `EHT-IV 2019 </span>
+<span class="sd">    &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the </span>
+<span class="sd">    image to be piecewise smooth and the gradient of the image to be sparse.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.</span>
-<span class="sd">        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.</span>
+<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` </span>
+<span class="sd">            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and </span>
+<span class="sd">            :math:`v` is the channel (velocity or frequency) dimension in </span>
+<span class="sd">            :math:`ndim=1`. Should be in sky format representation.</span>
+<span class="sd">        epsilon (float): a softening parameter in </span>
+<span class="sd">            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations </span>
+<span class="sd">            within each image slice greater than this parameter will have a </span>
+<span class="sd">            significant penalty.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: total variation loss</span>
@@ -507,11 +563,15 @@ document.write(`
 
 <div class="viewcode-block" id="TV_channel"><a class="viewcode-back" href="../../api.html#mpol.losses.TV_channel">[docs]</a><span class="k">def</span> <span class="nf">TV_channel</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the total variation (TV) loss in the channel dimension. Following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
+<span class="sd">    Calculate the total variation (TV) loss in the channel dimension. Following the </span>
+<span class="sd">    definition in `EHT-IV 2019 </span>
+<span class="sd">    &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cube (any 3D tensor): the image cube array :math:`I_{lmv}`</span>
-<span class="sd">        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel variations greater than this parameter will have a significant penalty.</span>
+<span class="sd">        epsilon (float): a softening parameter in </span>
+<span class="sd">            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel </span>
+<span class="sd">            variations greater than this parameter will have a significant penalty.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: total variation loss</span>
@@ -552,11 +612,15 @@ document.write(`
 
 <div class="viewcode-block" id="sparsity"><a class="viewcode-back" href="../../api.html#mpol.losses.sparsity">[docs]</a><span class="k">def</span> <span class="nf">sparsity</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. For example, you might want this mask to be ``True`` for background regions.</span>
+<span class="sd">    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally </span>
+<span class="sd">    provide a boolean mask to apply the prior to only the ``True`` locations. For </span>
+<span class="sd">    example, you might want this mask to be ``True`` for background regions.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cube (nchan, npix, npix): tensor image cube</span>
-<span class="sd">        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``. Default is to apply prior to all pixels.</span>
+<span class="sd">        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior </span>
+<span class="sd">            will be applied to those pixels where the mask is ``True``. Default is </span>
+<span class="sd">            to apply prior to all pixels.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: sparsity loss calculated where ``mask == True``</span>
@@ -578,11 +642,13 @@ document.write(`
 
 <div class="viewcode-block" id="UV_sparsity"><a class="viewcode-back" href="../../api.html#mpol.losses.UV_sparsity">[docs]</a><span class="k">def</span> <span class="nf">UV_sparsity</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">q_max</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`.</span>
+<span class="sd">    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than </span>
+<span class="sd">    :math:`q_\mathrm{max}`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)</span>
-<span class="sd">        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2)</span>
+<span class="sd">        qs: numpy array corresponding to visibility coordinates. Dimensionality of </span>
+<span class="sd">            (npix, npix//2)</span>
 <span class="sd">        q_max (float): maximum radial baseline</span>
 
 <span class="sd">    Returns:</span>
@@ -607,7 +673,8 @@ document.write(`
 
 <div class="viewcode-block" id="PSD"><a class="viewcode-back" href="../../api.html#mpol.losses.PSD">[docs]</a><span class="k">def</span> <span class="nf">PSD</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">psd</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.</span>
+<span class="sd">    Apply a loss function corresponding to the power spectral density using a Gaussian </span>
+<span class="sd">    process kernel.</span>
 
 <span class="sd">    Assumes an image plane kernel of</span>
 
@@ -650,10 +717,18 @@ document.write(`
 
 <div class="viewcode-block" id="TSV"><a class="viewcode-back" href="../../api.html#mpol.losses.TSV">[docs]</a><span class="k">def</span> <span class="nf">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the total square variation (TSV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the image to be edge smoothed which may be a better reoresentation of the truth image `K. Kuramochi et al 2018 &lt;https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract&gt;`_.</span>
+<span class="sd">    Calculate the total square variation (TSV) loss in the image dimension </span>
+<span class="sd">    (R.A. and DEC). Following the definition in `EHT-IV 2019 </span>
+<span class="sd">    &lt;https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract&gt;`_ Promotes the </span>
+<span class="sd">    image to be edge smoothed which may be a better reoresentation of the truth image </span>
+<span class="sd">    `K. Kuramochi et al 2018</span>
+<span class="sd">    &lt;https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract&gt;`_.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.</span>
+<span class="sd">        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` </span>
+<span class="sd">            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and </span>
+<span class="sd">            :math:`v` is the channel (velocity or frequency) dimension in </span>
+<span class="sd">            :math:`ndim=1`. Should be in sky format representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.double: total square variation loss</span>

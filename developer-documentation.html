@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Developer Documentation &#8212; MPoL 0.2.1 documentation</title>
+    <title>Developer Documentation &#8212; MPoL 0.1.dev1+g3070436 documentation</title>
   
   
   
@@ -141,8 +141,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.2.1 documentation - Home"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.2.1 documentation - Home"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+g3070436 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -477,11 +477,10 @@ $ coverage html
 <span class="n">git</span> <span class="n">checkout</span> <span class="n">tags</span><span class="o">/</span><span class="n">v0</span><span class="mf">.2.0</span>
 </pre></div>
 </div>
-<p>Otherwise, proceed directly with installing the build dependencies for the documentation with</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;.[docs]&quot;
+<p>Otherwise, proceed directly with installing the development dependencies</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;.[dev]&quot;
 </pre></div>
 </div>
-<p>Alternatively, you could start from <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> list, since it is a superset of <code class="docutils literal notranslate"><span class="pre">[docs]</span></code>.</p>
 </section>
 <section id="building-the-documentation">
 <h3>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h3>
@@ -539,7 +538,7 @@ $ coverage html
 <p>Like with the <a class="reference external" href="https://docs.exoplanet.codes/en/stable/user/dev/">exoplanet</a> codebase, MPoL tutorials are written as <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/authoring/basics.html#text-based-notebooks">MyST-NB <code class="docutils literal notranslate"><span class="pre">.md</span></code> source files</a>. During the Sphinx build process, they are converted to Jupyter notebooks and executed using the MyST build process. For these smaller tutorials, the <code class="docutils literal notranslate"><span class="pre">.md</span></code> file you create is the only thing you need to commit to the github repo (don’t commit the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file to the git repository in this case). This practice keeps the git diffs small while making it easier to edit tutorials with an integrated development environment.</p>
 <p>To write a tutorial, we suggest copying and rename one of the existing <code class="docutils literal notranslate"><span class="pre">.md</span></code> files in <code class="docutils literal notranslate"><span class="pre">docs/ci-tutorials/</span></code> to <code class="docutils literal notranslate"><span class="pre">docs/ci-tutorials/your-new-tutorial</span></code>, being sure to keep the header metadata. Then, you can write your tutorial using the <a class="reference external" href="https://myst-nb.readthedocs.io/en/latest/authoring/text-notebooks.html">MyST markdown syntax</a>.</p>
 <p>When done, add a reference to your tutorial in the table of contents in <code class="docutils literal notranslate"><span class="pre">docs/index.rst</span></code>. E.g., if your contribution is the <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder.md</span></code> file, add a <code class="docutils literal notranslate"><span class="pre">ci-tutorials/gridder.md</span></code> line. Then, you should be able to build the documentation as normal (i.e., <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>) and your tutorial will be included in the documentation. The MyST-NB plugin is doing the work behind the scenes.</p>
-<p>If your tutorial requires any extra build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">EXTRA_REQUIRES['docs']</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p>
+<p>If your tutorial requires any extra build dependencies, please add them to the <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies][&quot;dev&quot;]</span></code> list in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
 </section>
 <section id="larger-tutorials-requiring-substantial-computational-resources">
 <h4>Larger tutorials requiring substantial computational resources<a class="headerlink" href="#larger-tutorials-requiring-substantial-computational-resources" title="Permalink to this heading">#</a></h4>
@@ -564,35 +563,34 @@ $ coverage html
 </section>
 <section id="releasing-a-new-version-of-mpol">
 <span id="releasing-new-version-label"></span><h2>Releasing a new version of MPoL<a class="headerlink" href="#releasing-a-new-version-of-mpol" title="Permalink to this heading">#</a></h2>
-<p>To release a new version of MPoL, follow these steps in order:</p>
+<p>To release a new version of MPoL, follow this checklist in order:</p>
 <ol class="arabic simple">
-<li><p>Ensure all tests are passing on your PR</p>
+<li><p>Ensure <em>all</em> tests are passing on your PR, both locally and via GitHub Actions.</p>
 <ul class="simple">
-<li><p>If tests are passing locally and failing in the GitHub Actions workflows, compare the code dependencies in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with your local versions</p></li>
+<li><p>If tests pass locally but fail in the GitHub Actions workflows, inspect the GitHub Actions workflow logs for clues about missing packages or outdated dependencies.</p></li>
 </ul>
 </li>
-<li><p>Ensure the docs build locally without errors or warnings</p></li>
-<li><p>Update the code version in <code class="docutils literal notranslate"><span class="pre">__init__</span></code></p></li>
-<li><p>Update the version history in <code class="docutils literal notranslate"><span class="pre">changelog.md</span></code></p></li>
-<li><p>Update the contributors in <code class="docutils literal notranslate"><span class="pre">CONTRIBUTORS.md</span></code></p></li>
+<li><p>Ensure the docs build locally without errors or warnings. Check output by opening <code class="docutils literal notranslate"><span class="pre">docs/_build/html/index.html</span></code> with your web browser.</p></li>
+<li><p>Perform final round of edits documenting the changes since last version in <code class="docutils literal notranslate"><span class="pre">changelog.md</span></code>. If any changes are potentially breaking, suggest how users might change their workflow to incorporate updates.</p></li>
+<li><p>Check contributors in <code class="docutils literal notranslate"><span class="pre">CONTRIBUTORS.md</span></code> up to date.</p></li>
 <li><p>Update the copyright year and citation in <code class="docutils literal notranslate"><span class="pre">README.md</span></code></p>
 <ul class="simple">
 <li><p>In the citation, update all fields except ‘Zenodo’, ‘doi’, and ‘url’ (the current DOI will cite all versions and the URL will direct to the most recent version)</p></li>
 </ul>
 </li>
-<li><p>Merge your PR into <code class="docutils literal notranslate"><span class="pre">main</span></code></p>
+<li><p>Merge your PR into <code class="docutils literal notranslate"><span class="pre">main</span></code> using the GitHub interface.</p>
 <ul class="simple">
-<li><p>Ensure all tests triggered by the merge pass</p></li>
+<li><p>A new round of tests will be triggered by the merge. Make sure <em>all</em> of these pass.</p></li>
 </ul>
 </li>
-<li><p>Publish a pre-release</p>
+<li><p>Go to the <a class="reference external" href="https://github.com/MPoL-dev/MPoL/releases">Releases</a> page, draft release notes, and publish a pre-release</p>
 <ul class="simple">
-<li><p>Ensure the <code class="docutils literal notranslate"><span class="pre">pre-release.yml</span></code> workflow passes</p></li>
+<li><p>Ensure the <code class="docutils literal notranslate"><span class="pre">pre-release.yml</span></code> workflow passes.</p></li>
 </ul>
 </li>
-<li><p>Publish a (true) release, which will be automatically uploaded to PyPI and archived on Zenodo</p>
+<li><p>Publish the true release. GitHub actions will automatically uploaded the built package to PyPI and archive it on Zenodo</p>
 <ul class="simple">
-<li><p>Verify this by ensuring the <code class="docutils literal notranslate"><span class="pre">package.yml</span></code> workflow passes</p></li>
+<li><p>Verify this has worked by checking the <code class="docutils literal notranslate"><span class="pre">package.yml</span></code> workflow passed.</p></li>
 </ul>
 </li>
 </ol>
