@@ -14,40 +14,67 @@ from .utils import get_max_spatial_freq, get_maximum_cell_size
 
 class GridCoords:
     r"""
-    The GridCoords object uses desired image dimensions (via the ``cell_size`` and ``npix`` arguments) to define a corresponding Fourier plane grid.
+    The GridCoords object uses desired image dimensions (via the ``cell_size`` and 
+    ``npix`` arguments) to define a corresponding Fourier plane grid.
 
     Args:
         cell_size (float): width of a single square pixel in [arcsec]
         npix (int): number of pixels in the width of the image
 
-    The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is implementation simplicity.
+    The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even 
+    though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to
+    :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is 
+    implementation simplicity.
 
-    Images (and their corresponding Fourier transform quantities) are represented as two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` representation assumes the Fourier grid (and thus image) are laid out as one might normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
+    Images (and their corresponding Fourier transform quantities) are represented as 
+    two-dimensional arrays packed as ``[y, x]`` and ``[v, u]``.  This means that an 
+    image with dimensions ``(npix, npix)`` will also have a corresponding FFT Fourier 
+    grid with shape ``(npix, npix)``. The native :class:`~mpol.gridding.GridCoords` 
+    representation assumes the Fourier grid (and thus image) are laid out as one might 
+    normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
 
     After the object is initialized, instance variables can be accessed, for example
 
     >>> myCoords = GridCoords(cell_size=0.005, 512)
     >>> myCoords.img_ext
 
-    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) [radians]
+    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive) 
+        [radians]
     :ivar dm: image-plane cell spacing in DEC direction [radians]
-    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [arcsec]
-    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.
-    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied [arcseconds]. Useful for directly evaluating some function to create a packed cube.
-    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image [arcseconds]. l coordinate increases to the left (as on sky).
-    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image [arcseconds]. 
-    :ivar du: Fourier-plane cell spacing in East-West direction [:math:`\mathrm{k}\lambda`]
-    :ivar dv: Fourier-plane cell spacing in North-South direction [:math:`\mathrm{k}\lambda`]
-    :ivar u_centers: 1D array of cell centers in East-West direction [:math:`\mathrm{k}\lambda`].
-    :ivar v_centers: 1D array of cell centers in North-West direction [:math:`\mathrm{k}\lambda`].
-    :ivar u_edges: 1D array of cell edges in East-West direction [:math:`\mathrm{k}\lambda`].
-    :ivar v_edges: 1D array of cell edges in North-South direction [:math:`\mathrm{k}\lambda`].
+    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines 
+        like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming 
+        ``origin='lower'``. Units of [arcsec]
+    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied 
+        [arcseconds]. Useful for directly evaluating some function to create a 
+        packed cube.
+    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied 
+        [arcseconds]. Useful for directly evaluating some function to create a 
+        packed cube.
+    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image 
+        [arcseconds]. l coordinate increases to the left (as on sky).
+    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image 
+        [arcseconds]. 
+    :ivar du: Fourier-plane cell spacing in East-West direction 
+        [:math:`\mathrm{k}\lambda`]
+    :ivar dv: Fourier-plane cell spacing in North-South direction 
+        [:math:`\mathrm{k}\lambda`]
+    :ivar u_centers: 1D array of cell centers in East-West direction 
+        [:math:`\mathrm{k}\lambda`].
+    :ivar v_centers: 1D array of cell centers in North-West direction 
+        [:math:`\mathrm{k}\lambda`].
+    :ivar u_edges: 1D array of cell edges in East-West direction 
+        [:math:`\mathrm{k}\lambda`].
+    :ivar v_edges: 1D array of cell edges in North-South direction 
+        [:math:`\mathrm{k}\lambda`].
     :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]
     :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]
     :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]
     :ivar v_bin_max: maximum v edge [:math:`\mathrm{k}\lambda`]
-    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid [:math:`\mathrm{k}\lambda`]
-    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
+    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid 
+        [:math:`\mathrm{k}\lambda`]
+    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines 
+        like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming 
+        ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
     """
 
     def __init__(self, cell_size: float, npix: int) -> None:
@@ -154,14 +181,19 @@ class GridCoords:
 
     def check_data_fit(self, uu: npt.ArrayLike, vv: npt.ArrayLike) -> None:
         r"""
-        Test whether loose data visibilities fit within the Fourier grid defined by cell_size and npix.
+        Test whether loose data visibilities fit within the Fourier grid defined by 
+        cell_size and npix.
 
         Args:
-            uu (np.array): array of u spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
-            vv (np.array): array of v spatial frequency coordinates. Units of [:math:`\mathrm{k}\lambda`]
+            uu (np.array): array of u spatial frequency coordinates. 
+                Units of [:math:`\mathrm{k}\lambda`]
+            vv (np.array): array of v spatial frequency coordinates. 
+                Units of [:math:`\mathrm{k}\lambda`]
 
         Returns:
-            ``True`` if all visibilities fit within the Fourier grid defined by ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an ``AssertionError`` is raised on the first violated boundary.
+            ``True`` if all visibilities fit within the Fourier grid defined by 
+            ``[u_bin_min, u_bin_max, v_bin_min, v_bin_max]``. Otherwise an 
+            ``AssertionError`` is raised on the first violated boundary.
         """
 
         # max freq in dataset
@@ -172,12 +204,16 @@ class GridCoords:
 
         if np.max(np.abs(uu)) > self.max_grid:
             raise CellSizeError(
-                f"Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+                f"Dataset contains uu spatial frequency measurements larger than those 
+                in the proposed model image. Decrease cell_size 
+                below {max_cell_size} arcsec."
             )
 
         if np.max(np.abs(vv)) > self.max_grid:
             raise CellSizeError(
-                f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+                f"Dataset contains vv spatial frequency measurements larger than those 
+                in the proposed model image. Decrease cell_size below {max_cell_size} 
+                arcsec."
             )
 
     def __eq__(self, other: Any) -> bool:
@@ -185,6 +221,6 @@ class GridCoords:
             # don't attempt to compare against different types
             return NotImplemented
 
-        # GridCoords objects are considered equal if they have the same cell_size and npix, since
-        # all other attributes are derived from these two core properties.
+        # GridCoords objects are considered equal if they have the same cell_size and 
+        # npix, since all other attributes are derived from these two core properties.
         return self.cell_size == other.cell_size and self.npix == other.npix

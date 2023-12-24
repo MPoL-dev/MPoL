@@ -16,6 +16,7 @@ from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
 from mpol.utils import loglinspace
 
+
 class CrossValidate:
     r"""
     Utilities to run a cross-validation loop (implicitly running a training
@@ -29,10 +30,10 @@ class CrossValidate:
     imager : `mpol.gridding.DirtyImager` object
         Instance of the `mpol.gridding.DirtyImager` class.
     learn_rate : float, default=0.3
-        Initial learning rate  
+        Initial learning rate
     regularizers : nested dict, default={}
-        Dictionary of image regularizers to use. For each, a dict of the 
-        strength ('lambda', float), whether to guess an initial value for lambda 
+        Dictionary of image regularizers to use. For each, a dict of the
+        strength ('lambda', float), whether to guess an initial value for lambda
         ('guess', bool), and other quantities needed to compute their loss term.
         Example:
         {"sparsity":{"lambda":1e-3, "guess":False},
@@ -44,10 +45,10 @@ class CrossValidate:
         Tolerance for training iteration stopping criterion as assessed by
         loss function (suggested <= 1e-3)
     schedule_factor : float, default=0.995
-        For the `torch.optim.lr_scheduler.ReduceLROnPlateau` scheduler, factor 
+        For the `torch.optim.lr_scheduler.ReduceLROnPlateau` scheduler, factor
         to which the learning rate is reduced when learning rate stops decreasing
     start_dirty_image : bool, default=False
-        Whether to start the RML optimization loop by initializing the model 
+        Whether to start the RML optimization loop by initializing the model
         image to a dirty image of the observed data. If False, the optimization
         loop will start with a blank image.
     train_diag_step : int, default=None
@@ -72,20 +73,33 @@ class CrossValidate:
         Whether to print notification messages.
     device : torch.device, default=None
         Which hardware device to perform operations on (e.g., 'cuda:0').
-        'None' defaults to current device.        
+        'None' defaults to current device.
     seed : int, default=None
-        Seed for random number generator used in splitting data        
+        Seed for random number generator used in splitting data
     """
 
-    def __init__(self, coords, imager, learn_rate=0.3, 
-                regularizers={}, epochs=10000, convergence_tol=1e-5, 
-                schedule_factor=0.995,
-                start_dirty_image=False, 
-                train_diag_step=None, kfolds=5, split_method="dartboard",
-                dartboard_q_edges=None, dartboard_phi_edges=None,
-                split_diag_fig=False, store_cv_diagnostics=False, 
-                save_prefix=None, verbose=True, device=None, seed=None,
-                ):
+    def __init__(
+        self,
+        coords,
+        imager,
+        learn_rate=0.3,
+        regularizers={},
+        epochs=10000,
+        convergence_tol=1e-5,
+        schedule_factor=0.995,
+        start_dirty_image=False,
+        train_diag_step=None,
+        kfolds=5,
+        split_method="dartboard",
+        dartboard_q_edges=None,
+        dartboard_phi_edges=None,
+        split_diag_fig=False,
+        store_cv_diagnostics=False,
+        save_prefix=None,
+        verbose=True,
+        device=None,
+        seed=None,
+    ):
         self._coords = coords
         self._imager = imager
         self._learn_rate = learn_rate
@@ -126,7 +140,7 @@ class CrossValidate:
         Returns
         -------
         split_iterator : iterator returning tuple
-            Iterator that provides a (train, test) pair of 
+            Iterator that provides a (train, test) pair of
             :class:`~mpol.datasets.GriddedDataset` for each k-fold
         """
         if self._split_method == "random_cell":
@@ -144,15 +158,16 @@ class CrossValidate:
                 # often be a factor of >~2 larger than the longest baseline in
                 # the dataset).
                 stacked_mask = torch.any(dataset.mask, axis=0)
-                stacked_mask = stacked_mask.to('cpu') # TODO: remove
+                stacked_mask = stacked_mask.to("cpu")  # TODO: remove
                 qs = dataset.coords.packed_q_centers_2D[stacked_mask]
                 pad_factor = 1.1
                 q_edges = loglinspace(0, qs.max() * pad_factor, N_log=8, M_linear=5)
 
-            dartboard = Dartboard(coords=self._coords, 
-                                  q_edges=q_edges, 
-                                  phi_edges=self._dartboard_phi_edges,
-                                  )
+            dartboard = Dartboard(
+                coords=self._coords,
+                q_edges=q_edges,
+                phi_edges=self._dartboard_phi_edges,
+            )
 
             # use 'dartboard' to split full dataset into train/test subsets
             split_iterator = DartboardSplitGridded(
@@ -160,8 +175,12 @@ class CrossValidate:
             )
 
             if self._verbose:
-                logging.info(f"  Max baseline in Fourier grid {self._coords.q_max:.0f} klambda")
-                logging.info(f"    Dartboard: baseline bin edges {[round(x, 1) for x in dartboard.q_edges.tolist()]} klambda")
+                logging.info(
+                    f"  Max baseline in Fourier grid {self._coords.q_max:.0f} klambda"
+                )
+                logging.info(
+                    f"    Dartboard: baseline bin edges {[round(x, 1) for x in dartboard.q_edges.tolist()]} klambda"
+                )
 
         else:
             supported_methods = ["dartboard", "random_cell"]
@@ -183,8 +202,8 @@ class CrossValidate:
             Instance of the `mpol.datasets.GriddedDataset` class
         Returns
         -------
-        cv_score : dict 
-            Dictionary with mean and standard deviation of cross-validation 
+        cv_score : dict
+            Dictionary with mean and standard deviation of cross-validation
             scores across all k-folds, and all raw scores
         """
         all_scores = []
@@ -193,7 +212,9 @@ class CrossValidate:
 
         split_iterator = self.split_dataset(dataset)
         if self._split_diag_fig:
-            split_fig, split_axes = split_diagnostics_fig(split_iterator, save_prefix=self._save_prefix)
+            split_fig, split_axes = split_diagnostics_fig(
+                split_iterator, save_prefix=self._save_prefix
+            )
             self._split_figure = (split_fig, split_axes)
 
         for kk, (train_set, test_set) in enumerate(split_iterator):
@@ -211,21 +232,30 @@ class CrossValidate:
                             "\n  Pre-training to dirty image to initialize subsequent optimization loops"
                         )
                     # initial short training loop to get model image to approximate dirty image
-                    model_pretrained = train_to_dirty_image(model=model, imager=self._imager)
+                    model_pretrained = train_to_dirty_image(
+                        model=model, imager=self._imager
+                    )
                     # save the model to a state we can load in subsequent kfolds
-                    torch.save(model_pretrained.state_dict(), f=self._save_prefix + "_dirty_image_model.pt")
+                    torch.save(
+                        model_pretrained.state_dict(),
+                        f=self._save_prefix + "_dirty_image_model.pt",
+                    )
                 else:
                     # create a new model for this kfold, initializing it to the model pretrained on the dirty image
-                    model.load_state_dict(torch.load(self._save_prefix + "_dirty_image_model.pt"))
+                    model.load_state_dict(
+                        torch.load(self._save_prefix + "_dirty_image_model.pt")
+                    )
 
             # create a new optimizer and scheduler for this kfold
             optimizer = torch.optim.Adam(model.parameters(), lr=self._learn_rate)
             if self._schedule_factor is None:
                 scheduler = None
             else:
-                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=self._schedule_factor)
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                    optimizer, mode="min", factor=self._schedule_factor
+                )
 
-            trainer = TrainTest( 
+            trainer = TrainTest(
                 imager=self._imager,
                 optimizer=optimizer,
                 scheduler=scheduler,
@@ -238,13 +268,13 @@ class CrossValidate:
                 verbose=self._verbose,
             )
 
-            # run training 
+            # run training
             loss, loss_history = trainer.train(model, train_set)
 
             # run testing
             all_scores.append(trainer.test(model, test_set))
 
-            # store objects from the most recent kfold for diagnostics           
+            # store objects from the most recent kfold for diagnostics
             self._model = model
             self._train_figure = trainer.train_figure
 
@@ -252,7 +282,7 @@ class CrossValidate:
             if self._store_cv_diagnostics:
                 self._diagnostics["models"].append(self._model)
                 self._diagnostics["regularizers"].append(self._regularizers)
-                self._diagnostics["loss_histories"].append(loss_history)                
+                self._diagnostics["loss_histories"].append(loss_history)
                 # self._diagnostics["train_figures"].append(self._train_figure)
 
         # average individual test scores to get the cross-val metric for chosen
@@ -262,9 +292,9 @@ class CrossValidate:
             "std": np.std(all_scores),
             "all": all_scores,
         }
-        
+
         return self._cv_score
-    
+
     @property
     def model(self):
         """For the most recent kfold, trained model (`SimpleNet` class instance)"""
@@ -284,17 +314,17 @@ class CrossValidate:
     def split_method(self):
         """String of the method used to split the dataset into train/test sets"""
         return self._split_method
-    
+
     @property
     def train_figure(self):
         """For the most recent kfold, (fig, axes) showing training progress"""
         return self._train_figure
-        
+
     @property
     def split_figure(self):
         """(fig, axes) of train/test splitting diagnostic figure"""
         return self._split_figure
-    
+
     @property
     def diagnostics(self):
         """Dict containing diagnostics of the cross-validation loop across all kfolds: models, regularizers, loss values"""
@@ -413,15 +443,27 @@ class RandomCellSplitGridded:
 
 class DartboardSplitGridded:
     r"""
-    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned by a Dartboard. Inherit the properties of the GriddedDataset. This object creates an iterator providing a (train, test) pair of :class:`~mpol.datasets.GriddedDataset` for each k-fold.
+    Split a GriddedDataset into :math:`k` non-overlapping chunks, internally partitioned
+      by a Dartboard. Inherit the properties of the GriddedDataset. This object creates
+      an iterator providing a (train, test) pair of
+      :class:`~mpol.datasets.GriddedDataset` for each k-fold.
 
     Args:
-        griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+        griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the
+            gridded dataset
         k (int): the number of subpartitions of the dataset
-        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized Dartboard instance. If ``dartboard`` is provided, do not provide ``q_edges`` or ``phi_edges``.
-        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-        seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+        dartboard (:class:`~mpol.datasets.Dartboard`): a pre-initialized
+            Dartboard instance. If ``dartboard`` is provided, do not provide
+            ``q_edges`` or ``phi_edges``.
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard
+            cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12
+            log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}`
+            represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard
+            cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins
+            stretched from :math:`0` to :math:`\pi`.
+        seed (int): (optional) numpy random seed to use for the permutation, for
+            reproducibility
 
     Once initialized, iterate through the datasets like
 
@@ -432,7 +474,8 @@ class DartboardSplitGridded:
     >>> ... # do operations with test dataset
 
     Notes:
-        All train splits have the cells belonging to the shortest dartboard baseline bin.
+        All train splits have the cells belonging to the shortest dartboard
+        baseline bin.
 
         The number of points in the splits is in general not equal.
     """
@@ -443,7 +486,7 @@ class DartboardSplitGridded:
         k: int,
         dartboard: Dartboard | None = None,
         seed: int | None = None,
-        verbose: bool = True
+        verbose: bool = True,
     ):
         if k <= 0:
             raise ValueError("k must be a positive integer")
@@ -468,9 +511,9 @@ class DartboardSplitGridded:
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
 
         # indices of cells in the smallest q bin that also have data
-        small_q_idx = [i for i,l in enumerate(self.cell_list) if l[0] == 0]
+        small_q_idx = [i for i, l in enumerate(self.cell_list) if l[0] == 0]
         # cells in the smallest q bin
-        self.small_q = self.cell_list[:len(small_q_idx)]
+        self.small_q = self.cell_list[: len(small_q_idx)]
 
         # partition the cell_list into k pieces.
         # first, randomly permute the sequence to make sure
@@ -481,7 +524,7 @@ class DartboardSplitGridded:
             np.random.seed(seed)
 
         self.k_split_cell_list = np.array_split(
-            np.random.permutation(self.cell_list[len(small_q_idx):]), k
+            np.random.permutation(self.cell_list[len(small_q_idx) :]), k
         )
 
     @classmethod
@@ -495,14 +538,22 @@ class DartboardSplitGridded:
         verbose: bool = True,
     ) -> DartboardSplitGridded:
         r"""
-        Alternative method to initialize a DartboardSplitGridded object from Dartboard parameters.
+        Alternative method to initialize a DartboardSplitGridded object from
+        Dartboard parameters.
 
          Args:
-             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the gridded dataset
+             griddedDataset (:class:`~mpol.datasets.GriddedDataset`): instance of the
+                gridded dataset
              k (int): the number of subpartitions of the dataset
-             q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-             phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-             seed (int): (optional) numpy random seed to use for the permutation, for reproducibility
+             q_edges (1D numpy array): an array of radial bin edges to set the
+                dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults
+                to 12 log-linearly radial bins stretching from 0 to the
+                :math:`q_\mathrm{max}` represented by ``coords``.
+             phi_edges (1D numpy array): an array of azimuthal bin edges to set the
+                dartboard cells in [radians]. If ``None``, defaults to 8 equal-spaced
+                azimuthal bins stretched from :math:`0` to :math:`\pi`.
+             seed (int): (optional) numpy random seed to use for the permutation,
+                for reproducibility
              verbose (bool): whether to print notification messages
         """
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
@@ -517,7 +568,9 @@ class DartboardSplitGridded:
             k_list = self.k_split_cell_list.copy()
             if self.k == 1:
                 if self.verbose is True:
-                    logging.info("    DartboardSplitGridded: only 1 k-fold: splitting dataset as ~80/20 train/test")
+                    logging.info(
+                        "    DartboardSplitGridded: only 1 k-fold: splitting dataset as ~80/20 train/test"
+                    )
                 ntest = round(0.2 * len(k_list[0]))
                 # put ~20% of cells into test set
                 cell_list_test = k_list[0][:ntest]

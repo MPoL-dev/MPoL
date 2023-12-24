@@ -70,3 +70,6 @@ source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/mpol/mpol_version.py"
+
+[tool.black]
+line-length = 88

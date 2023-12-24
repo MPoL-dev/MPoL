@@ -1,4 +1,5 @@
-r"""The ``images`` module provides the core functionality of MPoL via :class:`mpol.images.ImageCube`."""
+r"""The ``images`` module provides the core functionality of MPoL via 
+:class:`mpol.images.ImageCube`."""
 
 from __future__ import annotations
 
@@ -13,21 +14,31 @@ from .coordinates import GridCoords
 
 class BaseCube(nn.Module):
     r"""
-    A base cube of the same dimensions as the image cube. Designed to use a pixel mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube domain.
+    A base cube of the same dimensions as the image cube. Designed to use a pixel
+    mapping function :math:`f_\mathrm{map}` from the base cube values to the ImageCube
+    domain.
 
     .. math::
 
         I = f_\mathrm{map}(b)
 
-    The ``base_cube`` pixel values are set as PyTorch `parameters <https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html>`_.
+    The ``base_cube`` pixel values are set as PyTorch `parameters
+    <https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html>`_.
 
     Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        coords (GridCoords): an object already instantiated from the GridCoords class.
+            If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the base cube. Default = 1.
-        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel representation to the cube representation. If `None`, defaults to `torch.nn.Softplus() <https://pytorch.org/docs/stable/generated/torch.nn.Softplus.html#torch.nn.Softplus>`_. Output of the function should be in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
-        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize the model with. If None, assumes ``torch.zeros``. See :ref:`cube-orientation-label` for more information on the expectations of the orientation of the input image.
+        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel
+            representation to the cube representation. If `None`, defaults to
+            `torch.nn.Softplus()`. Output of the function should be in units of
+            [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize
+            the model with. If None, assumes ``torch.zeros``. See
+            :ref:`cube-orientation-label` for more information on the expectations of
+            the orientation of the input image.
     """
 
     def __init__(
@@ -76,7 +87,8 @@ class BaseCube(nn.Module):
 
     def forward(self):
         r"""
-        Calculate the image representation from the ``base_cube`` using the pixel mapping
+        Calculate the image representation from the ``base_cube`` using the pixel
+        mapping
 
         .. math::
 
@@ -100,9 +112,16 @@ class HannConvCube(nn.Module):
         0.0625 & 0.1250 & 0.0625 \\
         \end{bmatrix}
 
-    which is the 2D version of the discretely-sampled response function corresponding to a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a convolutional kernel in the image plane, and so effectively acts as apodization by a Hann window function in the Fourier domain. For more information, see the following Wikipedia articles on `Window Functions <https://en.wikipedia.org/wiki/Window_function>`_ in general and the `Hann Window <https://en.wikipedia.org/wiki/Hann_function>`_ specifically.
+    which is the 2D version of the discretely-sampled response function corresponding to
+    a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a 
+    convolutional kernel in the image plane, and so effectively acts as apodization 
+    by a Hann window function in the Fourier domain. For more information, see the 
+    following Wikipedia articles on `Window Functions 
+    <https://en.wikipedia.org/wiki/Window_function>`_ in general and the `Hann Window 
+    <https://en.wikipedia.org/wiki/Hann_function>`_ specifically.
 
-    The idea is that this layer would help naturally attenuate high spatial frequency artifacts by baking in a natural apodization in the Fourier plane.
+    The idea is that this layer would help naturally attenuate high spatial frequency 
+    artifacts by baking in a natural apodization in the Fourier plane.
 
     Args:
         nchan (int): number of channels
@@ -143,12 +162,15 @@ class HannConvCube(nn.Module):
 
     def forward(self, cube):
         r"""Args:
-            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked image cube, for example, from ImageCube.forward()
+            cube (torch.double tensor, of shape ``(nchan, npix, npix)``): a prepacked
+            image cube, for example, from ImageCube.forward()
 
         Returns:
-            torch.complex tensor: the FFT of the image cube, in packed format and of shape ``(nchan, npix, npix)``
+            torch.complex tensor: the FFT of the image cube, in packed format and of
+            shape ``(nchan, npix, npix)``
         """
-        # Conv2d is designed to work on batches, so some extra unsqueeze/squeezing action is required.
+        # Conv2d is designed to work on batches, so some extra unsqueeze/squeezing
+        # action is required.
         # Additionally, the convolution must be done on the *sky-oriented* cube
         sky_cube = utils.packed_cube_to_sky_cube(cube)
 
@@ -169,17 +191,33 @@ class HannConvCube(nn.Module):
 
 class ImageCube(nn.Module):
     r"""
-    The parameter set is the pixel values of the image cube itself. The pixels are assumed to represent samples of the specific intensity and are given in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+    The parameter set is the pixel values of the image cube itself. The pixels are
+    assumed to represent samples of the specific intensity and are given in units of
+    [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
 
-    All keyword arguments are required unless noted. The passthrough argument is essential for specifying whether the ImageCube object is the set of root parameters (``passthrough==False``) or if its simply a passthrough layer (``pasthrough==True``). In either case, ImageCube is essentially an identity layer, since no transformations are applied to the ``cube`` tensor. The main purpose of the ImageCube layer is to provide useful functionality around the ``cube`` tensor, such as returning a sky_cube representation and providing FITS writing functionility. In the case of ``passthrough==False``, the ImageCube layer also acts as a container for the trainable parameters.
+    All keyword arguments are required unless noted. The passthrough argument is
+    essential for specifying whether the ImageCube object is the set of root parameters
+    (``passthrough==False``) or if its simply a passthrough layer
+    (``pasthrough==True``). In either case, ImageCube is essentially an identity layer,
+    since no transformations are applied to the ``cube`` tensor. The main purpose of
+    the ImageCube layer is to provide useful functionality around the ``cube`` tensor,
+    such as returning a sky_cube representation and providing FITS writing
+    functionility. In the case of ``passthrough==False``, the ImageCube layer also acts
+    as a container for the trainable parameters.
 
     Args:
         cell_size (float): the width of a pixel [arcseconds]
         npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
+        coords (GridCoords): an object already instantiated from the GridCoords class.
+            If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the image
-        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed to parameter base.
-        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a prepacked image cube to initialize the model with in units of [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting ``cube`` is ``torch.zeros``. See :ref:`cube-orientation-label` for more information on the expectations of the orientation of the input image.
+        passthrough (bool): if passthrough, assume ImageCube is just a layer as opposed
+            to parameter base.
+        cube (torch.double tensor, of shape ``(nchan, npix, npix)``): (optional) a
+            prepacked image cube to initialize the model with in units of
+            [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting
+            ``cube`` is ``torch.zeros``. See :ref:`cube-orientation-label` for more
+            information on the expectations of the orientation of the input image.
     """
 
     def __init__(
@@ -229,14 +267,20 @@ class ImageCube(nn.Module):
 
     def forward(self, cube=None):
         r"""
-        If the ImageCube object was initialized with ``passthrough=True``, the ``cube`` argument is required. ``forward`` essentially just passes this on as an identity operation.
+        If the ImageCube object was initialized with ``passthrough=True``, the ``cube``
+        argument is required. ``forward`` essentially just passes this on as an identity
+          operation.
 
-        If the ImageCube object was initialized with ``passthrough=False``, the ``cube`` argument is not permitted, and ``forward`` passes on the stored ``nn.Parameter`` cube as an identity operation.
+        If the ImageCube object was initialized with ``passthrough=False``, the ``cube``
+          argument is not permitted, and ``forward`` passes on the stored
+          ``nn.Parameter`` cube as an identity operation.
 
         Args:
-            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if the ImageCube object was initialized with ``passthrough=True``.
+            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if
+            the ImageCube object was initialized with ``passthrough=True``.
 
-        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity operation
+        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity
+        operation
         """
 
         if cube is not None:
@@ -264,15 +308,16 @@ class ImageCube(nn.Module):
     @property
     def flux(self):
         """
-        The spatially-integrated flux of the image. Returns a 'spectrum' with the flux in each channel in units of Jy.
+        The spatially-integrated flux of the image. Returns a 'spectrum' with the flux
+        in each channel in units of Jy.
 
         Returns:
-            torch.double: a 1D tensor of length ``(nchan)`` 
+            torch.double: a 1D tensor of length ``(nchan)``
         """
 
         # convert from Jy/arcsec^2 to Jy/pixel using area of a pixel
         # multiply by arcsec^2/pixel
-        return self.coords.cell_size**2 * torch.sum(self.cube, dim=(1,2))
+        return self.coords.cell_size**2 * torch.sum(self.cube, dim=(1, 2))
 
     def to_FITS(self, fname="cube.fits", overwrite=False, header_kwargs=None):
         """
