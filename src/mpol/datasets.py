@@ -20,19 +20,27 @@ from .utils import loglinspace
 class GriddedDataset(torch.nn.Module):
     r"""
     Args:
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
-        weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
-        mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+        coords (GridCoords): an object already instantiated from the GridCoords class. 
+            If providing this, cannot provide ``cell_size`` or ``npix``.
+        vis_gridded (torch complex): the gridded visibility data stored in a "packed" 
+            format (pre-shifted for fft)
+        weight_gridded (torch double): the weights corresponding to the gridded 
+            visibility data, also in a packed format
+        mask (torch boolean): a boolean mask to index the non-zero locations of 
+            ``vis_gridded`` and ``weight_gridded`` in their packed format.
         nchan (int): the number of channels in the image (default = 1).
-        device (torch.device) : the desired device of the dataset. If ``None``, defaults to current device.
+        device (torch.device): the desired device of the dataset. If ``None``, 
+            defaults to current device.
 
-    After initialization, the GriddedDataset provides the non-zero cells of the gridded visibilities and weights as a 1D vector via the following instance variables. This means that any individual channel information has been collapsed.
+    After initialization, the GriddedDataset provides the non-zero cells of the 
+    gridded visibilities and weights as a 1D vector via the following instance 
+    variables. This means that any individual channel information has been collapsed.
 
     :ivar vis_indexed: 1D complex tensor of visibility data
     :ivar weight_indexed: 1D tensor of weight values
-
-    If you index the output of the Fourier layer in the same manner using ``self.mask``, then the model and data visibilities can be directly compared using a loss function.
+    
+    If you index the output of the Fourier layer in the same manner using ``self.mask``,
+    then the model and data visibilities can be directly compared using a loss function.
     """
 
     def __init__(
@@ -77,14 +85,18 @@ class GriddedDataset(torch.nn.Module):
         nchan: int = 1,
         device: torch.device | str | None = None,
     ):
-        """Alternative method to instantiate a GriddedDataset object from cell_size and npix.
+        """Alternative method to instantiate a GriddedDataset object from cell_size 
+        and npix.
 
         Args:
             cell_size (float): the width of a pixel [arcseconds]
             npix (int): the number of pixels per image side
-            vis_gridded (torch complex): the gridded visibility data stored in a "packed" format (pre-shifted for fft)
-            weight_gridded (torch double): the weights corresponding to the gridded visibility data, also in a packed format
-            mask (torch boolean): a boolean mask to index the non-zero locations of ``vis_gridded`` and ``weight_gridded`` in their packed format.
+            vis_gridded (torch complex): the gridded visibility data stored in a 
+                "packed" format (pre-shifted for fft)
+            weight_gridded (torch double): the weights corresponding to the gridded 
+                visibility data, also in a packed format
+            mask (torch boolean): a boolean mask to index the non-zero locations of 
+                ``vis_gridded`` and ``weight_gridded`` in their packed format.
             nchan (int): the number of channels in the image (default = 1).
         """
         return cls(
@@ -100,16 +112,19 @@ class GriddedDataset(torch.nn.Module):
         mask: ArrayLike,
     ) -> None:
         r"""
-        Apply an additional mask to the data. Only works as a data limiting operation (i.e., ``mask`` is more restrictive than the mask already attached to the dataset).
+        Apply an additional mask to the data. Only works as a data limiting operation 
+        (i.e., ``mask`` is more restrictive than the mask already attached 
+        to the dataset).
 
         Args:
-            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to apply to dataset. Assumes input will be broadcast across all channels.
+            mask (2D numpy or PyTorch tensor): boolean mask (in packed format) to 
+                apply to dataset. Assumes input will be broadcast across all channels.
         """
 
         new_2D_mask = torch.Tensor(mask).detach()
         new_3D_mask = torch.broadcast_to(new_2D_mask, self.mask.size())
 
-        # update mask via an AND operation, meaning we will only keep visibilities that are
+        # update mask via an AND operation, we will only keep visibilities that are
         # 1) part of the original dataset
         # 2) valid within the new mask
         self.mask = torch.logical_and(self.mask, new_3D_mask)
@@ -128,10 +143,13 @@ class GriddedDataset(torch.nn.Module):
     def forward(self, modelVisibilityCube):
         """
         Args:
-            modelVisibilityCube (complex torch.tensor): with shape ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in output from :meth:`mpol.fourier.FourierCube.forward()`
+            modelVisibilityCube (complex torch.tensor): with shape 
+                ``(nchan, npix, npix)`` to be indexed. In "pre-packed" format, as in 
+                output from :meth:`mpol.fourier.FourierCube.forward()`
 
         Returns:
-            torch complex tensor:  1d torch tensor of indexed model samples collapsed across cube dimensions.
+            torch complex tensor:  1d torch tensor of indexed model samples collapsed 
+                across cube dimensions.
         """
 
         assert (
@@ -162,12 +180,22 @@ class GriddedDataset(torch.nn.Module):
 
 class Dartboard:
     r"""
-    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, reminiscent of a dartboard layout. The main utility of this object is to support splitting a dataset along radial and azimuthal bins for k-fold cross validation.
+    A polar coordinate grid relative to a :class:`~mpol.coordinates.GridCoords` object, 
+    reminiscent of a dartboard layout. The main utility of this object is to support 
+    splitting a dataset along radial and azimuthal bins for k-fold cross validation.
 
     Args:
-        coords (GridCoords): an object already instantiated from the GridCoords class. If providing this, cannot provide ``cell_size`` or ``npix``.
-        q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-        phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+        coords (GridCoords): an object already instantiated from the GridCoords class. 
+            If providing this, cannot provide ``cell_size`` or ``npix``.
+        q_edges (1D numpy array): an array of radial bin edges to set the dartboard 
+            cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 
+            log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` 
+            represented by ``coords``.
+        phi_edges (1D numpy array): an array of azimuthal bin edges to set the 
+            dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is 
+            also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the 
+            Hermitian nature of the visibilities. If ``None``, defaults to 
+            8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
     """
 
     def __init__(
@@ -186,13 +214,15 @@ class Dartboard:
             raise ValueError("Elements of phi_edges must be between 0 and pi.")
 
         if q_edges is None:
-            # set q edges approximately following inspriation from Petry et al. scheme:
+            # set q edges approximately following inspiration from Petry et al. scheme:
             # https://ui.adsabs.harvard.edu/abs/2020SPIE11449E..1DP/abstract
             # first two bins set to 7m width
-            # after third bin, bin width increases linearly until it is 700m at 16km baseline.
+            # after third bin, bin width increases linearly until it is 
+            # 700m at 16km baseline.
             # From 16m to 16km, bin width goes from 7m to 700m.
             # ---
-            # We aren't doing quite the same thing, just logspacing with a few linear cells at the start.
+            # We aren't doing *quite* the same thing, 
+            # just logspacing with a few linear cells at the start.
             q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
 
         self.q_edges = q_edges
@@ -224,8 +254,15 @@ class Dartboard:
         Args:
             cell_size (float): the width of a pixel [arcseconds]
             npix (int): the number of pixels per image side
-            q_edges (1D numpy array): an array of radial bin edges to set the dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults to 12 log-linearly radial bins stretching from 0 to the :math:`q_\mathrm{max}` represented by ``coords``.
-            phi_edges (1D numpy array): an array of azimuthal bin edges to set the dartboard cells in [radians], over the domain :math:`[0, \pi]`, which is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve the Hermitian nature of the visibilities. If ``None``, defaults to 8 equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
+            q_edges (1D numpy array): an array of radial bin edges to set the 
+                dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults 
+                to 12 log-linearly radial bins stretching from 0 to the 
+                :math:`q_\mathrm{max}` represented by ``coords``.
+            phi_edges (1D numpy array): an array of azimuthal bin edges to set the 
+                dartboard cells in [radians], over the domain :math:`[0, \pi]`, which 
+                is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve 
+                the Hermitian nature of the visibilities. If ``None``, defaults to 8 
+                equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
         """
         coords = GridCoords(cell_size, npix)
         return cls(coords, q_edges, phi_edges)
@@ -234,15 +271,18 @@ class Dartboard:
         self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
     ) -> NDArray[floating[Any]]:
         r"""
-        Calculate a histogram in polar coordinates, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
+        Calculate a histogram in polar coordinates, using the bin edges defined by 
+        ``q_edges`` and ``phi_edges`` during initialization.
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
-            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+            phis: 1d array of datapoint azimuth values [radians] (must be the same 
+                length as qs)
 
         Returns:
-            2d integer numpy array of cell counts, i.e., how many datapoints fell into each dartboard cell.
+            2d integer numpy array of cell counts, i.e., how many datapoints fell into 
+            each dartboard cell.
         """
 
         histogram: NDArray
@@ -257,12 +297,14 @@ class Dartboard:
         self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]
     ) -> NDArray[integer[Any]]:
         r"""
-        Return a list of the cell indices that contain data points, using the bin edges defined by ``q_edges`` and ``phi_edges`` during initialization.
+        Return a list of the cell indices that contain data points, using the bin edges 
+        defined by ``q_edges`` and ``phi_edges`` during initialization.
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
             qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
-            phis: 1d array of datapoint azimuth values [radians] (must be the same length as qs)
+            phis: 1d array of datapoint azimuth values [radians] (must be the same 
+                length as qs)
 
         Returns:
             list of cell indices where cell contains at least one datapoint.
@@ -279,10 +321,13 @@ class Dartboard:
         self, cell_index_list: NDArray[integer[Any]]
     ) -> NDArray[np.bool_]:
         r"""
-        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding to the ``vis_gridded`` and ``weight_gridded`` quantities of the :class:`~mpol.datasets.GriddedDataset` .
+        Create a boolean mask of size ``(npix, npix)`` (in packed format) corresponding 
+        to the ``vis_gridded`` and ``weight_gridded`` quantities of the 
+        :class:`~mpol.datasets.GriddedDataset` .
 
         Args:
-            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index pairs to include in the mask.
+            cell_index_list (list): list or iterable containing [q_cell, phi_cell] index
+                pairs to include in the mask.
 
         Returns: (numpy array) 2D boolean mask in packed format.
         """

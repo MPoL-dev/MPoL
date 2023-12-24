@@ -1,6 +1,11 @@
-r"""The following loss functions are available to use in imaging. Many of the definitions follow those in Appendix A of `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, including the regularization strength, which aspires to be similar across all terms, providing at least a starting point for tuning multiple loss functions.
+r"""The following loss functions are available to use in imaging. Many of the 
+definitions follow those in Appendix A of 
+`EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, 
+including the regularization strength, which aspires to be similar across all terms, 
+providing at least a starting point for tuning multiple loss functions.
 
-If you don't see a loss function you need, it's easy to write your own directly within your optimization script. If you like it, please consider opening a pull request!
+If you don't see a loss function you need, it's easy to write your own directly within 
+your optimization script. If you like it, please consider opening a pull request!
 """
 
 import numpy as np
@@ -12,16 +17,21 @@ from .constants import *
 
 def chi_squared(model_vis, data_vis, weight):
     r"""
-    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using
+    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model
+      :math:`M` visibilities using
 
     .. math::
 
         \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
 
-    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the answer returned will be different between the two cases. We recommend not including the Hermitian conjugates.
+    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities. 
+    This function is agnostic as to whether the sum should include the Hermitian 
+    conjugate visibilities, but be aware that the answer returned will be different 
+    between the two cases. We recommend not including the Hermitian conjugates.
 
     Args:
-        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        model_vis (PyTorch complex): array tuple of the model representing 
+            :math:`\boldsymbol{V}`
         data_vis (PyTorch complex): array of the data values representing :math:`M`
         weight (PyTorch real): array of weight values representing :math:`w_i`
 
@@ -38,7 +48,8 @@ def chi_squared(model_vis, data_vis, weight):
 
 def log_likelihood(model_vis, data_vis, weight):
     r"""
-    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using
+    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data 
+    :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
 
@@ -46,10 +57,14 @@ def log_likelihood(model_vis, data_vis, weight):
 
     where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
 
-    This function is agnostic as to whether the sum should include the Hermitian conjugate visibilities, but be aware that the normalization of the answer returned will be different between the two cases. Inference of the parameter values should be unaffected. We recommend not including the Hermitian conjugates.
+    This function is agnostic as to whether the sum should include the Hermitian 
+    conjugate visibilities, but be aware that the normalization of the answer returned 
+    will be different between the two cases. Inference of the parameter values should 
+    be unaffected. We recommend not including the Hermitian conjugates.
 
     Args:
-        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        model_vis (PyTorch complex): array tuple of the model representing 
+            :math:`\boldsymbol{V}`
         data_vis (PyTorch complex): array of the data values representing :math:`M`
         weight (PyTorch real): array of weight values representing :math:`w_i`
 
@@ -71,19 +86,34 @@ def log_likelihood(model_vis, data_vis, weight):
 
 def nll(model_vis, data_vis, weight):
     r"""
-    Calculate a normalized "negative log likelihood" loss between the complex data :math:`\boldsymbol{V}` and model :math:`M` visibilities using
+    Calculate a normalized "negative log likelihood" loss between the complex data 
+    :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
 
         L_\mathrm{nll} = \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta})
 
-    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`. Visibilities may be any shape as long as all quantities have the same shape. Following `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
-    a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The factor of 2 comes in because we must count real and imaginaries in the :math:`\chi^2` sum. This means that this normalized negative log likelihood loss function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the prefactor strengths of other regularizers *relative* to this value.
+    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`. 
+    Visibilities may be any shape as long as all quantities have the same shape. 
+    Following `EHT-IV 2019 
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
+    a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The 
+    factor of 2 comes in because we must count real and imaginaries in the 
+    :math:`\chi^2` sum. This means that this normalized negative log likelihood loss 
+    function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}}) 
+    \approx 1$ for a well-fit model (regardless of the number of data points), making 
+    it easier to set the prefactor strengths of other regularizers *relative* to this 
+    value.
 
-    Note that this function should only be used in an optimization or point estimate situation. If it is used in any situation where uncertainties on parameter values are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to parameter value is incorrect.
+    Note that this function should only be used in an optimization or point estimate 
+    situation. If it is used in any situation where uncertainties on parameter values 
+    are determined (such as Markov Chain Monte Carlo), it will return the wrong answer. 
+    This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to 
+    parameter value is incorrect.
 
     Args:
-        model_vis (PyTorch complex): array tuple of the model representing :math:`\boldsymbol{V}`
+        model_vis (PyTorch complex): array tuple of the model representing 
+            :math:`\boldsymbol{V}`
         data_vis (PyTorch complex): array of the data values representing :math:`M`
         weight (PyTorch real): array of weight values representing :math:`w_i`
 
@@ -99,10 +129,14 @@ def nll(model_vis, data_vis, weight):
 
 def chi_squared_gridded(modelVisibilityCube, griddedDataset):
     r"""
-    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) using gridded data and model visibilities.
+    Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`) 
+    using gridded data and model visibilities.
 
     Args:
-        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+        modelVisibilityCube (torch complex tensor): torch tensor with shape 
+            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from 
+            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," 
+            as in output from :meth:`mpol.fourier.FourierCube.forward()`.
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
 
     Returns:
@@ -123,10 +157,14 @@ def chi_squared_gridded(modelVisibilityCube, griddedDataset):
 
 def log_likelihood_gridded(modelVisibilityCube, griddedDataset):
     r"""
-    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.
+    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to 
+    :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.
 
     Args:
-        modelVisibilityCube (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+        modelVisibilityCube (torch complex tensor): torch tensor with shape 
+            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from 
+            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as 
+            in output from :meth:`mpol.fourier.FourierCube.forward()`.
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
 
     Returns:
@@ -146,10 +184,15 @@ def log_likelihood_gridded(modelVisibilityCube, griddedDataset):
 
 def nll_gridded(modelVisibilityCube, griddedDataset):
     r"""
-    Calculate a normalized "negative log likelihood" (corresponding to :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will return the same value regardless of whether Hermitian pairs are included.
+    Calculate a normalized "negative log likelihood" (corresponding to 
+    :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will 
+    return the same value regardless of whether Hermitian pairs are included.
 
     Args:
-        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to 
+            be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`. 
+            Assumes tensor is "pre-packed," as in output from 
+            :meth:`mpol.fourier.FourierCube.forward()`.
         griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
 
     Returns:
@@ -162,12 +205,16 @@ def nll_gridded(modelVisibilityCube, griddedDataset):
 
 def entropy(cube, prior_intensity, tot_flux=10):
     r"""
-    Calculate the entropy loss of a set of pixels following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
+    Calculate the entropy loss of a set of pixels following the definition in 
+    `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
     Args:
-        cube (any tensor): pixel values must be positive :math:`I_i > 0` for all :math:`i`
-        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy against. Could be a single constant or an array the same shape as image.
-        tot_flux (float): a fixed normalization factor; the user-defined target total flux density
+        cube (any tensor): pixel values must be positive :math:`I_i > 0` 
+            for all :math:`i`
+        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy 
+            against. Could be a single constant or an array the same shape as image.
+        tot_flux (float): a fixed normalization factor; the user-defined target total 
+            flux density
 
     Returns:
         torch.double: entropy loss
@@ -188,11 +235,20 @@ def entropy(cube, prior_intensity, tot_flux=10):
 
 def TV_image(sky_cube, epsilon=1e-10):
     r"""
-    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be piecewise smooth and the gradient of the image to be sparse.
+    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC). 
+    Following the definition in `EHT-IV 2019 
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the 
+    image to be piecewise smooth and the gradient of the image to be sparse.
 
     Args:
-        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.
-        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations within each image slice greater than this parameter will have a significant penalty.
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` 
+            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and 
+            :math:`v` is the channel (velocity or frequency) dimension in 
+            :math:`ndim=1`. Should be in sky format representation.
+        epsilon (float): a softening parameter in 
+            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations 
+            within each image slice greater than this parameter will have a 
+            significant penalty.
 
     Returns:
         torch.double: total variation loss
@@ -216,11 +272,15 @@ def TV_image(sky_cube, epsilon=1e-10):
 
 def TV_channel(cube, epsilon=1e-10):
     r"""
-    Calculate the total variation (TV) loss in the channel dimension. Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
+    Calculate the total variation (TV) loss in the channel dimension. Following the 
+    definition in `EHT-IV 2019 
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
     Args:
         cube (any 3D tensor): the image cube array :math:`I_{lmv}`
-        epsilon (float): a softening parameter in [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel variations greater than this parameter will have a significant penalty.
+        epsilon (float): a softening parameter in 
+            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel 
+            variations greater than this parameter will have a significant penalty.
 
     Returns:
         torch.double: total variation loss
@@ -261,11 +321,15 @@ def edge_clamp(cube):
 
 def sparsity(cube, mask=None):
     r"""
-    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally provide a boolean mask to apply the prior to only the ``True`` locations. For example, you might want this mask to be ``True`` for background regions.
+    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally 
+    provide a boolean mask to apply the prior to only the ``True`` locations. For 
+    example, you might want this mask to be ``True`` for background regions.
 
     Args:
         cube (nchan, npix, npix): tensor image cube
-        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior will be applied to those pixels where the mask is ``True``. Default is to apply prior to all pixels.
+        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior 
+            will be applied to those pixels where the mask is ``True``. Default is 
+            to apply prior to all pixels.
 
     Returns:
         torch.double: sparsity loss calculated where ``mask == True``
@@ -287,11 +351,13 @@ def sparsity(cube, mask=None):
 
 def UV_sparsity(vis, qs, q_max):
     r"""
-    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than :math:`q_\mathrm{max}`.
+    Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than 
+    :math:`q_\mathrm{max}`.
 
     Args:
         vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)
-        qs: numpy array corresponding to visibility coordinates. Dimensionality of (npix, npix//2)
+        qs: numpy array corresponding to visibility coordinates. Dimensionality of 
+            (npix, npix//2)
         q_max (float): maximum radial baseline
 
     Returns:
@@ -316,7 +382,8 @@ def UV_sparsity(vis, qs, q_max):
 
 def PSD(qs, psd, l):
     r"""
-    Apply a loss function corresponding to the power spectral density using a Gaussian process kernel.
+    Apply a loss function corresponding to the power spectral density using a Gaussian 
+    process kernel.
 
     Assumes an image plane kernel of
 
@@ -359,10 +426,18 @@ def PSD(qs, psd, l):
 
 def TSV(sky_cube):
     r"""
-    Calculate the total square variation (TSV) loss in the image dimension (R.A. and DEC). Following the definition in `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the image to be edge smoothed which may be a better reoresentation of the truth image `K. Kuramochi et al 2018 <https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract>`_.
+    Calculate the total square variation (TSV) loss in the image dimension 
+    (R.A. and DEC). Following the definition in `EHT-IV 2019 
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the 
+    image to be edge smoothed which may be a better reoresentation of the truth image 
+    `K. Kuramochi et al 2018
+    <https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract>`_.
 
     Args:
-        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and :math:`v` is the channel (velocity or frequency) dimension in :math:`ndim=1`. Should be in sky format representation.
+        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l` 
+            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and 
+            :math:`v` is the channel (velocity or frequency) dimension in 
+            :math:`ndim=1`. Should be in sky format representation.
 
     Returns:
         torch.double: total square variation loss
