@@ -88,3 +88,7 @@ module = [
     "fast_histogram.*"
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "MPoL.losses"
+disallow_untyped_defs = true
