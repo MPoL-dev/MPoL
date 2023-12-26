@@ -3,82 +3,99 @@ import math
 import numpy as np
 import torch
 
-from .constants import arcsec, c_ms, cc, deg, kB
-
-def torch2npy(tensor):
-    """Make a copy of a PyTorch tensor on the CPU in numpy format, e.g. for plotting"""
-    return tensor.detach().cpu().numpy()
+from typing import Any
+import numpy.typing as npt
+from mpol.constants import arcsec, c_ms, cc, deg, kB
 
 
-def ground_cube_to_packed_cube(ground_cube):
+def torch2npy(t: torch.Tensor) -> npt.NDArray:
+    """
+    Copy a tensor (potentially on the GPU) to the CPU and convert to a numpy
+    :class:`np.ndarray`, e.g., for visualization or further analysis with non-PyTorch
+    scientific libraries.
+
+    Parameters
+    ----------
+    t : torch.Tensor
+
+    Returns
+    _______
+    np.ndarray
+
+    """
+    t_cpu: torch.Tensor = t.detach().cpu()
+    t_np: np.ndarray = t_cpu.numpy()
+    return t_np
+
+
+def ground_cube_to_packed_cube(ground_cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work. 
+    Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work.
     See Units and Conventions for more details.
 
     Args:
-        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor 
+        ground_cube: a previously initialized Ground Cube object (cube (3D torch tensor
         of shape ``(nchan, npix, npix)``))
 
     Returns:
-        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting 
-            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a 
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting
+            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a
             Packed Visibility Cube.
     """
-    shifted = torch.fft.fftshift(ground_cube, dim=(1, 2))
+    shifted: torch.Tensor = torch.fft.fftshift(ground_cube, dim=(1, 2))
     return shifted
 
 
-def packed_cube_to_ground_cube(packed_cube) -> torch.Tensor:
+def packed_cube_to_ground_cube(packed_cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See 
+    Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See
     Units and Conventions for more details.
 
     Args:
-        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor 
+        packed_cube: a previously initialized Packed Cube object (cube (3D torch tensor
         of shape ``(nchan, npix, npix)``))
 
     Returns:
-        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting 
-            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a 
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting
+            array after applying ``torch.fft.fftshift`` to the input arg; i.e Returns a
             Ground Cube.
     """
     # fftshift the image cube to the correct quadrants
-    shifted: torch.Tensor
-    shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
+    shifted: torch.Tensor = torch.fft.fftshift(packed_cube, dim=(1, 2))
     return shifted
 
 
-def sky_cube_to_packed_cube(sky_cube):
+def sky_cube_to_packed_cube(sky_cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and 
+    Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and
     Conventions for more details.
 
     Args:
-        sky_cube: a previously initialized Sky Cube object with RA increasing to the 
+        sky_cube: a previously initialized Sky Cube object with RA increasing to the
             *left* (cube (3D torch tensor of shape ``(nchan, npix, npix)``))
 
     Returns:
-        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting 
-            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the 
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting
+            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the
             RA axis; i.e Returns a Packed Image Cube.
     """
     flipped = torch.flip(sky_cube, (2,))
-    shifted = torch.fft.fftshift(flipped, dim=(1, 2))
+    shifted: torch.Tensor = torch.fft.fftshift(flipped, dim=(1, 2))
     return shifted
 
 
-def packed_cube_to_sky_cube(packed_cube):
+def packed_cube_to_sky_cube(packed_cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and 
+    Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and
     Conventions for more details.
 
     Args:
-        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch 
+        packed_cube: a previously initialized Packed Image Cube object (cube (3D torch
         tensor of shape ``(nchan, npix, npix)``))
 
     Returns:
-        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting 
-            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the 
+        torch.double : 3D image cube of shape ``(nchan, npix, npix)``; The resulting
+            array after applying ``torch.fft.fftshift`` to the ``torch.flip()`` of the
             RA axis; i.e Returns a Sky Cube.
     """
     # fftshift the image cube to the correct quadrants
@@ -88,9 +105,9 @@ def packed_cube_to_sky_cube(packed_cube):
     return flipped
 
 
-def get_Jy_arcsec2(T_b, nu=230e9):
+def get_Jy_arcsec2(T_b: float, nu: float = 230e9) -> float:
     r"""
-    Calculate specific intensity from the brightness temperature, using the 
+    Calculate specific intensity from the brightness temperature, using the
     Rayleigh-Jeans definition.
 
     Args:
@@ -113,31 +130,31 @@ def get_Jy_arcsec2(T_b, nu=230e9):
     return Jy_arcsec2
 
 
-def log_stretch(x):
+def loglinspace(
+    start: float, end: float, N_log: int, M_linear: int = 3
+) -> npt.NDArray[np.floating[Any]]:
     r"""
-    Apply a log stretch to the tensor.
-
-    Args:
-        tensor (PyTorch tensor): input tensor :math:`x`
-
-    Returns: :math:`\ln(1 + |x|)`
-    """
-
-    return torch.log(1 + torch.abs(x))
-
-
-def loglinspace(start, end, N_log, M_linear=3):
-    r"""
-    Return a logspaced array of bin edges, with the first ``M_linear`` cells being 
-    equal width. There is a one-cell overlap between the linear and logarithmic 
-    stretches of the array, since the last linear cell is also the first logarithmic 
+    Return a logspaced array of bin edges, with the first ``M_linear`` cells being
+    equal width. There is a one-cell overlap between the linear and logarithmic
+    stretches of the array, since the last linear cell is also the first logarithmic
     cell, which means the total number of cells is ``M_linear + N_log - 1``.
 
-    Args:
-        start (float): starting cell left edge
-        end (float): ending cell right edge
-        N_log (int): number of logarithmically spaced bins
-        M_linear (int): number of linearly (equally) spaced bins
+    Parameters
+    ----------
+    start : float
+        starting cell left edge
+    end : float
+        ending cell right edge
+    N_log : int
+        number of logarithmically spaced bins
+    M_linear : int
+        number of linearly (equally) spaced bins
+
+    Returns
+    -------
+    np.ndarray
+        logspaced bin edges
+
     """
 
     # transition cell left edge
@@ -157,9 +174,9 @@ def loglinspace(start, end, N_log, M_linear=3):
     return np.array(cell_walls)
 
 
-def fftspace(width, N):
-    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements 
-    (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle 
+def fftspace(width: float, N: int) -> npt.NDArray[np.floating[Any]]:
+    """Delivers a (nearly) symmetric coordinate array that spans :math:`N` elements
+    (where :math:`N` is even) from `-width` to `+width`, but ensures that the middle
     point lands on :math:`0`. The array indices go from :math:`0` to :math:`N -1.`
 
     Args:
@@ -228,7 +245,7 @@ def convert_baselines(baselines, freq=None, wle=None):
     Returns:
         (1D array nvis): baselines in [klambda]
     Notes:
-        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be 
+        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be
         broadcast-able.
     """
     if (freq is None and wle is None) or (wle and freq):
@@ -271,9 +288,9 @@ def broadcast_and_convert_baselines(u, v, chan_freq):
     return (uu, vv)
 
 
-def get_max_spatial_freq(cell_size, npix):
+def get_max_spatial_freq(cell_size: float, npix: int) -> float:
     r"""
-    Calculate the maximum spatial frequency that the image can represent and still 
+    Calculate the maximum spatial frequency that the image can represent and still
     satisfy the Nyquist Sampling theorem.
 
     Args:
@@ -291,13 +308,13 @@ def get_max_spatial_freq(cell_size, npix):
     return (npix / 2 - 1) / (npix * cell_size * arcsec) * 1e-3  # kilolambda
 
 
-def get_maximum_cell_size(uu_vv_point):
+def get_maximum_cell_size(uu_vv_point: float) -> float:
     r"""
-    Calculate the maximum possible cell_size that will still Nyquist sample the uu or 
+    Calculate the maximum possible cell_size that will still Nyquist sample the uu or
     vv point. Note: not q point.
 
     Args:
-        uu_vv_point (float): a single spatial frequency. Units of 
+        uu_vv_point (float): a single spatial frequency. Units of
             [:math:`\mathrm{k}\lambda`].
 
     Returns:
@@ -307,10 +324,14 @@ def get_maximum_cell_size(uu_vv_point):
     return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
 
 
-def get_optimal_image_properties(image_width, u, v):
+def get_optimal_image_properties(
+    image_width: float,
+    u: npt.NDArray[np.floating[Any]],
+    v: npt.NDArray[np.floating[Any]],
+) -> tuple[float, int]:
     r"""
     For an image of desired width, determine the maximum pixel size that
-    ensures Nyquist sampling of the provided spatial frequency points, and the 
+    ensures Nyquist sampling of the provided spatial frequency points, and the
     corresponding number of pixels to obtain the desired image width.
 
     Parameters
@@ -318,8 +339,8 @@ def get_optimal_image_properties(image_width, u, v):
     image_width : float, unit = arcsec
         Desired width of the image (for a square image of size
         `image_width` :math:`\times` `image_width`).
-    u, v : float or array, unit = :math:`k\lambda`
-        `u` and `v` spatial frequency points. 
+    u, v : np.ndarray of np.float, unit = :math:`k\lambda`
+        `u` and `v` baselines.
 
     Returns
     -------
@@ -330,8 +351,7 @@ def get_optimal_image_properties(image_width, u, v):
         width (npix will be rounded up and enforced as even).
     Notes
     -----
-    No assumption or correction is made concerning whether the spatial 
-    frequency points are projected or deprojected.
+    Assumes baselines are as-observed.
     """
     max_freq = max(max(abs(u)), max(abs(v)))
 
@@ -341,21 +361,34 @@ def get_optimal_image_properties(image_width, u, v):
     npix = math.ceil(image_width / cell_size)
 
     # account for Nyquist of proposed cell_size, npix
-    cell_size *= cell_size / get_maximum_cell_size(get_max_spatial_freq(cell_size, npix))
+    cell_size *= cell_size / get_maximum_cell_size(
+        get_max_spatial_freq(cell_size, npix)
+    )
 
     npix = math.ceil(image_width / cell_size)
-    
+
     # enforce that npix be even
     if npix % 2 == 1:
         npix += 1
 
-    # should never occur 
-    assert(get_max_spatial_freq(cell_size, npix) >= max_freq), "error in get_optimal_image_properties"
+    # should never occur
+    assert (
+        get_max_spatial_freq(cell_size, npix) >= max_freq
+    ), "error in get_optimal_image_properties"
 
     return cell_size, npix
 
 
-def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
+def sky_gaussian_radians(
+    l: npt.NDArray[np.floating[Any]],
+    m: npt.NDArray[np.floating[Any]],
+    a: float,
+    delta_l: float,
+    delta_m: float,
+    sigma_l: float,
+    sigma_m: float,
+    Omega: float,
+) -> npt.NDArray[np.floating[Any]]:
     r"""
     Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is 
     centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is 
@@ -379,7 +412,9 @@ def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
 
     .. math::
 
-        f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left [ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m} \right )^2 \right ] \right )
+        f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left 
+        [ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m} 
+        \right )^2 \right ] \right )
 
     Args:
         l: units of [radians]
@@ -403,13 +438,25 @@ def sky_gaussian_radians(l, m, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
     lp = lt * np.cos(Omega * deg) - mt * np.sin(Omega * deg)
     mp = lt * np.sin(Omega * deg) + mt * np.cos(Omega * deg)
 
-    return a * np.exp(-0.5 * ((lp / sigma_l) ** 2 + (mp / sigma_m) ** 2))
+    gauss: npt.NDArray[np.floating[Any]] = a * np.exp(
+        -0.5 * ((lp / sigma_l) ** 2 + (mp / sigma_m) ** 2)
+    )
+    return gauss
 
 
-def sky_gaussian_arcsec(x, y, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
+def sky_gaussian_arcsec(
+    x: npt.NDArray[np.floating[Any]],
+    y: npt.NDArray[np.floating[Any]],
+    a: float,
+    delta_x: float,
+    delta_y: float,
+    sigma_x: float,
+    sigma_y: float,
+    Omega: float,
+) -> npt.NDArray[np.floating[Any]]:
     r"""
     Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience
-    wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts 
+    wrapper to :func:`~mpol.utils.sky_gaussian_radians` that automatically converts
     from arcsec to radians.
 
     Args:
@@ -438,7 +485,16 @@ def sky_gaussian_arcsec(x, y, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
     )
 
 
-def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m, Omega):
+def fourier_gaussian_lambda_radians(
+    u: npt.NDArray[np.floating[Any]],
+    v: npt.NDArray[np.floating[Any]],
+    a: float,
+    delta_l: float,
+    delta_m: float,
+    sigma_l: float,
+    sigma_m: float,
+    Omega: float,
+) -> npt.NDArray[np.floating[Any]]:
     r"""
     Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the 
     Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in 
@@ -581,7 +637,7 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
     vp = u * np.sin(Omega * deg) + v * np.cos(Omega * deg)
 
     # calculate the Fourier Gaussian
-    return (
+    fgauss: npt.NDArray[np.floating[Any]] = (
         a
         * sigma_l
         * sigma_m
@@ -592,15 +648,25 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
             - 2.0j * np.pi * (delta_l * u + delta_m * v)
         )
     )
+    return fgauss
 
 
-def fourier_gaussian_klambda_arcsec(u, v, a, delta_x, delta_y, sigma_x, sigma_y, Omega):
+def fourier_gaussian_klambda_arcsec(
+    u: npt.NDArray[np.floating[Any]],
+    v: npt.NDArray[np.floating[Any]],
+    a: float,
+    delta_x: float,
+    delta_y: float,
+    sigma_x: float,
+    sigma_y: float,
+    Omega: float,
+) -> npt.NDArray[np.floating[Any]]:
     r"""
-    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the 
-    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in 
+    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the
+    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in
     :func:`~mpol.utils.sky_gaussian_arcsec`, using analytical relationships. The Fourier
-    Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``), 
-    widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in 
+    Gaussian is parameterized using the sky plane centroid (``delta_l, delta_m``),
+    widths (``sigma_l, sigma_m``) and rotation (``Omega``). Assumes that ``a`` was in
     units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
 
     Args:

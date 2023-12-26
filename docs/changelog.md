@@ -5,7 +5,8 @@
 ## v0.2.1
 
 - *Placeholder* Planned changes described by Architecture GitHub Project.
-- Implemented type checking for more of the codebase
+- Removed unused routine `mpol.utils.log_stretch`.
+- Added type hints for core modules ([#54](https://github.com/MPoL-dev/MPoL/issues/54)). This should improve stability of core routines and help users when writing code using MPoL in an IDE.
 - Manually line wrapped many docstrings to conform to 88 characters per line or less. Ian thought `black` would do this by default, but actually that [doesn't seem to be the case](https://github.com/psf/black/issues/2865).
 - Fully leaned into the `pyproject.toml` setup to modernize build via [hatch](https://github.com/pypa/hatch). This centralizes the project dependencies and derives package versioning directly from git tags. Intermediate packages built from commits after the latest tag (e.g., `0.2.0`) will have an extra long string, e.g., `0.2.1.dev178+g16cfc3e.d20231223` where the version is a guess at the next version and the hash gives reference to the commit. This means that developers bump versions entirely by tagging a new version with git (or more likely by drafting a new release on the [GitHub release page](https://github.com/MPoL-dev/MPoL/releases)).
 - Removed `setup.py`.

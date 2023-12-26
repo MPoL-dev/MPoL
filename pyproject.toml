@@ -94,6 +94,7 @@ module = [
     "MPol.constants",
     "MPoL.losses",
     # "MPoL.fourier", # once we remove get_vis_residuals
+    # "MPoL.utils", # once we fix check_baselines
     "MPoL.datasets"
 ]
 disallow_untyped_defs = true
