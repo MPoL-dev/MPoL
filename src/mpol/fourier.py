@@ -32,12 +32,12 @@ class FourierCube(nn.Module):
 
     Parameters
     ----------
-    coords : :class:`~mpol.coordinates.GridCoords` 
+    coords : :class:`~mpol.coordinates.GridCoords`
         object containing image dimensions
     persistent_vis : bool
-        should the visibility cube be stored as part of 
-        the module  s `state_dict`? If `True`, the state of the UV grid will be 
-        stored. It is recommended to use `False` for most applications, since the 
+        should the visibility cube be stored as part of
+        the module  s `state_dict`? If `True`, the state of the UV grid will be
+        stored. It is recommended to use `False` for most applications, since the
         visibility cube will rarely be a direct parameter of the model.
 
     """
@@ -58,16 +58,21 @@ class FourierCube(nn.Module):
         Alternative method for instantiating a FourierCube from ``cell_size`` and
         ``npix``
 
-        Args:
-            cell_size (float): the width of an image-plane pixel [arcseconds]
-            npix (int): the number of pixels per image side
-            persistent_vis (Boolean): should the visibility cube be stored as part of
-                the modules `state_dict`? If `True`, the state of the UV grid will be
-                stored. It is recommended to use `False` for most applications, since
-                the visibility cube will rarely be a direct parameter of the model.
+        Parameters
+        ----------
+        cell_size : float
+            the width of an image-plane pixel [arcseconds]
+        npix : int)
+            the number of pixels per image side
+        persistent_vis : bool
+            should the visibility cube be stored as part of
+            the modules `state_dict`? If `True`, the state of the UV grid will be
+            stored. It is recommended to use `False` for most applications, since
+            the visibility cube will rarely be a direct parameter of the model.
 
-        Returns:
-            instantiated :class:`mpol.fourier.FourierCube` object.
+        Returns
+        -------
+        :class:`mpol.fourier.FourierCube`
         """
         coords = GridCoords(cell_size, npix)
         return cls(coords, persistent_vis)
@@ -76,14 +81,16 @@ class FourierCube(nn.Module):
         """
         Perform the FFT of the image cube on each channel.
 
-        Args:
-            cube (torch.double tensor): a prepacked tensor of shape 
-                ``(nchan, npix, npix)``. For example, an image cube 
-                from ImageCube.forward()
+        Parameters
+        ----------
+        cube : :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+            A 'packed' tensor. For example, an image cube from
+            :meth:`mpol.images.ImageCube.forward`
 
-        Returns:
-            torch.complex tensor, of shape ``(nchan, npix, npix)``. The FFT of the
-                image cube, in packed format.
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``.
+            The FFT of the image cube, in packed format.
         """
 
         # make sure the cube is 3D
@@ -102,9 +109,11 @@ class FourierCube(nn.Module):
         The visibility cube in ground format cube fftshifted for plotting with
         ``imshow``.
 
-        Returns:
-            (torch.complex tensor, of shape ``(nchan, npix, npix)``): the FFT of the
-                image cube, in sky plane format.
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.complex128` of shape ``(nchan, npix, npix)``
+            complex-valued FFT of the image cube (i.e., the visibility cube), in 
+            'ground' format.
         """
 
         return utils.packed_cube_to_ground_cube(self.vis)
@@ -115,8 +124,10 @@ class FourierCube(nn.Module):
         The amplitude of the cube, arranged in unpacked format corresponding to the FFT
         of the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
-        Returns:
-            torch.double : 3D amplitude cube of shape ``(nchan, npix, npix)``
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+            amplitude cube in 'ground' format.
         """
         return torch.abs(self.ground_vis)
 
@@ -126,8 +137,10 @@ class FourierCube(nn.Module):
         The phase of the cube, arranged in unpacked format corresponding to the FFT of
         the sky_cube. Array dimensions for plotting given by ``self.coords.vis_ext``.
 
-        Returns:
-            torch.double : 3D phase cube of shape ``(nchan, npix, npix)``
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+            phase cube in 'ground' format (:math:`[-\pi,\pi)`).
         """
         return torch.angle(self.ground_vis)
 
@@ -161,22 +174,29 @@ def safe_baseline_constant_meters(
     If this function returns ``True``, then it would be safe to proceed with
     parallelization in the :class:`mpol.fourier.NuFFT` layer via the coil dimension.
 
-    Args:
-        uu (1D np.array): a 1D array of length ``nvis`` array of the u (East-West)
-            spatial frequency coordinate in units of [m]
-        vv (1D np.array): a 1D array of length ``nvis`` array of the v (North-South)
-            spatial frequency coordinate in units of [m]
-        freqs (1D np.array): a 1D array of length ``nchan`` of the channel frequencies,
-            in units of [Hz].
-        coords: a :class:`mpol.coordinates.GridCoords` object which represents the image
-            and uv-grid dimensions.
-        uv_cell_frac (float): the maximum threshold for a change in :math:`u` or
-            :math:`v` spatial frequency across channels, measured as a fraction of the
-            :math:`u,v` cell defined by ``coords``.
+    Parameters
+    ----------
+    uu : 1D np.array 
+        a 1D array of length ``nvis`` array of the u (East-West)
+        spatial frequency coordinate in units of [m]
+    vv : 1D np.array
+        a 1D array of length ``nvis`` array of the v (North-South)
+        spatial frequency coordinate in units of [m]
+    freqs : 1D np.array
+        a 1D array of length ``nchan`` of the channel frequencies,
+        in units of [Hz].
+    coords: :class:`mpol.coordinates.GridCoords` 
+        object which represents the image and uv-grid dimensions.
+    uv_cell_frac : float
+        the maximum threshold for a change in :math:`u` or
+        :math:`v` spatial frequency across channels, measured as a fraction of the
+        :math:`u,v` cell defined by ``coords``.
 
-    Returns:
-        boolean: `True` if it is safe to assume that the baselines are constant with
-            channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
+    Returns
+    -------
+    boolean
+        `True` if it is safe to assume that the baselines are constant with
+        channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
     """
 
     # broadcast and convert baselines to kilolambda across channel
@@ -378,13 +398,13 @@ class NuFFT(nn.Module):
         vector will influence how TorchKbNufft will perform the operations.
 
         * If ``uu`` and ``vv`` have a 1D shape of (``nvis``), then it will be assumed
-            that the spatial frequencies can be treated as constant with channel. This 
+            that the spatial frequencies can be treated as constant with channel. This
             will result in a ``k_traj`` vector that has shape (``2, nvis``), such that
             parallelization will be across the image cube ``nchan`` dimension using the
             'coil' dimension of the TorchKbNufft package.
         * If the ``uu`` and ``vv`` have a 2D shape of (``nchan, nvis``), then it will
-            be assumed that the spatial frequencies are different for each channel, and 
-            the spatial frequencies provided for each channel will be used. This will 
+            be assumed that the spatial frequencies are different for each channel, and
+            the spatial frequencies provided for each channel will be used. This will
             result in a ``k_traj`` vector that has shape (``nchan, 2, nvis``), such that
             parallelization will be across the image cube ``nchan`` dimension using the
             'batch' dimension of the TorchKbNufft package.
@@ -499,8 +519,8 @@ class NuFFT(nn.Module):
         constant based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
 
         * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that
-            the spatial frequencies can be treated as constant with channel (and will 
-            invoke parallelization across the image cube ``nchan`` dimension using the 
+            the spatial frequencies can be treated as constant with channel (and will
+            invoke parallelization across the image cube ``nchan`` dimension using the
             'coil' dimension of the TorchKbNufft package).
         * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be
             assumed that the spatial frequencies are different for each channel, and the
@@ -649,12 +669,12 @@ class NuFFTCached(NuFFT):
 
     * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the
         spatial frequencies can be treated as constant with channel (and will invoke
-        parallelization across the image cube ``nchan`` dimension using the 'coil' 
+        parallelization across the image cube ``nchan`` dimension using the 'coil'
         dimension of the TorchKbNufft package).
     * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be
-        assumed that the spatial frequencies are different for each channel, and the 
-        spatial frequencies provided for each channel will be used (and will invoke 
-        parallelization across the image cube ``nchan`` dimension using the 'batch' 
+        assumed that the spatial frequencies are different for each channel, and the
+        spatial frequencies provided for each channel will be used (and will invoke
+        parallelization across the image cube ``nchan`` dimension using the 'batch'
         dimension of the TorchKbNufft package).
 
     Note that there is no straightforward, computationally efficient way to proceed if
@@ -663,7 +683,7 @@ class NuFFTCached(NuFFT):
     (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points
     to have the same length ``nvis``, and you create a boolean mask to keep track of
     which points are valid. Then, when this routine returns data points of shape
-    (``nchan, nvis``), you can use that boolean mask to select only the valid 
+    (``nchan, nvis``), you can use that boolean mask to select only the valid
     :math:`u,v` points.
 
     **Interpolation mode**: You may choose the type of interpolation mode that KbNufft

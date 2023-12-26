@@ -500,26 +500,30 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
     .. math::
 
-        f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 + \left( \frac{m}{\sigma_m} \right)^2 \right] \right).
+        f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 +
+        \left( \frac{m}{\sigma_m} \right)^2 \right] \right).
 
     i.e., something we might call a normalized Gaussian function. Phrased in terms of 
     :math:`f_0`, :math:`f_1` is
 
     .. math::
 
-        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, \frac{m}{\sigma_m \sqrt{2 \pi}}\right).
+        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, 
+        \frac{m}{\sigma_m \sqrt{2 \pi}}\right).
 
     Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is
 
     .. math::
 
-        F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\, \sigma_m \sqrt{2 \pi} v \right),
+        F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\, 
+        \sigma_m \sqrt{2 \pi} v \right),
 
     or
 
     .. math::
 
-        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + \sigma_m^2 v^2] \right).
+        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + 
+        \sigma_m^2 v^2] \right).
 
     Next, we rotate the Gaussian to match the sky plane rotation. A rotation 
     :math:`\Omega` in the sky plane is carried out in the same direction in the 
@@ -551,11 +555,14 @@ def fourier_gaussian_lambda_radians(u, v, a, delta_l, delta_m, sigma_l, sigma_m,
 
         F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)
 
-    We have arrived at the corresponding Fourier Gaussian, :math:`F_\mathrm{g}(u,v) = F_3(u,v)`. The simplified equation is
+    We have arrived at the corresponding Fourier Gaussian, :math:`F_\mathrm{g}(u,v) = 
+    F_3(u,v)`. The simplified equation is
 
     .. math::
 
-        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]  - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).
+        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( 
+        -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]  
+        - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).
 
     N.B. that we have mixed primed (:math:`u'`) and unprimed (:math:`u`) coordinates in 
     the same equation for brevity.
