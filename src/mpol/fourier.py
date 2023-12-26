@@ -15,7 +15,6 @@ from torch import nn
 
 from mpol.exceptions import DimensionMismatchError
 from mpol.images import ImageCube
-from mpol.protocols import MPoLModel
 
 from mpol import utils
 from mpol.coordinates import GridCoords
