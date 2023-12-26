@@ -14,18 +14,22 @@ from mpol import utils
 
 class GriddedDataset(torch.nn.Module):
     r"""
-    Args:
-        coords (GridCoords): an object already instantiated from the GridCoords class.
-            If providing this, cannot provide ``cell_size`` or ``npix``.
-        vis_gridded (torch complex): the gridded visibility data stored in a "packed"
-            format (pre-shifted for fft)
-        weight_gridded (torch double): the weights corresponding to the gridded
-            visibility data, also in a packed format
-        mask (torch boolean): a boolean mask to index the non-zero locations of
-            ``vis_gridded`` and ``weight_gridded`` in their packed format.
-        nchan (int): the number of channels in the image (default = 1).
-        device (torch.device): the desired device of the dataset. If ``None``,
-            defaults to current device.
+    Parameters
+    ----------
+    coords : :class:`~mpol.coordinates.GridCoords`
+        If providing this, cannot provide ``cell_size`` or ``npix``.
+    vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`
+        the gridded visibility data stored in a "packed" format (pre-shifted for fft)
+    weight_gridded : :class:`torch.Tensor` of :class:`torch.double`
+        the weights corresponding to the gridded visibility data,
+        also in a packed format
+    mask : :class:`torch.Tensor` of :class:`torch.bool`
+        a boolean mask to index the non-zero locations of ``vis_gridded`` and
+        ``weight_gridded`` in their packed format.
+    nchan : int
+        the number of channels in the image (default = 1).
+    device : :class:`torch.device`
+        the desired device of the dataset. If ``None``, defaults to current device.
 
     After initialization, the GriddedDataset provides the non-zero cells of the
     gridded visibilities and weights as a 1D vector via the following instance
