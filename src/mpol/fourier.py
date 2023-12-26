@@ -17,8 +17,8 @@ from mpol.exceptions import DimensionMismatchError
 from mpol.images import ImageCube
 from mpol.protocols import MPoLModel
 
-from . import utils
-from .coordinates import GridCoords
+from mpol import utils
+from mpol.coordinates import GridCoords
 
 
 class FourierCube(nn.Module):
@@ -30,24 +30,20 @@ class FourierCube(nn.Module):
     :func:`mpol.losses.nll_gridded`) and a gridded dataset (e.g.,
     :class:`mpol.datasets.GriddedDataset`).
 
-    Args:
-        coords (GridCoords): an object already instantiated from the GridCoords class.
-        persistent_vis (Boolean): should the visibility cube be stored as part of 
-            the module  s `state_dict`? If `True`, the state of the UV grid will be 
-            stored. It is recommended to use `False` for most applications, since the 
-            visibility cube will rarely be a direct parameter of the model.
+    Parameters
+    ----------
+    coords : :class:`~mpol.coordinates.GridCoords` 
+        object containing image dimensions
+    persistent_vis : bool
+        should the visibility cube be stored as part of 
+        the module  s `state_dict`? If `True`, the state of the UV grid will be 
+        stored. It is recommended to use `False` for most applications, since the 
+        visibility cube will rarely be a direct parameter of the model.
 
     """
 
     def __init__(self, coords: GridCoords, persistent_vis: bool = False):
         super().__init__()
-
-        # TODO: Is this comment relevant? There was no nchan instantiation
-        # before
-        # ---
-        # we don't want to bother with the nchan argument here, so
-        # we don't use the convenience method _setup_coords
-        # and just do it manually
 
         self.coords = coords
 
