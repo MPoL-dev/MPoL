@@ -28,15 +28,16 @@ class GriddedDataset(torch.nn.Module):
         ``weight_gridded`` in their packed format.
     nchan : int
         the number of channels in the image (default = 1).
-    device : :class:`torch.device`
-        the desired device of the dataset. If ``None``, defaults to current device.
+
 
     After initialization, the GriddedDataset provides the non-zero cells of the
     gridded visibilities and weights as a 1D vector via the following instance
     variables. This means that any individual channel information has been collapsed.
 
     :ivar vis_indexed: 1D complex tensor of visibility data
+
     :ivar weight_indexed: 1D tensor of weight values
+
 
     If you index the output of the Fourier layer in the same manner using ``self.mask``,
     then the model and data visibilities can be directly compared using a loss function.
@@ -82,21 +83,27 @@ class GriddedDataset(torch.nn.Module):
         weight_gridded: torch.Tensor,
         mask: torch.Tensor,
         nchan: int = 1,
-        device: torch.device | str | None = None,
-    ):
-        """Alternative method to instantiate a GriddedDataset object from cell_size
-        and npix.
+    ) -> GriddedDataset:
+        """
+            Alternative method to instantiate a GriddedDataset object from cell_size
+            and npix.
 
-        Args:
-            cell_size (float): the width of a pixel [arcseconds]
-            npix (int): the number of pixels per image side
-            vis_gridded (torch complex): the gridded visibility data stored in a
-                "packed" format (pre-shifted for fft)
-            weight_gridded (torch double): the weights corresponding to the gridded
-                visibility data, also in a packed format
-            mask (torch boolean): a boolean mask to index the non-zero locations of
-                ``vis_gridded`` and ``weight_gridded`` in their packed format.
-            nchan (int): the number of channels in the image (default = 1).
+            Parameters
+            ----------
+            cell_size : float 
+                the width of a pixel [arcseconds]
+            npix : int
+                the number of pixels per image side
+            vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`
+                the gridded visibility data stored in a "packed" format (pre-shifted for fft)
+            weight_gridded : :class:`torch.Tensor` of :class:`torch.double`
+                the weights corresponding to the gridded visibility data,
+                also in a packed format
+            mask : :class:`torch.Tensor` of :class:`torch.bool`
+                a boolean mask to index the non-zero locations of ``vis_gridded`` and
+                ``weight_gridded`` in their packed format.
+            nchan : int
+                the number of channels in the image (default = 1).
         """
         return cls(
             coords=GridCoords(cell_size, npix),
