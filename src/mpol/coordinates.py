@@ -8,8 +8,7 @@ import numpy.typing as npt
 
 import mpol.constants as const
 from mpol.exceptions import CellSizeError
-
-from .utils import get_max_spatial_freq, get_maximum_cell_size
+from mpol.utils import get_max_spatial_freq, get_maximum_cell_size
 
 
 class GridCoords:

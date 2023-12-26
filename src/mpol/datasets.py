@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-import copy
 from typing import Any
 
 import numpy as np
 import torch
-import torch.utils.data as torch_ud
 from numpy import floating, integer
 from numpy.typing import ArrayLike, NDArray
 
 from mpol.coordinates import GridCoords
-from mpol.exceptions import WrongDimensionError
 
-from . import utils
-from .constants import *
-from .utils import loglinspace
+from mpol import utils
 
 
 class GriddedDataset(torch.nn.Module):
@@ -224,7 +219,7 @@ class Dartboard:
             # ---
             # We aren't doing *quite* the same thing,
             # just logspacing with a few linear cells at the start.
-            q_edges = loglinspace(0, self.q_max, N_log=8, M_linear=5)
+            q_edges = utils.loglinspace(0, self.q_max, N_log=8, M_linear=5)
 
         self.q_edges = q_edges
         self.phi_edges = phi_edges
