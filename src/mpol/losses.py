@@ -9,17 +9,23 @@ your optimization script. If you like it, please consider opening a pull request
 """
 
 import numpy as np
+import numpy.typing as npt
 import torch
 
+from .datasets import GriddedDataset
 
-def chi_squared(model_vis, data_vis, weight):
-    r"""
-    Compute the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model
-      :math:`M` visibilities using
+
+def chi_squared(
+    model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
+) -> torch.Tensor:
+    r"""Computes :math:`\chi^2` between data and model.
+
+    The :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model
+    :math:`M` visibilities is computed as
 
     .. math::
 
-        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) = 
+        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) =
         \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
 
     where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities.
@@ -27,28 +33,37 @@ def chi_squared(model_vis, data_vis, weight):
     conjugate visibilities, but be aware that the answer returned will be different
     between the two cases. We recommend not including the Hermitian conjugates.
 
-    Args:
-        model_vis (PyTorch complex): array tuple of the model representing
-            :math:`\boldsymbol{V}`
-        data_vis (PyTorch complex): array of the data values representing :math:`M`
-        weight (PyTorch real): array of weight values representing :math:`w_i`
+    Parameters
+    ----------
+    model_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the model values representing :math:`\boldsymbol{V}`
+    data_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the data values representing :math:`M`
+    weight : :class:`torch.Tensor` of :class:`torch.double`
+        array of weight values representing :math:`w_i`
 
-    Returns:
-        torch.double: the :math:`\chi^2` likelihood
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the :math:`\chi^2` likelihood, summed over all dimensions of input array.
     """
 
     return torch.sum(weight * torch.abs(data_vis - model_vis) ** 2)
 
 
-def log_likelihood(model_vis, data_vis, weight):
+def log_likelihood(
+    model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
+) -> torch.Tensor:
     r"""
-    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data
+    Compute the log likelihood function of the data given a model.
+
+    :math:`\ln\mathcal{L}` is computed between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
 
-        \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) = 
-        - \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 + 
+        \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) =
+        - \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 +
         \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
 
     where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
@@ -58,31 +73,41 @@ def log_likelihood(model_vis, data_vis, weight):
     will be different between the two cases. Inference of the parameter values should
     be unaffected. We recommend not including the Hermitian conjugates.
 
-    Args:
-        model_vis (PyTorch complex): array tuple of the model representing
-            :math:`\boldsymbol{V}`
-        data_vis (PyTorch complex): array of the data values representing :math:`M`
-        weight (PyTorch real): array of weight values representing :math:`w_i`
+    Parameters
+    ----------
+    model_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the model values representing :math:`\boldsymbol{V}`
+    data_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the data values representing :math:`M`
+    weight : :class:`torch.Tensor` of :class:`torch.double`
+        array of weight values representing :math:`w_i`
 
-    Returns:
-        torch.double: the :math:`\ln\mathcal{L}` log likelihood
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the :math:`\ln\mathcal{L}` log likelihood, summed over all dimensions
+        of input array.
     """
 
     # If model and data are multidimensional, then flatten them to get full N
     N = len(torch.ravel(data_vis))
 
-    sigma_term = torch.sum(1 / weight)
+    sigma_term: torch.Tensor = torch.sum(1 / weight)
 
-    return (
-        N * np.log(2 * np.pi)
-        + sigma_term
-        + 0.5 * chi_squared(model_vis, data_vis, weight)
-    )
+    # calculate separately so we can type as np, otherwise mypy thinks
+    # the expression is Any
+    first_term: np.float64 = N * np.log(2 * np.pi)
+
+    return first_term + sigma_term + 0.5 * chi_squared(model_vis, data_vis, weight)
 
 
-def nll(model_vis, data_vis, weight):
+def nll(
+    model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
+) -> torch.Tensor:
     r"""
-    Calculate a normalized "negative log likelihood" loss between the complex data
+    Calculate a normalized "negative log likelihood" loss between data and model.
+
+    The "negative log likelihood loss" is calculated between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
@@ -96,8 +121,8 @@ def nll(model_vis, data_vis, weight):
     a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The
     factor of 2 comes in because we must count real and imaginaries in the
     :math:`\chi^2` sum. This means that this normalized negative log likelihood loss
-    function will have a minimum value of $L_\mathrm{nll}(\hat{\boldsymbol{\theta}})
-    \approx 1$ for a well-fit model (regardless of the number of data points), making
+    function will have a minimum value of :math:`L_\mathrm{nll}(\hat{\boldsymbol{\theta}})
+    \approx 1` for a well-fit model (regardless of the number of data points), making
     it easier to set the prefactor strengths of other regularizers *relative* to this
     value.
 
@@ -107,14 +132,19 @@ def nll(model_vis, data_vis, weight):
     This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to
     parameter value is incorrect.
 
-    Args:
-        model_vis (PyTorch complex): array tuple of the model representing
-            :math:`\boldsymbol{V}`
-        data_vis (PyTorch complex): array of the data values representing :math:`M`
-        weight (PyTorch real): array of weight values representing :math:`w_i`
-
-    Returns:
-        torch.double: the normalized negative log likelihood likelihood loss
+    Parameters
+    ----------
+    model_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the model values representing :math:`\boldsymbol{V}`
+    data_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the data values representing :math:`M`
+    weight : :class:`torch.Tensor` of :class:`torch.double`
+        array of weight values representing :math:`w_i`
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the normalized negative log likelihood likelihood loss, summed over all
+        dimensions of input array.
     """
 
     # If model and data are multidimensional, then flatten them to get full N
@@ -123,21 +153,27 @@ def nll(model_vis, data_vis, weight):
     return 1 / (2 * N) * chi_squared(model_vis, data_vis, weight)
 
 
-def chi_squared_gridded(modelVisibilityCube, griddedDataset):
+def chi_squared_gridded(
+    modelVisibilityCube: torch.Tensor, griddedDataset: GriddedDataset
+) -> torch.Tensor:
     r"""
     Calculate the :math:`\chi^2` (corresponding to :func:`~mpol.losses.chi_squared`)
     using gridded data and model visibilities.
 
-    Args:
-        modelVisibilityCube (torch complex tensor): torch tensor with shape
-            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from
-            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed,"
-            as in output from :meth:`mpol.fourier.FourierCube.forward()`.
-        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+    Parameters
+    ----------
+    modelVisibilityCube : :class:`torch.Tensor` of :class:`torch.complex`
+        torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the
+        ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is
+        "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+    griddedDataset: :class:`~mpol.datasets.GriddedDataset` object
+        the gridded dataset, most likely produced from
+        :meth:`mpol.gridding.DataAverager.to_pytorch_dataset`
 
-    Returns:
-        torch.double: the :math:`\chi^2` value
-
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the :math:`\chi^2` value, summed over all dimensions of input data.
     """
 
     # get the model_visibilities from the dataset
@@ -251,7 +287,7 @@ def TV_image(sky_cube, epsilon=1e-10):
 
     .. math::
 
-        L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 + 
+        L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 +
             (I_{l, m+1, v} - I_{l, m, v})^2 + \epsilon}
 
     """
@@ -441,7 +477,7 @@ def TSV(sky_cube):
 
     .. math::
 
-        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 + 
+        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 +
         (I_{l, m+1, v} - I_{l, m, v})^2
 
     """
