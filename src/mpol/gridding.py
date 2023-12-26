@@ -11,8 +11,7 @@ from fast_histogram import histogram as fast_hist
 
 from mpol.coordinates import GridCoords
 from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
-
-from .datasets import GriddedDataset
+from mpol.datasets import GriddedDataset
 
 
 def _check_data_inputs_2d(uu=None, vv=None, weight=None, data_re=None, data_im=None):
