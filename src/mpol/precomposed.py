@@ -2,7 +2,8 @@ import torch
 
 from mpol.coordinates import GridCoords
 
-from . import fourier, images
+from mpol import fourier
+from mpol import images
 
 
 class SimpleNet(torch.nn.Module):

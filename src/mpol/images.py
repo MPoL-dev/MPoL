@@ -8,8 +8,8 @@ import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
 
-from . import utils
-from .coordinates import GridCoords
+from mpol import utils
+from mpol.coordinates import GridCoords
 
 
 class BaseCube(nn.Module):

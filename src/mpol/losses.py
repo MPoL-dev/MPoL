@@ -9,19 +9,20 @@ your optimization script. If you like it, please consider opening a pull request
 """
 
 import numpy as np
-import numpy.typing as npt
 import torch
 
-from .datasets import GriddedDataset
+
+from mpol import constants
+from mpol.datasets import GriddedDataset
+from typing import Optional
 
 
 def chi_squared(
     model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
 ) -> torch.Tensor:
-    r"""Computes :math:`\chi^2` between data and model.
-
-    The :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and model
-    :math:`M` visibilities is computed as
+    r"""
+    Computes the :math:`\chi^2` between the complex data :math:`\boldsymbol{V}` and
+    model :math:`M` visibilities using
 
     .. math::
 
@@ -55,9 +56,7 @@ def log_likelihood(
     model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
 ) -> torch.Tensor:
     r"""
-    Compute the log likelihood function of the data given a model.
-
-    :math:`\ln\mathcal{L}` is computed between the complex data
+    Compute the log likelihood function :math:`\ln\mathcal{L}` between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
@@ -105,9 +104,7 @@ def nll(
     model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
 ) -> torch.Tensor:
     r"""
-    Calculate a normalized "negative log likelihood" loss between data and model.
-
-    The "negative log likelihood loss" is calculated between the complex data
+    Calculate a normalized "negative log likelihood" loss between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
@@ -187,21 +184,28 @@ def chi_squared_gridded(
     )
 
 
-def log_likelihood_gridded(modelVisibilityCube, griddedDataset):
+def log_likelihood_gridded(
+    modelVisibilityCube: torch.Tensor, griddedDataset: GriddedDataset
+) -> torch.Tensor:
     r"""
-    Calculate the log likelihood function :math:`\ln\mathcal{L}` (corresponding to
-    :func:`~mpol.losses.log_likelihood`) using gridded data and model visibilities.
 
-    Args:
-        modelVisibilityCube (torch complex tensor): torch tensor with shape
-            ``(nchan, npix, npix)`` to be indexed by the ``mask`` from
-            :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is "pre-packed," as
-            in output from :meth:`mpol.fourier.FourierCube.forward()`.
-        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+    Calculate :math:`\ln\mathcal{L}` (corresponding to
+    :func:`~mpol.losses.log_likelihood`) using gridded quantities.
 
-    Returns:
-        torch.double: the :math:`\ln\mathcal{L}` value
+    Parameters
+    ----------
+    modelVisibilityCube : :class:`torch.Tensor` of :class:`torch.complex`
+        torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the
+        ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is
+        "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+    griddedDataset: :class:`~mpol.datasets.GriddedDataset` object
+        the gridded dataset, most likely produced from
+        :meth:`mpol.gridding.DataAverager.to_pytorch_dataset`
 
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the :math:`\ln\mathcal{L}` value, summed over all dimensions of input data.
     """
 
     # get the model_visibilities from the dataset
@@ -214,48 +218,63 @@ def log_likelihood_gridded(modelVisibilityCube, griddedDataset):
     )
 
 
-def nll_gridded(modelVisibilityCube, griddedDataset):
+def nll_gridded(
+    modelVisibilityCube: torch.Tensor, griddedDataset: GriddedDataset
+) -> torch.Tensor:
     r"""
+
     Calculate a normalized "negative log likelihood" (corresponding to
     :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will
     return the same value regardless of whether Hermitian pairs are included.
 
-    Args:
-        vis (torch complex tensor): torch tensor with shape ``(nchan, npix, npix)`` to
-            be indexed by the ``mask`` from :class:`~mpol.datasets.GriddedDataset`.
-            Assumes tensor is "pre-packed," as in output from
-            :meth:`mpol.fourier.FourierCube.forward()`.
-        griddedDataset: instantiated :class:`~mpol.datasets.GriddedDataset` object
+    Parameters
+    ----------
+    modelVisibilityCube : :class:`torch.Tensor` of :class:`torch.complex`
+        torch tensor with shape ``(nchan, npix, npix)`` to be indexed by the
+        ``mask`` from :class:`~mpol.datasets.GriddedDataset`. Assumes tensor is
+        "pre-packed," as in output from :meth:`mpol.fourier.FourierCube.forward()`.
+    griddedDataset: :class:`~mpol.datasets.GriddedDataset` object
+        the gridded dataset, most likely produced from
+        :meth:`mpol.gridding.DataAverager.to_pytorch_dataset`
 
-    Returns:
-        torch.double: the normalized negative log likelihood likelihood loss
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the normalized negative log likelihood likelihood loss, summed over all input
+        values
     """
     model_vis = griddedDataset(modelVisibilityCube)
 
     return nll(model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed)
 
 
-def entropy(cube, prior_intensity, tot_flux=10):
+def entropy(
+    cube: torch.Tensor, prior_intensity: torch.Tensor, tot_flux: float = 10
+) -> torch.Tensor:
     r"""
     Calculate the entropy loss of a set of pixels following the definition in
     `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
 
-    Args:
-        cube (any tensor): pixel values must be positive :math:`I_i > 0`
-            for all :math:`i`
-        prior_intensity (any tensor): the prior value :math:`p` to calculate entropy
-            against. Could be a single constant or an array the same shape as image.
-        tot_flux (float): a fixed normalization factor; the user-defined target total
-            flux density
-
-    Returns:
-        torch.double: entropy loss
-
-    The entropy loss is calculated as
-
     .. math::
 
         L = \frac{1}{\zeta} \sum_i I_i \; \ln \frac{I_i}{p_i}
+
+    Parameters
+    ----------
+    cube : :class:`torch.Tensor` of :class:`torch.double`
+        pixel values must be positive :math:`I_i > 0` for all :math:`i`
+    prior_intensity : :class:`torch.Tensor` of :class:`torch.double`
+        the prior value :math:`p` to calculate entropy against. Tensors of any shape
+        are allowed so long as they will broadcast to the shape of the cube under
+        division (`/`).
+    tot_flux : float
+        a fixed normalization factor; the user-defined target total flux density, in
+        units of Jy.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        entropy loss
     """
     # check to make sure image is positive, otherwise raise an error
     assert (cube >= 0.0).all(), "image cube contained negative pixel values"
@@ -265,31 +284,35 @@ def entropy(cube, prior_intensity, tot_flux=10):
     return (1 / tot_flux) * torch.sum(cube * torch.log(cube / prior_intensity))
 
 
-def TV_image(sky_cube, epsilon=1e-10):
+def TV_image(sky_cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
     r"""
     Calculate the total variation (TV) loss in the image dimension (R.A. and DEC).
     Following the definition in `EHT-IV 2019
     <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the
     image to be piecewise smooth and the gradient of the image to be sparse.
 
-    Args:
-        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l`
-            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
-            :math:`v` is the channel (velocity or frequency) dimension in
-            :math:`ndim=1`. Should be in sky format representation.
-        epsilon (float): a softening parameter in
-            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any pixel-to-pixel variations
-            within each image slice greater than this parameter will have a
-            significant penalty.
-
-    Returns:
-        torch.double: total variation loss
-
     .. math::
 
         L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 +
             (I_{l, m+1, v} - I_{l, m, v})^2 + \epsilon}
 
+
+    Parameters
+    ----------
+    sky_cube: 3D :class:`torch.Tensor` of :class:`torch.double`
+        the image cube array :math:`I_{lmv}`, where :math:`l`
+        is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
+        :math:`v` is the channel (velocity or frequency) dimension in
+        :math:`ndim=1`. Should be in sky format representation.
+    epsilon : float
+        a softening parameter in units of [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`].
+        Any pixel-to-pixel variations within each image North-South or East-West
+        slice greater than this parameter will incur a significant penalty.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        total variation loss
     """
 
     # diff the cube in ll and remove the last row
@@ -303,25 +326,29 @@ def TV_image(sky_cube, epsilon=1e-10):
     return loss
 
 
-def TV_channel(cube, epsilon=1e-10):
+def TV_channel(cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
     r"""
-    Calculate the total variation (TV) loss in the channel dimension. Following the
-    definition in `EHT-IV 2019
-    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_.
-
-    Args:
-        cube (any 3D tensor): the image cube array :math:`I_{lmv}`
-        epsilon (float): a softening parameter in
-            [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`]. Any channel-to-channel pixel
-            variations greater than this parameter will have a significant penalty.
-
-    Returns:
-        torch.double: total variation loss
+    Calculate the total variation (TV) loss in the channel (first) dimension.
+    Following the definition in `EHT-IV 2019
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, calculate
 
     .. math::
 
         L = \sum_{l,m,v} \sqrt{(I_{l, m, v + 1} - I_{l,m,v})^2 + \epsilon}
 
+    Parameters
+    ----------
+    cube: :class:`torch.Tensor` of :class:`torch.double`
+        the image cube array :math:`I_{lmv}`
+    epsilon: float
+        a softening parameter in units of [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`].
+        Any channel-to-channel pixel variations greater than this parameter will incur
+        a significant penalty.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        total variation loss
     """
     # calculate the difference between the n+1 cube and the n cube
     diff_vel = cube[1:] - cube[0:-1]
@@ -330,48 +357,71 @@ def TV_channel(cube, epsilon=1e-10):
     return loss
 
 
-def edge_clamp(cube):
+def TSV(sky_cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Promote all pixels at the edge of the image to be zero using an :math:`L_2` norm.
+    Calculate the total square variation (TSV) loss in the image dimension
+    (R.A. and DEC). Following the definition in `EHT-IV 2019
+    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the
+    image to be edge smoothed which may be a better reoresentation of the truth image
+    `K. Kuramochi et al 2018
+    <https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract>`_.
 
-    Args:
-        cube (any 3D tensor): the array and pixel values
+    .. math::
 
-    Returns:
-        torch.double: edge loss
+        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 +
+        (I_{l, m+1, v} - I_{l, m, v})^2
+
+    Parameters
+    ----------
+    sky_cube :class:`torch.Tensor` of :class:`torch.double`
+        the image cube array :math:`I_{lmv}`, where :math:`l`
+        is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
+        :math:`v` is the channel (velocity or frequency) dimension in
+        :math:`ndim=1`. Should be in sky format representation.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        total square variation loss
+
     """
 
-    # find edge pixels
-    # all channels
-    # pixel edges
-    bt_edges = cube[:, (0, -1)]
-    lr_edges = cube[:, :, (0, -1)]
+    # diff the cube in ll and remove the last row
+    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
 
-    loss = torch.sum(bt_edges**2) + torch.sum(lr_edges**2)
+    # diff the cube in mm and remove the last column
+    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
+
+    loss = torch.sum(diff_ll**2 + diff_mm**2)
 
     return loss
 
 
-def sparsity(cube, mask=None):
+def sparsity(cube: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
     r"""
     Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally
     provide a boolean mask to apply the prior to only the ``True`` locations. For
     example, you might want this mask to be ``True`` for background regions.
-
-    Args:
-        cube (nchan, npix, npix): tensor image cube
-        mask (boolean): tensor array the same shape as ``cube``. The sparsity prior
-            will be applied to those pixels where the mask is ``True``. Default is
-            to apply prior to all pixels.
-
-    Returns:
-        torch.double: sparsity loss calculated where ``mask == True``
 
     The sparsity loss calculated as
 
     .. math::
 
         L = \sum_i | I_i |
+
+    Parameters
+    ----------
+    cube : :class:`torch.Tensor` of :class:`torch.double`
+        the image cube array :math:`I_{lmv}`
+    mask : :class:`torch.Tensor` of :class:`torch.bool`
+        tensor array the same shape as ``cube``. The sparsity prior
+        will be applied to those pixels where the mask is ``True``. Default is
+        to apply prior to all pixels.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        sparsity loss calculated where ``mask == True``
     """
 
     if mask is not None:
@@ -382,19 +432,27 @@ def sparsity(cube, mask=None):
     return loss
 
 
-def UV_sparsity(vis, qs, q_max):
+def UV_sparsity(
+    vis: torch.Tensor, qs: torch.Tensor, q_max: torch.Tensor
+) -> torch.Tensor:
     r"""
     Enforce a sparsity prior for all :math:`q = \sqrt{u^2 + v^2}` points larger than
     :math:`q_\mathrm{max}`.
 
-    Args:
-        vis (torch.double) : visibility cube of (nchan, npix, npix//2 +1, 2)
-        qs: numpy array corresponding to visibility coordinates. Dimensionality of
-            (npix, npix//2)
-        q_max (float): maximum radial baseline
+    Parameters
+    ----------
+    vis : :class:`torch.Tensor` of :class:`torch.complex128`
+        visibility cube of (nchan, npix, npix//2 +1, 2)
+    qs : :class:`torch.Tensor` of :class:`torch.float64`
+        array corresponding to visibility coordinates. Dimensionality of
+        (npix, npix//2)
+    q_max : float
+        maximum radial baseline
 
-    Returns:
-        torch.double: UV sparsity loss above :math:`q_\mathrm{max}`
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        UV sparsity loss above :math:`q_\mathrm{max}`
     """
 
     # make a mask, then send it to the device (in case we're using a GPU)
@@ -413,7 +471,7 @@ def UV_sparsity(vis, qs, q_max):
     return loss
 
 
-def PSD(qs, psd, l):
+def PSD(qs: torch.Tensor, psd: torch.Tensor, l: torch.Tensor) -> torch.Tensor:
     r"""
     Apply a loss function corresponding to the power spectral density using a Gaussian
     process kernel.
@@ -422,29 +480,35 @@ def PSD(qs, psd, l):
 
     .. math::
 
-        k(r) = exp(-\frac{r^2}{2 \ell^2})
+        k(r) = \exp(-\frac{r^2}{2 \ell^2})
 
     The corresponding power spectral density is
 
     .. math::
 
-        P(q) = (2 \pi \ell^2) exp(- 2 \pi^2 \ell^2 q^2)
+        P(q) = (2 \pi \ell^2) \exp(- 2 \pi^2 \ell^2 q^2)
 
 
-    Args:
-        qs (torch.double): the radial UV coordinate (in kilolambda)
-        psd (torch.double): the power spectral density cube
-        l (torch.double): the correlation length in the image plane (in arcsec)
+    Parameters
+    ----------
+    qs : :class:`torch.Tensor` of :class:`torch.double`
+        the radial UV coordinate (in kilolambda)
+    psd : :class:`torch.Tensor` of :class:`torch.double`
+        the power spectral density cube
+    l : :class:`torch.Tensor` of :class:`torch.double`
+        the correlation length in the image plane (in arcsec)
 
-    Returns:
-        torch.double : the loss calculated using the power spectral density
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the loss calculated using the power spectral density
 
     """
 
     # stack to the full 3D shape
     qs = qs * 1e3  # lambda
 
-    l_rad = l * arcsec  # radians
+    l_rad = l * constants.arcsec  # radians
 
     # calculate the expected power spectral density
     expected_PSD = (
@@ -457,37 +521,27 @@ def PSD(qs, psd, l):
     return loss
 
 
-def TSV(sky_cube):
+def edge_clamp(cube: torch.Tensor) -> torch.Tensor:
     r"""
-    Calculate the total square variation (TSV) loss in the image dimension
-    (R.A. and DEC). Following the definition in `EHT-IV 2019
-    <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_ Promotes the
-    image to be edge smoothed which may be a better reoresentation of the truth image
-    `K. Kuramochi et al 2018
-    <https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract>`_.
+    Promote all pixels at the edge of the image to be zero using an :math:`L_2` norm.
 
-    Args:
-        sky_cube (any 3D tensor): the image cube array :math:`I_{lmv}`, where :math:`l`
-            is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
-            :math:`v` is the channel (velocity or frequency) dimension in
-            :math:`ndim=1`. Should be in sky format representation.
+    Parameters
+    ----------
+    cube: :class:`torch.Tensor` of :class:`torch.double`
+        the image cube array :math:`I_{lmv}`
 
-    Returns:
-        torch.double: total square variation loss
-
-    .. math::
-
-        L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 +
-        (I_{l, m+1, v} - I_{l, m, v})^2
-
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        edge loss
     """
 
-    # diff the cube in ll and remove the last row
-    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
+    # find edge pixels
+    # all channels
+    # pixel edges
+    bt_edges = cube[:, (0, -1)]
+    lr_edges = cube[:, :, (0, -1)]
 
-    # diff the cube in mm and remove the last column
-    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
-
-    loss = torch.sum(diff_ll**2 + diff_mm**2)
+    loss = torch.sum(bt_edges**2) + torch.sum(lr_edges**2)
 
     return loss

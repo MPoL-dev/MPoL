@@ -73,3 +73,18 @@ version-file = "src/mpol/mpol_version.py"
 
 [tool.black]
 line-length = 88
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "astropy.*",
+    "matplotlib.*",
+    "scipy.*",
+    "torchkbnufft.*",
+    "frank.*",
+    "fast_histogram.*"
+]
+ignore_missing_imports = true
