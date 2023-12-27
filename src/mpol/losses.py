@@ -26,10 +26,10 @@ def chi_squared(
 
     .. math::
 
-        \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) =
-        \sum_i^N \frac{|V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2}{\sigma_i^2}
+        \chi^2(\boldsymbol{\theta};\,\boldsymbol{V}) =
+        \sum_i^N w_i |V_i - M(u_i, v_i |\,\boldsymbol{\theta})|^2
 
-    where :math:`\sigma_i^2 = 1/w_i`. The sum is over all of the provided visibilities.
+    where :math:`w_i = 1/\sigma_i^2`. The sum is over all of the provided visibilities.
     This function is agnostic as to whether the sum should include the Hermitian
     conjugate visibilities, but be aware that the answer returned will be different
     between the two cases. We recommend not including the Hermitian conjugates.
@@ -61,11 +61,25 @@ def log_likelihood(
 
     .. math::
 
-        \ln \mathcal{L}(\boldsymbol{V}|\,\boldsymbol{\theta}) =
-        - \left ( N \ln 2 \pi +  \sum_i^N \sigma_i^2 +
-        \frac{1}{2} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta}) \right )
+        \ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V}) =
+        - N \ln 2 \pi +  \sum_i^N w_i -
+        \frac{1}{2} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})
 
-    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
+    where :math:`N` is the number of complex visibilities and :math:`\chi^2` is
+    evaluated using :func:`mpol.losses.chi_squared`. Note that this expression has
+    factors of 2 in different places compared to the multivariate Normal you might be
+    used to seeing because the visibilities are complex-valued. We could alternatively
+    write
+
+    .. math::
+
+        \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V}) =
+        \mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\}) \times
+        \mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})
+
+    where :math:`\mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\})` and 
+    :math:`\mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})` each are the 
+    well-known multivariate Normal for reals.
 
     This function is agnostic as to whether the sum should include the Hermitian
     conjugate visibilities, but be aware that the normalization of the answer returned
@@ -74,9 +88,9 @@ def log_likelihood(
 
     Parameters
     ----------
-    model_vis : :class:`torch.Tensor` of :class:`torch.complex`
+    model_vis : :class:`torch.Tensor` of :class:`torch.complex128`
         array of the model values representing :math:`\boldsymbol{V}`
-    data_vis : :class:`torch.Tensor` of :class:`torch.complex`
+    data_vis : :class:`torch.Tensor` of :class:`torch.complex128`
         array of the data values representing :math:`M`
     weight : :class:`torch.Tensor` of :class:`torch.double`
         array of weight values representing :math:`w_i`
@@ -91,13 +105,13 @@ def log_likelihood(
     # If model and data are multidimensional, then flatten them to get full N
     N = len(torch.ravel(data_vis))
 
-    sigma_term: torch.Tensor = torch.sum(1 / weight)
+    weight_term: torch.Tensor = torch.sum(torch.log(weight))
 
     # calculate separately so we can type as np, otherwise mypy thinks
     # the expression is Any
-    first_term: np.float64 = N * np.log(2 * np.pi)
+    first_term: np.float64 = -N * np.log(2 * np.pi)
 
-    return first_term + sigma_term + 0.5 * chi_squared(model_vis, data_vis, weight)
+    return first_term + weight_term - 0.5 * chi_squared(model_vis, data_vis, weight)
 
 
 def nll(
