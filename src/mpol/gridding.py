@@ -532,7 +532,7 @@ class GridderBase:
         return cube[:, :, ::-1]
 
     @property
-    def ground_cube(self):
+    def ground_cube(self) -> npt.NDArray[np.floating[Any]]:
         r"""
         The visibility FFT cube fftshifted for plotting with ``imshow``.
 
@@ -602,7 +602,7 @@ class DataAverager(GridderBase):
 
     """
 
-    def _grid_weights(self):
+    def _grid_weights(self) -> None:
         r"""
         Average the visibility weights to the Fourier grid contained in ``self.coords``,
         such that the ``self.weight_gridded`` corresponds to the equivalent weight on
@@ -617,9 +617,12 @@ class DataAverager(GridderBase):
         # instantiate uncertainties for each averaged visibility.
         self.weight_gridded = np.fft.fftshift(cell_weight, axes=(1, 2))
 
-    def to_pytorch_dataset(self, check_visibility_scatter=True, max_scatter=1.2):
+    def to_pytorch_dataset(
+        self, check_visibility_scatter: bool = True, max_scatter: float = 1.2
+    ) -> GriddedDataset:
         r"""
-        Export gridded visibilities to a PyTorch dataset object.
+        Export gridded visibilities to a PyTorch :class:`mpol.datasets.GriddedDataset`
+        object.
 
         Args:
             check_visibility_scatter (bool): whether the routine should check the

@@ -58,9 +58,9 @@ class GriddedDataset(torch.nn.Module):
         self.nchan = nchan
 
         # store variables as buffers of the module
-        self.register_buffer("vis_gridded", torch.tensor(vis_gridded))
-        self.register_buffer("weight_gridded", torch.tensor(weight_gridded))
-        self.register_buffer("mask", torch.tensor(mask))
+        self.register_buffer("vis_gridded", vis_gridded)
+        self.register_buffer("weight_gridded", weight_gridded)
+        self.register_buffer("mask", mask)
         self.vis_gridded: torch.Tensor
         self.weight_gridded: torch.Tensor
         self.mask: torch.Tensor
