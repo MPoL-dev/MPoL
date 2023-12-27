@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import warnings
 
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -18,12 +18,12 @@ from mpol.datasets import GriddedDataset
 
 
 def _check_data_inputs_2d(
-    uu=npt.NDArray[np.floating[Any]] | None,
-    vv=npt.NDArray[np.floating[Any]] | None,
-    weight=npt.NDArray[np.floating[Any]] | None,
-    data_re=npt.NDArray[np.floating[Any]] | None,
-    data_im=npt.NDArray[np.floating[Any]] | None,
-):
+    uu=npt.NDArray[np.floating[Any]],
+    vv=npt.NDArray[np.floating[Any]],
+    weight=npt.NDArray[np.floating[Any]],
+    data_re=npt.NDArray[np.floating[Any]],
+    data_im=npt.NDArray[np.floating[Any]],
+) -> tuple[np.ndarray, ...]:
     """
     Check that all data inputs are the same shape, the weights are positive, and the
     data_re and data_im are floats.
@@ -67,7 +67,13 @@ def _check_data_inputs_2d(
     return uu, vv, weight, data_re, data_im
 
 
-def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
+def verify_no_hermitian_pairs(
+    uu: npt.NDArray[np.floating[Any]],
+    vv: npt.NDArray[np.floating[Any]],
+    data: npt.NDArray[np.complexfloating[Any, Any]],
+    test_vis: int = 5,
+    test_channel: int = 0,
+) -> bool:
     r"""
     Check that the dataset does not contain Hermitian pairs. Because the sky brightness
     :math:`I_\nu` is real, the visibility function :math:`\mathcal{V}` is Hermitian,
@@ -153,27 +159,20 @@ def verify_no_hermitian_pairs(uu, vv, data, test_vis=5, test_channel=0):
             num_pairs += 1
 
     if num_pairs == 0:
-        return
+        return True
 
     if num_pairs == test_vis:
         raise DataError(
             "Hermitian pairs were found in the data. Please provide data without"
             " Hermitian pairs."
         )
+        return False
     else:
         raise DataError(
             f"{num_pairs} Hermitian pairs were found out of {test_vis} visibilities"
             " tested, dataset is inconsistent."
         )
-
-    # choose a uu, vv point, then see if the opposite value exists in the dataset
-    # if it does, then check that its visibility value is the complex conjugate
-
-    # we could have a max threshold, i.e., like at least 5 need to exist to say
-    # the dataset has pairs
-
-    # Subtract
-    return False
+        return False
 
 
 class GridderBase:
@@ -218,13 +217,13 @@ class GridderBase:
 
     def __init__(
         self,
-        coords=None,
-        uu=None,
-        vv=None,
-        weight=None,
-        data_re=None,
-        data_im=None,
-    ):
+        coords=GridCoords,
+        uu=npt.NDArray[np.floating[Any]],
+        vv=npt.NDArray[np.floating[Any]],
+        weight=npt.NDArray[np.floating[Any]],
+        data_re=npt.NDArray[np.floating[Any]],
+        data_im=npt.NDArray[np.floating[Any]],
+    ) -> None:
         # check everything should be 2d, expand if not
         # also checks data does not contain Hermitian pairs
         uu, vv, weight, data_re, data_im = _check_data_inputs_2d(
@@ -249,21 +248,7 @@ class GridderBase:
         # and register cell indices against data
         self._create_cell_indices()
 
-    @classmethod
-    def from_image_properties(
-        cls,
-        cell_size,
-        npix,
-        uu=None,
-        vv=None,
-        weight=None,
-        data_re=None,
-        data_im=None,
-    ) -> GridderBase:
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, uu, vv, weight, data_re, data_im)
-
-    def _create_cell_indices(self):
+    def _create_cell_indices(self) -> None:
         # figure out which visibility cell each datapoint lands in, so that
         # we can later assign it the appropriate robust weight for that cell
         # do this by calculating the nearest cell index [0, N] for all samples
@@ -275,7 +260,12 @@ class GridderBase:
             [np.digitize(v_chan, self.coords.v_edges) - 1 for v_chan in self.vv]
         )
 
-    def _sum_cell_values_channel(self, uu, vv, values=None):
+    def _sum_cell_values_channel(
+        self,
+        uu: npt.NDArray[np.floating[Any]],
+        vv: npt.NDArray[np.floating[Any]],
+        values: npt.NDArray[np.floating[Any]] | None = None,
+    ) -> npt.NDArray[np.floating[Any]]:
         r"""
         Given a list of loose visibility points :math:`(u,v)` and their corresponding
         values :math:`x`, partition the points up into 2D :math:`u-v` cells defined by
@@ -308,7 +298,7 @@ class GridderBase:
             cell quantities.
         """
 
-        result = fast_hist.histogram2d(
+        result: npt.NDArray[np.floating[Any]] = fast_hist.histogram2d(
             vv,
             uu,
             bins=self.coords.ncell_u,
@@ -322,7 +312,9 @@ class GridderBase:
         # only return the "H" value
         return result
 
-    def _sum_cell_values_cube(self, values=None):
+    def _sum_cell_values_cube(
+        self, values: npt.NDArray[np.floating[Any]] | Sequence[None] | None = None
+    ) -> npt.NDArray[np.floating[Any]]:
         r"""
         Perform the :func:`~mpol.gridding.DataAverager.sum_cell_values_channel` routine
         over all channels of the input visibilities.
@@ -353,7 +345,9 @@ class GridderBase:
 
         return cube
 
-    def _extract_gridded_values_to_loose(self, gridded_quantity):
+    def _extract_gridded_values_to_loose(
+        self, gridded_quantity: npt.NDArray[np.floating[Any]]
+    ) -> npt.NDArray[np.floating[Any]]:
         r"""
         Extract the gridded cell quantity corresponding to each of the loose
         visibilities.
@@ -374,7 +368,45 @@ class GridderBase:
             ]
         )
 
-    def _estimate_cell_standard_deviation(self):
+    def _grid_visibilities(self) -> None:
+        r"""
+        Average the loose data visibilities to the Fourier grid.
+        """
+
+        # create the cells as edges around the existing points
+        # note that at this stage, the UV grid is strictly increasing
+        # when in fact, later on, we'll need to fftshift for the FFT
+        cell_weight = self._sum_cell_values_cube(self.weight)
+
+        # boolean index for cells that *contain* visibilities
+        mask = cell_weight > 0.0
+
+        # calculate the density weights under "uniform"
+        # the density weights have the same shape as the re, im samples.
+        # cell_weight is (nchan, ncell_v, ncell_u)
+        # self.index_v, self.index_u are (nchan, nvis)
+        # we want density_weights to be (nchan, nvis)
+        density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
+
+        # grid the reals and imaginaries separately
+        # outputs from _sum_cell_values_cube are *not* pre-packed
+        data_re_gridded = self._sum_cell_values_cube(
+            self.data_re * density_weight * self.weight
+        )
+
+        data_im_gridded = self._sum_cell_values_cube(
+            self.data_im * density_weight * self.weight
+        )
+
+        # store the pre-packed FFT products for access by outside routines
+        self.mask = np.fft.fftshift(mask, axes=(1, 2))
+        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
+        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
+        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
+
+    def _estimate_cell_standard_deviation(
+        self,
+    ) -> tuple[npt.NDArray[np.floating[Any]], npt.NDArray[np.floating[Any]]]:
         r"""
         Estimate the `standard deviation
         <https://en.wikipedia.org/wiki/Standard_deviation>`__ of the real and imaginary
@@ -462,7 +494,9 @@ class GridderBase:
 
         return s_re, s_im
 
-    def _check_scatter_error(self, max_scatter=1.2):
+    def _check_scatter_error(
+        self, max_scatter: float = 1.2
+    ) -> dict[str, bool | np.floating[Any]]:
         """
         Checks/compares visibility scatter to a given threshold value ``max_scatter``
         and raises an AssertionError if the median scatter across all cells exceeds
@@ -567,42 +601,6 @@ class DataAverager(GridderBase):
             visibility measurements. Units of [:math:`\mathrm{Jy}`]
 
     """
-
-    def _grid_visibilities(self):
-        r"""
-        Average the loose data visibilities to the Fourier grid.
-        """
-
-        # create the cells as edges around the existing points
-        # note that at this stage, the UV grid is strictly increasing
-        # when in fact, later on, we'll need to fftshift for the FFT
-        cell_weight = self._sum_cell_values_cube(self.weight)
-
-        # boolean index for cells that *contain* visibilities
-        mask = cell_weight > 0.0
-
-        # calculate the density weights under "uniform"
-        # the density weights have the same shape as the re, im samples.
-        # cell_weight is (nchan, ncell_v, ncell_u)
-        # self.index_v, self.index_u are (nchan, nvis)
-        # we want density_weights to be (nchan, nvis)
-        density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
-
-        # grid the reals and imaginaries separately
-        # outputs from _sum_cell_values_cube are *not* pre-packed
-        data_re_gridded = self._sum_cell_values_cube(
-            self.data_re * density_weight * self.weight
-        )
-
-        data_im_gridded = self._sum_cell_values_cube(
-            self.data_im * density_weight * self.weight
-        )
-
-        # store the pre-packed FFT products for access by outside routines
-        self.mask = np.fft.fftshift(mask, axes=(1, 2))
-        self.data_re_gridded = np.fft.fftshift(data_re_gridded, axes=(1, 2))
-        self.data_im_gridded = np.fft.fftshift(data_im_gridded, axes=(1, 2))
-        self.vis_gridded = self.data_re_gridded + self.data_im_gridded * 1.0j
 
     def _grid_weights(self):
         r"""

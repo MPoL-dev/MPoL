@@ -5,7 +5,7 @@
 ## v0.2.1
 
 - *Placeholder* Planned changes described by Architecture GitHub Project.
-- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a :class:`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the :class:`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
+- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a :class:`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed, rather than passing `cell_size` and `npix` separately. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the :class:`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain, test, and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
   - :class:`mpol.datasets.GriddedDataset`
   - :class:`mpol.datasets.Dartboard` 
   - :class:`mpol.fourier.NuFFT`

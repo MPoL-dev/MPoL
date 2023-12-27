@@ -57,11 +57,6 @@ class SimpleNet(torch.nn.Module):
         )
         self.fcube = fourier.FourierCube(coords=self.coords)
 
-    @classmethod
-    def from_image_properties(cls, cell_size, npix, nchan, base_cube):
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, base_cube)
-
     def forward(self):
         r"""
         Feed forward to calculate the model visibilities. In this step, a 

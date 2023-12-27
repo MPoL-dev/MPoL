@@ -73,46 +73,6 @@ class GriddedDataset(torch.nn.Module):
         self.vis_indexed: torch.Tensor
         self.weight_indexed: torch.Tensor
 
-    @classmethod
-    def from_image_properties(
-        cls,
-        cell_size: float,
-        npix: int,
-        *,
-        vis_gridded: torch.Tensor,
-        weight_gridded: torch.Tensor,
-        mask: torch.Tensor,
-        nchan: int = 1,
-    ) -> GriddedDataset:
-        """
-            Alternative method to instantiate a GriddedDataset object from cell_size
-            and npix.
-
-            Parameters
-            ----------
-            cell_size : float 
-                the width of a pixel [arcseconds]
-            npix : int
-                the number of pixels per image side
-            vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`
-                the gridded visibility data stored in a "packed" format (pre-shifted for fft)
-            weight_gridded : :class:`torch.Tensor` of :class:`torch.double`
-                the weights corresponding to the gridded visibility data,
-                also in a packed format
-            mask : :class:`torch.Tensor` of :class:`torch.bool`
-                a boolean mask to index the non-zero locations of ``vis_gridded`` and
-                ``weight_gridded`` in their packed format.
-            nchan : int
-                the number of channels in the image (default = 1).
-        """
-        return cls(
-            coords=GridCoords(cell_size, npix),
-            vis_gridded=vis_gridded,
-            weight_gridded=weight_gridded,
-            mask=mask,
-            nchan=nchan,
-        )
-
     def add_mask(
         self,
         mask: ArrayLike,
@@ -246,33 +206,6 @@ class Dartboard:
     @property
     def q_max(self) -> float:
         return self.coords.q_max
-
-    @classmethod
-    def from_image_properties(
-        cls,
-        cell_size: float,
-        npix: int,
-        q_edges: NDArray[floating[Any]] | None = None,
-        phi_edges: NDArray[floating[Any]] | None = None,
-    ) -> Dartboard:
-        """Alternative method to instantiate a Dartboard object from cell_size
-        and npix.
-
-        Args:
-            cell_size (float): the width of a pixel [arcseconds]
-            npix (int): the number of pixels per image side
-            q_edges (1D numpy array): an array of radial bin edges to set the
-                dartboard cells in :math:`[\mathrm{k}\lambda]`. If ``None``, defaults
-                to 12 log-linearly radial bins stretching from 0 to the
-                :math:`q_\mathrm{max}` represented by ``coords``.
-            phi_edges (1D numpy array): an array of azimuthal bin edges to set the
-                dartboard cells in [radians], over the domain :math:`[0, \pi]`, which
-                is also implicitly mapped to the domain :math:`[-\pi, \pi]` to preserve
-                the Hermitian nature of the visibilities. If ``None``, defaults to 8
-                equal-spaced azimuthal bins stretched from :math:`0` to :math:`\pi`.
-        """
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, q_edges, phi_edges)
 
     def get_polar_histogram(
         self, qs: NDArray[floating[Any]], phis: NDArray[floating[Any]]

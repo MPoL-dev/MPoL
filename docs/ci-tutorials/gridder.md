@@ -155,21 +155,7 @@ imager = gridding.DirtyImager(
 )
 ```
 
-Instantiating the {class}`~mpol.gridding.DirtyImager` object attaches the {class}`~mpol.coordinates.GridCoords`  object and the loose visibilities. There is also a convenience method to create the {class}`~mpol.coordinates.GridCoords` and {class}`~mpol.gridding.DirtyImager` object in one shot by
-
-```{code-cell}
-imager = gridding.DirtyImager.from_image_properties(
-    cell_size=0.005,  # [arcsec]
-    npix=800,
-    uu=uu,
-    vv=vv,
-    weight=weight,
-    data_re=data_re,
-    data_im=data_im,
-)
-```
-
-if you don't want to specify your {class}`~mpol.coordinates.GridCoords` object separately.
+Instantiating the {class}`~mpol.gridding.DirtyImager` object attaches the {class}`~mpol.coordinates.GridCoords`  object and the loose visibilities. 
 
 As we saw, the raw visibility dataset is a set of complex-valued Fourier samples. Our objective is to make images of the sky-brightness distribution and do astrophysics. We'll cover how to do this with MPoL and RML techniques in later tutorials, but it is possible to get a rough idea of the sky brightness by calculating the inverse Fourier transform of the visibility values.
 

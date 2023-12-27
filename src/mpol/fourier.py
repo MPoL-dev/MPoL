@@ -49,33 +49,6 @@ class FourierCube(nn.Module):
         self.register_buffer("vis", None, persistent=persistent_vis)
         self.vis: torch.Tensor
 
-    @classmethod
-    def from_image_properties(
-        cls, cell_size: float, npix: int, persistent_vis: bool = False
-    ) -> FourierCube:
-        """
-        Alternative method for instantiating a FourierCube from ``cell_size`` and
-        ``npix``
-
-        Parameters
-        ----------
-        cell_size : float
-            the width of an image-plane pixel [arcseconds]
-        npix : int)
-            the number of pixels per image side
-        persistent_vis : bool
-            should the visibility cube be stored as part of
-            the modules `state_dict`? If `True`, the state of the UV grid will be
-            stored. It is recommended to use `False` for most applications, since
-            the visibility cube will rarely be a direct parameter of the model.
-
-        Returns
-        -------
-        :class:`mpol.fourier.FourierCube`
-        """
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, persistent_vis)
-
     def forward(self, cube: torch.Tensor) -> torch.Tensor:
         """
         Perform the FFT of the image cube on each channel.
@@ -312,32 +285,6 @@ class NuFFT(nn.Module):
         # initialize the non-uniform FFT object
         self.nufft_ob = torchkbnufft.KbNufft(
             im_size=(self.coords.npix, self.coords.npix)
-        )
-
-    @classmethod
-    def from_image_properties(
-        cls,
-        cell_size: float,
-        npix: int,
-        nchan: int = 1,
-    ):
-        """
-        Instantiate a :class:`mpol.fourier.NuFFT` object from image properties rather
-        than a :meth:`mpol.coordinates.GridCoords` instance.
-
-        Args:
-            cell_size (float): the width of an image-plane pixel [arcseconds]
-            npix (int): the number of pixels per image side
-            nchan (int): the number of channels in the :class:`mpol.images.ImageCube`.
-                Default = 1.
-
-        Returns:
-            an instance of the :class:`mpol.fourier.NuFFT`
-        """
-        coords = GridCoords(cell_size, npix)
-        return cls(
-            coords,
-            nchan,
         )
 
     def _klambda_to_radpix(self, klambda: torch.Tensor) -> torch.Tensor:
@@ -751,19 +698,6 @@ class NuFFTCached(NuFFT):
             self.register_buffer("imag_interp_mat", imag_interp_mat)
             self.real_interp_mat: torch.Tensor
             self.imag_interp_mat: torch.Tensor
-
-    @classmethod
-    def from_image_properties(
-        cls,
-        cell_size,
-        npix,
-        uu,
-        vv,
-        nchan=1,
-        sparse_matrices=True,
-    ):
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, uu, vv, nchan, sparse_matrices)
 
     def forward(self, cube):
         r"""
