@@ -3,9 +3,21 @@
 # Changelog
 
 ## v0.2.1
-
-- *Placeholder* Planned changes described by Architecture GitHub Project.
-- Implemented type checking for more of the codebase
+- Made some progress converting docstrings from "Google" style format to "NumPy" style format. Ian is now convinced that NumPy style format is more readable for the type of docstrings we write in MPoL. We usually require long type definitions and long argument descriptions, and the extra indentation required for Google makes these very scrunched.
+- Make the `passthrough` behaviour of :class:`mpol.images.ImageCube` the default and removed this parameter entirely. Previously, it was possible to have :class:`mpol.images.ImageCube` act as a layer with `nn.Parameter`s. This functionality has effectively been replaced since the introduction of :class:`mpol.images.BaseCube` which provides a more useful way to parameterize pixel values. If a one-to-one mapping (including negative pixels) from `nn.Parameter`s to output tensor is desired, then one can specify `pixel_mapping=lambda x : x` when instantiating :class:`mpol.images.BaseCube`. More details in ([#246](https://github.com/MPoL-dev/MPoL/issues/246))
+- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a :class:`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed, rather than passing `cell_size` and `npix` separately. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the :class:`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain, test, and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
+  - :class:`mpol.datasets.GriddedDataset`
+  - :class:`mpol.datasets.Dartboard` 
+  - :class:`mpol.fourier.NuFFT`
+  - :class:`mpol.fourier.NuFFTCached` 
+  - :class:`mpol.fourier.FourierCube` 
+  - :class:`mpol.gridding.GridderBase` 
+  - :class:`mpol.gridding.DataAverager`
+  - :class:`mpol.gridding.DirtyImager`
+  - :class:`mpol.images.BaseCube`
+  - :class:`mpol.images.ImageCube`
+- Removed unused routine `mpol.utils.log_stretch`.
+- Added type hints for core modules ([#54](https://github.com/MPoL-dev/MPoL/issues/54)). This should improve stability of core routines and help users when writing code using MPoL in an IDE.
 - Manually line wrapped many docstrings to conform to 88 characters per line or less. Ian thought `black` would do this by default, but actually that [doesn't seem to be the case](https://github.com/psf/black/issues/2865).
 - Fully leaned into the `pyproject.toml` setup to modernize build via [hatch](https://github.com/pypa/hatch). This centralizes the project dependencies and derives package versioning directly from git tags. Intermediate packages built from commits after the latest tag (e.g., `0.2.0`) will have an extra long string, e.g., `0.2.1.dev178+g16cfc3e.d20231223` where the version is a guess at the next version and the hash gives reference to the commit. This means that developers bump versions entirely by tagging a new version with git (or more likely by drafting a new release on the [GitHub release page](https://github.com/MPoL-dev/MPoL/releases)).
 - Removed `setup.py`.

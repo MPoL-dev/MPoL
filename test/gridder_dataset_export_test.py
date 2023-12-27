@@ -10,9 +10,9 @@ from mpol.constants import *
 def averager(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.DataAverager.from_image_properties(
-        cell_size=0.005,
-        npix=800,
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+    return gridding.DataAverager(
+        coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,

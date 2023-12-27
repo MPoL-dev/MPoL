@@ -142,7 +142,8 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
 
     nchan = 10
 
-    # instantiate an ImageCube layer filled with zeros
+    # instantiate an BaseCube layer filled with zeros
+    basecube = images.BaseCube(coords=coords, nchan=nchan, pixel_mapping=lambda x: x)
     imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # we have a multi-channel cube, but only sent single-channel uu and vv
@@ -151,7 +152,7 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
     layer = fourier.NuFFT(coords=coords, nchan=nchan)
 
     # predict the values of the cube at the u,v locations
-    output = layer(imagecube(), uu, vv)
+    output = layer(imagecube(basecube()), uu, vv)
 
     # make sure we got back the number of visibilities we expected
     assert output.shape == (nchan, len(uu))
@@ -172,6 +173,8 @@ def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
     nchan = 10
 
     # instantiate an ImageCube layer filled with zeros
+    # instantiate an BaseCube layer filled with zeros
+    basecube = images.BaseCube(coords=coords, nchan=nchan, pixel_mapping=lambda x: x)
     imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # we have a multi-channel cube, but sent only single-channel uu and vv
@@ -180,7 +183,7 @@ def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # predict the values of the cube at the u,v locations
-    output = layer(imagecube())
+    output = layer(imagecube(basecube()))
 
     # make sure we got back the number of visibilities we expected
     assert output.shape == (nchan, len(uu))

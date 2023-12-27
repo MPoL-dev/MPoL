@@ -149,7 +149,10 @@ def mock_1d_image_model(mock_1d_archive):
     # pack the numpy image array into an ImageCube
     packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
     packed_tensor = torch.from_numpy(packed_cube)
-    cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
+    bcube = images.BaseCube(coords=coords,nchan=1,base_cube=packed_tensor,pixel_mapping=lambda x: x)
+    cube_true = images.ImageCube(coords=coords, nchan=1)
+    # register cube to buffer inside cube_true.cube
+    cube_true(bcube())
 
     return rtrue, itrue, cube_true, xmax, ymax, geom
 
@@ -176,8 +179,13 @@ def mock_1d_vis_model(mock_1d_archive):
     # pack the numpy image array into an ImageCube
     packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
     packed_tensor = torch.from_numpy(packed_cube)
-    cube_true = images.ImageCube(coords=coords, nchan=1, cube=packed_tensor)
-    
+    bcube = images.BaseCube(coords=coords,nchan=1, base_cube=packed_tensor, pixel_mapping=lambda x:x)
+    cube_true = images.ImageCube(coords=coords, nchan=1)
+
+    # register image 
+    cube_true(bcube())
+
+
     # create a FourierCube
     fcube_true = fourier.FourierCube(coords=coords)    
 
