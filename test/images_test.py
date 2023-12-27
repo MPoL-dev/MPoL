@@ -22,7 +22,7 @@ def test_basecube_grad():
 def test_imagecube_grad(coords):
     bcube = images.BaseCube(coords=coords)
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, passthrough=True)
+    imagecube = images.ImageCube(coords=coords)
 
     # send things through this layer
     loss = torch.sum(imagecube(bcube()))
@@ -36,7 +36,7 @@ def test_imagecube_tofits(coords, tmp_path):
     bcube = images.BaseCube(coords=coords)
 
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, passthrough=True)
+    imagecube = images.ImageCube(coords=coords)
 
     # sending the basecube through the imagecube
     imagecube(bcube())
@@ -88,7 +88,7 @@ def test_basecube_imagecube(coords, tmp_path):
     fig.savefig(tmp_path / "basecube_mapped.png", dpi=300)
 
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # send things through this layer
     imagecube(basecube())
@@ -173,5 +173,7 @@ def test_multi_chan_conv(coords, tmp_path):
 
 def test_image_flux(coords):
     nchan = 20
+    bcube = images.BaseCube(coords=coords, nchan=nchan)
     im = images.ImageCube(coords=coords, nchan=nchan)
+    im(bcube())
     assert im.flux.size()[0] == nchan

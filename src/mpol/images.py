@@ -61,9 +61,8 @@ class BaseCube(nn.Module):
         # The ``base_cube`` is already packed to make the Fourier transformation easier
         if base_cube is None:
             self.base_cube = nn.Parameter(
-                torch.full(
+                torch.zeros(
                     (self.nchan, self.coords.npix, self.coords.npix),
-                    fill_value=0.05,
                     requires_grad=True,
                     dtype=torch.double,
                 )
@@ -211,80 +210,36 @@ class ImageCube(nn.Module):
         the image `cell_size` and `npix`.
     nchan : int
         the number of channels in the base cube. Default = 1.
-    passthrough : bool
-        if `True`, assume ImageCube is just a layer as opposed
-        to parameter base.
-    cube : :class:torch.Tensor of :class:torch.double, of shape ``(nchan, npix, npix)``
-        a prepacked image cube to initialize the model with in units of
-        [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`]. If None, assumes starting
-        ``cube`` is ``torch.zeros``. See :ref:`cube-orientation-label` for more
-        information on the expectations of the orientation of the input image.
     """
 
     def __init__(
         self,
         coords: GridCoords,
         nchan: int = 1,
-        passthrough: bool = False,
-        cube: torch.Tensor | None = None,
     ) -> None:
         super().__init__()
 
         self.coords = coords
         self.nchan = nchan
+        self.register_buffer("cube", None)
 
-        self.passthrough = passthrough
-
-        if not self.passthrough:
-            if cube is None:
-                self.cube : torch.nn.Parameter = nn.Parameter(
-                    torch.full(
-                        (self.nchan, self.coords.npix, self.coords.npix),
-                        fill_value=0.0,
-                        requires_grad=True,
-                        dtype=torch.double,
-                    )
-                )
-
-            else:
-                # We expect the user to supply a pre-packed base cube
-                # so that it's ready to go for the FFT
-                # We could apply this transformation for the user, but I think it will
-                # lead to less confusion if we make this transformation explicit
-                # for the user during the setup phase.
-                self.cube = nn.Parameter(cube)
-        else:
-            # ImageCube is working as a passthrough layer, so cube should
-            # only be provided as an arg to the forward method, not as
-            # an initialization argument
-            self.cube = None
-
-    def forward(self, cube: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(self, cube: torch.Tensor) -> torch.Tensor:
         r"""
-        If the ImageCube object was initialized with ``passthrough=True``, the ``cube``
-        argument is required. ``forward`` essentially just passes this on as an identity
-        operation.
+        Pass the cube through as an identity operation, storing the value to the 
+        internal buffer. After the cube has been passed through, convenience 
+        instance attributes like `sky_cube` and `flux` will reflect the updated cube.
 
-        If the ImageCube object was initialized with ``passthrough=False``, the ``cube``
-        argument is not permitted, and ``forward`` passes on the stored
-        ``nn.Parameter`` cube as an identity operation.
+        Parameters
+        ----------
+        cube : :class:`torch.Tensor` of type :class:`torch.double` 
+            3D torch tensor of shape ``(nchan, npix, npix)``) in 'packed' format
 
-        Args:
-            cube (3D torch tensor of shape ``(nchan, npix, npix)``): only permitted if
-            the ImageCube object was initialized with ``passthrough=True``.
-
-        Returns: (3D torch.double tensor of shape ``(nchan, npix, npix)``) as identity
-        operation
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.double` type
+            tensor of shape ``(nchan, npix, npix)``), same as `cube`
         """
-
-        if cube is not None:
-            assert (
-                self.passthrough
-            ), "ImageCube.passthrough must be True if supplying cube."
-            self.cube = cube
-
-        if not self.passthrough:
-            assert cube is None, "Do not supply cube if ImageCube.passthrough == False."
+        self.cube = cube
 
         return self.cube
 

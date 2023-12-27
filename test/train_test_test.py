@@ -175,7 +175,7 @@ def test_train_to_dirty_image(coords, dataset, imager):
     train_to_dirty_image(model, imager, niter=10)
 
 
-def test_tensorboard(coords, dataset_cont, tmp_path):
+def test_tensorboard(coords, dataset_cont):
     # not using TrainTest class, 
     # set everything up to run on a single channel and then
     # test the writer function

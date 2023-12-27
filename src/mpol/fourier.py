@@ -852,7 +852,7 @@ def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan)
 
-    vis_model = nufft(model.icube().to("cpu"), u_true, v_true)  # TODO: remove 'to' call
+    vis_model = nufft(model.icube.cube.to("cpu"), u_true, v_true)  # TODO: remove 'to' call
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 

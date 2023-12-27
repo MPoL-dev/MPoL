@@ -27,7 +27,7 @@ def test_index(coords, dataset):
     basecube = images.BaseCube(coords=coords, nchan=nchan, base_cube=base_cube)
 
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # produce dense model visibility cube
     modelVisibilityCube = flayer(imagecube(basecube()))
@@ -42,7 +42,7 @@ def test_connector_grad(coords, dataset):
     flayer = fourier.FourierCube(coords=coords)
     nchan = dataset.nchan
     basecube = images.BaseCube(coords=coords, nchan=nchan)
-    imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # produce model visibilities
     modelVisibilityCube = flayer(imagecube(basecube()))
