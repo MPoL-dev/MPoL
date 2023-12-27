@@ -31,9 +31,11 @@ def test_hermitian_pairs(mock_visibility_data):
 def test_averager_instantiate_cell_npix(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    gridding.DataAverager.from_image_properties(
+    coords = coordinates.GridCoords(
         cell_size=0.005,
-        npix=800,
+        npix=800
+    )
+    gridding.DataAverager(coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,

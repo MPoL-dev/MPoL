@@ -14,9 +14,9 @@ from mpol.constants import *
 def imager(mock_visibility_data):
     uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    return gridding.DirtyImager.from_image_properties(
-        cell_size=0.005,
-        npix=800,
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+    return gridding.DirtyImager(
+        coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,

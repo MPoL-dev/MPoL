@@ -14,9 +14,13 @@ def test_average_cont(mock_visibility_data_cont):
     """
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
 
-    averager = gridding.DataAverager.from_image_properties(
+    coords = coordinates.GridCoords(
         cell_size=0.005,
         npix=800,
+    )
+
+    averager = gridding.DataAverager(
+        coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,
@@ -57,7 +61,10 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     averager._grid_visibilities()
 
     im = plt.imshow(
-        averager.ground_cube[4].real, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
+        averager.ground_cube[4].real,
+        origin="lower",
+        extent=averager.coords.vis_ext,
+        interpolation="none",
     )
     plt.colorbar(im)
     plt.savefig(tmp_path / "gridded_re.png", dpi=300)
@@ -65,20 +72,23 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.figure()
 
     im2 = plt.imshow(
-        averager.ground_cube[4].imag, origin="lower", extent=averager.coords.vis_ext, interpolation="none"
+        averager.ground_cube[4].imag,
+        origin="lower",
+        extent=averager.coords.vis_ext,
+        interpolation="none",
     )
     plt.colorbar(im2)
     plt.savefig(tmp_path / "gridded_im.png", dpi=300)
 
     plt.close("all")
 
-    # if the gridding worked, 
+    # if the gridding worked,
     # cells with no data should be 0
     assert averager.data_re_gridded[~averager.mask] == pytest.approx(0)
-    
+
     # and cells with data should have real values approximately 1
     assert averager.data_re_gridded[averager.mask] == pytest.approx(1)
-    
+
     # and imaginary values approximately 0 everywhere
     assert averager.data_im_gridded == pytest.approx(0)
 
@@ -91,9 +101,9 @@ def test_weight_gridding(mock_visibility_data):
     data_re = np.ones_like(uu)
     data_im = np.ones_like(uu)
 
-    averager = gridding.DataAverager.from_image_properties(
-        cell_size=0.005,
-        npix=800,
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+    averager = gridding.DataAverager(
+        coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,

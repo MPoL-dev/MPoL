@@ -5,43 +5,29 @@ import torch
 from mpol import fourier, images, losses, utils
 
 
-# create a fixture that has an image and produces loose and gridded model visibilities
+# create a fixture that returns nchan and an image
 @pytest.fixture
-def image_cube(mock_visibility_data, coords):
-    # Gaussian parameters
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
-
+def nchan_cube(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
     nchan = len(uu)
 
-    # evaluate the Gaussian over the sky-plane, as np array
-    img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+    # create a mock base image
+    basecube = images.BaseCube(
+        coords=coords,
+        nchan=nchan,
     )
-
-    # broadcast to (nchan, npix, npix)
-    img_packed_cube = np.broadcast_to(
-        img_packed, (nchan, coords.npix, coords.npix)
-    ).copy()
-    # convert img_packed to pytorch tensor
-    img_packed_tensor = torch.from_numpy(img_packed_cube)
     # insert into ImageCube layer
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
+    packed_cube = imagecube(basecube())
 
-    return images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
+    return nchan, packed_cube
 
 
 @pytest.fixture
-def loose_visibilities(mock_visibility_data, image_cube):
+def loose_visibilities(mock_visibility_data, coords, nchan_cube):
     # use the NuFFT to produce model visibilities
 
-    nchan = image_cube.nchan
+    nchan, packed_cube = nchan_cube
 
     # use the coil broadcasting ability
     chan = 4
@@ -50,16 +36,16 @@ def loose_visibilities(mock_visibility_data, image_cube):
     uu_chan = uu[chan]
     vv_chan = vv[chan]
 
-    nufft = fourier.NuFFT(coords=image_cube.coords, nchan=nchan)
-    return nufft(image_cube(), uu_chan, vv_chan)
+    nufft = fourier.NuFFT(coords=coords, nchan=nchan)
+    return nufft(packed_cube, uu_chan, vv_chan)
 
 
 @pytest.fixture
-def gridded_visibilities(image_cube):
-
+def gridded_visibilities(coords, nchan_cube):
+    nchan, packed_cube = nchan_cube
     # use the FourierCube to produce model visibilities
-    flayer = fourier.FourierCube(coords=image_cube.coords)
-    return flayer(image_cube())
+    flayer = fourier.FourierCube(coords=coords)
+    return flayer(packed_cube)
 
 
 def test_chi_squared_evaluation(

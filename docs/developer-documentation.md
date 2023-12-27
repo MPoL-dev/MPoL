@@ -168,7 +168,7 @@ In general, we envision the contribution lifecycle following a pattern:
 8. After the tests have completed successfully, use the Github interface to initiate a pull request back to the central repository. If you know that your feature branch isn't ready to be merged, but would still like feedback on your work, please submit a [draft or "work in progress"](https://github.blog/2019-02-14-introducing-draft-pull-requests/) pull request.
 9. Someone will review your pull request and may suggest additional changes for improvements. If approved, your pull request will be merged into the MPoL-dev/MPoL repo. Thank you for your contribution!
 
-### Contributing code and tests
+### Tests
 
 We strive to release a useable, stable software package. One way to help accomplish this is through writing rigorous and complete tests, especially after adding new functionality to the package. MPoL tests are located within the `test/` directory and follow [pytest](https://docs.pytest.org/en/6.2.x/contents.html#toc) conventions. Please add your new tests to this directory---we love new and useful tests.
 
@@ -176,7 +176,17 @@ If you are adding new code functionality to the package, please make sure you ha
 
 For MPoL maintainers, see instructions [here](https://github.com/MPoL-dev/MPoL/wiki/Releasing-a-new-version-of-MPoL) for releasing a new version of MPoL.
 
-### Contributing documentation
+### Typing
+
+Core MPoL routines are type-checked with [mypy](https://mypy.readthedocs.io/en/stable/index.html) for 100% coverage. Before you push your changes to the repo, you will want to make sure your code passes type checking locally (otherwise they will fail the GitHub Actions continuous integration tests). You can do this from the root of the repo by 
+
+```
+mypy src/mpol --pretty
+```
+
+If you are unfamiliar with typing in Python, we recommend reading the [mypy cheatsheet](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html) to get started.
+
+### Documentation
 
 A general workflow for writing documentation might look like
 

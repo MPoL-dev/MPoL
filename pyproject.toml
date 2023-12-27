@@ -23,7 +23,7 @@ description = "Regularized Maximum Likelihood Imaging for Radio Astronomy"
 dynamic = ["version"]
 name = "MPoL"
 readme = "README.md"
-requires-python = ">3.8"
+requires-python = ">=3.8"
 
 [project.optional-dependencies]
 dev = [
@@ -37,7 +37,7 @@ dev = [
     "frank>=1.2.1",
     "sphinx>=5.3.0",
     "jupytext",
-    "ipython!=8.7.0",               # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
+    "ipython!=8.7.0", # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
     "nbsphinx",
     "sphinx_book_theme>=0.9.3",
     "sphinx_copybutton",
@@ -73,3 +73,32 @@ version-file = "src/mpol/mpol_version.py"
 
 [tool.black]
 line-length = 88
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "astropy.*",
+    "matplotlib.*",
+    "scipy.*",
+    "torchkbnufft.*",
+    "frank.*",
+    "fast_histogram.*"
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "MPoL.constants",
+    "MPoL.coordinates",
+    "MPoL.datasets",
+    # "MPoL.fourier", # once we remove get_vis_residuals
+    "MPoL.geometry",
+    # "MPoL.gridding", # once we sort check_data_inputs_2d
+    "MPoL.images",
+    "MPoL.losses"
+    # "MPoL.utils", # once we fix check_baselines
+    ]
+disallow_untyped_defs = true
