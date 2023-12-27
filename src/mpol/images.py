@@ -8,6 +8,8 @@ import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
 
+from typing import Callable
+
 from mpol import utils
 from mpol.coordinates import GridCoords
 
@@ -25,28 +27,31 @@ class BaseCube(nn.Module):
     The ``base_cube`` pixel values are set as PyTorch `parameters
     <https://pytorch.org/docs/stable/generated/torch.nn.parameter.Parameter.html>`_.
 
-    Args:
-        cell_size (float): the width of a pixel [arcseconds]
-        npix (int): the number of pixels per image side
-        coords (GridCoords): an object already instantiated from the GridCoords class.
-            If providing this, cannot provide ``cell_size`` or ``npix``.
-        nchan (int): the number of channels in the base cube. Default = 1.
-        pixel_mapping (torch.nn): a PyTorch function mapping the base pixel
-            representation to the cube representation. If `None`, defaults to
-            `torch.nn.Softplus()`. Output of the function should be in units of
-            [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
-        base_cube (torch.double tensor, optional): a pre-packed base cube to initialize
-            the model with. If None, assumes ``torch.zeros``. See
-            :ref:`cube-orientation-label` for more information on the expectations of
-            the orientation of the input image.
+    Parameters
+    ----------
+    coords : :class:`mpol.coordinates.GridCoords`
+        an object instantiated from the GridCoords class, containing information about
+        the image `cell_size` and `npix`.
+    nchan : int
+        the number of channels in the base cube. Default = 1.
+    pixel_mapping : function
+        a PyTorch function mapping the base pixel
+        representation to the cube representation. If `None`, defaults to
+        `torch.nn.Softplus()`. Output of the function should be in units of
+        [:math:`\mathrm{Jy}\,\mathrm{arcsec}^{-2}`].
+    base_cube : torch.double tensor, optional
+        a pre-packed base cube to initialize
+        the model with. If None, assumes ``torch.zeros``. See
+        :ref:`cube-orientation-label` for more information on the expectations of
+        the orientation of the input image.
     """
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        pixel_mapping=None,
-        base_cube=None,
+        coords: GridCoords,
+        nchan: int = 1,
+        pixel_mapping: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        base_cube: torch.Tensor | None = None,
     ):
         super().__init__()
 
@@ -75,17 +80,11 @@ class BaseCube(nn.Module):
         if pixel_mapping is None:
             self.pixel_mapping = torch.nn.Softplus()
         else:
-            # TODO assert that this is a PyTorch function
+            # TODO assert that this is a PyTorch function (and not a numpy function,
+            # for example)
             self.pixel_mapping = pixel_mapping
 
-    @classmethod
-    def from_image_properties(
-        cls, cell_size, npix, nchan=1, pixel_mapping=None, base_cube=None
-    ) -> BaseCube:
-        coords = GridCoords(cell_size, npix)
-        return cls(coords, nchan, pixel_mapping, base_cube)
-
-    def forward(self):
+    def forward(self) -> torch.Tensor:
         r"""
         Calculate the image representation from the ``base_cube`` using the pixel
         mapping

@@ -5,6 +5,17 @@
 ## v0.2.1
 
 - *Placeholder* Planned changes described by Architecture GitHub Project.
+- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a :class:`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the :class:`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
+  - :class:`mpol.datasets.GriddedDataset`
+  - :class:`mpol.datasets.Dartboard` 
+  - :class:`mpol.fourier.NuFFT`
+  - :class:`mpol.fourier.NuFFTCached` 
+  - :class:`mpol.fourier.FourierCube` 
+  - :class:`mpol.gridding.GridderBase` 
+  - :class:`mpol.gridding.DataAverager`
+  - :class:`mpol.gridding.DirtyImager`
+  - :class:`mpol.images.BaseCube`
+  - :class:`mpol.images.ImageCube`
 - Removed unused routine `mpol.utils.log_stretch`.
 - Added type hints for core modules ([#54](https://github.com/MPoL-dev/MPoL/issues/54)). This should improve stability of core routines and help users when writing code using MPoL in an IDE.
 - Manually line wrapped many docstrings to conform to 88 characters per line or less. Ian thought `black` would do this by default, but actually that [doesn't seem to be the case](https://github.com/psf/black/issues/2865).
