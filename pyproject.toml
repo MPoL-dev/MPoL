@@ -95,6 +95,8 @@ module = [
     "MPoL.coordinates",
     "MPoL.datasets",
     # "MPoL.fourier", # once we remove get_vis_residuals
+    "MPoL.geometry",
+    # "MPoL.gridding", # once we sort check_data_inputs_2d
     "MPoL.images",
     "MPoL.losses"
     # "MPoL.utils", # once we fix check_baselines
