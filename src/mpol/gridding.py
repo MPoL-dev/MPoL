@@ -12,6 +12,8 @@ import numpy as np
 import numpy.typing as npt
 from fast_histogram import histogram as fast_hist
 
+import torch
+
 from mpol.coordinates import GridCoords
 from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
 from mpol.datasets import GriddedDataset
@@ -657,9 +659,9 @@ class DataAverager(GridderBase):
         return GriddedDataset(
             coords=self.coords,
             nchan=self.nchan,
-            vis_gridded=self.vis_gridded,
-            weight_gridded=self.weight_gridded,
-            mask=self.mask,
+            vis_gridded=torch.from_numpy(self.vis_gridded),
+            weight_gridded=torch.from_numpy(self.weight_gridded),
+            mask=torch.from_numpy(self.mask),
         )
 
 
