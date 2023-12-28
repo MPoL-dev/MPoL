@@ -23,7 +23,7 @@ rml_intro.md
 installation.md
 units-and-conventions.md
 developer-documentation.md
-api.rst
+apidocs/index
 ```
 
 ```{toctree}

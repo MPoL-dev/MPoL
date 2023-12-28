@@ -16,7 +16,7 @@ import sphinx.util.osutil
 sphinx.util.osutil.ENOENT = errno.ENOENT
 
 project = "MPoL"
-copyright = "2019-22, Ian Czekala"
+copyright = "2019-24, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags

@@ -356,13 +356,9 @@ def TV_image(sky_cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
         total variation loss
     """
 
-    # diff the cube in ll and remove the last row
-    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
-
-    # diff the cube in mm and remove the last column
-    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
-
-    loss = torch.sum(torch.sqrt(diff_ll**2 + diff_mm**2 + epsilon))
+    diff_ll = torch.diff(sky_cube[:, 0:-1, :], dim=2)
+    diff_mm = torch.diff(sky_cube[:, :, 0:-1], dim=1)
+    loss = torch.sqrt(diff_ll**2 + diff_mm**2 + epsilon).sum()
 
     return loss
 
@@ -427,11 +423,8 @@ def TSV(sky_cube: torch.Tensor) -> torch.Tensor:
 
     """
 
-    # diff the cube in ll and remove the last row
-    diff_ll = sky_cube[:, 0:-1, 1:] - sky_cube[:, 0:-1, 0:-1]
-
-    # diff the cube in mm and remove the last column
-    diff_mm = sky_cube[:, 1:, 0:-1] - sky_cube[:, 0:-1, 0:-1]
+    diff_ll = torch.diff(sky_cube[:, 0:-1, :], dim=2)
+    diff_mm = torch.diff(sky_cube[:, :, 0:-1], dim=1)
 
     loss = torch.sum(diff_ll**2 + diff_mm**2)
 
