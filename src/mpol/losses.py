@@ -77,8 +77,8 @@ def log_likelihood(
         \mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\}) \times
         \mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})
 
-    where :math:`\mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\})` and 
-    :math:`\mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})` each are the 
+    where :math:`\mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\})` and
+    :math:`\mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})` each are the
     well-known multivariate Normal for reals.
 
     This function is agnostic as to whether the sum should include the Hermitian
@@ -114,34 +114,37 @@ def log_likelihood(
     return first_term + weight_term - 0.5 * chi_squared(model_vis, data_vis, weight)
 
 
-def nll(
+def reduced_chi_squared(
     model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
 ) -> torch.Tensor:
     r"""
-    Calculate a normalized "negative log likelihood" loss between the complex data
+    Calculate the reduced :math:`\chi^2_\mathrm{r}` between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
 
-        L_\mathrm{nll} = \frac{1}{2 N} \chi^2(\boldsymbol{V}|\,\boldsymbol{\theta})
+        \chi^2_\mathrm{r} = \frac{1}{2 N} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})
 
     where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
-    Visibilities may be any shape as long as all quantities have the same shape.
-    Following `EHT-IV 2019
+    Data and model visibilities may be any shape as long as all tensors (including
+    weight) have the same shape. Following `EHT-IV 2019
     <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
     a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The
     factor of 2 comes in because we must count real and imaginaries in the
     :math:`\chi^2` sum. This means that this normalized negative log likelihood loss
-    function will have a minimum value of :math:`L_\mathrm{nll}(\hat{\boldsymbol{\theta}})
+    function will have a minimum value of
+    :math:`\chi^2_\mathrm{r}(\hat{\boldsymbol{\theta}};\,\boldsymbol{V})
     \approx 1` for a well-fit model (regardless of the number of data points), making
     it easier to set the prefactor strengths of other regularizers *relative* to this
     value.
 
     Note that this function should only be used in an optimization or point estimate
-    situation. If it is used in any situation where uncertainties on parameter values
+    situation `and` where you are not adjusting the weight or the amplitudes of
+    the data values. If it is used in any situation where uncertainties on parameter values
     are determined (such as Markov Chain Monte Carlo), it will return the wrong answer.
-    This is because the relative scaling of :math:`L_\mathrm{nll}` with respect to
-    parameter value is incorrect.
+    This is because the relative scaling of :math:`\chi^2_\mathrm{r}` with respect to
+    parameter value is incorrect. For those applications, you should use
+    :meth:`mpol.losses.log_likelihood`.
 
     Parameters
     ----------
@@ -151,17 +154,56 @@ def nll(
         array of the data values representing :math:`M`
     weight : :class:`torch.Tensor` of :class:`torch.double`
         array of weight values representing :math:`w_i`
+
     Returns
     -------
     :class:`torch.Tensor` of :class:`torch.double`
-        the normalized negative log likelihood likelihood loss, summed over all
-        dimensions of input array.
+        the :math:`\chi^2_\mathrm{r}`, summed over all dimensions of input array.
     """
 
     # If model and data are multidimensional, then flatten them to get full N
     N = len(torch.ravel(data_vis))
 
     return 1 / (2 * N) * chi_squared(model_vis, data_vis, weight)
+
+
+def neg_log_likelihood_avg(
+    model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
+) -> torch.Tensor:
+    r"""
+    Calculate the average value of the negative log likelihood
+
+    .. math::
+
+        - \frac{1}{2 N} \ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V})
+
+    where :math:`N` is the number of complex visibilities. This loss function is most
+    useful where you are in an optimization or point estimate
+    situation `and` where you may adjusting the weight or the amplitudes of
+    the data values, perhaps via a self-calibration operation.
+
+    If you are in any situation where uncertainties on parameter values
+    are determined (such as Markov Chain Monte Carlo), you should use
+    :meth:`mpol.losses.log_likelihood`.
+
+    Parameters
+    ----------
+    model_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the model values representing :math:`\boldsymbol{V}`
+    data_vis : :class:`torch.Tensor` of :class:`torch.complex`
+        array of the data values representing :math:`M`
+    weight : :class:`torch.Tensor` of :class:`torch.double`
+        array of weight values representing :math:`w_i`
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+        the :math:`\chi^2_\mathrm{r}`, summed over all dimensions of input array.
+    """
+    N = len(torch.ravel(data_vis))  # number of complex visibilities
+    ll = log_likelihood(model_vis, data_vis, weight)
+    # factor of 2 is because of complex calculation
+    return -ll / (2 * N)
 
 
 def chi_squared_gridded(
@@ -232,14 +274,15 @@ def log_likelihood_gridded(
     )
 
 
-def nll_gridded(
+def reduced_chi_squared_gridded(
     modelVisibilityCube: torch.Tensor, griddedDataset: GriddedDataset
 ) -> torch.Tensor:
     r"""
 
-    Calculate a normalized "negative log likelihood" (corresponding to
-    :func:`~mpol.losses.nll`) using gridded data and model visibilities. Function will
-    return the same value regardless of whether Hermitian pairs are included.
+    Calculate the reduced :math:`\chi^2_\mathrm{r}` between the complex data
+    :math:`\boldsymbol{V}` and model :math:`M` visibilities using gridded quantities.
+    Function will return the same value regardless of whether Hermitian pairs are
+    included.
 
     Parameters
     ----------
@@ -259,7 +302,9 @@ def nll_gridded(
     """
     model_vis = griddedDataset(modelVisibilityCube)
 
-    return nll(model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed)
+    return reduced_chi_squared(
+        model_vis, griddedDataset.vis_indexed, griddedDataset.weight_indexed
+    )
 
 
 def entropy(

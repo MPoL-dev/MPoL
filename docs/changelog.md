@@ -3,20 +3,22 @@
 # Changelog
 
 ## v0.3.0
-- *WIP* Fix loss function errors.
+- Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration).
+- Renamed `mpol.losses.nll` -> {meth}`mpol.losses.reduced_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.reduced_chi_squared_gridded` because that is what those routines were previously calculating (see the {ref}`api-reference-label` for more details). ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
+- Fixed implementation and docstring of {meth}`mpol.losses.log_likelihood` ([#237](https://github.com/MPoL-dev/MPoL/issues/237)).
 - Made some progress converting docstrings from "Google" style format to "NumPy" style format. Ian is now convinced that NumPy style format is more readable for the type of docstrings we write in MPoL. We usually require long type definitions and long argument descriptions, and the extra indentation required for Google makes these very scrunched.
-- Make the `passthrough` behaviour of :class:`mpol.images.ImageCube` the default and removed this parameter entirely. Previously, it was possible to have :class:`mpol.images.ImageCube` act as a layer with `nn.Parameter`s. This functionality has effectively been replaced since the introduction of :class:`mpol.images.BaseCube` which provides a more useful way to parameterize pixel values. If a one-to-one mapping (including negative pixels) from `nn.Parameter`s to output tensor is desired, then one can specify `pixel_mapping=lambda x : x` when instantiating :class:`mpol.images.BaseCube`. More details in ([#246](https://github.com/MPoL-dev/MPoL/issues/246))
-- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a :class:`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed, rather than passing `cell_size` and `npix` separately. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the :class:`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain, test, and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
-  - :class:`mpol.datasets.GriddedDataset`
-  - :class:`mpol.datasets.Dartboard` 
-  - :class:`mpol.fourier.NuFFT`
-  - :class:`mpol.fourier.NuFFTCached` 
-  - :class:`mpol.fourier.FourierCube` 
-  - :class:`mpol.gridding.GridderBase` 
-  - :class:`mpol.gridding.DataAverager`
-  - :class:`mpol.gridding.DirtyImager`
-  - :class:`mpol.images.BaseCube`
-  - :class:`mpol.images.ImageCube`
+- Make the `passthrough` behaviour of {class}`mpol.images.ImageCube` the default and removed this parameter entirely. Previously, it was possible to have {class}`mpol.images.ImageCube` act as a layer with `nn.Parameter`s. This functionality has effectively been replaced since the introduction of {class}`mpol.images.BaseCube` which provides a more useful way to parameterize pixel values. If a one-to-one mapping (including negative pixels) from `nn.Parameter`s to output tensor is desired, then one can specify `pixel_mapping=lambda x : x` when instantiating {class}`mpol.images.BaseCube`. More details in ([#246](https://github.com/MPoL-dev/MPoL/issues/246))
+- Removed convenience classmethods `from_image_properties` from across the code base. From [#233](https://github.com/MPoL-dev/MPoL/issues/233). The recommended workflow is to create a {class}`mpol.coordinates.GridCoords` object and pass that to instantiate these objects as needed, rather than passing `cell_size` and `npix` separately. For nearly all but trivially short workflows, this simplifies the number of variables the user needs to keep track and pass around revealing the central role of the {class}`mpol.coordinates.GridCoords` object and its useful attributes for image extent, visibility extent, etc. Most importantly, this significantly reduces the size of the codebase and the burden to maintain, test, and document multiple entry points to key `nn.modules`. We removed `from_image_properties` from
+  - {class}`mpol.datasets.GriddedDataset`
+  - {class}`mpol.datasets.Dartboard` 
+  - {class}`mpol.fourier.NuFFT`
+  - {class}`mpol.fourier.NuFFTCached` 
+  - {class}`mpol.fourier.FourierCube` 
+  - {class}`mpol.gridding.GridderBase` 
+  - {class}`mpol.gridding.DataAverager`
+  - {class}`mpol.gridding.DirtyImager`
+  - {class}`mpol.images.BaseCube`
+  - {class}`mpol.images.ImageCube`
 - Removed unused routine `mpol.utils.log_stretch`.
 - Added type hints for core modules ([#54](https://github.com/MPoL-dev/MPoL/issues/54)). This should improve stability of core routines and help users when writing code using MPoL in an IDE.
 - Manually line wrapped many docstrings to conform to 88 characters per line or less. Ian thought `black` would do this by default, but actually that [doesn't seem to be the case](https://github.com/psf/black/issues/2865).
