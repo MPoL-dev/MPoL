@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from mpol import fourier, images, losses, utils
+from mpol import fourier, images, losses
 
 
 # create a fixture that returns nchan and an image
@@ -102,7 +102,7 @@ def test_nll_hermitian_pairs(loose_visibilities, mock_visibility_data):
     data = torch.tensor(data_re + 1.0j * data_im)
     weight = torch.tensor(weight)
 
-    log_like = losses.nll(loose_visibilities, data, weight)
+    log_like = losses.reduced_chi_squared(loose_visibilities, data, weight)
     print("loose nll", log_like)
 
     # calculate it with Hermitian pairs
@@ -116,7 +116,7 @@ def test_nll_hermitian_pairs(loose_visibilities, mock_visibility_data):
     data = torch.cat([data, torch.conj(data)], axis=1)
     weight = torch.cat([weight, weight], axis=1)
 
-    log_like = losses.nll(loose_visibilities, data, weight)
+    log_like = losses.reduced_chi_squared(loose_visibilities, data, weight)
     print("loose nll w/ Hermitian", log_like)
 
 
@@ -133,11 +133,11 @@ def test_nll_evaluation(
     data = torch.tensor(data_re + 1.0j * data_im)
     weight = torch.tensor(weight)
 
-    log_like = losses.nll(loose_visibilities, data, weight)
+    log_like = losses.reduced_chi_squared(loose_visibilities, data, weight)
     print("loose nll", log_like)
 
     # calculate the gridded log likelihood
-    log_like_gridded = losses.nll_gridded(gridded_visibilities, dataset)
+    log_like_gridded = losses.reduced_chi_squared_gridded(gridded_visibilities, dataset)
     print("gridded nll", log_like_gridded)
 
 
@@ -156,7 +156,7 @@ def test_nll_1D_zero():
     data_im = model_im
     data_vis = torch.complex(data_re, data_im)
 
-    loss = losses.nll(model_vis, data_vis, weights)
+    loss = losses.reduced_chi_squared(model_vis, data_vis, weights)
     assert loss.item() == 0.0
 
 
@@ -175,7 +175,7 @@ def test_nll_1D_random():
     data_im = torch.randn_like(weights)
     data_vis = torch.complex(data_re, data_im)
 
-    losses.nll(model_vis, data_vis, weights)
+    losses.reduced_chi_squared(model_vis, data_vis, weights)
 
 
 def test_nll_2D_zero():
@@ -195,7 +195,7 @@ def test_nll_2D_zero():
     data_im = model_im
     data_vis = torch.complex(data_re, data_im)
 
-    loss = losses.nll(model_vis, data_vis, weights)
+    loss = losses.reduced_chi_squared(model_vis, data_vis, weights)
     assert loss.item() == 0.0
 
 
@@ -215,7 +215,7 @@ def test_nll_2D_random():
     data_im = torch.randn_like(weights)
     data_vis = torch.complex(data_re, data_im)
 
-    losses.nll(model_vis, data_vis, weights)
+    losses.reduced_chi_squared(model_vis, data_vis, weights)
 
 
 def test_entropy_raise_error_negative():

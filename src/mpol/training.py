@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import torch
 
-from mpol.losses import TSV, TV_image, entropy, nll_gridded, sparsity
+from mpol.losses import TSV, TV_image, entropy, reduced_chi_squared_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
 from mpol.utils import torch2npy
 
@@ -205,7 +205,7 @@ class TrainTest:
             Value of loss function
         """
         # negative log-likelihood loss function
-        loss = nll_gridded(vis, dataset)
+        loss = reduced_chi_squared_gridded(vis, dataset)
 
         # regularizers
         if sky_cube is not None:

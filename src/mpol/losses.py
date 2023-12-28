@@ -198,7 +198,8 @@ def neg_log_likelihood_avg(
     Returns
     -------
     :class:`torch.Tensor` of :class:`torch.double`
-        the :math:`\chi^2_\mathrm{r}`, summed over all dimensions of input array.
+        the average of the negative log likelihood, summed over all dimensions of
+        input array.
     """
     N = len(torch.ravel(data_vis))  # number of complex visibilities
     ll = log_likelihood(model_vis, data_vis, weight)
@@ -297,8 +298,7 @@ def reduced_chi_squared_gridded(
     Returns
     -------
     :class:`torch.Tensor` of :class:`torch.double`
-        the normalized negative log likelihood likelihood loss, summed over all input
-        values
+        the :math:`\chi^2_\mathrm{r}` value summed over all input dimensions
     """
     model_vis = griddedDataset(modelVisibilityCube)
 
