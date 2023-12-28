@@ -154,8 +154,6 @@ img_packed = utils.sky_gaussian_arcsec(
 img_packed_cube = np.broadcast_to(img_packed, (nchan, coords.npix, coords.npix)).copy()
 # convert img_packed to pytorch tensor
 img_packed_tensor = torch.from_numpy(img_packed_cube)
-# insert into ImageCube layer
-icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 ```
 
 ## Producing model visibilities
@@ -163,7 +161,7 @@ icube = images.ImageCube(coords=coords, nchan=nchan, cube=img_packed_tensor)
 The interesting part of the NuFFT is that it will carry an image plane model all the way to the Fourier plane in loose visibilities, resulting in a model visibility array the same shape as the original visibility data.
 
 ```{code-cell}
-vis_model_loose = nufft(icube(), uu_chan, vv_chan)
+vis_model_loose = nufft(img_packed_tensor, uu_chan, vv_chan)
 print("Loose model visibilities from the NuFFT have shape {:}".format(vis_model_loose.shape))
 print("The original loose data visibilities have shape {:}".format(data.shape))
 ```
@@ -171,7 +169,7 @@ print("The original loose data visibilities have shape {:}".format(data.shape))
 By comparison, the {class}`~mpol.gridding.Gridder` object puts the visibilities onto a grid and exports a {class}`~mpol.datasets.GriddedDataset` object. These gridded data visibilities have the same dimensionality as the gridded model visibilities produced by the {class}`~mpol.fourier.FourierCube` layer
 
 ```{code-cell}
-vis_model_gridded = flayer(icube())
+vis_model_gridded = flayer(img_packed_tensor)
 print("Gridded model visibilities from FourierCube have shape {:}".format(vis_model_gridded.shape))
 print("Gridded data visibilities have shape {:}".format(gridded_dset.vis_gridded.shape))
 ```
@@ -273,18 +271,18 @@ Now we'll evaluate the likelihood function using both the loose visibilities pro
 data_loose = torch.tensor(data)
 weight_loose = torch.tensor(weight)
 
-chisquare = losses.chi_squared(vis_model_loose, data_loose, weight_loose)
+r_chisquare = losses.r_chi_squared(vis_model_loose, data_loose, weight_loose)
 loglike = losses.log_likelihood(vis_model_loose, data_loose, weight_loose)
-print("Chi squared", chisquare)
+print("Reduced Chi squared", r_chisquare)
 print("Log likelihood", loglike)
 ```
 
 ### Gridded visibility log likelihood
 
 ```{code-cell}
-chisquare_gridded = losses.chi_squared_gridded(vis_model_gridded, gridded_dset)
+r_chisquare_gridded = losses.r_chi_squared_gridded(vis_model_gridded, gridded_dset)
 loglike_gridded = losses.log_likelihood_gridded(vis_model_gridded, gridded_dset)
-print("Chi squared gridded", chisquare_gridded)
+print("Reduced Chi squared gridded", r_chisquare_gridded)
 print("Log likelihood gridded", loglike_gridded)
 ```
 
@@ -320,16 +318,16 @@ $$
 
 This is the same reasoning that gives rise to the statistical apothegm "a well-fit model has a reduced $\chi^2_R \approx 1$" (one that has [many caveats and pitfalls](https://arxiv.org/abs/1012.3754)). In this case the extra factor of 2 in the denominator comes about because the visibility data and its noise are complex-valued.
 
-The hope is that for many applications, the normalized negative log likelihood loss function will have a minimum value of $L(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the regularizer strengths *relative* to this value. Note that even this normalized loss won't be the same between an unbinned and binned dataset, though hopefully both will be on the order of $1$.
+The hope is that for many applications, the reduced $\chi^2_R$ loss function will have a minimum value of $$\chi^2_R(\hat{\boldsymbol{\theta}}) \approx 1$ for a well-fit model (regardless of the number of data points), making it easier to set the regularizer strengths *relative* to this value. Note that even this normalized loss won't be the same between an unbinned and binned dataset, though hopefully both will be on the order of $1$.
 
-This loss function is implemented in {func}`mpol.losses.nll` and {func}`mpol.losses.nll_gridded`, and we can see the results here.
+This loss function is implemented in {func}`mpol.losses.r_chi_squared` and {func}`mpol.losses.r_chi_squared_gridded`, and we can see the results here.
 
 ```{code-cell}
-nll = losses.nll(vis_model_loose, data_loose, weight_loose)
-print("Normalized log likelihood", nll)
+r_chi2 = losses.r_chi_squared(vis_model_loose, data_loose, weight_loose)
+print("Reduced chi squared", r_chi2)
 ```
 
 ```{code-cell}
-nll_gridded = losses.nll_gridded(vis_model_gridded, gridded_dset)
-print("Normalized log likelihood gridded", nll_gridded)
+r_chi2_gridded = losses.r_chi_squared_gridded(vis_model_gridded, gridded_dset)
+print("Reduced chi squared gridded", r_chi2_gridded)
 ```

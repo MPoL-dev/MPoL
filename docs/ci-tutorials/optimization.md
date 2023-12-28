@@ -183,7 +183,7 @@ But, exciting things are about to happen! We can calculate the loss between thes
 
 ```{code-cell} ipython3
 # calculate a loss
-loss = losses.nll_gridded(vis, dset)
+loss = losses.r_chi_squared_gridded(vis, dset)
 print(loss.item())
 ```
 
@@ -255,7 +255,7 @@ for i in range(300):
     vis = rml()
 
     # calculate a loss
-    loss = losses.nll_gridded(vis, dset)
+    loss = losses.r_chi_squared_gridded(vis, dset)
 
     loss_tracker.append(loss.item())
 
@@ -318,8 +318,8 @@ nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan)
 and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since {meth}`mpol.fourier.NuFFT.forward` returns a Pytorch tensor, we'll need to detach it and convert it to numpy. We'll also remove the channel dimension.
 
 ```{code-cell} ipython3
-# note the NuFFT expects a "packed image cube," as output from ImageCube.forward()
-vis_model = nufft(rml.icube(), uu, vv)
+# note the NuFFT expects a "packed image cube," as stored in ImageCube.cube
+vis_model = nufft(rml.icube.cube, uu, vv)
 # convert from Pytorch to numpy, remove channel dimension
 vis_model = np.squeeze(vis_model.detach().numpy())
 ```

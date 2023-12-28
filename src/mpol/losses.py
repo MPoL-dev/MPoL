@@ -6,18 +6,22 @@ providing at least a starting point for tuning multiple loss functions.
 
 We expect you might use the loss functions in the following scenarios:
 
-- *optimizing a model with fixed data amplitudes and weights* this is the most common 
-scenario for RML imaging. Use :meth:`~mpol.losses.r_chi_squared` for loose visibilities 
-and :meth:`~mpol.losses.r_chi_squared_gridded` for gridded quantities 
-(e.g., :class:`~mpol.datasets.GriddedDataset`).
-- *optimizing a model with potential adjustments to data amplitudes and weights*: you 
-will need to do this in a self-calibration workflow. Use 
-:meth:`~mpol.losses.neg_log_likelihood_avg` for loose visibilities. The nature of the 
-adjustments makes gridding inefficient, so there is no gridded version of this loss.
-- *doing Bayesian inference*: if you are calculating a log likelihood to use with MCMC 
-sampling, for example, use :meth:`~mpol.losses.log_likelihood` or 
-:meth:`~mpol.losses.log_likelihood_gridded`. (Pyro defines its own likelihood function 
-through the probabilistic programming language, so this is not needed in that case).
+* optimizing a model with fixed data amplitudes and weights:
+    this is the most common 
+    scenario for RML imaging. Use :meth:`~mpol.losses.r_chi_squared` for loose 
+    visibilities and :meth:`~mpol.losses.r_chi_squared_gridded` for gridded quantities 
+    (e.g., :class:`~mpol.datasets.GriddedDataset`).
+* optimizing a model with potential adjustments to data amplitudes and weights: 
+    you will need to do this in a self-calibration workflow. Use 
+    :meth:`~mpol.losses.neg_log_likelihood_avg` for loose visibilities. The nature of 
+    the adjustments makes gridding inefficient, so there is no gridded version of this 
+    loss.
+* doing Bayesian inference: 
+    if you are calculating a log likelihood to use with MCMC 
+    sampling, for example, use :meth:`~mpol.losses.log_likelihood` or 
+    :meth:`~mpol.losses.log_likelihood_gridded`. (Pyro defines its own likelihood 
+    function through the probabilistic programming language, so this is not needed in 
+    that case).
 """
 
 import numpy as np
