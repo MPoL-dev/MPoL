@@ -56,12 +56,6 @@ For convenience, we provide some "precomposed" [modules](https://pytorch.org/doc
 .. automodule:: mpol.precomposed
 ```
 
-## Losses
-
-```{eval-rst}
-.. automodule:: mpol.losses
-
-```
 
 ## Training and testing
 

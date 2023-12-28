@@ -21,21 +21,6 @@ If you'd like to help build the MPoL package, please check out the {ref}`develop
 
 rml_intro.md
 installation.md
-units-and-conventions.md
-developer-documentation.md
-apidocs/index
-```
-
-```{toctree}
-:hidden: true
-
-changelog.md
-```
-
-```{toctree}
-:caption: Tutorials
-:maxdepth: 2
-
 ci-tutorials/PyTorch
 ci-tutorials/gridder
 ci-tutorials/optimization
@@ -47,6 +32,35 @@ large-tutorials/HD143006_part_1
 large-tutorials/HD143006_part_2
 ci-tutorials/fakedata
 large-tutorials/pyro
+```
+
+```{toctree}
+:caption: API
+:maxdepth: 2
+
+api/index
+api/coordinates
+api/datasets
+api/fourier
+api/gridding
+api/images
+api/losses
+api/geometry
+api/utilities
+api/precomposed
+api/train_test
+api/plotting
+api/crossval
+api/analysis
+```
+
+```{toctree}
+:caption: Reference
+:maxdepth: 2
+
+units-and-conventions.md
+developer-documentation.md
+changelog.md
 ```
 
 - {ref}`genindex`

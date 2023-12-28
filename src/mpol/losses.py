@@ -1,8 +1,9 @@
-r"""The following loss functions are available to use in imaging. Many of the 
-definitions follow those in Appendix A of 
+r"""
+Many loss function definitions follow those in Appendix A of 
 `EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, 
 including the regularization strength, which aspires to be similar across all terms, 
 providing at least a starting point for tuning multiple loss functions.
+
 
 We expect you might use the loss functions in the following scenarios:
 
