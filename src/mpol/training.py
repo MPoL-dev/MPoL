@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import torch
 
-from mpol.losses import TSV, TV_image, entropy, reduced_chi_squared_gridded, sparsity
+from mpol.losses import TSV, TV_image, entropy, r_chi_squared_gridded, sparsity
 from mpol.plot import train_diagnostics_fig
 from mpol.utils import torch2npy
 

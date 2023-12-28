@@ -248,7 +248,7 @@ def train(model, dset, config, optimizer, writer=None):
 
         # calculate a loss
         loss = (
-            losses.nll_gridded(vis, dset)
+            losses.r_chi_squared_gridded(vis, dset)
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
         )
@@ -270,7 +270,7 @@ def test(model, dset):
     model.train(False)
     # evaluate test score
     vis = model()
-    loss = losses.nll_gridded(vis, dset)
+    loss = losses.r_chi_squared_gridded(vis, dset)
     return loss.item()
 ```
 
@@ -354,7 +354,7 @@ print("Cross validation score:", cross_validate(pars))
 train_and_image(pars)
 ```
 
-More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``nll_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
+More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``r_chi_squared_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
 
 +++
 

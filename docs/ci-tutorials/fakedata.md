@@ -255,7 +255,9 @@ img_tensor_packed = utils.sky_cube_to_packed_cube(img_tensor)
 from mpol.images import ImageCube
 from mpol import coordinates
 coords = coordinates.GridCoords(cell_size=cell_size, npix=npix)
-image = ImageCube(coords=coords, nchan=1, cube=img_tensor_packed)
+image = ImageCube(coords=coords, nchan=1)
+# run forward to cache img_tensor_packed to the layer
+image(img_tensor_packed)
 ```
 
 If you want to double-check that the image was correctly inserted, you can do
