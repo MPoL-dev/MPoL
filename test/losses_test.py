@@ -133,11 +133,11 @@ def test_nll_evaluation(
     data = torch.tensor(data_re + 1.0j * data_im)
     weight = torch.tensor(weight)
 
-    log_like = losses.reduced_chi_squared(loose_visibilities, data, weight)
+    log_like = losses.r_chi_squared(loose_visibilities, data, weight)
     print("loose nll", log_like)
 
     # calculate the gridded log likelihood
-    log_like_gridded = losses.reduced_chi_squared_gridded(gridded_visibilities, dataset)
+    log_like_gridded = losses.r_chi_squared_gridded(gridded_visibilities, dataset)
     print("gridded nll", log_like_gridded)
 
 

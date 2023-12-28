@@ -1,29 +1,15 @@
----
-substitutions:
-  Discussions badge: |-
-    ```{image} https://img.shields.io/badge/community-Github%20Discussions-orange
-    :target: https://github.com/MPoL-dev/MPoL/discussions
-    ```
-  Tests badge: |-
-    ```{image} https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main
-    :target: https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml
-    ```
----
-
 # Million Points of Light (MPoL)
 
-{{ Tests badge }}
-{{ Discussions badge }}
+[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
+[![gh-pages docs](https://img.shields.io/badge/community-Github%20Discussions-orange)](https://github.com/MPoL-dev/MPoL/discussions)
 
-```{raw} html
-<!-- Place this tag where you want the button to render. -->
-<a class="github-button" href="https://github.com/MPoL-dev/MPoL" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star MPoL-dev/MPoL on GitHub">Star</a>
-<a class="github-button" href="https://github.com/MPoL-dev/MPoL/discussions" data-color-scheme="no-preference: light; light: light; dark: dark_dimmed;" data-icon="octicon-comment-discussion" data-size="large" aria-label="Discuss MPoL-dev/MPoL on GitHub">Discuss</a>
-```
+MPoL is a [PyTorch](https://pytorch.org/) *library* built for Regularized Maximum Likelihood (RML) imaging and Bayesian Inference with datasets from interferometers like the Atacama Large Millimeter/Submillimeter Array ([ALMA](https://www.almaobservatory.org/en/home/)) and the Karl G. Jansky Very Large Array ([VLA](https://public.nrao.edu/telescopes/vla/)). 
 
-MPoL is a Python framework for Regularized Maximum Likelihood (RML) imaging. It is built on top of PyTorch, which provides state of the art auto-differentiation capabilities and optimizers. We focus on supporting continuum and spectral line observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and other forms of optical interferometry.
+As a PyTorch *library*, MPoL is designed expecting that the user will write Python code that uses MPoL primitives as building blocks to solve their interferometric imaging workflow, much the same way the artificial intelligence community uses PyTorch layers to implement new neural network architectures (for [example](https://github.com/pytorch/examples)). You will find MPoL easiest to use if you emulate PyTorch customs and idioms, e.g., feed-forward neural networks, data storage, GPU acceleration, and train/test optimization loops. Therefore, a basic familiarity with PyTorch is considered a prerequisite for MPoL.
 
-To get a sense of how MPoL works, please take a look at the {ref}`rml-intro-label` and then the tutorials down below. If you have any questions, please join us on our [Github discussions page](https://github.com/MPoL-dev/MPoL/discussions).
+MPoL is *not* an imaging application nor a pipeline, though such programs could be built for specialized workflows with MPoL components. We are focused on providing a numerically correct and expressive set of core primitives so the user can leverage the full power of the PyTorch (and Python) ecosystem to solve their research-grade imaging tasks. This is already a significant development and maintenance burden for the limited resources of our small research team, so our immediate scope must necessarily be limited.
+
+To get a sense of how MPoL works, please take a look at the {ref}`rml-intro-label` and then the tutorials down below. If you have any questions, please ask us on our [Github discussions page](https://github.com/MPoL-dev/MPoL/discussions).
 
 If you'd like to help build the MPoL package, please check out the {ref}`developer-documentation-label` to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization [website](https://mpol-dev.github.io/) and [github](https://github.com/MPoL-dev) repository hosting the source code.
 

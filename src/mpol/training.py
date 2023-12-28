@@ -205,7 +205,7 @@ class TrainTest:
             Value of loss function
         """
         # negative log-likelihood loss function
-        loss = reduced_chi_squared_gridded(vis, dataset)
+        loss = r_chi_squared_gridded(vis, dataset)
 
         # regularizers
         if sky_cube is not None:
