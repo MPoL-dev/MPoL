@@ -18,8 +18,6 @@ Extra packages required for development can be installed via
 
 This directs pip to install whatever package is in the current working directory (`.`) as an editable package (`-e`), using the set of `[dev]` optional packages. There is also a more limited set of packages under `[test]`. You can view these packages in the `pyproject.toml` file. 
 
-
-(testing-reference-label)=
 ## Testing
 
 MPoL includes a test suite written using [pytest](https://docs.pytest.org/). We aim for this test suite to be as comprehensive as possible, since this helps us achieve our goal of shipping stable software.
