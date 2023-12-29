@@ -23,15 +23,10 @@ If you'd like to help build the MPoL package, please check out the [](developer-
 
 background
 installation
-ci-tutorials/PyTorch
 ci-tutorials/gridder
 ci-tutorials/optimization
-ci-tutorials/loose-visibilities
 ci-tutorials/crossvalidation
-ci-tutorials/gpu_setup.rst
 ci-tutorials/initializedirtyimage
-large-tutorials/HD143006_part_1
-large-tutorials/HD143006_part_2
 ci-tutorials/fakedata
 ```
 
