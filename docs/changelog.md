@@ -3,6 +3,7 @@
 # Changelog
 
 ## v0.3.0
+- Edited documentation to be more concise.
 - Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration).
 - Renamed `mpol.losses.nll` -> {meth}`mpol.losses.r_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.r_chi_squared_gridded` because that is what those routines were previously calculating (see the {ref}`api-reference-label` for more details). ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
 - Fixed implementation and docstring of {meth}`mpol.losses.log_likelihood` ([#237](https://github.com/MPoL-dev/MPoL/issues/237)).

@@ -1,30 +1,3 @@
-r"""
-Many loss function definitions follow those in Appendix A of 
-`EHT-IV 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, 
-including the regularization strength, which aspires to be similar across all terms, 
-providing at least a starting point for tuning multiple loss functions.
-
-
-We expect you might use the loss functions in the following scenarios:
-
-* optimizing a model with fixed data amplitudes and weights:
-    this is the most common 
-    scenario for RML imaging. Use :meth:`~mpol.losses.r_chi_squared` for loose 
-    visibilities and :meth:`~mpol.losses.r_chi_squared_gridded` for gridded quantities 
-    (e.g., :class:`~mpol.datasets.GriddedDataset`).
-* optimizing a model with potential adjustments to data amplitudes and weights: 
-    you will need to do this in a self-calibration workflow. Use 
-    :meth:`~mpol.losses.neg_log_likelihood_avg` for loose visibilities. The nature of 
-    the adjustments makes gridding inefficient, so there is no gridded version of this 
-    loss.
-* doing Bayesian inference: 
-    if you are calculating a log likelihood to use with MCMC 
-    sampling, for example, use :meth:`~mpol.losses.log_likelihood` or 
-    :meth:`~mpol.losses.log_likelihood_gridded`. (Pyro defines its own likelihood 
-    function through the probabilistic programming language, so this is not needed in 
-    that case).
-"""
-
 import numpy as np
 import torch
 
@@ -73,22 +46,21 @@ def r_chi_squared(
     model_vis: torch.Tensor, data_vis: torch.Tensor, weight: torch.Tensor
 ) -> torch.Tensor:
     r"""
-    Calculate the reduced :math:`\chi^2_\mathrm{r}` between the complex data
+    Calculate the reduced :math:`\chi^2_\mathrm{R}` between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using
 
     .. math::
 
-        \chi^2_\mathrm{r} = \frac{1}{2 N} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})
+        \chi^2_\mathrm{R} = \frac{1}{2 N} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})
 
-    where :math:`\chi^2` is evaluated using :func:`mpol.losses.chi_squared`.
+    where :math:`\chi^2` is evaluated using private function :func:`mpol.losses._chi_squared`.
     Data and model visibilities may be any shape as long as all tensors (including
     weight) have the same shape. Following `EHT-IV 2019
     <https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract>`_, we apply
     a prefactor :math:`1/(2 N)`, where :math:`N` is the number of visibilities. The
     factor of 2 comes in because we must count real and imaginaries in the
-    :math:`\chi^2` sum. This means that this normalized negative log likelihood loss
-    function will have a minimum value of
-    :math:`\chi^2_\mathrm{r}(\hat{\boldsymbol{\theta}};\,\boldsymbol{V})
+    :math:`\chi^2` sum. This loss function will have a minimum value of
+    :math:`\chi^2_\mathrm{R}(\hat{\boldsymbol{\theta}};\,\boldsymbol{V})
     \approx 1` for a well-fit model (regardless of the number of data points), making
     it easier to set the prefactor strengths of other regularizers *relative* to this
     value.
@@ -97,7 +69,7 @@ def r_chi_squared(
     situation `and` where you are not adjusting the weight or the amplitudes of
     the data values. If it is used in any situation where uncertainties on parameter values
     are determined (such as Markov Chain Monte Carlo), it will return the wrong answer.
-    This is because the relative scaling of :math:`\chi^2_\mathrm{r}` with respect to
+    This is because the relative scaling of :math:`\chi^2_\mathrm{R}` with respect to
     parameter value is incorrect. For those applications, you should use
     :meth:`mpol.losses.log_likelihood`.
 
@@ -113,7 +85,7 @@ def r_chi_squared(
     Returns
     -------
     :class:`torch.Tensor` of :class:`torch.double`
-        the :math:`\chi^2_\mathrm{r}`, summed over all dimensions of input array.
+        the :math:`\chi^2_\mathrm{R}`, summed over all dimensions of input array.
     """
 
     # If model and data are multidimensional, then flatten them to get full N
@@ -127,7 +99,7 @@ def r_chi_squared_gridded(
 ) -> torch.Tensor:
     r"""
 
-    Calculate the reduced :math:`\chi^2_\mathrm{r}` between the complex data
+    Calculate the reduced :math:`\chi^2_\mathrm{R}` between the complex data
     :math:`\boldsymbol{V}` and model :math:`M` visibilities using gridded quantities.
     Function will return the same value regardless of whether Hermitian pairs are
     included.
@@ -145,7 +117,7 @@ def r_chi_squared_gridded(
     Returns
     -------
     :class:`torch.Tensor` of :class:`torch.double`
-        the :math:`\chi^2_\mathrm{r}` value summed over all input dimensions
+        the :math:`\chi^2_\mathrm{R}` value summed over all input dimensions
     """
     model_vis = griddedDataset(modelVisibilityCube)
 
@@ -168,7 +140,7 @@ def log_likelihood(
         \frac{1}{2} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})
 
     where :math:`N` is the number of complex visibilities and :math:`\chi^2` is
-    evaluated using :func:`mpol.losses.chi_squared`. Note that this expression has
+    evaluated internally using :func:`mpol.losses._chi_squared`. Note that this expression has
     factors of 2 in different places compared to the multivariate Normal you might be
     used to seeing because the visibilities are complex-valued. We could alternatively
     write
@@ -258,7 +230,7 @@ def neg_log_likelihood_avg(
 
     .. math::
 
-        - \frac{1}{2 N} \ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V})
+        L = - \frac{1}{2 N} \ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V})
 
     where :math:`N` is the number of complex visibilities. This loss function is most
     useful where you are in an optimization or point estimate

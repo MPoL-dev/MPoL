@@ -20,6 +20,7 @@ If you'd like to help build the MPoL package, please check out the {ref}`develop
 :maxdepth: 2
 
 rml_intro.md
+introduction.md
 installation.md
 ci-tutorials/PyTorch
 ci-tutorials/gridder
@@ -38,7 +39,6 @@ large-tutorials/pyro
 :caption: API
 :maxdepth: 2
 
-api/index
 api/coordinates
 api/datasets
 api/fourier
