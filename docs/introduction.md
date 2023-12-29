@@ -1,3 +1,27 @@
+# Introduction and Orientation
+
+2 pages max.
+
+first par
+* restate MPoL as a library w/ maintenance goal
+* highlight science cases: RML imaging, Bayesian inference
+* discuss scope of documentation and need for pre-requisites
+
+second par
+* brief description to what RML is, with call-outs to Zawadzki and other seminal resources.
+
+third par
+* discuss pre-requisites: radio background, 
+* pytorch background
+
+fourth par
+* scope of tutorial examples to follow, showing module building blocks
+* browse the API
+* organization of examples folder
+
+
+
+
 (rml-intro-label)=
 
 # Introduction to Regularized Maximum Likelihood Imaging
