@@ -9,9 +9,9 @@ As a PyTorch *library*, MPoL expects that the user will write Python code to lin
 
 MPoL is *not* an imaging application nor a pipeline, though MPoL components could be used to build specialized workflows. We are focused on providing a numerically correct and expressive set of core primitives so the user can leverage the full power of the PyTorch (and Python) ecosystem to solve their research-grade imaging tasks. This is already a significant development and maintenance burden for the limited resources of our small research team, so our immediate scope must necessarily be limited.
 
-To get a sense of what MPoL is and what background material this library assumes, please look at the [](introduction.md). If the package is right for your needs, installation instructions are available [](installation.md). 
+To get a sense of what MPoL is and what background material this library assumes, please look at the [](introduction.md). If the package is right for your needs, follow the [installation instructions](installation.md).
 
-This documentation provides a short set of tutorials demonstrating key components of the MPoL library. Longer examples demonstrating how one might use MPoL components to build an imaging workflow are packaged together in the [MPoL-dev/examples](https://github.com/MPoL-dev/examples) repository.
+This documentation covers the API and a short set of tutorials demonstrating key components of the MPoL library. Longer examples demonstrating how one might use MPoL components to build an imaging workflow are packaged together in the [MPoL-dev/examples](https://github.com/MPoL-dev/examples) repository.
 
 If you'd like to help build the MPoL package, please check out the [](developer-documentation.md) to get started. For more information about the constellation of packages supporting RML imaging and modeling, check out the MPoL-dev organization [website](https://mpol-dev.github.io/) and [github](https://github.com/MPoL-dev) repository hosting the source code. If you have any questions, please ask us on our [Github discussions page](https://github.com/MPoL-dev/MPoL/discussions). 
 
@@ -33,7 +33,6 @@ ci-tutorials/initializedirtyimage
 large-tutorials/HD143006_part_1
 large-tutorials/HD143006_part_2
 ci-tutorials/fakedata
-large-tutorials/pyro
 ```
 
 ```{toctree}

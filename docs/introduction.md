@@ -1,38 +1,44 @@
-# Introduction and Orientation
+# Orientation
 
-2 pages max.
+*Million Points of Light* or "MPoL" is a [PyTorch](https://pytorch.org/) *library* supporting Regularized Maximum Likelihood (RML) imaging and Bayesian Inference workflows with Fourier datasets. We provide the building blocks to create flexible image models and optimize them to fit interferometric datasets.
 
-first par
-* restate MPoL as a library w/ maintenance goal
-* highlight science cases: RML imaging, Bayesian inference
-* discuss scope of documentation and need for pre-requisites
+## Background and prerequisites
 
-second par
-* brief description to what RML is, with call-outs to Zawadzki and other seminal resources.
+### Radio astronomy
 
-third par
-* discuss pre-requisites: radio background, 
-* pytorch background
+A background in radio astronomy, Fourier transforms, and interferometry is a prerequisite for using MPoL but is beyond the scope of this documentation. We recommend reviewing these resources as needed.
 
-fourth par
-* scope of tutorial examples to follow, showing module building blocks
-* browse the API
-* organization of examples folder
+- [Essential radio astronomy](https://www.cv.nrao.edu/~sransom/web/xxx.html) textbook by James Condon and Scott Ransom, and in particular, Chapter 3.7 on Radio Interferometry.
+- NRAO's [17th Synthesis Imaging Workshop](http://www.cvent.com/events/virtual-17th-synthesis-imaging-workshop/agenda-0d59eb6cd1474978bce811194b2ff961.aspx) recorded lectures and slides available
+- [Interferometry and Synthesis in Radio Astronomy](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) by Thompson, Moran, and Swenson. An excellent and comprehensive reference on all things interferometry.
+- Ian Czekala's lecture notes on [Radio Interferometry and Imaging](https://iancze.github.io/courses/as5003/lectures/)
 
+RML imaging is different from CLEAN imaging, which operates as a deconvolution procedure in the image plane. However, CLEAN is by far the dominant algorithm used to synthesize images from interferometric data at sub-mm and radio wavelengths, and it is useful to have at least a basic understanding of how it works. We recommend
 
+- [Interferometry and Synthesis in Radio Astronomy](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) Chapter 11.1
+- David Wilner's lecture on [Imaging and Deconvolution in Radio Astronomy](https://www.youtube.com/watch?v=mRUZ9eckHZg)
+- For a discussion on using both CLEAN and RML techniques to robustly interpret kinematic data of protoplanetary disks, see Section 3 of [Visualizing the Kinematics of Planet Formation](https://ui.adsabs.harvard.edu/abs/2020arXiv200904345D/abstract) by The Disk Dynamics Collaboration
 
+### Statistics and Machine Learning
 
-(rml-intro-label)=
+MPoL is built on top of the [PyTorch](https://pytorch.org/) machine learning framework and adopts much of the terminology and design principles of machine learning workflows. As a prerequisite, we recommend at least a basic understanding of statistics and machine learning principles. Two excellent (free) textbooks are
 
-# Introduction to Regularized Maximum Likelihood Imaging
+- [Dive into Deep Learning](https://d2l.ai/), in particular chapters 1 - 3 to cover the basics of forward models, automatic differentiation, and optimization.
+- [Deep Learning: Foundations and Concepts](https://www.bishopbook.com/) for a lengthier discussion of these concepts and other foundational statistical concepts.
+
+And we highly recommend the informative and entertaining 3b1b lectures on [deep learning](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&ab_channel=3Blue1Brown).
+
+### PyTorch
+
+As a PyTorch library, MPoL expects that the user will write Python code that uses MPoL primitives as building blocks to solve their interferometric imaging workflow, much the same way the artificial intelligence community writes Python code that uses PyTorch layers to implement new neural network architectures (for [example](https://github.com/pytorch/examples)). You will find MPoL easiest to use if you follow PyTorch customs and idioms, e.g., feed-forward neural networks, data storage, GPU acceleration, and train/test optimization loops. Therefore, a basic familiarity with PyTorch is considered a prerequisite for MPoL.
+
+If you are new to PyTorch, we recommend starting with the official [Learn the Basics](https://pytorch.org/tutorials/beginner/basics/intro.html) guide. You can also find high quality introductions on YouTube and in textbooks.
+
+## MPoL for Regularized Maximum Likelihood imaging
 
 This document is an attempt to provide a whirlwind introduction to what Regularized Maximum Likelihood (RML) imaging is, and why you might want to use this MPoL package to perform it with your interferometric dataset. Of course, the field is rich, varied, and this short introduction couldn't possibly do justice to cover the topic in depth. We recommend that you check out many of the links and suggestions in this document for further reading and understanding.
 
 
-
-## The MPoL package for Regularized Maximum Likelihood imaging
-
-*Million Points of Light* or "MPoL" is a Python package that is used to perform regularized maximum likelihood imaging. By that we mean that the package provides the building blocks to create flexible image models and optimize them to fit interferometric datasets. The package is developed completely in the open on [Github](https://github.com/MPoL-dev/MPoL).
 
 We strive to
 
@@ -65,6 +71,30 @@ There are a few things about  MPoL that we believe make it an appealing platform
 
 To get started with MPoL, we recommend [installing the package](installation.md) and reading through the tutorial series. If you have any questions about the package, we invite you to join us on our [Github discussions page](https://github.com/MPoL-dev/MPoL/discussions).
 
+second par
+* brief description to what RML is, with call-outs to Zawadzki and other seminal resources.
+
+
+## Scope of tutorials nad exmaples
+
+* scope of tutorial examples to follow, showing module building blocks
+* browse the API
+* organization of examples folder
+
+
+
+
+
+
+
+
+
+Longer workflow exmaples are in examples.
+
+Including Pyro.
+
+
+
 :::{seealso}
 That's RML imaging in a nutshell, but we've barely scratched the surface. We highly recommend checking out the following excellent resources.
 
@@ -75,14 +105,6 @@ That's RML imaging in a nutshell, but we've barely scratched the surface. We hig
 
 
 
-```{admonition} CLEAN
-RML imaging is different from CLEAN imaging, which operates as a deconvolution procedure in the image plane. CLEAN is by far the dominant algorithm used to synthesize images from interferometric data at sub-mm and radio wavelengths. 
-
-- [Interferometry and Synthesis in Radio Astronomy](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) Chapter 11.1
-- [CASA documentation on tclean](https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging)
-- David Wilner's lecture on [Imaging and Deconvolution in Radio Astronomy](https://www.youtube.com/watch?v=mRUZ9eckHZg)
-- For a discussion on using both CLEAN and RML techniques to robustly interpret kinematic data of protoplanetary disks, see Section 3 of [Visualizing the Kinematics of Planet Formation](https://ui.adsabs.harvard.edu/abs/2020arXiv200904345D/abstract) by The Disk Dynamics Collaboration
-```
 
 
 ```{rubric} Footnotes
