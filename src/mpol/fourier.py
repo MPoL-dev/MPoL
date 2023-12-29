@@ -810,7 +810,7 @@ def make_fake_data(
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
     vis_noiseless: NDArray[complexfloating[Any, Any]]
-    vis_noiseless = nufft(image_cube(), uu, vv).detach().numpy()
+    vis_noiseless = nufft(image_cube.cube, uu, vv).detach().numpy()
 
     # generate complex noise
     sigma = 1 / np.sqrt(weight)

@@ -122,7 +122,7 @@ def test_standalone_init_train(coords, dataset):
     rml.zero_grad()
 
     # calculate a loss
-    loss = losses.nll_gridded(vis, dataset)
+    loss = losses.r_chi_squared_gridded(vis, dataset)
 
     # calculate gradients of parameters
     loss.backward()
@@ -147,7 +147,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
         vis = rml()
 
         # calculate a loss
-        loss = losses.nll_gridded(vis, dataset_cont)
+        loss = losses.r_chi_squared_gridded(vis, dataset_cont)
 
         # calculate gradients of parameters
         loss.backward()
@@ -194,7 +194,7 @@ def test_tensorboard(coords, dataset_cont):
         vis = rml()
 
         # calculate a loss
-        loss = losses.nll_gridded(vis, dataset_cont)
+        loss = losses.r_chi_squared_gridded(vis, dataset_cont)
 
         writer.add_scalar("loss", loss.item(), i)
 
