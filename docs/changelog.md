@@ -3,8 +3,8 @@
 # Changelog
 
 ## v0.3.0
-- Edited documentation to be more concise.
-- Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration).
+- Major documentation edits to be more concise with the objective of making the core package easier to develop and maintain. Some tutorials moved to the [MPoL-dev/examples](https://github.com/MPoL-dev/examples) repository.
+- Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration). Moved all documentation around loss functions into the [Losses API](api/losses.md).
 - Renamed `mpol.losses.nll` -> {meth}`mpol.losses.r_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.r_chi_squared_gridded` because that is what those routines were previously calculating (see the {ref}`api-reference-label` for more details). ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
 - Fixed implementation and docstring of {meth}`mpol.losses.log_likelihood` ([#237](https://github.com/MPoL-dev/MPoL/issues/237)).
 - Made some progress converting docstrings from "Google" style format to "NumPy" style format. Ian is now convinced that NumPy style format is more readable for the type of docstrings we write in MPoL. We usually require long type definitions and long argument descriptions, and the extra indentation required for Google makes these very scrunched.
