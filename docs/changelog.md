@@ -3,6 +3,17 @@
 # Changelog
 
 ## v0.3.0
+
+- Changed base spatial frequency unit from k$\lambda$ to $\lambda$, closing issue [#223](https://github.com/MPoL-dev/MPoL/issues/223) and simplifying the internals of the codebase in numerous places. The following routines now expect inputs in units of $\lambda$:
+  - {class}`mpol.coordinates.GridCoords`
+  - {class}`mpol.coordinates.check_data_fit`
+  - {class}`mpol.datasets.GriddedDataset`
+  - {class}`mpol.fourier.NuFFT.forward`
+  - {class}`mpol.fourier.NuFFTCached`
+  - {class}`mpol.gridding.verify_no_hermitian_pairs`
+  - {class}`mpol.gridding.GridderBase`
+  - {class}`mpol.gridding.DataAverager`
+  - {class}`mpol.gridding.DirtyImager`
 - Major documentation edits to be more concise with the objective of making the core package easier to develop and maintain. Some tutorials moved to the [MPoL-dev/examples](https://github.com/MPoL-dev/examples) repository.
 - Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration). Moved all documentation around loss functions into the [Losses API](api/losses.md).
 - Renamed `mpol.losses.nll` -> {meth}`mpol.losses.r_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.r_chi_squared_gridded` because that is what those routines were previously calculating (see the {ref}`api-reference-label` for more details). ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
