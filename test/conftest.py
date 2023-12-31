@@ -6,8 +6,13 @@ from astropy.utils.data import download_file
 from mpol import coordinates, fourier, gridding, images
 from mpol.__init__ import zenodo_record
 
+from importlib.resources import files
+
+npz_path = files("mpol.data").joinpath("mock_data.npz")
+
 # We need a fixture which provides mock visibilities of the sort we'd
 # expect from visread, but *without* the CASA dependency.
+
 
 # fixture to provide tuple of uu, vv, weight, data_re, and data_im values
 @pytest.fixture(scope="session")
@@ -20,6 +25,56 @@ def mock_visibility_archive():
     )
 
     return np.load(fname)
+
+
+@pytest.fixture(scope="session")
+def img2D_butterfly():
+    """Return the 2D source image of the butterfly, for use as a test image cube."""
+    archive = np.load(npz_path)
+    return np.float64(archive.img)
+
+
+@pytest.fixture(scope="session")
+def baselines_m():
+    "Return the mock baselines (in meters) produced from the IM Lup DSHARP dataset."
+    archive = np.load(npz_path)
+    return np.float64(archive.uu), np.float64(archive.vv)
+
+
+# to replace everything with the mock dataset (and pass), we need to replace
+# * mock_visibility_data
+# * mock_visibility_data_cont
+#
+# audit of test suite usage. Routines require
+# * only uu, vv in klambda, single-channel
+# * all uu, vv, weight, data_re, data_im, single-channel
+# * only uu, vv in klambda, multi-channel
+# * all uu, vv, weight, data_re, data_im, multi-channel
+
+# let's call these 1D and 2D
+#
+# We can also simplify a lot of logic if we create a packed test_img_cube that
+# can be fed to FourierLayer, and NuFFT.
+
+
+@pytest.fixture
+def baselines_1D(mock_visibility_archive):
+    chan = 4
+    d = mock_visibility_archive
+    uu = d["uu"][chan]
+    vv = d["vv"][chan]
+
+    return uu, vv
+
+
+@pytest.fixture
+def baselines_2D(mock_visibility_archive):
+    d = mock_visibility_archive
+    uu = d["uu"]
+    vv = d["vv"]
+
+    return uu, vv
+
 
 @pytest.fixture
 def mock_visibility_data(mock_visibility_archive):
@@ -67,7 +122,8 @@ def averager(mock_visibility_data, coords):
     )
 
     return averager
-    
+
+
 @pytest.fixture
 def imager(mock_visibility_data, coords):
     uu, vv, weight, data_re, data_im = mock_visibility_data
@@ -82,7 +138,6 @@ def imager(mock_visibility_data, coords):
     )
 
     return imager
-
 
 
 @pytest.fixture
@@ -103,7 +158,6 @@ def dataset(mock_visibility_data, coords):
 
 @pytest.fixture
 def dataset_cont(mock_visibility_data_cont, coords):
-
     uu, vv, weight, data_re, data_im = mock_visibility_data_cont
     averager = gridding.DataAverager(
         coords=coords,
@@ -125,23 +179,24 @@ def mock_1d_archive():
         cache=True,
         pkgname="mpol",
     )
-    
+
     return np.load(fname, allow_pickle=True)
 
 
 @pytest.fixture
 def mock_1d_image_model(mock_1d_archive):
     m = mock_1d_archive
-    rtrue = m['rtrue']
-    itrue = m['itrue']
-    i2dtrue = m['i2dtrue']
-    xmax = ymax = m['xmax']
-    geom = m['geometry']
+    rtrue = m["rtrue"]
+    itrue = m["itrue"]
+    i2dtrue = m["i2dtrue"]
+    xmax = ymax = m["xmax"]
+    geom = m["geometry"]
     geom = geom[()]
 
-    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
-                                    npix=i2dtrue.shape[0])
-    
+    coords = coordinates.GridCoords(
+        cell_size=xmax * 2 / i2dtrue.shape[0], npix=i2dtrue.shape[0]
+    )
+
     # the center of the array is already at the center of the image -->
     # undo this as expected by input to ImageCube
     i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
@@ -149,7 +204,9 @@ def mock_1d_image_model(mock_1d_archive):
     # pack the numpy image array into an ImageCube
     packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
     packed_tensor = torch.from_numpy(packed_cube)
-    bcube = images.BaseCube(coords=coords,nchan=1,base_cube=packed_tensor,pixel_mapping=lambda x: x)
+    bcube = images.BaseCube(
+        coords=coords, nchan=1, base_cube=packed_tensor, pixel_mapping=lambda x: x
+    )
     cube_true = images.ImageCube(coords=coords, nchan=1)
     # register cube to buffer inside cube_true.cube
     cube_true(bcube())
@@ -160,18 +217,19 @@ def mock_1d_image_model(mock_1d_archive):
 @pytest.fixture
 def mock_1d_vis_model(mock_1d_archive):
     m = mock_1d_archive
-    i2dtrue = m['i2dtrue']
-    xmax = m['xmax']
-    geom = m['geometry']
+    i2dtrue = m["i2dtrue"]
+    xmax = m["xmax"]
+    geom = m["geometry"]
     geom = geom[()]
 
-    Vtrue = m['vis']
-    Vtrue_dep = m['vis_dep']
-    q_dep = m['baselines_dep']
+    Vtrue = m["vis"]
+    Vtrue_dep = m["vis_dep"]
+    q_dep = m["baselines_dep"]
 
-    coords = coordinates.GridCoords(cell_size=xmax * 2 / i2dtrue.shape[0], 
-                                    npix=i2dtrue.shape[0])
-    
+    coords = coordinates.GridCoords(
+        cell_size=xmax * 2 / i2dtrue.shape[0], npix=i2dtrue.shape[0]
+    )
+
     # the center of the array is already at the center of the image -->
     # undo this as expected by input to ImageCube
     i2dtrue = np.flip(np.fft.fftshift(i2dtrue), 1)
@@ -179,23 +237,24 @@ def mock_1d_vis_model(mock_1d_archive):
     # pack the numpy image array into an ImageCube
     packed_cube = np.broadcast_to(i2dtrue, (1, coords.npix, coords.npix)).copy()
     packed_tensor = torch.from_numpy(packed_cube)
-    bcube = images.BaseCube(coords=coords,nchan=1, base_cube=packed_tensor, pixel_mapping=lambda x:x)
+    bcube = images.BaseCube(
+        coords=coords, nchan=1, base_cube=packed_tensor, pixel_mapping=lambda x: x
+    )
     cube_true = images.ImageCube(coords=coords, nchan=1)
 
-    # register image 
+    # register image
     cube_true(bcube())
 
-
     # create a FourierCube
-    fcube_true = fourier.FourierCube(coords=coords)    
+    fcube_true = fourier.FourierCube(coords=coords)
 
     # take FT of icube to populate fcube
     fcube_true.forward(cube_true.sky_cube)
-    
-    # insert the vis tensor into the FourierCube ('vis' would typically be 
+
+    # insert the vis tensor into the FourierCube ('vis' would typically be
     # populated by taking the FFT of an image)
     # packed_fcube = np.broadcast_to(Vtrue, (1, len(Vtrue))).copy()
-    # packed_ftensor = torch.from_numpy(packed_cube)    
+    # packed_ftensor = torch.from_numpy(packed_cube)
     # fcube_true.ground_cube = packed_tensor
 
     return fcube_true, Vtrue_dep, q_dep, geom
@@ -227,23 +286,27 @@ def crossvalidation_products(mock_visibility_data):
 def generic_parameters(tmp_path):
     # generic model parameters to test training loop and cross-val loop
     regularizers = {
-        "entropy": {"lambda":1e-3, "guess":False, "prior_intensity":1e-10},
-        }
+        "entropy": {"lambda": 1e-3, "guess": False, "prior_intensity": 1e-10},
+    }
 
-    train_pars = {"epochs":15, "convergence_tol":1e-3, 
-                "regularizers":regularizers, "train_diag_step":None, 
-                "save_prefix":tmp_path, "verbose":True
-                }
-    
+    train_pars = {
+        "epochs": 15,
+        "convergence_tol": 1e-3,
+        "regularizers": regularizers,
+        "train_diag_step": None,
+        "save_prefix": tmp_path,
+        "verbose": True,
+    }
+
     crossval_pars = train_pars.copy()
     crossval_pars["learn_rate"] = 0.5
     crossval_pars["kfolds"] = 2
-    crossval_pars["split_method"] = 'random_cell'
+    crossval_pars["split_method"] = "random_cell"
     crossval_pars["seed"] = 47
     crossval_pars["split_diag_fig"] = False
-    crossval_pars["store_cv_diagnostics"] = True 
+    crossval_pars["store_cv_diagnostics"] = True
     crossval_pars["device"] = None
 
-    gen_pars  = { "train_pars":train_pars, "crossval_pars":crossval_pars}
+    gen_pars = {"train_pars": train_pars, "crossval_pars": crossval_pars}
 
-    return gen_pars 
+    return gen_pars

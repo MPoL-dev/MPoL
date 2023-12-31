@@ -102,9 +102,9 @@ def test_instantiate_nufft(coords):
     fourier.NuFFT(coords=coords, nchan=1)
 
 
-def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont):
+def test_instantiate_nufft_cached_single_chan(coords, baselines_1D):
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
 
     # should assume everything is the same_uv
     layer = fourier.NuFFTCached(
@@ -117,9 +117,9 @@ def test_instantiate_nufft_cached_single_chan(coords, mock_visibility_data_cont)
     assert layer.same_uv
 
 
-def test_instantiate_nufft_cached_multi_chan(coords, mock_visibility_data_cont):
+def test_instantiate_nufft_cached_multi_chan(coords, baselines_1D):
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
 
     # should still assume that the uv is the same, since uu and vv are single-channel
     layer = fourier.NuFFTCached(
@@ -133,12 +133,12 @@ def test_instantiate_nufft_cached_multi_chan(coords, mock_visibility_data_cont):
     assert layer.same_uv
 
 
-def test_predict_vis_nufft(coords, mock_visibility_data_cont):
+def test_predict_vis_nufft(coords, baselines_1D):
     # just see that we can load the layer and get something through without error
     # for a very simple blank function
 
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
 
     nchan = 10
 
@@ -163,12 +163,12 @@ def test_predict_vis_nufft(coords, mock_visibility_data_cont):
     )
 
 
-def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
+def test_predict_vis_nufft_cached(coords, baselines_1D):
     # just see that we can load the layer and get something through without error
     # for a very simple blank function
 
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
 
     nchan = 10
 
@@ -194,7 +194,7 @@ def test_predict_vis_nufft_cached(coords, mock_visibility_data_cont):
     )
 
 
-def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
+def test_nufft_cached_predict_GPU(coords, baselines_1D):
     if not torch.cuda.is_available():
         pass
     else:
@@ -204,7 +204,7 @@ def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
         # for a very simple blank function
 
         # load some data
-        uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+        uu, vv = baselines_1D
 
         nchan = 10
 
@@ -230,13 +230,13 @@ def test_nufft_cached_predict_GPU(coords, mock_visibility_data_cont):
         )
 
 
-def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
+def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
 
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
     nchan = 1
 
     # create a NuFFT layer to perform interpolations to these points
@@ -298,13 +298,13 @@ def test_nufft_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path)
     assert num_output == approx(an_output, abs=2.5e-6)
 
 
-def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tmp_path):
+def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
 
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
     nchan = 1
 
     # create a NuFFT layer to perform interpolations to these points
@@ -366,13 +366,13 @@ def test_nufft_cached_accuracy_single_chan(coords, mock_visibility_data_cont, tm
     assert num_output == approx(an_output, abs=2e-8)
 
 
-def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont):
+def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
     # create a multi-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
 
     # load some data
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv = baselines_1D
     nchan = 5
 
     # create a NuFFT layer to perform interpolations to these points
@@ -412,13 +412,13 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, mock_visibility_data_cont)
         assert num_output[i] == approx(an_output, abs=2e-8)
 
 
-def test_nufft_cached_accuracy_batch_broadcast(coords, mock_visibility_data, tmp_path):
+def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D, tmp_path):
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
 
     # load some multi-channel data
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv = baselines_2D
     nchan = uu.shape[0]
 
     # create a NuFFT layer to perform interpolations to these points

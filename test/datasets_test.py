@@ -7,7 +7,6 @@ import torch
 
 from mpol import datasets, fourier, images
 
-
 def test_index(coords, dataset):
     # test that we can index a dataset
 

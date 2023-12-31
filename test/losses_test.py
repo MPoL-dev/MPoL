@@ -7,8 +7,8 @@ from mpol import fourier, images, losses
 
 # create a fixture that returns nchan and an image
 @pytest.fixture
-def nchan_cube(mock_visibility_data, coords):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def nchan_cube(baselines_2D, coords):
+    uu, vv = baselines_2D
     nchan = len(uu)
 
     # create a mock base image
@@ -24,7 +24,7 @@ def nchan_cube(mock_visibility_data, coords):
 
 
 @pytest.fixture
-def loose_visibilities(mock_visibility_data, coords, nchan_cube):
+def loose_visibilities(baselines_2D, coords, nchan_cube):
     # use the NuFFT to produce model visibilities
 
     nchan, packed_cube = nchan_cube
@@ -32,7 +32,7 @@ def loose_visibilities(mock_visibility_data, coords, nchan_cube):
     # use the coil broadcasting ability
     chan = 4
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv = baselines_2D
     uu_chan = uu[chan]
     vv_chan = vv[chan]
 
