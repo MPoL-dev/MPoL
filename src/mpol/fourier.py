@@ -271,7 +271,7 @@ class NuFFT(nn.Module):
 
     def forward(
         self,
-        cube: torch.Tensor,
+        packed_cube: torch.Tensor,
         uu: torch.Tensor,
         vv: torch.Tensor,
         sparse_matrices: bool = False,
@@ -285,7 +285,7 @@ class NuFFT(nn.Module):
 
         Parameters
         ----------
-        cube : :class:`torch.Tensor` of :class:`torch.double`
+        packed_cube : :class:`torch.Tensor` of :class:`torch.double`
             shape ``(nchan, npix, npix)``). The cube
             should be a "prepacked" image cube, for example,
             from :meth:`mpol.images.ImageCube.forward`
@@ -368,14 +368,14 @@ class NuFFT(nn.Module):
 
         # make sure that the nchan assumptions for the ImageCube and the NuFFT
         # setup are the same
-        if cube.size(0) != self.nchan:
+        if packed_cube.size(0) != self.nchan:
             raise DimensionMismatchError(
-                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+                f"nchan of ImageCube ({packed_cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
             )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
-        shifted = torch.fft.fftshift(cube, dim=(1, 2))
+        shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
 
         # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted.type(torch.complex128)
