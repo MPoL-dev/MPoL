@@ -102,3 +102,8 @@ def test_grid_coords_fail(baselines_2D):
 
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
+
+
+def test_coords_mock_image(coords, img2D_butterfly):
+    npix, _ = img2D_butterfly.shape
+    assert coords.npix == npix, "coords dimensions and mock image have different sizes"

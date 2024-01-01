@@ -51,6 +51,7 @@ dev = [
     "asdf",
     "pyro-ppl",
     "arviz[all]",
+    "visread>=0.0.4"
 ]
 test = [
     "pytest",
@@ -59,6 +60,7 @@ test = [
     "requests",
     "tensorboard",
     "mypy",
+    "visread>=0.0.4",
     "frank>=1.2.1",
 ]
 

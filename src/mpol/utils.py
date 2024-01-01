@@ -234,60 +234,6 @@ def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
             "[lambda].".format(min(q), min_feasible_q * 1e3)
         )
 
-
-def convert_baselines(baselines, freq=None, wle=None):
-    r"""
-    Convert baselines in meters to kilolambda.
-    Args:
-        baselines (float or np.array): baselines in [m].
-        freq (float or np.array), optional: frequencies in [Hz].
-        wle (float or np.array), optional: wavelengths in [m].
-    Returns:
-        (1D array nvis): baselines in [klambda]
-    Notes:
-        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be
-        broadcast-able.
-    """
-    if (freq is None and wle is None) or (wle and freq):
-        raise AttributeError("Exactly one of 'freq' or 'wle' must be supplied.")
-
-    if wle is None:
-        # calculate wavelengths in meters
-        wle = c_ms / freq  # m
-
-    # calculate baselines in klambda
-    return 1e-3 * baselines / wle  # [klambda]
-
-
-def broadcast_and_convert_baselines(u, v, chan_freq):
-    r"""
-    Convert baselines to kilolambda and broadcast to match shape of channel frequencies.
-    Args:
-        u (1D array nvis): baseline [m]
-        v (1D array nvis): baseline [m]
-        chan_freq (1D array nchan): frequencies [Hz]
-    Returns:
-        (u, v) each of which are (nchan, nvis) arrays of baselines in [klambda]
-    """
-
-    nchan = len(chan_freq)
-
-    # broadcast to the same shape as the data
-    # stub to broadcast u, v to all channels
-    broadcast = np.ones((nchan, 1))
-    uu = u * broadcast
-    vv = v * broadcast
-
-    # calculate wavelengths in meters
-    wavelengths = c_ms / chan_freq[:, np.newaxis]  # m
-
-    # calculate baselines in klambda
-    uu = 1e-3 * uu / wavelengths  # [klambda]
-    vv = 1e-3 * vv / wavelengths  # [klambda]
-
-    return (uu, vv)
-
-
 def get_max_spatial_freq(cell_size: float, npix: int) -> float:
     r"""
     Calculate the maximum spatial frequency that the image can represent and still

@@ -452,7 +452,7 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D, tmp_path):
     num_output = layer(img_packed_tensor).detach().numpy()
 
     # plot a single channel, to check
-    ichan = 3
+    ichan = 1
 
     qq = np.hypot(uu[ichan], vv[ichan])
     an_output = utils.fourier_gaussian_klambda_arcsec(uu[ichan], vv[ichan], **kw)

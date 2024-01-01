@@ -1,17 +1,15 @@
 import numpy as np
 import pytest
 import torch
+import visread.process
 from astropy.utils.data import download_file
 
-from mpol import coordinates, fourier, gridding, images
+from mpol import coordinates, fourier, gridding, images, utils
 from mpol.__init__ import zenodo_record
 
 from importlib.resources import files
 
 npz_path = files("mpol.data").joinpath("mock_data.npz")
-
-# We need a fixture which provides mock visibilities of the sort we'd
-# expect from visread, but *without* the CASA dependency.
 
 
 # fixture to provide tuple of uu, vv, weight, data_re, and data_im values
@@ -31,14 +29,48 @@ def mock_visibility_archive():
 def img2D_butterfly():
     """Return the 2D source image of the butterfly, for use as a test image cube."""
     archive = np.load(npz_path)
-    return np.float64(archive.img)
+    return np.float64(archive["img"])
+
+
+@pytest.fixture(scope="session")
+def packed_cube(img2D_butterfly):
+    """Create a packed tensor image cube from the butterfly."""
+    # now (1, npix, npix)
+    print("npix packed cube", img2D_butterfly.shape)
+    nchan = 10
+    # tile to some nchan, npix, npix
+    cube = torch.tile(torch.from_numpy(img2D_butterfly), (nchan, 1, 1))
+    # convert to packed format
+    return utils.sky_cube_to_packed_cube(cube)
 
 
 @pytest.fixture(scope="session")
 def baselines_m():
     "Return the mock baselines (in meters) produced from the IM Lup DSHARP dataset."
     archive = np.load(npz_path)
-    return np.float64(archive.uu), np.float64(archive.vv)
+    return np.float64(archive["uu"]), np.float64(archive["vv"])
+
+
+@pytest.fixture
+def baselines_1D(baselines_m):
+    uu, vv = baselines_m
+
+    # klambda for now
+    return 1e-3 * visread.process.convert_baselines(
+        uu, 230.0e9
+    ), 1e-3 * visread.process.convert_baselines(vv, 230.0e9)
+
+
+@pytest.fixture
+def baselines_2D(baselines_m):
+    uu, vv = baselines_m
+
+    u_lam, v_lam = visread.process.broadcast_and_convert_baselines(
+        uu, vv, np.array([230.0, 230.01, 230.02]) * 1e9
+    )
+
+    # klambda for now
+    return 1e-3 * u_lam, 1e-3 * v_lam
 
 
 # to replace everything with the mock dataset (and pass), we need to replace
@@ -46,34 +78,8 @@ def baselines_m():
 # * mock_visibility_data_cont
 #
 # audit of test suite usage. Routines require
-# * only uu, vv in klambda, single-channel
 # * all uu, vv, weight, data_re, data_im, single-channel
-# * only uu, vv in klambda, multi-channel
 # * all uu, vv, weight, data_re, data_im, multi-channel
-
-# let's call these 1D and 2D
-#
-# We can also simplify a lot of logic if we create a packed test_img_cube that
-# can be fed to FourierLayer, and NuFFT.
-
-
-@pytest.fixture
-def baselines_1D(mock_visibility_archive):
-    chan = 4
-    d = mock_visibility_archive
-    uu = d["uu"][chan]
-    vv = d["vv"][chan]
-
-    return uu, vv
-
-
-@pytest.fixture
-def baselines_2D(mock_visibility_archive):
-    d = mock_visibility_archive
-    uu = d["uu"]
-    vv = d["vv"]
-
-    return uu, vv
 
 
 @pytest.fixture
@@ -105,7 +111,8 @@ def mock_visibility_data_cont(mock_visibility_archive):
 
 @pytest.fixture
 def coords():
-    return coordinates.GridCoords(cell_size=0.005, npix=800)
+    # note that this is now the same as the mock image we created
+    return coordinates.GridCoords(cell_size=0.005, npix=1028)
 
 
 @pytest.fixture
