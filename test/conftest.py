@@ -56,9 +56,11 @@ def baselines_1D(baselines_m):
     uu, vv = baselines_m
 
     # klambda for now
-    return 1e-3 * visread.process.convert_baselines(
-        uu, 230.0e9
-    ), 1e-3 * visread.process.convert_baselines(vv, 230.0e9)
+    uu = 1e-3 * visread.process.convert_baselines(uu, 230.0e9)
+    vv = 1e-3 * visread.process.convert_baselines(vv, 230.0e9)
+
+    # convert to torch
+    return torch.as_tensor(uu), torch.as_tensor(vv)
 
 
 @pytest.fixture
@@ -70,7 +72,10 @@ def baselines_2D(baselines_m):
     )
 
     # klambda for now
-    return 1e-3 * u_lam, 1e-3 * v_lam
+    u_klam = 1e-3 * torch.as_tensor(u_lam)
+    v_klam = 1e-3 * torch.as_tensor(v_lam)
+
+    return u_klam, v_klam
 
 
 # to replace everything with the mock dataset (and pass), we need to replace

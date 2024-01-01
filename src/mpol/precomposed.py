@@ -37,10 +37,10 @@ class SimpleNet(torch.nn.Module):
 
     def __init__(
         self,
-        coords=None,
-        nchan=1,
-        base_cube=None,
-    ):
+        coords: GridCoords,
+        nchan: int = 1,
+        base_cube: torch.Tensor | None = None,
+    ) -> None:
         super().__init__()
 
         self.coords = coords
@@ -55,7 +55,7 @@ class SimpleNet(torch.nn.Module):
         self.icube = images.ImageCube(coords=self.coords, nchan=self.nchan)
         self.fcube = fourier.FourierCube(coords=self.coords)
 
-    def forward(self):
+    def forward(self) -> torch.Tensor:
         r"""
         Feed forward to calculate the model visibilities. In this step, a
         :class:`~mpol.images.BaseCube` is fed to a :class:`~mpol.images.HannConvCube`
@@ -67,5 +67,5 @@ class SimpleNet(torch.nn.Module):
         x = self.bcube()
         x = self.conv_layer(x)
         x = self.icube(x)
-        vis = self.fcube(x)
+        vis: torch.Tensor = self.fcube(x)
         return vis

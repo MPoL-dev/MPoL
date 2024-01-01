@@ -4,6 +4,9 @@
 
 ## v0.3.0
 
+- Standardized treatment of numpy vs `torch.tensor`s, with preference for `torch.tensor` in many routines. This simplifies the internal logic of the routines and will make most operations run faster.
+- Standardized the input types of {class}:`mpol.fourier.NuFFT` and {class}:`mpol.fourier.NuFFTCached` to expect {class}`torch.Tensor`s (removed support for numpy arrays). This simplifies the internal logic of the routines and will make most operations run faster.
+- Changed {class}`mpol.fourier.make_fake_data` -> {class}`mpol.fourier.generate_fake_data`.
 - Changed base spatial frequency unit from k$\lambda$ to $\lambda$, closing issue [#223](https://github.com/MPoL-dev/MPoL/issues/223) and simplifying the internals of the codebase in numerous places. The following routines now expect inputs in units of $\lambda$:
   - {class}`mpol.coordinates.GridCoords`
   - {class}`mpol.coordinates.check_data_fit`

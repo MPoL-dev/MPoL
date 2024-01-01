@@ -5,7 +5,7 @@ import torch
 
 from typing import Any
 import numpy.typing as npt
-from mpol.constants import arcsec, c_ms, cc, deg, kB
+from mpol.constants import arcsec, cc, deg, kB
 
 
 def torch2npy(t: torch.Tensor) -> npt.NDArray:
@@ -234,6 +234,7 @@ def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
             "[lambda].".format(min(q), min_feasible_q * 1e3)
         )
 
+
 def get_max_spatial_freq(cell_size: float, npix: int) -> float:
     r"""
     Calculate the maximum spatial frequency that the image can represent and still
@@ -272,8 +273,8 @@ def get_maximum_cell_size(uu_vv_point: float) -> float:
 
 def get_optimal_image_properties(
     image_width: float,
-    u: npt.NDArray[np.floating[Any]],
-    v: npt.NDArray[np.floating[Any]],
+    u: torch.Tensor,
+    v: torch.Tensor,
 ) -> tuple[float, int]:
     r"""
     For an image of desired width, determine the maximum pixel size that
@@ -285,7 +286,7 @@ def get_optimal_image_properties(
     image_width : float, unit = arcsec
         Desired width of the image (for a square image of size
         `image_width` :math:`\times` `image_width`).
-    u, v : np.ndarray of np.float, unit = :math:`k\lambda`
+    u, v : :class:`torch.Tensor` of :class:`torch.double`, unit = :math:`k\lambda`
         `u` and `v` baselines.
 
     Returns
@@ -299,9 +300,9 @@ def get_optimal_image_properties(
     -----
     Assumes baselines are as-observed.
     """
-    max_freq = max(max(abs(u)), max(abs(v)))
+    max_freq = torch.max(torch.abs(torch.concat([u,v])))
 
-    cell_size = get_maximum_cell_size(max_freq)
+    cell_size = get_maximum_cell_size(max_freq.item())
 
     # round npix up to nearest integer
     npix = math.ceil(image_width / cell_size)

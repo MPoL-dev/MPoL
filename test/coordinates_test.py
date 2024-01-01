@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy as np
+import torch
 import pytest
 
 from mpol import coordinates
@@ -97,7 +97,7 @@ def test_grid_coords_fail(baselines_2D):
 
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
-    print("max u data", np.max(uu))
+    print("max u data", torch.max(uu))
     print("max u grid", coords.max_grid)
 
     with pytest.raises(CellSizeError):

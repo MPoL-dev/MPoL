@@ -84,7 +84,7 @@ class FourierCube(nn.Module):
         Returns
         -------
         :class:`torch.Tensor` of :class:`torch.complex128` of shape ``(nchan, npix, npix)``
-            complex-valued FFT of the image cube (i.e., the visibility cube), in 
+            complex-valued FFT of the image cube (i.e., the visibility cube), in
             'ground' format.
         """
 
@@ -115,6 +115,7 @@ class FourierCube(nn.Module):
             phase cube in 'ground' format (:math:`[-\pi,\pi)`).
         """
         return torch.angle(self.ground_vis)
+
 
 class NuFFT(nn.Module):
     r"""
@@ -271,8 +272,8 @@ class NuFFT(nn.Module):
     def forward(
         self,
         cube: torch.Tensor,
-        uu,
-        vv,
+        uu: torch.Tensor,
+        vv: torch.Tensor,
         sparse_matrices: bool = False,
     ) -> torch.Tensor:
         r"""
@@ -282,22 +283,29 @@ class NuFFT(nn.Module):
         points. In general, you probably do not want to provide baselines that include
         Hermitian pairs.
 
-        Args:
-            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube
-                should be a "prepacked" image cube, for example,
-                from :meth:`mpol.images.ImageCube.forward`
-            uu (array-like): array of the u (East-West) spatial frequency coordinate
-                [klambda].
-            vv (array-like): array of the v (North-South) spatial frequency coordinate
-                [klambda] (must be the same shape as uu)
-            sparse_matrices (bool): If False, use the default table-based interpolation
-                of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
-                slower but more accurate).  Note that sparse matrices are incompatible
-                with multi-channel `uu` and `vv` arrays (see below).
+        Parameters
+        ----------
+        cube : :class:`torch.Tensor` of :class:`torch.double`
+            shape ``(nchan, npix, npix)``). The cube
+            should be a "prepacked" image cube, for example,
+            from :meth:`mpol.images.ImageCube.forward`
+        uu : :class:`torch.Tensor` of :class:`torch.double`
+            2D array of the u (East-West) spatial frequency coordinate
+            [klambda] of shape ``(nchan, npix)``
+        vv : :class:`torch.Tensor` of :class:`torch.double`
+            2D array of the v (North-South) spatial frequency coordinate
+            [klambda] (must be the same shape as uu)
+        sparse_matrices : bool
+            If False, use the default table-based interpolation
+            of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
+            slower but more accurate).  Note that sparse matrices are incompatible
+            with multi-channel `uu` and `vv` arrays (see below).
 
-        Returns:
-            torch.complex tensor: Fourier samples of shape ``(nchan, nvis)``, evaluated
-                at the ``uu``, ``vv`` points
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.complex128`
+            Fourier samples of shape ``(nchan, nvis)``, evaluated at the ``uu``,
+            ``vv`` points
 
         **Dimensionality**: You should consider the dimensionality of your image and
         your visibility samples when using this method. If your image has multiple
@@ -357,10 +365,6 @@ class NuFFT(nn.Module):
         table-based interpolation to be sufficiently accurate, but this could change
         depending on your problem.
         """
-
-        # permit numpy, but prefer tensor
-        uu = torch.as_tensor(uu)
-        vv = torch.as_tensor(vv)
 
         # make sure that the nchan assumptions for the ImageCube and the NuFFT
         # setup are the same
@@ -503,8 +507,6 @@ class NuFFTCached(NuFFT):
     this will result in a warning.
 
     Args:
-        cell_size (float): the width of an image-plane pixel [arcseconds]
-        npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the :class:`mpol.images.ImageCube`.
@@ -519,8 +521,8 @@ class NuFFTCached(NuFFT):
     def __init__(
         self,
         coords: GridCoords,
-        uu,
-        vv,
+        uu: torch.Tensor,
+        vv: torch.Tensor,
         nchan: int = 1,
         sparse_matrices: bool = True,
     ):
@@ -542,10 +544,6 @@ class NuFFTCached(NuFFT):
 
         self.sparse_matrices = sparse_matrices
         self.same_uv = same_uv
-
-        # permit numpy, but prefer tensor
-        uu = torch.as_tensor(uu)
-        vv = torch.as_tensor(vv)
 
         self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
         self.k_traj: torch.Tensor
@@ -629,55 +627,73 @@ class NuFFTCached(NuFFT):
         return output
 
 
-def make_fake_data(
-    image_cube: ImageCube,
-    uu: NDArray[floating[Any]],
-    vv: NDArray[floating[Any]],
-    weight: NDArray[floating[Any]],
-) -> tuple[NDArray[complexfloating[Any, Any]], ...]:
+def generate_fake_data(
+    packed_cube: torch.Tensor,
+    coords: GridCoords,
+    uu: torch.Tensor,
+    vv: torch.Tensor,
+    weight: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
     r"""
-    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See
-    :ref:`mock-dataset-label` for more details on how to prepare a generic image for
-    use in an :class:`~mpol.images.ImageCube`.
+    Create a fake dataset from a supplied packed tensor cube using
+    :class:`mpol.fourier.NuFFT`. See :ref:`mock-dataset-label` for more details on how
+    to prepare a generic image to a `packed_cube`.
 
-    The provided visibilities can be 1d for a single continuum channel, or 2d for
-    image cube. If 1d, visibilities will be converted to 2d arrays of shape
-    ``(1, nvis)``.
+    The ``uu`` and ``vv`` baselines can either be 1D or 2D, depending on the desired
+    broadcasting behavior from the :class:`mpol.fourier.NuFFT`.
 
-    Args:
-        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a
-            fake dataset
-        uu (numpy array): array of u spatial frequency coordinates, not including
-            Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        vv (numpy array): array of v spatial frequency coordinates, not including
-            Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        weight (2d numpy array): length array of thermal weights
-            :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+    If the ``weight`` array is 1D, the routine assumes the weights will be broadcasted
+    to all ``nchan``. Otherwise, provide a 2D weight array.
 
-    Returns:
-        (2-tuple): a two tuple of the fake data. The first array is the mock dataset
+    Parameters
+    ----------
+    packed_cube : :class:`torch.Tensor` of `class:`torch.double`
+        the image in "packed" format with shape (`nchan`, `npix`, `npix`)
+    coords : :class:`mpol.coordinates.GridCoords`
+    uu : :class:`torch.Tensor` of `class:`torch.double`
+        array of u spatial frequency coordinates,
+        not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+    vv : :class:`torch.Tensor` of `class:`torch.double`
+        array of v spatial frequency coordinates,
+        not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+    weight : :class:`torch.Tensor` of `class:`torch.double`
+        shape ``(nchan, nvis)`` array of thermal weights
+        :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+
+    Returns
+    -------
+    :class:`torch.Tensor` of `class:`torch.complex128`
+        A 2-tuple of the fake data. The first array is the mock dataset
         including noise, the second array is the mock dataset without added noise.
+        Each array is shape ``(nchan, npix, npix)``.
     """
 
-    # instantiate a NuFFT object based on the ImageCube
-    # OK if uu shape (nvis,)
-    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan)
-
-    # make into a multi-channel dataset, even if only a single-channel provided
-    if uu.ndim == 1:
-        uu = np.atleast_2d(uu)
-        vv = np.atleast_2d(vv)
-        weight = np.atleast_2d(weight)
+    # instantiate a NuFFT object based on the
+    nchan, npix, _ = packed_cube.size()
+    assert coords.npix == npix, "npix for packed_cube {:} and coords {:} differ".format(
+        nchan, coords.npix
+    )
+    nufft = NuFFT(coords=coords, nchan=nchan)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
-    vis_noiseless: NDArray[complexfloating[Any, Any]]
-    vis_noiseless = nufft(image_cube.cube, uu, vv).detach().numpy()
+    vis_noiseless: torch.Tensor
+    vis_noiseless = nufft(packed_cube, uu, vv)
 
     # generate complex noise
-    sigma = 1 / np.sqrt(weight)
-    noise = np.random.normal(
-        loc=0, scale=sigma, size=uu.shape
-    ) + 1.0j * np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    # we could use torch.normal with complex quantities directly, but they treat
+    # a complex normal with std of 1 as having an amplitude of 1. 
+    # wheras ALMA "weights" have the definition that their scatter is for the reals
+    # (or imaginaries). So there is a factor of sqrt(2) between them.
+    # we split things up, work with real quantities, and then combine later
+    mean = torch.zeros(vis_noiseless.size())
+
+    # broadcast weight to (nchan, nvis) if it isn't already
+    weight = torch.broadcast_to(weight, vis_noiseless.size())
+    sigma = torch.sqrt(1 / weight)
+
+    noise_re = torch.normal(mean, sigma)
+    noise_im = torch.normal(mean, sigma)
+    noise = torch.complex(noise_re, noise_im)
 
     # add to data
     vis_noise = vis_noiseless + noise
@@ -713,7 +729,9 @@ def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=
     """
     nufft = NuFFT(coords=model.coords, nchan=model.nchan)
 
-    vis_model = nufft(model.icube.cube.to("cpu"), u_true, v_true)  # TODO: remove 'to' call
+    vis_model = nufft(
+        model.icube.cube.to("cpu"), u_true, v_true
+    )  # TODO: remove 'to' call
     # convert to numpy, select channel
     vis_model = vis_model.detach().numpy()[channel]
 

@@ -306,12 +306,12 @@ Thankfully, we see that we already chose a sufficiently small `cell_size`.
 
 ## Making the mock dataset
 
-With the {class}`~mpol.images.ImageCube`, $u,v$ and weight distributions now in hand, generating the mock visibilities is relatively straightforward using the {func}`mpol.fourier.make_fake_data` routine. This routine uses the {class}`~mpol.fourier.NuFFT` to produce loose visibilities at the $u,v$ locations and then adds random Gaussian noise to the visibilities, drawn from a probability distribution set by the value of the weights.
+With the {class}`~mpol.images.ImageCube`, $u,v$ and weight distributions now in hand, generating the mock visibilities is relatively straightforward using the {func}`mpol.fourier.generate_fake_data` routine. This routine uses the {class}`~mpol.fourier.NuFFT` to produce loose visibilities at the $u,v$ locations and then adds random Gaussian noise to the visibilities, drawn from a probability distribution set by the value of the weights.
 
 ```{code-cell} ipython3
 from mpol import fourier
 # will have the same shape as the uu, vv, and weight inputs
-data_noise, data_noiseless = fourier.make_fake_data(image, uu, vv, weight)
+data_noise, data_noiseless = fourier.generate_fake_data(image, uu, vv, weight)
 
 print(data_noise.shape)
 print(data_noiseless.shape)

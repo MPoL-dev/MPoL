@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 from pytest import approx
 
 from mpol import fourier, images, utils
-from mpol.constants import *
 
 
 def test_fourier_cube(coords, tmp_path):
@@ -258,21 +258,23 @@ def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = (
-        layer(img_packed_tensor, uu, vv)[0].detach().numpy()
-    )  # take the channel dim out
+    num_output = layer(img_packed_tensor, uu, vv)[0]  # take the channel dim out
 
     # calculate the values analytically
     an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
 
     # find max difference
     diff = num_output - an_output
-    max_diff = np.max(np.abs(diff))
-    max = np.max(np.abs(num_output))
+    max_diff = torch.max(torch.abs(diff))
+    max = torch.max(torch.abs(num_output))
     print(max_diff, max)
 
     # collapse the function into 1D by doing q
-    qq = np.hypot(uu, vv)
+    qq = utils.torch2npy(torch.hypot(uu, vv))
+
+    # convert to numpy for plotting
+    num_output = utils.torch2npy(num_output)
+    diff = utils.torch2npy(diff)
 
     fig, ax = plt.subplots(nrows=4, sharex=True)
     ax[0].scatter(qq, an_output.real, s=3, label="analytic")
@@ -327,7 +329,7 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
 
     # use the NuFFT to predict the values of the cube at the u,v locations
     num_output = (
-        layer(img_packed_tensor)[0].detach().numpy()
+        layer(img_packed_tensor)[0]
     )  # take the channel dim out
 
     # calculate the values analytically
@@ -335,12 +337,17 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
 
     # find max difference
     diff = num_output - an_output
-    max_diff = np.max(np.abs(diff))
-    max = np.max(np.abs(num_output))
+    max_diff = torch.max(torch.abs(diff))
+    max = torch.max(torch.abs(num_output))
     print(max_diff, max)
 
+
     # collapse the function into 1D by doing q
-    qq = np.hypot(uu, vv)
+    qq = utils.torch2npy(torch.hypot(uu, vv))
+
+    # convert to numpy for plotting
+    num_output = utils.torch2npy(num_output)
+    diff = utils.torch2npy(diff)
 
     fig, ax = plt.subplots(nrows=4, sharex=True)
     ax[0].scatter(qq, an_output.real, s=3, label="analytic")
@@ -449,14 +456,19 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D, tmp_path):
     )
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor).detach().numpy()
+    num_output = layer(img_packed_tensor)
 
     # plot a single channel, to check
     ichan = 1
 
-    qq = np.hypot(uu[ichan], vv[ichan])
     an_output = utils.fourier_gaussian_klambda_arcsec(uu[ichan], vv[ichan], **kw)
+
     diff = num_output[ichan] - an_output
+
+    # convert for plotting
+    qq = utils.torch2npy(torch.hypot(uu[ichan], vv[ichan]))
+    num_output = utils.torch2npy(num_output)
+    diff = utils.torch2npy(diff)
 
     fig, ax = plt.subplots(nrows=4, sharex=True)
     ax[0].scatter(qq, an_output.real, s=3, label="analytic")
