@@ -37,7 +37,7 @@ def packed_cube(img2D_butterfly):
     """Create a packed tensor image cube from the butterfly."""
     # now (1, npix, npix)
     print("npix packed cube", img2D_butterfly.shape)
-    nchan = 10
+    nchan = 9
     # tile to some nchan, npix, npix
     cube = torch.tile(torch.from_numpy(img2D_butterfly), (nchan, 1, 1))
     # convert to packed format

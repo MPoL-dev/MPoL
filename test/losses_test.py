@@ -107,6 +107,7 @@ def test_rchi_evaluation(
     print("loose nll", log_like)
 
     # calculate the gridded log likelihood
+    print(gridded_vis_model.size(), dataset.mask.size())
     log_like_gridded = losses.r_chi_squared_gridded(gridded_vis_model, dataset)
     print("gridded nll", log_like_gridded)
 
