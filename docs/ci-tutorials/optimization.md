@@ -89,19 +89,19 @@ print("this dataset has {:} channel".format(dset.nchan))
 
 ## Building an image model
 
-MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We've bundled the most common modules for imaging together in a {class}`mpol.precomposed.SimpleNet` meta-module, which we'll use here.
+MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We've bundled the most common modules for imaging together in a {class}`mpol.precomposed.GriddedNet` meta-module, which we'll use here.
 
-This diagram shows how the primitive modules, like {class}`mpol.images.BaseCube`, {class}`mpol.images.ImageCube`, etc... are connected together to form {class}`mpol.precomposed.SimpleNet`. In this workflow, the pixel values of the {class}`mpol.images.BaseCube` are the core model parameters representing the image. More information about all of these components is available in the {ref}`API documentation <api-reference-label>`.
+This diagram shows how the primitive modules, like {class}`mpol.images.BaseCube`, {class}`mpol.images.ImageCube`, etc... are connected together to form {class}`mpol.precomposed.GriddedNet`. In this workflow, the pixel values of the {class}`mpol.images.BaseCube` are the core model parameters representing the image. More information about all of these components is available in the {ref}`API documentation <api-reference-label>`.
 
-```{mermaid} ../_static/mmd/src/SimpleNet.mmd
+```{mermaid} ../_static/mmd/src/GriddedNet.mmd
 ```
 
-It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves following the SimpleNet source code as an example ({class}`mpol.precomposed.SimpleNet`) and swap in/out modules as we saw fit.
+It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves following the GriddedNet source code as an example ({class}`mpol.precomposed.GriddedNet`) and swap in/out modules as we saw fit.
 
-We then initialize SimpleNet with the relevant information
+We then initialize GriddedNet with the relevant information
 
 ```{code-cell} ipython3
-rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+rml = precomposed.GriddedNet(coords=coords, nchan=dset.nchan)
 ```
 
 ## Breaking down the training loop
@@ -132,7 +132,7 @@ Let's walk through how we calculate a loss value and optimize the parameters. To
 rml.state_dict()
 ```
 
-These are the default values that were used to initialize the {class}`mpol.images.BaseCube` component of the {class}`mpol.precomposed.SimpleNet`.
+These are the default values that were used to initialize the {class}`mpol.images.BaseCube` component of the {class}`mpol.precomposed.GriddedNet`.
 
 For demonstration purposes, lets access and plot the base cube with matplotlib. In a normal workflow you probably won't need to do this, but to access the basecube in sky orientation, we do
 
@@ -309,7 +309,7 @@ $$
 \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 $$
 
-For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but basically we instantiate the NuFFT layer relative to some image dimensions and $u,v$ locations 
+For speed reasons, the {class}`mpol.precomposed.GriddedNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but basically we instantiate the NuFFT layer relative to some image dimensions and $u,v$ locations 
 
 ```{code-cell} ipython3
 nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan)

@@ -221,9 +221,9 @@ class ImageCube(nn.Module):
 
         self.coords = coords
         self.nchan = nchan
-        self.register_buffer("cube", None)
+        self.register_buffer("packed_cube", None)
 
-    def forward(self, cube: torch.Tensor) -> torch.Tensor:
+    def forward(self, packed_cube: torch.Tensor) -> torch.Tensor:
         r"""
         Pass the cube through as an identity operation, storing the value to the 
         internal buffer. After the cube has been passed through, convenience 
@@ -231,7 +231,7 @@ class ImageCube(nn.Module):
 
         Parameters
         ----------
-        cube : :class:`torch.Tensor` of type :class:`torch.double` 
+        packed_cube : :class:`torch.Tensor` of type :class:`torch.double` 
             3D torch tensor of shape ``(nchan, npix, npix)``) in 'packed' format
 
         Returns
@@ -239,9 +239,9 @@ class ImageCube(nn.Module):
         :class:`torch.Tensor` of :class:`torch.double` type
             tensor of shape ``(nchan, npix, npix)``), same as `cube`
         """
-        self.cube = cube
+        self.packed_cube = packed_cube
 
-        return self.cube
+        return self.packed_cube
 
     @property
     def sky_cube(self) -> torch.Tensor:
@@ -252,7 +252,7 @@ class ImageCube(nn.Module):
             torch.double : 3D image cube of shape ``(nchan, npix, npix)``
 
         """
-        return utils.packed_cube_to_sky_cube(self.cube)
+        return utils.packed_cube_to_sky_cube(self.packed_cube)
 
     @property
     def flux(self) -> torch.Tensor:
@@ -266,7 +266,7 @@ class ImageCube(nn.Module):
 
         # convert from Jy/arcsec^2 to Jy/pixel using area of a pixel
         # multiply by arcsec^2/pixel
-        return self.coords.cell_size**2 * torch.sum(self.cube, dim=(1, 2))
+        return self.coords.cell_size**2 * torch.sum(self.packed_cube, dim=(1, 2))
 
     def to_FITS(
         self,
@@ -304,7 +304,7 @@ class ImageCube(nn.Module):
             for k, v in header_kwargs.items():
                 header[k] = v
 
-        hdu = fits.PrimaryHDU(self.sky_cube.detach().cpu().numpy(), header=header)
+        hdu = fits.PrimaryHDU(utils.torch2npy(self.sky_cube), header=header)
 
         hdul = fits.HDUList([hdu])
         hdul.writeto(fname, overwrite=overwrite)

@@ -292,7 +292,7 @@ def cross_validate(config):
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
 
         # create a new model and optimizer for this k_fold
-        rml = precomposed.SimpleNet(coords=coords, nchan=train_dset.nchan)
+        rml = precomposed.GriddedNet(coords=coords, nchan=train_dset.nchan)
         optimizer = torch.optim.Adam(rml.parameters(), lr=config["lr"])
 
         # train for a while
@@ -310,7 +310,7 @@ Finally, we'll write one more function to train the model using the full dataset
 
 ```{code-cell}
 def train_and_image(pars):
-    rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+    rml = precomposed.GriddedNet(coords=coords, nchan=dset.nchan)
     optimizer = torch.optim.Adam(rml.parameters(), lr=pars["lr"])
     writer = SummaryWriter()
     train(rml, dset, pars, optimizer, writer=writer)

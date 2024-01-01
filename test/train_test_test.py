@@ -13,7 +13,7 @@ from mpol.utils import torch2npy
 def test_traintestclass_training(coords, imager, dataset, generic_parameters):
     # using the TrainTest class, run a training loop without regularizers
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
     
@@ -32,7 +32,7 @@ def test_traintestclass_training_scheduler(coords, imager, dataset, generic_para
     # using the TrainTest class, run a training loop with regularizers, 
     # using the learning rate scheduler
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
 
@@ -52,7 +52,7 @@ def test_traintestclass_training_guess(coords, imager, dataset, generic_paramete
     # using the TrainTest class, run a training loop with regularizers,
     # with a call to the regularizer strength guesser
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"] 
 
@@ -70,7 +70,7 @@ def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_p
     # using the TrainTest class, run a training loop, 
     # and generate the train diagnostics figure 
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     train_pars = generic_parameters["train_pars"]
     # bypass TrainTest.loss_lambda_guess
@@ -100,7 +100,7 @@ def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_p
 def test_traintestclass_testing(coords, imager, dataset, generic_parameters):
     # using the TrainTest class, perform a call to test
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 
@@ -115,7 +115,7 @@ def test_standalone_init_train(coords, dataset):
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     vis = rml()
 
@@ -136,7 +136,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
     # and run a few iterations
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 
@@ -158,7 +158,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
     # let's see what one channel of the image looks like
     fig, ax = plt.subplots(nrows=1)
     ax.imshow(
-        np.squeeze(rml.icube.cube.detach().numpy()),
+        np.squeeze(torch2npy(rml.icube.packed_cube)),
         origin="lower",
         interpolation="none",
         extent=rml.icube.coords.img_ext,
@@ -170,7 +170,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
 def test_train_to_dirty_image(coords, dataset, imager):
     # run a training loop against a dirty image
     nchan = dataset.nchan
-    model = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     train_to_dirty_image(model, imager, niter=10)
 
@@ -181,7 +181,7 @@ def test_tensorboard(coords, dataset_cont):
     # test the writer function
 
     nchan = 1
-    rml = precomposed.SimpleNet(coords=coords, nchan=nchan)
+    rml = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
     optimizer = torch.optim.SGD(rml.parameters(), lr=0.001)
 

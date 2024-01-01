@@ -8,7 +8,7 @@ from mpol import precomposed
 # def test_image_comparison_fig(coords, tmp_path):
 #     # generate an image comparison figure
 
-#     model = precomposed.SimpleNet(coords=coords, nchan=1)
+#     model = precomposed.GriddedNet(coords=coords, nchan=1)
 #     model()
 
 #     # just interested in whether the tested functionality runs

@@ -6,7 +6,6 @@ import torch
 
 from astropy.visualization.mpl_normalize import simple_norm
 
-from mpol.fourier import get_vis_residuals
 from mpol.gridding import DirtyImager
 from mpol.onedim import radialI, radialV
 from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
@@ -66,7 +65,7 @@ def get_image_cmap_norm(
 #     Parameters
 #     ----------
 #     model : `torch.nn.Module` object
-#         Instance of the  `mpol.precomposed.SimpleNet` class.
+#         Instance of the  `mpol.precomposed.GriddedNet` class.
 #     uu : :class:`torch.Tensor` of `class:`torch.double`
 #         array of u spatial frequency coordinates,
 #         not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
@@ -452,7 +451,7 @@ def train_diagnostics_fig(
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network module; instance of the `mpol.precomposed.GriddedNet` class.
     losses : list
         Loss value at each epoch in the training loop
     learn_rates : list
@@ -650,7 +649,7 @@ def image_comparison_fig(
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network; instance of the `mpol.precomposed.GriddedNet` class.
     u, v : array, unit=[k\lambda]
         Data u- and v-coordinates
     V : array, unit=[Jy]
@@ -822,7 +821,7 @@ def vis_1d_fig(
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network; instance of the `mpol.precomposed.GriddedNet` class.
     u, v : array, unit=[k\lambda]
         Data u- and v-coordinates
     V : array, unit=[Jy]
@@ -1024,7 +1023,7 @@ def radial_fig(
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network; instance of the `mpol.precomposed.GriddedNet` class.
     geom : dict
         Dictionary of source geometry. Used to deproject image and visibilities.
             Keys:

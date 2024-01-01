@@ -4,6 +4,9 @@
 
 ## v0.3.0
 
+- Changed name of {class}`mpol.precomposed.SimpleNet` to {class}`mpol.precomposed.GriddedNet` to more clearly indicate purpose. Updated documentation to make clear that this is just a convenience starter module, and users are encouraged to write their own `nn.Module`s.
+- Changed internal instance attribute of {class}`mpol.images.ImageCube` from `cube` to `packed_cube` to more clearly indicate format.
+- Removed `mpol.fourier.get_vis_residuals` and added `predict_loose_visibilities` to {class}`mpol.precomposed.SimpleNet`.
 - Standardized treatment of numpy vs `torch.tensor`s, with preference for `torch.tensor` in many routines. This simplifies the internal logic of the routines and will make most operations run faster.
 - Standardized the input types of {class}:`mpol.fourier.NuFFT` and {class}:`mpol.fourier.NuFFTCached` to expect {class}`torch.Tensor`s (removed support for numpy arrays). This simplifies the internal logic of the routines and will make most operations run faster.
 - Changed {class}`mpol.fourier.make_fake_data` -> {class}`mpol.fourier.generate_fake_data`.

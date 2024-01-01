@@ -11,7 +11,7 @@ from numpy import floating
 from numpy.typing import NDArray
 
 from mpol.datasets import Dartboard, GriddedDataset
-from mpol.precomposed import SimpleNet
+from mpol.precomposed import GriddedNet
 from mpol.training import TrainTest, train_to_dirty_image
 from mpol.plot import split_diagnostics_fig
 from mpol.utils import loglinspace
@@ -224,7 +224,7 @@ class CrossValidate:
             # if hasattr(self._device,'type') and self._device.type == 'cuda': # TODO: confirm which objects need to be passed to gpu
             #     train_set, test_set = train_set.to(self._device), test_set.to(self._device)
 
-            model = SimpleNet(coords=self._coords, nchan=self._imager.nchan)
+            model = GriddedNet(coords=self._coords, nchan=self._imager.nchan)
             if self._start_dirty_image is True:
                 if kk == 0:
                     if self._verbose:
@@ -297,7 +297,7 @@ class CrossValidate:
 
     @property
     def model(self):
-        """For the most recent kfold, trained model (`SimpleNet` class instance)"""
+        """For the most recent kfold, trained model (`GriddedNet` class instance)"""
         return self._model
 
     @property

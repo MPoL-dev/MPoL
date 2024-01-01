@@ -17,7 +17,7 @@ def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):
     Parameters
     ----------
     model : `torch.nn.Module` object
-        A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
+        A neural network module; instance of the `mpol.precomposed.GriddedNet` class.
     imager : :class:`mpol.gridding.DirtyImager` object
         Instance of the `mpol.gridding.DirtyImager` class.
     robust : float, default=0.5
@@ -233,7 +233,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.GriddedNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 
@@ -366,7 +366,7 @@ class TrainTest:
         Parameters
         ----------
         model : `torch.nn.Module` object
-            A neural network module; instance of the `mpol.precomposed.SimpleNet` class.
+            A neural network module; instance of the `mpol.precomposed.GriddedNet` class.
         dataset : PyTorch dataset object
             Instance of the `mpol.datasets.GriddedDataset` class.
 

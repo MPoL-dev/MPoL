@@ -6,20 +6,25 @@ from mpol import fourier
 from mpol import images
 
 
-class SimpleNet(torch.nn.Module):
+class GriddedNet(torch.nn.Module):
     r"""
-    A basic but functional network for RML imaging.
+    A basic but functional network for RML imaging. Designed to optimize a model image
+    using the entirety of the dataset in a :class:`mpol.datasets.GriddedDataset`
+    (i.e., gradient descent). For stochastic gradient descent (SGD), where the model
+    is only seeing a fraction of the dataset with each iteration, we recommend defining
+    your own module in your analysis code, following the 'Getting Started' guide.
+
 
     .. note:
 
         This module is provided as a starting point. However, we recommend
-        that you don't get too comfortable using it. Instead, we recommend that you
-        start writing your own (custom) module following PyTorch idioms, potentially
+        that you *don't get too comfortable using it*. Instead, we recommend that you
+        *start writing your own* (custom) module following PyTorch idioms, potentially
         using the source of this routine as a reference point to get started. Using
-        the torch module building system directly is much more powerful and will
+        the torch module building system directly is *much more powerful* and will
         cultivate good machine learning model building habits.
 
-    .. mermaid:: _static/mmd/src/SimpleNet.mmd
+    .. mermaid:: _static/mmd/src/GriddedNet.mmd
 
     Parameters
     ----------
@@ -82,7 +87,7 @@ class SimpleNet(torch.nn.Module):
         self, uu: torch.Tensor, vv: torch.Tensor
     ) -> torch.Tensor:
         """
-        Use the :class:`mpol.fourier.NuFFT` to calculate loose model visibilities from 
+        Use the :class:`mpol.fourier.NuFFT` to calculate loose model visibilities from
         the cube stored to ``self.icube.cube``.
 
         Parameters
@@ -100,4 +105,5 @@ class SimpleNet(torch.nn.Module):
             model visibilities corresponding to ``uu`` and ``vv`` locations.
         """
 
-        return self.nufft(self.icube.cube, uu, vv)
+        model_vis: torch.Tensor = self.nufft(self.icube.cube, uu, vv)
+        return model_vis

@@ -97,9 +97,9 @@ module = [
     "MPoL.constants",
     "MPoL.coordinates",
     "MPoL.datasets",
-    # "MPoL.fourier", # once we remove get_vis_residuals
+    "MPoL.fourier", 
     "MPoL.geometry",
-    "MPoL.gridding", # once we sort check_data_inputs_2d
+    "MPoL.gridding", 
     "MPoL.images",
     "MPoL.losses",
     "MPoL.precomposed",
