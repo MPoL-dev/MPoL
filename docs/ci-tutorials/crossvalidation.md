@@ -324,8 +324,6 @@ def train_and_image(pars):
     return fig, ax
 ```
 
-All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the {ref}`GPU Setup Tutorial <gpu-reference-label>`.
-
 +++
 
 ## Results

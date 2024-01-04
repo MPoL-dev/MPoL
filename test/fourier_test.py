@@ -419,13 +419,13 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
         assert num_output[i] == approx(an_output, abs=2e-8)
 
 
-def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D, tmp_path):
+def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D_t, tmp_path):
     # create a single-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
 
     # load some multi-channel data
-    uu, vv = baselines_2D
+    uu, vv = baselines_2D_t
     nchan = uu.shape[0]
 
     # create a NuFFT layer to perform interpolations to these points

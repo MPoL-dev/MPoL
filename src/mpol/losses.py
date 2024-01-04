@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 
-
 from mpol import constants
 from mpol.datasets import GriddedDataset
 from typing import Optional

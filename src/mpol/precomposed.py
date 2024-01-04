@@ -5,9 +5,19 @@ from mpol.coordinates import GridCoords
 from mpol import fourier
 from mpol import images
 
+import typing
+
 
 class GriddedNet(torch.nn.Module):
     r"""
+    .. note::
+
+        This module is provided as a starting point. However, we recommend
+        that you *don't get too comfortable using it* and instead write your own
+        (custom) modules following PyTorch idioms, potentially
+        using the source of this routine as a reference point. Using
+        the torch module system directly is *much more powerful* and expressive.
+
     A basic but functional network for RML imaging. Designed to optimize a model image
     using the entirety of the dataset in a :class:`mpol.datasets.GriddedDataset`
     (i.e., gradient descent). For stochastic gradient descent (SGD), where the model
@@ -15,16 +25,7 @@ class GriddedNet(torch.nn.Module):
     your own module in your analysis code, following the 'Getting Started' guide.
 
 
-    .. note:
-
-        This module is provided as a starting point. However, we recommend
-        that you *don't get too comfortable using it*. Instead, we recommend that you
-        *start writing your own* (custom) module following PyTorch idioms, potentially
-        using the source of this routine as a reference point to get started. Using
-        the torch module building system directly is *much more powerful* and will
-        cultivate good machine learning model building habits.
-
-    .. mermaid:: _static/mmd/src/GriddedNet.mmd
+    .. mermaid:: ../_static/mmd/src/GriddedNet.mmd
 
     Parameters
     ----------
@@ -35,6 +36,7 @@ class GriddedNet(torch.nn.Module):
         a pre-packed base cube to initialize the model with. If
         None, assumes ``torch.zeros``.
 
+        
     After the object is initialized, instance variables can be accessed, for example
 
     :ivar bcube: the :class:`~mpol.images.BaseCube` instance
@@ -49,7 +51,7 @@ class GriddedNet(torch.nn.Module):
         self,
         coords: GridCoords,
         nchan: int = 1,
-        base_cube: torch.Tensor | None = None,
+        base_cube: typing.Optional[torch.Tensor] = None,
     ) -> None:
         super().__init__()
 
@@ -88,7 +90,7 @@ class GriddedNet(torch.nn.Module):
     ) -> torch.Tensor:
         """
         Use the :class:`mpol.fourier.NuFFT` to calculate loose model visibilities from
-        the cube stored to ``self.icube.cube``.
+        the cube stored to ``self.icube.packed_cube``.
 
         Parameters
         ----------
@@ -105,5 +107,5 @@ class GriddedNet(torch.nn.Module):
             model visibilities corresponding to ``uu`` and ``vv`` locations.
         """
 
-        model_vis: torch.Tensor = self.nufft(self.icube.cube, uu, vv)
+        model_vis: torch.Tensor = self.nufft(self.icube.packed_cube, uu, vv)
         return model_vis

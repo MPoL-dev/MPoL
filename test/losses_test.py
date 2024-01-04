@@ -4,12 +4,12 @@ import torch
 
 from mpol import coordinates, fourier, losses
 
-@pytest.fixture
-def loose_vis_model(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
 
-    mean = torch.zeros_like(torch.as_tensor(data_re))
-    sigma = torch.sqrt(1 / torch.as_tensor(weight))
+@pytest.fixture
+def loose_vis_model(weight_2D_t):
+    # just random noise is fine for these structural tests
+    mean = torch.zeros_like(weight_2D_t)
+    sigma = torch.sqrt(1 / weight_2D_t)
     model_re = torch.normal(mean, sigma)
     model_im = torch.normal(mean, sigma)
     return torch.complex(model_re, model_im)
@@ -26,8 +26,7 @@ def gridded_vis_model(coords, packed_cube):
 
 
 def test_chi_squared_evaluation(
-    loose_vis_model,
-    mock_visibility_data,
+    loose_vis_model, mock_data_t, weight_2D_t
 ):
     # because of the way likelihood functions are defined, we would not expect
     # the loose chi_squared or log_likelihood function to give the same answers as
@@ -41,57 +40,20 @@ def test_chi_squared_evaluation(
     # https://stats.stackexchange.com/questions/97515/what-does-likelihood-is-only-defined-up-to-a-multiplicative-constant-of-proport?noredirect=1&lq=1
 
     # calculate the ungridded chi^2
-    uu, vv, weight, data_re, data_im = mock_visibility_data
-    data = torch.tensor(data_re + 1.0j * data_im)
-    weight = torch.tensor(weight)
-
-    chi_squared = losses._chi_squared(loose_vis_model, data, weight)
+    chi_squared = losses._chi_squared(loose_vis_model, mock_data_t, weight_2D_t)
     print("loose chi_squared", chi_squared)
 
 
-def test_log_likelihood_evaluation(
-    loose_vis_model, mock_visibility_data, gridded_vis_model, dataset
-):
-    # see comments under test_chi_squared_evaluation for why we don't necessarily expect these
-    # to be the same between gridded and ungridded
-
+def test_log_likelihood_loose(loose_vis_model, mock_data_t, weight_2D_t):
     # calculate the ungridded log likelihood
-    uu, vv, weight, data_re, data_im = mock_visibility_data
-    data = torch.tensor(data_re + 1.0j * data_im)
-    weight = torch.tensor(weight)
+    losses.log_likelihood(loose_vis_model, mock_data_t, weight_2D_t)
 
-    log_like = losses.log_likelihood(loose_vis_model, data, weight)
-    print("loose log_likelihood", log_like)
-
-    # calculate the gridded log likelihood
-    log_like_gridded = losses.log_likelihood_gridded(gridded_vis_model, dataset)
-    print("gridded log likelihood", log_like_gridded)
-
-
-def test_rchi_hermitian_pairs(loose_vis_model, mock_visibility_data):
-    # calculate the ungridded log likelihood
-    uu, vv, weight, data_re, data_im = mock_visibility_data
-    data = torch.tensor(data_re + 1.0j * data_im)
-    weight = torch.tensor(weight)
-
-    log_like = losses.r_chi_squared(loose_vis_model, data, weight)
-    print("loose nll", log_like)
-
-    # calculate it with Hermitian pairs
-
-    # expand the vectors to include complex conjugates
-    uu = np.concatenate([uu, -uu], axis=1)
-    vv = np.concatenate([vv, -vv], axis=1)
-    loose_vis_model = torch.cat([loose_vis_model, torch.conj(loose_vis_model)], axis=1)
-    data = torch.cat([data, torch.conj(data)], axis=1)
-    weight = torch.cat([weight, weight], axis=1)
-
-    log_like = losses.r_chi_squared(loose_vis_model, data, weight)
-    print("loose nll w/ Hermitian", log_like)
+def test_log_likelihood_gridded(gridded_vis_model, dataset):
+    losses.log_likelihood_gridded(gridded_vis_model, dataset)
 
 
 def test_rchi_evaluation(
-    loose_vis_model, mock_visibility_data, gridded_vis_model, dataset
+    loose_vis_model, mock_data_t, weight_2D_t, gridded_vis_model, dataset
 ):
     # We would have expected the ungridded and gridded values to be closer than they are
     # but I suppose this comes down to how the noise is averaged within each visibility cell.
@@ -99,11 +61,7 @@ def test_rchi_evaluation(
     # https://arxiv.org/abs/1012.3754
 
     # calculate the ungridded log likelihood
-    uu, vv, weight, data_re, data_im = mock_visibility_data
-    data = torch.tensor(data_re + 1.0j * data_im)
-    weight = torch.tensor(weight)
-
-    log_like = losses.r_chi_squared(loose_vis_model, data, weight)
+    log_like = losses.r_chi_squared(loose_vis_model, mock_data_t, weight_2D_t)
     print("loose nll", log_like)
 
     # calculate the gridded log likelihood
@@ -112,7 +70,7 @@ def test_rchi_evaluation(
     print("gridded nll", log_like_gridded)
 
 
-def test_nll_1D_zero():
+def test_r_chi_1D_zero():
     # make identical fake pytorch arrays for data and model
     # assert that nll losses returns 0
 
@@ -131,7 +89,7 @@ def test_nll_1D_zero():
     assert loss.item() == 0.0
 
 
-def test_nll_1D_random():
+def test_r_chi_1D_random():
     # make fake pytorch arrays that are random
     # and then test that the nll version evaluates
 
@@ -149,7 +107,7 @@ def test_nll_1D_random():
     losses.r_chi_squared(model_vis, data_vis, weights)
 
 
-def test_nll_2D_zero():
+def test_r_chi_2D_zero():
     # sometimes thing come in as a (nchan, nvis) tensor
     # make identical fake pytorch arrays in this size,
     # and assert that they evaluate the same
@@ -170,7 +128,7 @@ def test_nll_2D_zero():
     assert loss.item() == 0.0
 
 
-def test_nll_2D_random():
+def test_r_chi_2D_random():
     # sometimes thing come in as a (nchan, nvis) tensor
     # make random fake pytorch arrays and make sure we can evaluate the function
 
@@ -187,6 +145,29 @@ def test_nll_2D_random():
     data_vis = torch.complex(data_re, data_im)
 
     losses.r_chi_squared(model_vis, data_vis, weights)
+
+
+def test_loss_scaling():
+    for N in np.logspace(4, 5, num=10):
+        # create fake model, resid, and weight
+        N = int(N)
+
+        mean = torch.zeros(N)
+        std = 0.2 * torch.ones(N)
+        weight = 1 / std**2
+
+        model_real = torch.ones(N)
+        model_imag = torch.zeros(N)
+        model = torch.complex(model_real, model_imag)
+
+        noise_real = torch.normal(mean, std)
+        noise_imag = torch.normal(mean, std)
+        noise = torch.complex(noise_real, noise_imag)
+
+        data = model + noise
+
+        nlla = losses.neg_log_likelihood_avg(model, data, weight)
+        print("N", N, "nlla", nlla)
 
 
 def test_entropy_raise_error_negative():

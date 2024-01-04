@@ -85,21 +85,28 @@ def test_grid_coords_neg_cell_size():
 
 
 # instantiate a DataAverager object with mock visibilities
-def test_grid_coords_fit(baselines_2D):
-    uu, vv = baselines_2D
-
+def test_grid_coords_fit(baselines_2D_np, baselines_2D_t):
     coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+
+    uu, vv = baselines_2D_np
+    coords.check_data_fit(uu, vv)
+
+    uu, vv = baselines_2D_t
     coords.check_data_fit(uu, vv)
 
 
-def test_grid_coords_fail(baselines_2D):
-    uu, vv = baselines_2D
-
+def test_grid_coords_fail(baselines_2D_np, baselines_2D_t):
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
+    uu, vv = baselines_2D_np
+    print("max u data", np.max(uu))
+    print("max u grid", coords.max_grid)
+    with pytest.raises(CellSizeError):
+        coords.check_data_fit(uu, vv)
+
+    uu, vv = baselines_2D_t
     print("max u data", torch.max(uu))
     print("max u grid", coords.max_grid)
-
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
 

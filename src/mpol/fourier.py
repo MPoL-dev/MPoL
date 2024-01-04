@@ -261,8 +261,8 @@ class NuFFT(nn.Module):
                 f"nchan of vv ({vv_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
             )
 
-        uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
-        vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+        uu_radpix_aug = torch.unsqueeze(uu_radpix, 1)
+        vv_radpix_aug = torch.unsqueeze(vv_radpix, 1)
         # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will
         # parallelize across the batch dimension
         k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
@@ -658,7 +658,8 @@ def generate_fake_data(
         not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
     weight : :class:`torch.Tensor` of `class:`torch.double`
         shape ``(nchan, nvis)`` array of thermal weights
-        :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+        :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`] Will broadcast
+        from 1D to 2D if necessary.
 
     Returns
     -------

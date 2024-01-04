@@ -288,9 +288,9 @@ fname = download_file(
 # select the components for a single channel
 chan = 4
 d = np.load(fname)
-uu = d["uu"][chan]
-vv = d["vv"][chan]
-weight = d["weight"][chan]
+uu = torch.as_tensor(d["uu"][chan])
+vv = torch.as_tensor(d["vv"][chan])
+weight = torch.as_tensor(d["weight"][chan])
 ```
 
 MPoL has a helper routine to calculate the maximum `cell_size` that can still Nyquist sample the highest spatial frequency in the baseline distribution.
@@ -311,7 +311,7 @@ With the {class}`~mpol.images.ImageCube`, $u,v$ and weight distributions now in 
 ```{code-cell} ipython3
 from mpol import fourier
 # will have the same shape as the uu, vv, and weight inputs
-data_noise, data_noiseless = fourier.generate_fake_data(image_tensor_packed, coords, uu, vv, weight)
+data_noise, data_noiseless = fourier.generate_fake_data(img_tensor_packed, coords, uu, vv, weight)
 
 print(data_noise.shape)
 print(data_noiseless.shape)
@@ -337,22 +337,19 @@ To make sure the whole process worked OK, we'll load the visibilities and then m
 ```{code-cell} ipython3
 from mpol import coordinates, gridding
 
-# well set the
 coords = coordinates.GridCoords(cell_size=cell_size, npix=npix)
 
-imager = gridding.DirtyImager(
+imager = gridding.DirtyImager.from_tensors(
     coords=coords,
     uu=uu,
     vv=vv,
     weight=weight,
-    data_re=np.squeeze(np.real(data)),
-    data_im=np.squeeze(np.imag(data)),
-)
+    data=data)
 ```
 
 ```{code-cell} ipython3
-C = 1 / np.sum(weight)
-noise_estimate = C * np.sqrt(np.sum(weight))
+C = 1 / torch.sum(weight)
+noise_estimate = C * torch.sqrt(torch.sum(weight))
 print(noise_estimate, "Jy / dirty beam")
 ```
 
