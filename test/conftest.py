@@ -120,66 +120,6 @@ def mock_dataset_np(baselines_2D_np, weight_2D_t, mock_data_t):
     return (uu, vv, weight, data_re, data_im)
 
 
-# fixture to provide tuple of uu, vv, weight, data_re, and data_im values
-# @pytest.fixture(scope="session")
-# def mock_visibility_archive():
-#     # use astropy routines to cache data
-#     fname = download_file(
-#         f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
-#         cache=True,
-#         pkgname="mpol",
-#     )
-
-#     return np.load(fname)
-
-
-# to replace everything with the mock dataset (and pass), we need to replace
-# * mock_visibility_data
-# * mock_visibility_data_cont
-#
-# audit of test suite usage. Routines require
-# * all uu, vv, weight, data_re, data_im, single-channel
-# * all uu, vv, weight, data_re, data_im, multi-channel
-# consider if we need numpy or torch.
-
-# mock_visibility_data
-# either need
-# all uu, vv, weight, data_re, data_im for numpy gridding
-# or weight, data_re, data_im
-# as tensor
-
-# cont
-# only needed as numpy for averaging w/ gridder
-# and dataset cont
-
-
-# @pytest.fixture
-# def mock_visibility_data(mock_visibility_archive):
-#     d = mock_visibility_archive
-#     uu = d["uu"]
-#     vv = d["vv"]
-#     weight = d["weight"]
-#     data = d["data"]
-#     data_re = np.real(data)
-#     data_im = np.imag(data)  # MPoL convention
-
-#     return uu, vv, weight, data_re, data_im
-
-
-# @pytest.fixture
-# def mock_visibility_data_cont(mock_visibility_archive):
-#     chan = 4
-#     d = mock_visibility_archive
-#     uu = d["uu"][chan]
-#     vv = d["vv"][chan]
-#     weight = d["weight"][chan]
-#     data = d["data"][chan]
-#     data_re = np.real(data)
-#     data_im = np.imag(data)  # MPoL convention
-
-#     return uu, vv, weight, data_re, data_im
-
-
 @pytest.fixture(scope="session")
 def dataset(mock_dataset_np, coords):
     uu, vv, weight, data_re, data_im = mock_dataset_np
