@@ -4,6 +4,7 @@
 
 ## v0.3.0
 
+- Changed the base spatial frequency unit from k$\lambda$ to $\lambda$, addressing [#223](https://github.com/MPoL-dev/MPoL/issues/223). This will affect most users data-reading routines!
 - Added the {meth}`mpol.gridding.DirtyImager.from_tensors` routine to cover the use case where one might want to use the {meth}`mpol.gridding.DirtyImager` to image residual visibilities. Otherwise, {meth}`mpol.gridding.DirtyImager` and {meth}`mpol.gridding.DataAverager` are the only notable routines that expect `np.ndarray` input arrays. This is because they are designed to work with data arrays directly after loading (say from a MeasurementSet or `.npy` file) and are implemented internally in numpy. If a routine requires data separately as `data_re` and `data_im`, that is a tell-tale sign that the routine works with numpy histogram routines internally.
 - Changed name of {class}`mpol.precomposed.SimpleNet` to {class}`mpol.precomposed.GriddedNet` to more clearly indicate purpose. Updated documentation to make clear that this is just a convenience starter module, and users are encouraged to write their own `nn.Module`s.
 - Changed internal instance attribute of {class}`mpol.images.ImageCube` from `cube` to `packed_cube` to more clearly indicate format.
