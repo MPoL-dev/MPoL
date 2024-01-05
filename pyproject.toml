@@ -1,3 +1,108 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
+
+[project]
+authors = [{ name = "Ian Czekala", email = "ic95@st-andrews.ac.uk" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "fast-histogram",
+    "scipy",
+    "torch>=1.8.0",
+    "torchvision",
+    "torchaudio",
+    "torchkbnufft",
+    "astropy",
+]
+description = "Regularized Maximum Likelihood Imaging for Radio Astronomy"
+dynamic = ["version"]
+name = "MPoL"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "requests",
+    "astropy",
+    "tensorboard",
+    "mypy",
+    "frank>=1.2.1",
+    "sphinx>=7.2.0",
+    "sphinx-autodoc2",
+    "jupytext",
+    "ipython!=8.7.0", # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
+    "nbsphinx",
+    "sphinx_book_theme>=0.9.3",
+    "sphinx_copybutton",
+    "jupyter",
+    "nbconvert",
+    "sphinxcontrib-mermaid>=0.8.1",
+    "myst-nb",
+    "jupyter-cache",
+    "Pillow",
+    "asdf",
+    "pyro-ppl",
+    "arviz[all]",
+    "visread>=0.0.4"
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "requests",
+    "tensorboard",
+    "mypy",
+    "visread>=0.0.4",
+    "frank>=1.2.1",
+]
+
+[project.urls]
+Homepage = "https://mpol-dev.github.io/MPoL/"
+Issues = "https://github.com/MPoL-dev/MPoL/issues"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/mpol/mpol_version.py"
+
+[tool.black]
+line-length = 88
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "astropy.*",
+    "matplotlib.*",
+    "scipy.*",
+    "torchkbnufft.*",
+    "frank.*",
+    "fast_histogram.*"
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "MPoL.constants",
+    "MPoL.coordinates",
+    "MPoL.datasets",
+    "MPoL.fourier", 
+    "MPoL.geometry",
+    "MPoL.gridding", 
+    "MPoL.images",
+    "MPoL.losses",
+    "MPoL.precomposed",
+    "MPoL.utils"
+    ]
+disallow_untyped_defs = true

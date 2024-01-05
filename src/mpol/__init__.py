@@ -1,1 +1,2 @@
-__version__ = "0.1.13"
+from mpol.mpol_version import __version__
+zenodo_record = 10064221

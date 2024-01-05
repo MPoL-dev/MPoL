@@ -1,13 +1,19 @@
 # MPoL Installation
 
-MPoL requires `python >= 3.6`.
+MPoL requires `python >= 3.10`.
 
 ## Using pip
 
-Stable versions are hosted on PyPI and are installed via
+Stable versions are hosted on PyPI. You can install the latest version by
 
 ```
 $ pip install MPoL
+```
+
+Or if you require a specific version of MPoL (e.g., `0.2.0`), you can install via
+
+```
+$ pip install MPoL==0.2.0
 ```
 
 ## From source
@@ -22,7 +28,7 @@ $ pip install .
 
 If you have trouble installing please raise a [github issue](https://github.com/MPoL-dev/MPoL/issues) with the particulars of your system.
 
-If you're interested in contributing to the MPoL package, please see the {ref}`developer-documentation-label`.
+If you're interested in contributing to the MPoL package, please see the [](developer-documentation.md).
 
 ## Upgrading
 
@@ -48,8 +54,8 @@ $ python
 >>> print(mpol.__version__)
 ```
 
-## Using CUDA acceleration
+## Documentation
 
-MPoL uses PyTorch for its Neural Networks as seen in the `Optimization Loop` tutorial. If you are interested in using PyTorch's full potential by utilizing a Nvidia graphics card, then the CUDA tool kit will need to be installed (TensorVision is also required). More information on this is available in the `GPU Tutorial` page. It is worth noting that PyTorch may need to be (re)installed separately using a specific `pip` for your system.
+The documentation served online ([here](https://mpol-dev.github.io/MPoL/index.html)) corresponds to the `main` branch. This represents the current state of MPoL and is usually the best place to reference MPoL functionality. However, this documentation may be more current than last tagged version or the version you have installed. If you require the new features detailed in the documentation, then we recommend installing the package from source (as above).
 
-More information on this can be found on the PyTorch homepage: [pytorch.org](https://pytorch.org/).
+In the (foreseeably rare) situation where the latest online documentation significantly diverges from the package version you wish to use (but there are reasons you do not want to build the `main` branch from source), you can access the documentation for that version by [building the older documentation locally](developer-documentation.md#older-documentation-versions)

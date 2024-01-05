@@ -13,10 +13,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.10'
       - name: Install doc deps
         run: |
-          pip install .'[docs]'
+          pip install .'[dev]'
       - name: Install Pandoc dependency
         run: |
           sudo apt-get install pandoc

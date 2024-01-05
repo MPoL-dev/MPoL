@@ -5,7 +5,59 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from mpol import datasets
+from mpol import datasets, fourier, images
+
+
+def test_index(coords, dataset):
+    # test that we can index a dataset
+
+    flayer = fourier.FourierCube(coords=coords)
+
+    # create a mock cube that includes negative values
+    nchan = dataset.nchan
+    mean = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
+    )
+    std = torch.full(
+        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
+    )
+
+    # tensor
+    base_cube = torch.normal(mean=mean, std=std)
+
+    # layer
+    basecube = images.BaseCube(coords=coords, nchan=nchan, base_cube=base_cube)
+
+    # try passing through ImageLayer
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
+
+    # produce dense model visibility cube
+    modelVisibilityCube = flayer(imagecube(basecube()))
+
+    # take a basecube, imagecube, and GriddedDataset and predict corresponding visibilities.
+    dataset(modelVisibilityCube)
+
+
+def test_loss_grad(coords, dataset):
+    # test that we can calculate the gradients through the loss
+
+    flayer = fourier.FourierCube(coords=coords)
+    nchan = dataset.nchan
+    basecube = images.BaseCube(coords=coords, nchan=nchan)
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
+
+    # produce model visibilities
+    modelVisibilityCube = flayer(imagecube(basecube()))
+    samples = dataset(modelVisibilityCube)
+
+    print(samples)
+    loss = torch.sum(torch.abs(samples))
+
+    # segfaults on 3.9
+    # https://github.com/pytorch/pytorch/issues/50014
+    loss.backward()
+
+    print(basecube.base_cube.grad)
 
 
 def test_dataset_device(dataset):
@@ -27,8 +79,7 @@ def test_dartboard_init(coords):
     datasets.Dartboard(coords=coords)
 
 
-def test_dartboard_histogram(crossvalidation_products, tmp_path):
-    coords, dataset = crossvalidation_products
+def test_dartboard_histogram(coords, dataset, tmp_path):
 
     # use default bins
     dartboard = datasets.Dartboard(coords=coords)
@@ -70,8 +121,7 @@ def test_dartboard_histogram(crossvalidation_products, tmp_path):
     plt.close("all")
 
 
-def test_dartboard_nonzero(crossvalidation_products, tmp_path):
-    coords, dataset = crossvalidation_products
+def test_dartboard_nonzero(coords, dataset, tmp_path):
 
     # use default bins
     dartboard = datasets.Dartboard(coords=coords)
@@ -98,9 +148,7 @@ def test_dartboard_nonzero(crossvalidation_products, tmp_path):
     plt.close("all")
 
 
-def test_dartboard_mask(crossvalidation_products, tmp_path):
-    coords, dataset = crossvalidation_products
-
+def test_dartboard_mask(coords, dataset, tmp_path):
     # use default bins
     dartboard = datasets.Dartboard(coords=coords)
 
@@ -127,12 +175,11 @@ def test_dartboard_mask(crossvalidation_products, tmp_path):
     plt.close("all")
 
 
-def test_hermitian_mask_full(crossvalidation_products, tmp_path):
-    coords, dataset = crossvalidation_products
+def test_hermitian_mask_full(coords, dataset, tmp_path):
 
     dartboard = datasets.Dartboard(coords=coords)
 
-    chan = 4
+    chan = 1
 
     # do the indexing of individual points
     # plot up as function of q, phi, each point should have two dots (opacity layer).

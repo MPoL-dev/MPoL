@@ -3,37 +3,18 @@ import pytest
 import torch
 from astropy.io import fits
 
-from mpol import images, utils
+from mpol import coordinates, images, utils
 from mpol.constants import *
 
-
-def test_odd_npix():
-    expected_error_message = "Image must have a positive and even number of pixels."
-
-    with pytest.raises(ValueError, match=expected_error_message):
-        images.BaseCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
-
-    with pytest.raises(ValueError, match=expected_error_message):
-        images.ImageCube.from_image_properties(npix=853, nchan=30, cell_size=0.015)
-
-
-def test_negative_cell_size():
-    expected_error_message = "cell_size must be a positive real number."
-
-    with pytest.raises(ValueError, match=expected_error_message):
-        images.BaseCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
-
-    with pytest.raises(ValueError, match=expected_error_message):
-        images.ImageCube.from_image_properties(npix=800, nchan=30, cell_size=-0.015)
-
-
 def test_single_chan():
-    im = images.ImageCube.from_image_properties(cell_size=0.015, npix=800)
+    coords = coordinates.GridCoords(cell_size=0.015, npix=800)
+    im = images.ImageCube(coords=coords)
     assert im.nchan == 1
 
 
 def test_basecube_grad():
-    bcube = images.BaseCube.from_image_properties(npix=800, cell_size=0.015)
+    coords = coordinates.GridCoords(cell_size=0.015, npix=800)
+    bcube = images.BaseCube(coords=coords)
     loss = torch.sum(bcube())
     loss.backward()
 
@@ -41,7 +22,7 @@ def test_basecube_grad():
 def test_imagecube_grad(coords):
     bcube = images.BaseCube(coords=coords)
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, passthrough=True)
+    imagecube = images.ImageCube(coords=coords)
 
     # send things through this layer
     loss = torch.sum(imagecube(bcube()))
@@ -55,7 +36,7 @@ def test_imagecube_tofits(coords, tmp_path):
     bcube = images.BaseCube(coords=coords)
 
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, passthrough=True)
+    imagecube = images.ImageCube(coords=coords)
 
     # sending the basecube through the imagecube
     imagecube(bcube())
@@ -107,7 +88,7 @@ def test_basecube_imagecube(coords, tmp_path):
     fig.savefig(tmp_path / "basecube_mapped.png", dpi=300)
 
     # try passing through ImageLayer
-    imagecube = images.ImageCube(coords=coords, nchan=nchan, passthrough=True)
+    imagecube = images.ImageCube(coords=coords, nchan=nchan)
 
     # send things through this layer
     imagecube(basecube())
@@ -192,5 +173,7 @@ def test_multi_chan_conv(coords, tmp_path):
 
 def test_image_flux(coords):
     nchan = 20
+    bcube = images.BaseCube(coords=coords, nchan=nchan)
     im = images.ImageCube(coords=coords, nchan=nchan)
+    im(bcube())
     assert im.flux.size()[0] == nchan

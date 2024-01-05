@@ -48,10 +48,11 @@ from mpol import (
     losses,
     precomposed,
 )
+from mpol.__init__ import zenodo_record
 
 # load the mock dataset of the ALMA logo
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.noise.npz",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.noise.npz",
     cache=True,
     show_progress=True,
     pkgname="mpol",
@@ -247,7 +248,7 @@ def train(model, dset, config, optimizer, writer=None):
 
         # calculate a loss
         loss = (
-            losses.nll_gridded(vis, dset)
+            losses.r_chi_squared_gridded(vis, dset)
             + config["lambda_sparsity"] * losses.sparsity(sky_cube)
             + config["lambda_TV"] * losses.TV_image(sky_cube)
         )
@@ -269,7 +270,7 @@ def test(model, dset):
     model.train(False)
     # evaluate test score
     vis = model()
-    loss = losses.nll_gridded(vis, dset)
+    loss = losses.r_chi_squared_gridded(vis, dset)
     return loss.item()
 ```
 
@@ -291,7 +292,7 @@ def cross_validate(config):
     for k_fold, (train_dset, test_dset) in enumerate(k_fold_datasets):
 
         # create a new model and optimizer for this k_fold
-        rml = precomposed.SimpleNet(coords=coords, nchan=train_dset.nchan)
+        rml = precomposed.GriddedNet(coords=coords, nchan=train_dset.nchan)
         optimizer = torch.optim.Adam(rml.parameters(), lr=config["lr"])
 
         # train for a while
@@ -309,7 +310,7 @@ Finally, we'll write one more function to train the model using the full dataset
 
 ```{code-cell}
 def train_and_image(pars):
-    rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+    rml = precomposed.GriddedNet(coords=coords, nchan=dset.nchan)
     optimizer = torch.optim.Adam(rml.parameters(), lr=pars["lr"])
     writer = SummaryWriter()
     train(rml, dset, pars, optimizer, writer=writer)
@@ -322,8 +323,6 @@ def train_and_image(pars):
     )
     return fig, ax
 ```
-
-All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the {ref}`GPU Setup Tutorial <gpu-reference-label>`.
 
 +++
 
@@ -353,7 +352,7 @@ print("Cross validation score:", cross_validate(pars))
 train_and_image(pars)
 ```
 
-More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``nll_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
+More regularizing strength doesn't always mean better... there will reach a point where the regularizing terms are strong that the model starts ignoring the data (via the ``r_chi_squared_gridded`` term). To help you perform a full hyperparameter sweep and identify the "best" settings quickly, we recommend checking out tools like [Tensorboard](https://pytorch.org/docs/stable/tensorboard.html) and [Ray Tune](https://docs.ray.io/en/master/tune/index.html).
 
 +++
 
@@ -361,7 +360,7 @@ For the purposes of comparison, here is the image produced by the tclean algorit
 
 ```{code-cell}
 fname = download_file(
-    "https://zenodo.org/record/4930016/files/logo_cube.tclean.fits",
+    f"https://zenodo.org/record/{zenodo_record}/files/logo_cube.tclean.fits",
     cache=True,
     show_progress=True,
     pkgname="mpol",
