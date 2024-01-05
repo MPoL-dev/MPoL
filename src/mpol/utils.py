@@ -197,22 +197,23 @@ def fftspace(width: float, N: int) -> npt.NDArray[np.floating[Any]]:
     return xx
 
 
-def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
-    """
+def check_baselines(q, min_feasible_q=1e3, max_feasible_q=1e8):
+    r"""
     Check if baseline lengths are sensible for expected code unit of
-    [klambda], or if instead they're being supplied in [lambda].
+    [:math:`\lambda`], or if instead they're being supplied in
+    [:math:`\mathrm{k}\lambda`].
 
     Parameters
     ----------
-     q : array, unit = :math:`k\lambda`
+     q : array, unit = :math:`\lambda`
         Baseline distribution (all values must be non-negative).
-    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0
+    min_feasible_q : float, unit = :math:`\lambda`, default=1e3
         Minimum baseline in code units expected for a dataset. The default
-        value of 1e0 is a conservative value for ALMA, assuming a minimum
+        value of 1e3 is a conservative value for ALMA, assuming a minimum
         antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.
-    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5
+    max_feasible_q : float, unit = :math:`\lambda`, default=1e8
         Maximum baseline in code units expected for a dataset. The default
-        value of 1e5 is a conservative value for ALMA, assuming a maximum
+        value of 1e8 is a conservative value for ALMA, assuming a maximum
         antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.
     """
 
@@ -230,8 +231,7 @@ def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
         raise Warning(
             "Minimum baseline of {:.1e} is large for expected "
             "minimum value of {:.1e}. Baselines must be in units of "
-            "[klambda], but it looks like they're in "
-            "[lambda].".format(min(q), min_feasible_q * 1e3)
+            "[lambda]".format(min(q), min_feasible_q * 1e3)
         )
 
 
@@ -240,19 +240,24 @@ def get_max_spatial_freq(cell_size: float, npix: int) -> float:
     Calculate the maximum spatial frequency that the image can represent and still
     satisfy the Nyquist Sampling theorem.
 
-    Args:
-        cell_size (float): the pixel size in arcseconds
-        npix (int): the number of pixels in the image
+    Parameters
+    ----------
+    cell_size : float
+        the pixel size in arcseconds
+    npix : int
+        the number of pixels in the image
 
-    Returns:
-        max_freq : the maximum spatial frequency contained in the image (in kilolambda)
+    Returns
+    -------
+    float
+        the maximum spatial frequency contained in the image [:math:`\lambda`]
     """
 
     # technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized
     # arrays, the highest *positive* spatial frequency is (npix/2 - 1) / (npix * cell_size)
     # it is the most negative spatial frequency that goes to - 1/(2 * cell_size)
 
-    return (npix / 2 - 1) / (npix * cell_size * arcsec) * 1e-3  # kilolambda
+    return (npix / 2 - 1) / (npix * cell_size * arcsec)  # λ
 
 
 def get_maximum_cell_size(uu_vv_point: float) -> float:
@@ -262,13 +267,13 @@ def get_maximum_cell_size(uu_vv_point: float) -> float:
 
     Args:
         uu_vv_point (float): a single spatial frequency. Units of
-            [:math:`\mathrm{k}\lambda`].
+            [:math:`\lambda`].
 
     Returns:
         cell_size (in arcsec)
     """
 
-    return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
+    return 1 / ((2 - 1) * uu_vv_point) / arcsec
 
 
 def get_optimal_image_properties(
@@ -286,7 +291,7 @@ def get_optimal_image_properties(
     image_width : float, unit = arcsec
         Desired width of the image (for a square image of size
         `image_width` :math:`\times` `image_width`).
-    u, v : :class:`torch.Tensor` of :class:`torch.double`, unit = :math:`k\lambda`
+    u, v : :class:`torch.Tensor` of :class:`torch.double`, unit = :math:`\lambda`
         `u` and `v` baselines.
 
     Returns
@@ -300,7 +305,7 @@ def get_optimal_image_properties(
     -----
     Assumes baselines are as-observed.
     """
-    max_freq = torch.max(torch.abs(torch.concat([u,v])))
+    max_freq = torch.max(torch.abs(torch.concat([u, v])))
 
     cell_size = get_maximum_cell_size(max_freq.item())
 
@@ -598,7 +603,7 @@ def fourier_gaussian_lambda_radians(
     return fgauss
 
 
-def fourier_gaussian_klambda_arcsec(
+def fourier_gaussian_lambda_arcsec(
     u: npt.NDArray[np.floating[Any]],
     v: npt.NDArray[np.floating[Any]],
     a: float,
@@ -617,8 +622,8 @@ def fourier_gaussian_klambda_arcsec(
     units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
 
     Args:
-        u: l in units of [klambda]
-        v: m in units of [klambda]
+        u: l in units of [lambda]
+        v: m in units of [lambda]
         a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
         delta_x : offset [arcsec]
         delta_y : offset [arcsec]
@@ -632,8 +637,8 @@ def fourier_gaussian_klambda_arcsec(
 
     # convert the parameters and feed to the core routine
     return fourier_gaussian_lambda_radians(
-        1e3 * u,
-        1e3 * v,
+        u,
+        v,
         a / arcsec**2,
         delta_x * arcsec,
         delta_y * arcsec,

@@ -87,7 +87,7 @@ def test_analytic_plot(tmp_path):
     fourier_packed_num = coords.cell_size**2 * np.fft.fft2(img_packed)
 
     # calculate the analytical FFT
-    fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
+    fourier_packed_an = utils.fourier_gaussian_lambda_arcsec(
         coords.packed_u_centers_2D, coords.packed_v_centers_2D, **kw
     )
 

@@ -1,6 +1,3 @@
-r"""The ``fourier`` module provides the core functionality of MPoL via 
-:class:`mpol.fourier.FourierCube`."""
-
 from __future__ import annotations
 
 from typing import Any
@@ -9,12 +6,10 @@ import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
-from numpy import complexfloating, floating
 from numpy.typing import NDArray
 from torch import nn
 
 from mpol.exceptions import DimensionMismatchError
-from mpol.images import ImageCube
 
 from mpol import utils
 from mpol.coordinates import GridCoords
@@ -149,12 +144,12 @@ class NuFFT(nn.Module):
             im_size=(self.coords.npix, self.coords.npix)
         )
 
-    def _klambda_to_radpix(self, klambda: torch.Tensor) -> torch.Tensor:
-        """Convert a spatial frequency in units of klambda to 'radians/sky pixel,'
-        using the pixel cell_size provided by ``self.coords.dl``.
+    def _lambda_to_radpix(self, lam: torch.Tensor) -> torch.Tensor:
+        r"""Convert a spatial frequency in units of :math:`\lambda` to
+        'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
 
         Args:
-            klambda (torch.Tensor): spatial frequency in units of klambda.
+            lam (torch.Tensor): spatial frequency in units of :math:`\lambda`.
 
         Returns:
             torch.Tensor: spatial frequency measured in units of radian per sky pixel
@@ -172,29 +167,28 @@ class NuFFT(nn.Module):
         :math:`I_\nu(l,m)`, which we could quote in units of 'cycles per arcsecond' or
         'cycles per sky pixel,' for example. With a radio interferometer, spatial
         frequencies are typically quoted in units of the observing wavelength, i.e.,
-        lambda or kilo-lambda. If the field of view of the image is small, thanks to
-        the small-angle approximation, units of lambda are directly equivalent to
-        'cycles per sky radian.' The second angular measure comes about when converting
-        the spatial frequency from a linear measure of frequency 'cycles per sky radian'
-        to an angular measure of frequency 'radians per sky radian' or 'radians per
-        sky pixel.'
+        :math:`\lambda`. If the field of view of the image is small, thanks to
+        the small-angle approximation, units of :math:`\lambda` are directly equivalent
+        to 'cycles per sky radian.' The second angular measure comes about when
+        converting the spatial frequency from a linear measure of frequency
+        'cycles per sky radian' to an angular measure of frequency 'radians per sky
+        radian' or 'radians per sky pixel.'
 
         The TorchKbNufft package expects k-trajectory vectors in units of 'radians per
         sky pixel.' This routine helps convert spatial frequencies from their default
-        unit (kilolambda) into 'radians per sky pixel' using the pixel cell_size as
+        unit (:math:`\lambda`) into 'radians per sky pixel' using the pixel cell_size as
         provided by ``self.coords.dl``.
         """
 
-        # convert from kilolambda to cycles per sky radian
-        u_lam = klambda * 1e3  # [lambda, or cycles/radian]
-
+        # lambda is equivalent to cycles per sky radian
         # convert from 'cycles per sky radian' to 'radians per sky radian'
-        u_rad_per_rad = u_lam * 2 * np.pi  # [radians / sky radian]
+        u_rad_per_rad = lam * 2 * np.pi  # [radians / sky radian]
 
         # size of pixel in radians
         # self.coords.dl  # [sky radians/pixel]
 
         # convert from 'radians per sky radian' to 'radians per sky pixel'
+        # assumes pixels are square and dl and dm are interchangeable
         u_rad_per_pix = u_rad_per_rad * self.coords.dl  # [radians / pixel]
 
         return u_rad_per_pix
@@ -219,9 +213,9 @@ class NuFFT(nn.Module):
 
         Args:
             uu (1D or 2D torch.Tensor array): u (East-West) spatial frequency
-                coordinate [klambda]
+                coordinate [:math:`\lambda`]
             vv (1D or 2D torch.Tensor array): v (North-South) spatial frequency
-                coordinate [klambda]
+                coordinate [:math:`\lambda`]
 
         Returns:
             k_traj (torch.Tensor): a k-trajectory vector with shape
@@ -230,8 +224,8 @@ class NuFFT(nn.Module):
         # if uu and vv are 1D dimension, then we assume 'same_uv'
         same_uv = (uu.ndim == 1) and (vv.ndim == 1)
 
-        uu_radpix = self._klambda_to_radpix(uu)
-        vv_radpix = self._klambda_to_radpix(vv)
+        uu_radpix = self._lambda_to_radpix(uu)
+        vv_radpix = self._lambda_to_radpix(vv)
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         # same_uv will parallelize across the coil dimension.
@@ -291,10 +285,10 @@ class NuFFT(nn.Module):
             from :meth:`mpol.images.ImageCube.forward`
         uu : :class:`torch.Tensor` of :class:`torch.double`
             2D array of the u (East-West) spatial frequency coordinate
-            [klambda] of shape ``(nchan, npix)``
+            [:math:`\lambda`] of shape ``(nchan, npix)``
         vv : :class:`torch.Tensor` of :class:`torch.double`
             2D array of the v (North-South) spatial frequency coordinate
-            [klambda] (must be the same shape as uu)
+            [:math:`\lambda`] (must be the same shape as uu)
         sparse_matrices : bool
             If False, use the default table-based interpolation
             of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
@@ -445,61 +439,11 @@ class NuFFT(nn.Module):
 
 class NuFFTCached(NuFFT):
     r"""
-    This layer translates input from an :class:`mpol.images.ImageCube` directly to
-    loose, ungridded samples of the Fourier plane, directly corresponding to the
-    :math:`u,v` locations of the data. This layer is different than a
-    :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like
-    output from an FFT routine, it utilizes the non-uniform FFT or 'NuFFT' to
-    interpolate directly to discrete :math:`u,v` locations that need not correspond to
-    grid cell centers. This is implemented using the KbNufft routines of the
-    `TorchKbNufft <https://torchkbnufft.readthedocs.io/en/stable/index.html>`_ package.
-
-    **Dimensionality**: One consideration when using this layer is the dimensionality of
-    your image and your visibility samples. If your image has multiple channels
-    (``nchan > 1``), there is the possibility that the :math:`u,v` sample locations
-    corresponding to each channel may be different. In ALMA/VLA applications, this can
-    arise when continuum observations are taken over significant bandwidth, since the
-    spatial frequency sampled by any pair of antennas is wavelength-dependent
-
-    .. math::
-
-        u = \frac{D}{\lambda},
-
-    where :math:`D` is the projected baseline (measured in, say, meters) and
-    :math:`\lambda` is the observing wavelength. In this application, the image-plane
-    model could be the same for each channel, or it may vary with channel (necessary if
-    the spectral slope of the source is significant).
-
-    On the other hand, with spectral line observations it will usually be the case that
-    the total bandwidth of the observations is small enough such that the :math:`u,v`
-    sample locations could be considered as the same for each channel. In spectral line
-    applications, the image-plane model usually varies substantially with each channel.
-
-    This layer will determine whether the spatial frequencies are treated as constant
-    based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
-
-    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the
-        spatial frequencies can be treated as constant with channel (and will invoke
-        parallelization across the image cube ``nchan`` dimension using the 'coil'
-        dimension of the TorchKbNufft package).
-    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be
-        assumed that the spatial frequencies are different for each channel, and the
-        spatial frequencies provided for each channel will be used (and will invoke
-        parallelization across the image cube ``nchan`` dimension using the 'batch'
-        dimension of the TorchKbNufft package).
-
-    Note that there is no straightforward, computationally efficient way to proceed if
-    there are a different number of spatial frequencies for each channel. The best
-    approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of
-    (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points
-    to have the same length ``nvis``, and you create a boolean mask to keep track of
-    which points are valid. Then, when this routine returns data points of shape
-    (``nchan, nvis``), you can use that boolean mask to select only the valid
-    :math:`u,v` points.
-
-    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft
-    uses under the hood by changing the boolean value of ``sparse_matrices``. For
-    repeated evaluations of this layer (as might exist within an optimization loop),
+    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra 
+    functionality to cache the sparse matrices for a specific set of ``uu`` and ``vv``
+    points specified at initialization. 
+    
+    For repeated evaluations of this layer (as might exist within an optimization loop),
     ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If
     ``sparse_matrices=False``, this routine will use the default table-based
     interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse
@@ -652,10 +596,10 @@ def generate_fake_data(
     coords : :class:`mpol.coordinates.GridCoords`
     uu : :class:`torch.Tensor` of `class:`torch.double`
         array of u spatial frequency coordinates,
-        not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        not including Hermitian pairs. Units of [:math:`\lambda`]
     vv : :class:`torch.Tensor` of `class:`torch.double`
         array of v spatial frequency coordinates,
-        not including Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
+        not including Hermitian pairs. Units of [:math:`\lambda`]
     weight : :class:`torch.Tensor` of `class:`torch.double`
         shape ``(nchan, nvis)`` array of thermal weights
         :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`] Will broadcast
@@ -682,7 +626,7 @@ def generate_fake_data(
 
     # generate complex noise
     # we could use torch.normal with complex quantities directly, but they treat
-    # a complex normal with std of 1 as having an amplitude of 1. 
+    # a complex normal with std of 1 as having an amplitude of 1.
     # wheras ALMA "weights" have the definition that their scatter is for the reals
     # (or imaginaries). So there is a factor of sqrt(2) between them.
     # we split things up, work with real quantities, and then combine later

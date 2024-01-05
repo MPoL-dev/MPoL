@@ -52,9 +52,9 @@ def baselines_m():
 def baselines_1D(baselines_m):
     uu, vv = baselines_m
 
-    # klambda for now
-    uu = 1e-3 * visread.process.convert_baselines(uu, 230.0e9)
-    vv = 1e-3 * visread.process.convert_baselines(vv, 230.0e9)
+    # lambda for now
+    uu = visread.process.convert_baselines(uu, 230.0e9)
+    vv = visread.process.convert_baselines(vv, 230.0e9)
 
     # convert to torch
     return torch.as_tensor(uu), torch.as_tensor(vv)
@@ -68,11 +68,7 @@ def baselines_2D_np(baselines_m):
         uu, vv, np.linspace(230.0, 231.0, num=_nchan) * 1e9
     )
 
-    # klambda for now
-    u_klam = 1e-3 * u_lam
-    v_klam = 1e-3 * v_lam
-
-    return u_klam, v_klam
+    return u_lam, v_lam
 
 
 @pytest.fixture(scope="session")

@@ -31,7 +31,7 @@ def test_fourier_cube(coords, tmp_path):
     fourier_packed_num = np.squeeze(flayer(img_packed_tensor).numpy())
 
     # calculate the analytical FFT
-    fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
+    fourier_packed_an = utils.fourier_gaussian_lambda_arcsec(
         coords.packed_u_centers_2D, coords.packed_v_centers_2D, **kw
     )
 
@@ -261,7 +261,7 @@ def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
     num_output = layer(img_packed_tensor, uu, vv)[0]  # take the channel dim out
 
     # calculate the values analytically
-    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
 
     # find max difference
     diff = num_output - an_output
@@ -333,7 +333,7 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     )  # take the channel dim out
 
     # calculate the values analytically
-    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
 
     # find max difference
     diff = num_output - an_output
@@ -411,7 +411,7 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
     num_output = layer(img_packed_tensor).detach().numpy()
 
     # calculate the values analytically, for a single channel
-    an_output = utils.fourier_gaussian_klambda_arcsec(uu, vv, **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
 
     # loop through each channel and assert that things are the same
     for i in range(nchan):
@@ -461,7 +461,7 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D_t, tmp_path)
     # plot a single channel, to check
     ichan = 1
 
-    an_output = utils.fourier_gaussian_klambda_arcsec(uu[ichan], vv[ichan], **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu[ichan], vv[ichan], **kw)
 
     diff = num_output[ichan] - an_output
 
@@ -493,7 +493,7 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D_t, tmp_path)
     # loop through each channel and assert that things are the same
     for i in range(nchan):
         # calculate the values analytically for this channel
-        an_output = utils.fourier_gaussian_klambda_arcsec(uu[i], vv[i], **kw)
+        an_output = utils.fourier_gaussian_lambda_arcsec(uu[i], vv[i], **kw)
 
         # using table-based interpolation, so the accuracy bar is lower
         # should be < 3e-6, based on plot for single-channel

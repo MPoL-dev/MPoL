@@ -498,7 +498,7 @@ def PSD(qs: torch.Tensor, psd: torch.Tensor, l: torch.Tensor) -> torch.Tensor:
     Parameters
     ----------
     qs : :class:`torch.Tensor` of :class:`torch.double`
-        the radial UV coordinate (in kilolambda)
+        the radial UV coordinate (in :math:`\lambda`)
     psd : :class:`torch.Tensor` of :class:`torch.double`
         the power spectral density cube
     l : :class:`torch.Tensor` of :class:`torch.double`
@@ -510,9 +510,6 @@ def PSD(qs: torch.Tensor, psd: torch.Tensor, l: torch.Tensor) -> torch.Tensor:
         the loss calculated using the power spectral density
 
     """
-
-    # stack to the full 3D shape
-    qs = qs * 1e3  # lambda
 
     l_rad = l * constants.arcsec  # radians
 

@@ -1,7 +1,3 @@
-r"""The ``gridding`` module provides two core classes in 
-:class:`mpol.gridding.DataAverager` and :class:`mpol.gridding.DirtyImager`."""
-
-
 from __future__ import annotations
 
 import warnings
@@ -117,9 +113,9 @@ def verify_no_hermitian_pairs(
 
     Args:
         uu (numpy array): array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         data (numpy complex): array of data values
         test_vis (int): the number of data points to search for Hermitian 'matches'
         test_channel (int): the index of the channel to perform the check
@@ -219,9 +215,9 @@ class GridderBase:
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the
@@ -301,9 +297,9 @@ class GridderBase:
 
         Args:
             uu (np.array): 1D array of East-West spatial frequency coordinates for a
-                specific channel. Units of [:math:`\mathrm{k}\lambda`]
+                specific channel. Units of [:math:`\lambda`]
             vv (np.array): 1D array of North-South spatial frequency coordinates for a
-                specific channel. Units of [:math:`\mathrm{k}\lambda`]
+                specific channel. Units of [:math:`\lambda`]
             values (np.array): 1D array of values (the same length as uu and vv) to use
                 in the sum over each cell. The default (``values=None``) corresponds to
                 using ``values=np.ones_like(uu)`` such that the routine is equivalent
@@ -606,9 +602,9 @@ class DataAverager(GridderBase):
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the
@@ -724,9 +720,9 @@ class DirtyImager(GridderBase):
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the

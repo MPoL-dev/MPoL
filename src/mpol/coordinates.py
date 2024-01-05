@@ -35,7 +35,7 @@ class GridCoords:
 
     After the object is initialized, instance variables can be accessed, for example
 
-    >>> myCoords = GridCoords(cell_size=0.005, 512)
+    >>> myCoords = GridCoords(cell_size=0.005, npix=512)
     >>> myCoords.img_ext
 
     :ivar dl: image-plane cell spacing in RA direction (assumed to be positive)
@@ -55,26 +55,26 @@ class GridCoords:
     :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image
         [arcseconds].
     :ivar du: Fourier-plane cell spacing in East-West direction
-        [:math:`\mathrm{k}\lambda`]
+        [:math:`\lambda`]
     :ivar dv: Fourier-plane cell spacing in North-South direction
-        [:math:`\mathrm{k}\lambda`]
+        [:math:`\lambda`]
     :ivar u_centers: 1D array of cell centers in East-West direction
-        [:math:`\mathrm{k}\lambda`].
+        [:math:`\lambda`].
     :ivar v_centers: 1D array of cell centers in North-West direction
-        [:math:`\mathrm{k}\lambda`].
+        [:math:`\lambda`].
     :ivar u_edges: 1D array of cell edges in East-West direction
-        [:math:`\mathrm{k}\lambda`].
+        [:math:`\lambda`].
     :ivar v_edges: 1D array of cell edges in North-South direction
-        [:math:`\mathrm{k}\lambda`].
-    :ivar u_bin_min: minimum u edge [:math:`\mathrm{k}\lambda`]
-    :ivar u_bin_max: maximum u edge [:math:`\mathrm{k}\lambda`]
-    :ivar v_bin_min: minimum v edge [:math:`\mathrm{k}\lambda`]
-    :ivar v_bin_max: maximum v edge [:math:`\mathrm{k}\lambda`]
+        [:math:`\lambda`].
+    :ivar u_bin_min: minimum u edge [:math:`\lambda`]
+    :ivar u_bin_max: maximum u edge [:math:`\lambda`]
+    :ivar v_bin_min: minimum v edge [:math:`\lambda`]
+    :ivar v_bin_max: maximum v edge [:math:`\lambda`]
     :ivar max_grid: maximum spatial frequency enclosed by Fourier grid
-        [:math:`\mathrm{k}\lambda`]
+        [:math:`\lambda`]
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines
         like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming
-        ``origin='lower'``. Units of [:math:`\mathrm{k}\lambda`]
+        ``origin='lower'``. Units of [:math:`\lambda`]
     """
 
     def __init__(self, cell_size: float, npix: int) -> None:
@@ -106,8 +106,8 @@ class GridCoords:
         self.m_centers = self.dm * int_m_centers  # [radians]
 
         # the output spatial frequencies of the FFT routine
-        self.du = 1 / (self.npix * self.dl) * 1e-3  # [kλ]
-        self.dv = 1 / (self.npix * self.dm) * 1e-3  # [kλ]
+        self.du = 1 / (self.npix * self.dl)  # [λ]
+        self.dv = 1 / (self.npix * self.dm)  # [λ]
 
         # define the max/min of the FFT grid
         # because we store images as [y, x]
@@ -115,13 +115,13 @@ class GridCoords:
         int_u_edges = np.arange(self.ncell_u + 1) - self.ncell_v // 2 - 0.5
         int_v_edges = np.arange(self.ncell_v + 1) - self.ncell_v // 2 - 0.5
 
-        self.u_edges = self.du * int_u_edges  # [kλ]
-        self.v_edges = self.dv * int_v_edges  # [kλ]
+        self.u_edges = self.du * int_u_edges  # [λ]
+        self.v_edges = self.dv * int_v_edges  # [λ]
 
         int_u_centers = np.arange(self.ncell_u) - self.ncell_u // 2
         int_v_centers = np.arange(self.ncell_v) - self.ncell_v // 2
-        self.u_centers = self.du * int_u_centers  # [kλ]
-        self.v_centers = self.dv * int_v_centers  # [kλ]
+        self.u_centers = self.du * int_u_centers  # [λ]
+        self.v_centers = self.dv * int_v_centers  # [λ]
 
         self.v_bin_min = np.min(self.v_edges)
         self.v_bin_max = np.max(self.v_edges)
@@ -134,7 +134,7 @@ class GridCoords:
             self.u_bin_max,
             self.v_bin_min,
             self.v_bin_max,
-        ]  # [kλ]
+        ]  # [λ]
 
         # max u or v freq supported by current grid
         self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
@@ -147,7 +147,7 @@ class GridCoords:
         # only useful for plotting... uu, vv increasing, no fftshift
         self.sky_q_centers_2D = np.sqrt(
             self.sky_u_centers_2D**2 + self.sky_v_centers_2D**2
-        )  # [kλ]
+        )  # [λ]
 
         # https://en.wikipedia.org/wiki/Atan2
         self.sky_phi_centers_2D = np.arctan2(
@@ -164,7 +164,7 @@ class GridCoords:
 
         self.q_max = float(
             np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
-        )  # outer edge [klambda]
+        )  # outer edge [λ]
 
         # x_centers_2D and y_centers_2D are just l and m in units of arcsec
         x_centers_2D, y_centers_2D = np.meshgrid(
@@ -192,10 +192,10 @@ class GridCoords:
         ----------
         uu : :class:`torch.Tensor` of `torch.double`
             u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv : :class:`torch.Tensor` of `torch.double`
             v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
 
         Returns
         -------
@@ -207,7 +207,7 @@ class GridCoords:
         """
 
         # we need this routine to work with both numpy.ndarray or torch.Tensor
-        # because it is called for DirtyImager setup (numpy only) 
+        # because it is called for DirtyImager setup (numpy only)
         # and torch layers
         uu = torch.as_tensor(uu)
         vv = torch.as_tensor(vv)

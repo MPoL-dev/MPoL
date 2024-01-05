@@ -802,13 +802,13 @@ def vis_1d_fig(
     weights,
     geom=None,
     rescale_flux=False,
-    bin_width=20e3,
+    bin_width=20e6,
     q_logx=True,
     title="",
     channel=0,
     save_prefix=None,
 ):
-    """
+    r"""
     Figure for comparison of 1D projected MPoL model visibilities and observed
         visibilities.
 
@@ -822,7 +822,7 @@ def vis_1d_fig(
     ----------
     model : `torch.nn.Module` object
         A neural network; instance of the `mpol.precomposed.GriddedNet` class.
-    u, v : array, unit=[k\lambda]
+    u, v : array, unit=[:math:`\lambda`]
         Data u- and v-coordinates
     V : array, unit=[Jy]
         Data visibility amplitudes
@@ -849,7 +849,7 @@ def vis_1d_fig(
             :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
             No rescaling would be appropriate in the optically thin limit.
     bin_width : float, default=20e3
-        Bin size [klambda] for baselines
+        Bin size [:math:`\lambda`] for baselines
     q_logx : bool, default=True
         Whether to plot visibilities in log-baseline
     title : str, default=""
@@ -879,21 +879,18 @@ def vis_1d_fig(
     if geom is not None:
         # phase-shift the visibilities
         V = apply_phase_shift(
-            u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True
+            u, v, V, geom["dRA"], geom["dDec"], inverse=True
         )
         Vmod = apply_phase_shift(
-            u * 1e3, v * 1e3, Vmod, geom["dRA"], geom["dDec"], inverse=True
+            u, v, Vmod, geom["dRA"], geom["dDec"], inverse=True
         )
         Vresid = apply_phase_shift(
-            u * 1e3, v * 1e3, Vresid, geom["dRA"], geom["dDec"], inverse=True
+            u, v, Vresid, geom["dRA"], geom["dDec"], inverse=True
         )
 
         # deproject the (u,v) points
-        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
-        # convert back to [k\lambda]
-        u /= 1e3
-        v /= 1e3
-
+        u, v, _ = deproject(u, v, geom["incl"], geom["Omega"])
+        
         # if the source is optically thick, rescale the deprojected V(q)
         if rescale_flux:
             V.real /= np.cos(geom["incl"] * np.pi / 180)
@@ -903,11 +900,11 @@ def vis_1d_fig(
 
     # bin projected observed visibilities
     # (`UVDataBinner` expects `u`, `v` in [lambda])
-    binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
+    binned_Vtrue = UVDataBinner(np.hypot(u, v), V, weights, bin_width)
 
     # bin projected model and residual visibilities
-    binned_Vmod = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vmod, weights, bin_width)
-    binned_Vresid = UVDataBinner(np.hypot(u * 1e3, v * 1e3), Vresid, weights, bin_width)
+    binned_Vmod = UVDataBinner(np.hypot(u, v), Vmod, weights, bin_width)
+    binned_Vresid = UVDataBinner(np.hypot(u, v), Vresid, weights, bin_width)
 
     # baselines [Mlambda]
     qq = binned_Vtrue.uv / 1e6
@@ -1037,7 +1034,7 @@ def radial_fig(
                     Phase center offset in right ascension. Positive is west of north.
                 "dDec" : float, unit=[arcsec]
                     Phase center offset in declination.
-    u, v : array, optional, unit=[k\lambda], default=None
+    u, v : array, optional, unit=[:math:`\lambda`], default=None
         Data u- and v-coordinates
     V : array, optional, unit=[Jy], default=None
         Data visibility amplitudes
@@ -1080,15 +1077,12 @@ def radial_fig(
 
         # phase-shift the observed visibilities
         V = apply_phase_shift(
-            u * 1e3, v * 1e3, V, geom["dRA"], geom["dDec"], inverse=True
+            u, v, V, geom["dRA"], geom["dDec"], inverse=True
         )
 
         # deproject the observed (u,v) points
-        u, v, _ = deproject(u * 1e3, v * 1e3, geom["incl"], geom["Omega"])
-        # convert back to [k\lambda]
-        u /= 1e3
-        v /= 1e3
-
+        u, v, _ = deproject(u, v, geom["incl"], geom["Omega"])
+        
         # if the source is optically thick, rescale the deprojected V(q)
         if rescale_flux:
             V.real /= np.cos(geom["incl"] * np.pi / 180)
@@ -1096,7 +1090,7 @@ def radial_fig(
 
         # bin observed visibilities
         # (`UVDataBinner` expects `u`, `v` in [lambda])
-        binned_Vtrue = UVDataBinner(np.hypot(u * 1e3, v * 1e3), V, weights, bin_width)
+        binned_Vtrue = UVDataBinner(np.hypot(u, v), V, weights, bin_width)
 
     # model radial image profile
     rs, Is = radialI(model.icube, geom)
