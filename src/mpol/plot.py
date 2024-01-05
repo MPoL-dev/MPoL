@@ -622,182 +622,182 @@ def crossval_diagnostics_fig(cv, title="", save_prefix=None):
     return fig, axes
 
 
-def image_comparison_fig(
-    model,
-    u,
-    v,
-    V,
-    weights,
-    robust=0.5,
-    clean_fits=None,
-    share_cscale=False,
-    xzoom=[None, None],
-    yzoom=[None, None],
-    title="",
-    channel=0,
-    save_prefix=None,
-):
-    """
-    Figure for comparison of MPoL model image to other image models.
+# def image_comparison_fig(
+#     model,
+#     u,
+#     v,
+#     V,
+#     weights,
+#     robust=0.5,
+#     clean_fits=None,
+#     share_cscale=False,
+#     xzoom=[None, None],
+#     yzoom=[None, None],
+#     title="",
+#     channel=0,
+#     save_prefix=None,
+# ):
+#     """
+#     Figure for comparison of MPoL model image to other image models.
 
-    Plots:
-        - dirty image
-        - MPoL model image
-        - MPoL residual visibilities imaged
-        - clean image (if a .fits file is supplied)
+#     Plots:
+#         - dirty image
+#         - MPoL model image
+#         - MPoL residual visibilities imaged
+#         - clean image (if a .fits file is supplied)
 
-    Parameters
-    ----------
-    model : `torch.nn.Module` object
-        A neural network; instance of the `mpol.precomposed.GriddedNet` class.
-    u, v : array, unit=[k\lambda]
-        Data u- and v-coordinates
-    V : array, unit=[Jy]
-        Data visibility amplitudes
-    weights : array, unit=[Jy^-2]
-        Data weights
-    robust : float, default=0.5
-        Robust weighting parameter used to create the dirty image of the
-        observed visibilities and separately of the MPoL residual visibilities
-    clean_fits : str, default=None
-        Path to a clean .fits image
-    share_cscale : bool, default=False
-        Whether the MPoL model image, dirty image and clean image share the
-        same colorscale
-    xzoom, yzoom : list of float, default = [None, None]
-        X- and y- axis limits to zoom the images to. `xzoom` and `yzoom` should
-        both list values in ascending order (e.g. [-2, 3], not [3, -2])
-    title : str, default=""
-        Figure super-title
-    channel : int, default=0
-        Channel of the model to use to generate figure
-    save_prefix : string, default = None
-        Prefix for saved figure name. If None, the figure won't be saved
+#     Parameters
+#     ----------
+#     model : `torch.nn.Module` object
+#         A neural network; instance of the `mpol.precomposed.GriddedNet` class.
+#     u, v : array, unit=[k\lambda]
+#         Data u- and v-coordinates
+#     V : array, unit=[Jy]
+#         Data visibility amplitudes
+#     weights : array, unit=[Jy^-2]
+#         Data weights
+#     robust : float, default=0.5
+#         Robust weighting parameter used to create the dirty image of the
+#         observed visibilities and separately of the MPoL residual visibilities
+#     clean_fits : str, default=None
+#         Path to a clean .fits image
+#     share_cscale : bool, default=False
+#         Whether the MPoL model image, dirty image and clean image share the
+#         same colorscale
+#     xzoom, yzoom : list of float, default = [None, None]
+#         X- and y- axis limits to zoom the images to. `xzoom` and `yzoom` should
+#         both list values in ascending order (e.g. [-2, 3], not [3, -2])
+#     title : str, default=""
+#         Figure super-title
+#     channel : int, default=0
+#         Channel of the model to use to generate figure
+#     save_prefix : string, default = None
+#         Prefix for saved figure name. If None, the figure won't be saved
 
-    Returns
-    -------
-    fig : Matplotlib `.Figure` instance
-        The generated figure
-    axes : Matplotlib `~.axes.Axes` class
-        Axes of the generated figure
-    """
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
+#     Returns
+#     -------
+#     fig : Matplotlib `.Figure` instance
+#         The generated figure
+#     axes : Matplotlib `~.axes.Axes` class
+#         Axes of the generated figure
+#     """
+#     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
 
-    title += f"\nMPoL pixel size {model.coords.cell_size * 1e3:.2f} mas, N_pix {model.coords.npix}"
-    if share_cscale:
-        title += "\nDirty and clean images use colorscale of MPoL image"
-    fig.suptitle(title)
+#     title += f"\nMPoL pixel size {model.coords.cell_size * 1e3:.2f} mas, N_pix {model.coords.npix}"
+#     if share_cscale:
+#         title += "\nDirty and clean images use colorscale of MPoL image"
+#     fig.suptitle(title)
 
-    # get MPoL model image
-    mod_im = torch2npy(model.icube.sky_cube[channel])
-    total_flux = model.coords.cell_size**2 * np.sum(mod_im)
+#     # get MPoL model image
+#     mod_im = torch2npy(model.icube.sky_cube[channel])
+#     total_flux = model.coords.cell_size**2 * np.sum(mod_im)
 
-    # get imaged MPoL residual visibilities
-    im_resid, norm_resid = get_residual_image(model, u, v, V, weights, robust=robust)
+#     # get imaged MPoL residual visibilities
+#     im_resid, norm_resid = get_residual_image(model, u, v, V, weights, robust=robust)
 
-    # get dirty image
-    imager = DirtyImager(
-        coords=model.coords, uu=u, vv=v, weight=weights, data_re=V.real, data_im=V.imag
-    )
-    dirty_im, dirty_beam = imager.get_dirty_image(
-        weighting="briggs", robust=robust, unit="Jy/arcsec^2"
-    )
-    dirty_im = np.squeeze(dirty_im)
+#     # get dirty image
+#     imager = DirtyImager(
+#         coords=model.coords, uu=u, vv=v, weight=weights, data_re=V.real, data_im=V.imag
+#     )
+#     dirty_im, dirty_beam = imager.get_dirty_image(
+#         weighting="briggs", robust=robust, unit="Jy/arcsec^2"
+#     )
+#     dirty_im = np.squeeze(dirty_im)
 
-    # get clean image and beam
-    if clean_fits is not None:
-        fits_obj = ProcessFitsImage(clean_fits)
-        clean_im, clean_im_ext, clean_beam = fits_obj.get_image(beam=True)
+#     # get clean image and beam
+#     if clean_fits is not None:
+#         fits_obj = ProcessFitsImage(clean_fits)
+#         clean_im, clean_im_ext, clean_beam = fits_obj.get_image(beam=True)
 
-    # set image colorscales
-    norm_mod = get_image_cmap_norm(mod_im, stretch="asinh")
-    if share_cscale:
-        norm_dirty = norm_clean = norm_mod
-    else:
-        norm_dirty = get_image_cmap_norm(dirty_im, stretch="asinh")
-        if clean_fits is not None:
-            norm_clean = get_image_cmap_norm(clean_im, stretch="asinh")
+#     # set image colorscales
+#     norm_mod = get_image_cmap_norm(mod_im, stretch="asinh")
+#     if share_cscale:
+#         norm_dirty = norm_clean = norm_mod
+#     else:
+#         norm_dirty = get_image_cmap_norm(dirty_im, stretch="asinh")
+#         if clean_fits is not None:
+#             norm_clean = get_image_cmap_norm(clean_im, stretch="asinh")
 
-    # MPoL model image
-    plot_image(
-        mod_im,
-        extent=model.icube.coords.img_ext,
-        ax=axes[0][1],
-        norm=norm_mod,
-        xlab="",
-        ylab="",
-    )
+#     # MPoL model image
+#     plot_image(
+#         mod_im,
+#         extent=model.icube.coords.img_ext,
+#         ax=axes[0][1],
+#         norm=norm_mod,
+#         xlab="",
+#         ylab="",
+#     )
 
-    # imaged MPoL residual visibilities
-    plot_image(
-        im_resid,
-        extent=model.icube.coords.img_ext,
-        ax=axes[1][1],
-        norm=norm_resid,
-        cmap="RdBu_r",
-        xlab="",
-        ylab="",
-    )
+#     # imaged MPoL residual visibilities
+#     plot_image(
+#         im_resid,
+#         extent=model.icube.coords.img_ext,
+#         ax=axes[1][1],
+#         norm=norm_resid,
+#         cmap="RdBu_r",
+#         xlab="",
+#         ylab="",
+#     )
 
-    # dirty image
-    plot_image(
-        dirty_im, extent=model.icube.coords.img_ext, ax=axes[0][0], norm=norm_dirty
-    )
+#     # dirty image
+#     plot_image(
+#         dirty_im, extent=model.icube.coords.img_ext, ax=axes[0][0], norm=norm_dirty
+#     )
 
-    # clean image
-    if clean_fits is not None:
-        plot_image(
-            clean_im,
-            extent=clean_im_ext,
-            ax=axes[1][0],
-            norm=norm_clean,
-            xlab="",
-            ylab="",
-        )
+#     # clean image
+#     if clean_fits is not None:
+#         plot_image(
+#             clean_im,
+#             extent=clean_im_ext,
+#             ax=axes[1][0],
+#             norm=norm_clean,
+#             xlab="",
+#             ylab="",
+#         )
 
-        # add clean beam to plot
-        if any(xzoom) and any(yzoom):
-            beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
-        else:
-            beam_xy = (0.85 * axes[1][0].get_xlim()[1], 0.85 * axes[1][0].get_ylim()[0])
+#         # add clean beam to plot
+#         if any(xzoom) and any(yzoom):
+#             beam_xy = (0.85 * xzoom[1], 0.85 * yzoom[0])
+#         else:
+#             beam_xy = (0.85 * axes[1][0].get_xlim()[1], 0.85 * axes[1][0].get_ylim()[0])
 
-        beam_ellipse = Ellipse(
-            xy=beam_xy,
-            width=clean_beam[0],
-            height=clean_beam[1],
-            angle=-clean_beam[2],
-            color="w",
-        )
-        axes[1][0].add_artist(beam_ellipse)
+#         beam_ellipse = Ellipse(
+#             xy=beam_xy,
+#             width=clean_beam[0],
+#             height=clean_beam[1],
+#             angle=-clean_beam[2],
+#             color="w",
+#         )
+#         axes[1][0].add_artist(beam_ellipse)
 
-    if any(xzoom) and any(yzoom):
-        for ii in [0, 1]:
-            for jj in [0, 1]:
-                axes[ii][jj].set_xlim(xzoom[1], xzoom[0])
-                axes[ii][jj].set_ylim(yzoom[0], yzoom[1])
+#     if any(xzoom) and any(yzoom):
+#         for ii in [0, 1]:
+#             for jj in [0, 1]:
+#                 axes[ii][jj].set_xlim(xzoom[1], xzoom[0])
+#                 axes[ii][jj].set_ylim(yzoom[0], yzoom[1])
 
-    axes[0][0].set_title(f"Dirty image (robust {robust})")
-    axes[0][1].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
-    axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")
-    if clean_fits is not None:
-        axes[1][0].set_title(
-            f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)"
-        )
+#     axes[0][0].set_title(f"Dirty image (robust {robust})")
+#     axes[0][1].set_title(f"MPoL image (flux {total_flux:.4f} Jy)")
+#     axes[1][1].set_title(f"MPoL residual V imaged (robust {robust})")
+#     if clean_fits is not None:
+#         axes[1][0].set_title(
+#             f"Clean image (beam {clean_beam[0] * 1e3:.0f} $\\times$ {clean_beam[1] * 1e3:.0f} mas)"
+#         )
 
-    plt.tight_layout()
+#     plt.tight_layout()
 
-    if save_prefix is not None:
-        fig.savefig(save_prefix + "_image_comparison.png", dpi=300)
+#     if save_prefix is not None:
+#         fig.savefig(save_prefix + "_image_comparison.png", dpi=300)
 
-    plt.close()
+#     plt.close()
 
-    return fig, axes
+#     return fig, axes
 
 
 def vis_1d_fig(
     model,
-    u,
-    v,
+    uu,
+    vv,
     V,
     weights,
     geom=None,
@@ -822,7 +822,7 @@ def vis_1d_fig(
     ----------
     model : `torch.nn.Module` object
         A neural network; instance of the `mpol.precomposed.GriddedNet` class.
-    u, v : array, unit=[:math:`\lambda`]
+    uu, vv : array, unit=[:math:`\lambda`]
         Data u- and v-coordinates
     V : array, unit=[Jy]
         Data visibility amplitudes
@@ -874,22 +874,23 @@ def vis_1d_fig(
     from frank.utilities import UVDataBinner
 
     # get MPoL residual and model visibilities
-    Vresid, Vmod = get_vis_residuals(model, u, v, V, return_Vmod=True)
+    Vmod = model.predict_loose_visibilities(uu, vv)
+    Vresid = V - Vmod
 
     if geom is not None:
         # phase-shift the visibilities
         V = apply_phase_shift(
-            u, v, V, geom["dRA"], geom["dDec"], inverse=True
+            uu, vv, V, geom["dRA"], geom["dDec"], inverse=True
         )
         Vmod = apply_phase_shift(
-            u, v, Vmod, geom["dRA"], geom["dDec"], inverse=True
+            uu, vv, Vmod, geom["dRA"], geom["dDec"], inverse=True
         )
         Vresid = apply_phase_shift(
-            u, v, Vresid, geom["dRA"], geom["dDec"], inverse=True
+            uu, vv, Vresid, geom["dRA"], geom["dDec"], inverse=True
         )
 
         # deproject the (u,v) points
-        u, v, _ = deproject(u, v, geom["incl"], geom["Omega"])
+        uu, vv, _ = deproject(uu, vv, geom["incl"], geom["Omega"])
         
         # if the source is optically thick, rescale the deprojected V(q)
         if rescale_flux:
@@ -900,11 +901,11 @@ def vis_1d_fig(
 
     # bin projected observed visibilities
     # (`UVDataBinner` expects `u`, `v` in [lambda])
-    binned_Vtrue = UVDataBinner(np.hypot(u, v), V, weights, bin_width)
+    binned_Vtrue = UVDataBinner(np.hypot(uu, vv), V, weights, bin_width)
 
     # bin projected model and residual visibilities
-    binned_Vmod = UVDataBinner(np.hypot(u, v), Vmod, weights, bin_width)
-    binned_Vresid = UVDataBinner(np.hypot(u, v), Vresid, weights, bin_width)
+    binned_Vmod = UVDataBinner(np.hypot(uu, vv), Vmod, weights, bin_width)
+    binned_Vresid = UVDataBinner(np.hypot(uu, vv), Vresid, weights, bin_width)
 
     # baselines [Mlambda]
     qq = binned_Vtrue.uv / 1e6
