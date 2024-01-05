@@ -3,9 +3,30 @@
 # Changelog
 
 ## v0.3.0
+
+- Standardized nomenclature of {class}`mpol.coordinates.GridCoords` and {class}`mpol.fourier.FourierCube` to use `sky_cube` for a normal image and `ground_cube` for a normal visibility cube (rather than `sky_` for visibility quantities). Routines use `packed_cube` instead of `cube` internally to be clear when packed format is preferred.
+- Modified {class}`mpol.coordinates.GridCoords` object to use cached properties [#187](https://github.com/MPoL-dev/MPoL/pull/187).
+- Changed the base spatial frequency unit from k$\lambda$ to $\lambda$, addressing [#223](https://github.com/MPoL-dev/MPoL/issues/223). This will affect most users data-reading routines!
+- Added the {meth}`mpol.gridding.DirtyImager.from_tensors` routine to cover the use case where one might want to use the {meth}`mpol.gridding.DirtyImager` to image residual visibilities. Otherwise, {meth}`mpol.gridding.DirtyImager` and {meth}`mpol.gridding.DataAverager` are the only notable routines that expect `np.ndarray` input arrays. This is because they are designed to work with data arrays directly after loading (say from a MeasurementSet or `.npy` file) and are implemented internally in numpy. If a routine requires data separately as `data_re` and `data_im`, that is a tell-tale sign that the routine works with numpy histogram routines internally.
+- Changed name of {class}`mpol.precomposed.SimpleNet` to {class}`mpol.precomposed.GriddedNet` to more clearly indicate purpose. Updated documentation to make clear that this is just a convenience starter module, and users are encouraged to write their own `nn.Module`s.
+- Changed internal instance attribute of {class}`mpol.images.ImageCube` from `cube` to `packed_cube` to more clearly indicate format.
+- Removed `mpol.fourier.get_vis_residuals` and added `predict_loose_visibilities` to {class}`mpol.precomposed.SimpleNet`.
+- Standardized treatment of numpy vs `torch.tensor`s, with preference for `torch.tensor` in many routines. This simplifies the internal logic of the routines and will make most operations run faster.
+- Standardized the input types of {class}:`mpol.fourier.NuFFT` and {class}:`mpol.fourier.NuFFTCached` to expect {class}`torch.Tensor`s (removed support for numpy arrays). This simplifies the internal logic of the routines and will make most operations run faster.
+- Changed {class}`mpol.fourier.make_fake_data` -> {class}`mpol.fourier.generate_fake_data`.
+- Changed base spatial frequency unit from k$\lambda$ to $\lambda$, closing issue [#223](https://github.com/MPoL-dev/MPoL/issues/223) and simplifying the internals of the codebase in numerous places. The following routines now expect inputs in units of $\lambda$:
+  - {class}`mpol.coordinates.GridCoords`
+  - {class}`mpol.coordinates.check_data_fit`
+  - {class}`mpol.datasets.GriddedDataset`
+  - {class}`mpol.fourier.NuFFT.forward`
+  - {class}`mpol.fourier.NuFFTCached`
+  - {class}`mpol.gridding.verify_no_hermitian_pairs`
+  - {class}`mpol.gridding.GridderBase`
+  - {class}`mpol.gridding.DataAverager`
+  - {class}`mpol.gridding.DirtyImager`
 - Major documentation edits to be more concise with the objective of making the core package easier to develop and maintain. Some tutorials moved to the [MPoL-dev/examples](https://github.com/MPoL-dev/examples) repository.
 - Added the {meth}`mpol.losses.neg_log_likelihood_avg` method to be used in point-estimate or optimization situations where data amplitudes or weights may be adjusted as part of the optimization (such as via self-calibration). Moved all documentation around loss functions into the [Losses API](api/losses.md).
-- Renamed `mpol.losses.nll` -> {meth}`mpol.losses.r_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.r_chi_squared_gridded` because that is what those routines were previously calculating (see the {ref}`api-reference-label` for more details). ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
+- Renamed `mpol.losses.nll` -> {meth}`mpol.losses.r_chi_squared` and `mpol.losses.nll_gridded` -> {meth}`mpol.losses.r_chi_squared_gridded` because that is what those routines were previously calculating. ([#237](https://github.com/MPoL-dev/MPoL/issues/237)). Tutorials have also been updated to reflect the change. 
 - Fixed implementation and docstring of {meth}`mpol.losses.log_likelihood` ([#237](https://github.com/MPoL-dev/MPoL/issues/237)).
 - Made some progress converting docstrings from "Google" style format to "NumPy" style format. Ian is now convinced that NumPy style format is more readable for the type of docstrings we write in MPoL. We usually require long type definitions and long argument descriptions, and the extra indentation required for Google makes these very scrunched.
 - Make the `passthrough` behaviour of {class}`mpol.images.ImageCube` the default and removed this parameter entirely. Previously, it was possible to have {class}`mpol.images.ImageCube` act as a layer with `nn.Parameter`s. This functionality has effectively been replaced since the introduction of {class}`mpol.images.BaseCube` which provides a more useful way to parameterize pixel values. If a one-to-one mapping (including negative pixels) from `nn.Parameter`s to output tensor is desired, then one can specify `pixel_mapping=lambda x : x` when instantiating {class}`mpol.images.BaseCube`. More details in ([#246](https://github.com/MPoL-dev/MPoL/issues/246))
@@ -28,7 +49,7 @@
 - TOML does not support adding keyed entries, so creating layered build environments of default, `docs`, `test`, and `dev` as we used to with `setup.py` is laborious and repetitive with `pyproject.toml`. We have simplified the list to be default (key dependencies), `test` (minimal necessary for test-suite), and `dev` (covering everything needed to build the docs and actively develop the package).
 - Removed custom `spheroidal_gridding` routines, tests, and the `UVDataset` object that used them. These have been superseded by the TorchKbNuFFT package. For reference, the old routines (including the tricky `corrfun` math) is preserved in a Gist [here](https://gist.github.com/iancze/f3d2769005a9e2c6731ee6977f166a83).
 - Changed API of {class}`~mpol.fourier.NuFFT`. Previous signature took `uu` and `vv` points at initialization (`__init__`), and the `.forward` method took only an image cube. This behaviour is preserved in a new class {class}`~mpol.fourier.NuFFTCached`. The updated signature of {class}`~mpol.fourier.NuFFT` *does not* take `uu` and `vv` at initialization. Rather, its `forward` method is modified to take an image cube and the `uu` and `vv` points. This allows an instance of this class to be used with new `uu` and `vv` points in each forward call. This follows the standard expectation of a layer (e.g., a linear regression function predicting at new `x`) and the pattern of the TorchKbNuFFT package itself. It is expected that the new `NuFFT` will be the default routine and `NuFFTCached` will only be used in specialized circumstances (and possibly deprecated/removed in future updates). Changes implemented by [#232](https://github.com/MPoL-dev/MPoL/pull/232).
-- Moved "Releasing a new version of MPoL" from the wiki to the Developer Documentation ({ref}`releasing-new-version-label`).
+- Moved "Releasing a new version of MPoL" from the wiki to the Developer Documentation on the main docs.
 
 ## v0.2.0
 
@@ -38,7 +59,7 @@
 - Reorganized some of the docs API
 - Expanded discussion and demonstration in `optimzation.md` tutorial
 - Localized harcoded Zenodo record reference to single instance, and created new external Zenodo record from which to draw
-- Added [Parametric inference with Pyro tutorial](large-tutorials/pyro.md)
+- Added Parametric inference with Pyro tutorial
 - Updated some discussion and notation in `rml_intro.md` tutorial
 - Added `mypy` static type checks
 - Added `frank` as a 'test' and 'analysis' extras dependency

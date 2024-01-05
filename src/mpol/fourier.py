@@ -1,6 +1,3 @@
-r"""The ``fourier`` module provides the core functionality of MPoL via 
-:class:`mpol.fourier.FourierCube`."""
-
 from __future__ import annotations
 
 from typing import Any
@@ -9,12 +6,10 @@ import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
-from numpy import complexfloating, floating
 from numpy.typing import NDArray
 from torch import nn
 
 from mpol.exceptions import DimensionMismatchError
-from mpol.images import ImageCube
 
 from mpol import utils
 from mpol.coordinates import GridCoords
@@ -84,7 +79,7 @@ class FourierCube(nn.Module):
         Returns
         -------
         :class:`torch.Tensor` of :class:`torch.complex128` of shape ``(nchan, npix, npix)``
-            complex-valued FFT of the image cube (i.e., the visibility cube), in 
+            complex-valued FFT of the image cube (i.e., the visibility cube), in
             'ground' format.
         """
 
@@ -117,144 +112,6 @@ class FourierCube(nn.Module):
         return torch.angle(self.ground_vis)
 
 
-def safe_baseline_constant_meters(
-    uu: NDArray[floating[Any]],
-    vv: NDArray[floating[Any]],
-    freqs: NDArray[floating[Any]],
-    coords: GridCoords,
-    uv_cell_frac: float = 0.05,
-) -> bool:
-    r"""
-    This routine determines whether the baselines can safely be assumed to be constant
-    with channel when they converted from meters to units of kilolambda.
-
-    The antenna baselines *are* the same as a function of channel when they are measured
-    in physical distance units, such as meters. However, when these baselines are
-    converted to spatial frequency units, via
-
-    .. math::
-
-        u = \frac{D}{\lambda},
-
-    it's possible that the :math:`u` and :math:`v` values of each channel are
-    significantly different if the :math:`\lambda` values of each channel are
-    significantly different. This routine evaluates whether the maximum change in
-    :math:`u` or :math:`v` across channels (when represented in kilolambda) is smaller
-    than some threshold value, calculated as the fraction of a :math:`u,v` cell defined
-    by ``coords``.
-
-    If this function returns ``True``, then it would be safe to proceed with
-    parallelization in the :class:`mpol.fourier.NuFFT` layer via the coil dimension.
-
-    Parameters
-    ----------
-    uu : 1D np.array 
-        a 1D array of length ``nvis`` array of the u (East-West)
-        spatial frequency coordinate in units of [m]
-    vv : 1D np.array
-        a 1D array of length ``nvis`` array of the v (North-South)
-        spatial frequency coordinate in units of [m]
-    freqs : 1D np.array
-        a 1D array of length ``nchan`` of the channel frequencies,
-        in units of [Hz].
-    coords: :class:`mpol.coordinates.GridCoords` 
-        object which represents the image and uv-grid dimensions.
-    uv_cell_frac : float
-        the maximum threshold for a change in :math:`u` or
-        :math:`v` spatial frequency across channels, measured as a fraction of the
-        :math:`u,v` cell defined by ``coords``.
-
-    Returns
-    -------
-    boolean
-        `True` if it is safe to assume that the baselines are constant with
-        channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
-    """
-
-    # broadcast and convert baselines to kilolambda across channel
-    uu, vv = utils.broadcast_and_convert_baselines(uu, vv, freqs)
-    # should be (nchan, nvis) arrays
-
-    # convert uv_cell_frac to a kilolambda threshold
-    delta_uv = uv_cell_frac * coords.du  # [klambda]
-
-    # find maximum change in baseline across channel
-    # concatenate arrays to save steps
-    uv = np.array([uu, vv])  # (2, nchan, nvis) arrays
-
-    # find max - min along channel axis
-    uv_min = uv.min(axis=1)
-    uv_max = uv.max(axis=1)
-    uv_diff = uv_max - uv_min
-
-    # find maximum of that
-    max_diff: float = uv_diff.max()
-
-    # compare to uv_cell_frac
-    return max_diff < delta_uv
-
-
-def safe_baseline_constant_kilolambda(
-    uu: NDArray[floating[Any]],
-    vv: NDArray[floating[Any]],
-    coords: GridCoords,
-    uv_cell_frac: float = 0.05,
-) -> bool:
-    r"""
-    This routine determines whether the baselines can safely be assumed to be constant
-    with channel, when the are represented in units of kilolambda.
-
-    Compared to :class:`mpol.fourier.safe_baseline_constant_meters`, this function works
-    with multidimensional arrays of ``uu`` and ``vv`` that are shape (nchan, nvis) and
-    have units of kilolambda.
-
-    If this routine returns True, then it should be safe for the user to either average
-    the baselines across channel or simply choose a single, representative channel. This
-    would enable parallelization in the {class}`mpol.fourier.NuFFT` via the coil
-    dimension.
-
-    Args:
-        uu (1D np.array): a 1D array of length ``nvis`` array of the u (East-West)
-            spatial frequency coordinate in units of [m]
-        vv (1D np.array): a 1D array of length ``nvis`` array of the v (North-South)
-            spatial frequency coordinate in units of [m]
-        freqs (1D np.array): a 1D array of length ``nchan`` of the channel frequencies,
-            in units of [Hz].
-        coords: a :class:`mpol.coordinates.GridCoords` object which represents the
-            image and uv-grid dimensions.
-        uv_cell_frac (float): the maximum threshold for a change in :math:`u` or
-            :math:`v` spatial frequency across channels, measured as a fraction of the
-            :math:`u,v` cell defined by ``coords``.
-
-    Returns:
-        boolean: `True` if it is safe to assume that the baselines are constant with
-            channel (at a tolerance of ``uv_cell_frac``.) Otherwise returns `False`.
-
-    """
-    # convert uv_cell_frac to a kilolambda threshold
-    delta_uv = uv_cell_frac * coords.du  # [klambda]
-
-    # find maximum change in baseline across channel
-    # concatenate arrays to save steps
-    uv = np.array([uu, vv])  # (2, nchan, nvis) arrays
-
-    # find max - min along channel axis
-    uv_min = uv.min(axis=1)
-    uv_max = uv.max(axis=1)
-    uv_diff = uv_max - uv_min
-
-    # find maximum of that
-    max_diff: float = uv_diff.max()
-
-    # compare to uv_cell_frac
-    return max_diff < delta_uv
-
-
-# static image dimensions
-# potentially different uu and vv values with each forward call
-# forward call looks like .forward(image, uu, vv)
-# returns model @ those points
-# NuFFT
 class NuFFT(nn.Module):
     r"""
     This layer translates input from an :class:`mpol.images.ImageCube` to loose,
@@ -287,12 +144,12 @@ class NuFFT(nn.Module):
             im_size=(self.coords.npix, self.coords.npix)
         )
 
-    def _klambda_to_radpix(self, klambda: torch.Tensor) -> torch.Tensor:
-        """Convert a spatial frequency in units of klambda to 'radians/sky pixel,'
-        using the pixel cell_size provided by ``self.coords.dl``.
+    def _lambda_to_radpix(self, lam: torch.Tensor) -> torch.Tensor:
+        r"""Convert a spatial frequency in units of :math:`\lambda` to
+        'radians/sky pixel,' using the pixel cell_size provided by ``self.coords.dl``.
 
         Args:
-            klambda (torch.Tensor): spatial frequency in units of klambda.
+            lam (torch.Tensor): spatial frequency in units of :math:`\lambda`.
 
         Returns:
             torch.Tensor: spatial frequency measured in units of radian per sky pixel
@@ -310,29 +167,28 @@ class NuFFT(nn.Module):
         :math:`I_\nu(l,m)`, which we could quote in units of 'cycles per arcsecond' or
         'cycles per sky pixel,' for example. With a radio interferometer, spatial
         frequencies are typically quoted in units of the observing wavelength, i.e.,
-        lambda or kilo-lambda. If the field of view of the image is small, thanks to
-        the small-angle approximation, units of lambda are directly equivalent to
-        'cycles per sky radian.' The second angular measure comes about when converting
-        the spatial frequency from a linear measure of frequency 'cycles per sky radian'
-        to an angular measure of frequency 'radians per sky radian' or 'radians per
-        sky pixel.'
+        :math:`\lambda`. If the field of view of the image is small, thanks to
+        the small-angle approximation, units of :math:`\lambda` are directly equivalent
+        to 'cycles per sky radian.' The second angular measure comes about when
+        converting the spatial frequency from a linear measure of frequency
+        'cycles per sky radian' to an angular measure of frequency 'radians per sky
+        radian' or 'radians per sky pixel.'
 
         The TorchKbNufft package expects k-trajectory vectors in units of 'radians per
         sky pixel.' This routine helps convert spatial frequencies from their default
-        unit (kilolambda) into 'radians per sky pixel' using the pixel cell_size as
+        unit (:math:`\lambda`) into 'radians per sky pixel' using the pixel cell_size as
         provided by ``self.coords.dl``.
         """
 
-        # convert from kilolambda to cycles per sky radian
-        u_lam = klambda * 1e3  # [lambda, or cycles/radian]
-
+        # lambda is equivalent to cycles per sky radian
         # convert from 'cycles per sky radian' to 'radians per sky radian'
-        u_rad_per_rad = u_lam * 2 * np.pi  # [radians / sky radian]
+        u_rad_per_rad = lam * 2 * np.pi  # [radians / sky radian]
 
         # size of pixel in radians
         # self.coords.dl  # [sky radians/pixel]
 
         # convert from 'radians per sky radian' to 'radians per sky pixel'
+        # assumes pixels are square and dl and dm are interchangeable
         u_rad_per_pix = u_rad_per_rad * self.coords.dl  # [radians / pixel]
 
         return u_rad_per_pix
@@ -357,9 +213,9 @@ class NuFFT(nn.Module):
 
         Args:
             uu (1D or 2D torch.Tensor array): u (East-West) spatial frequency
-                coordinate [klambda]
+                coordinate [:math:`\lambda`]
             vv (1D or 2D torch.Tensor array): v (North-South) spatial frequency
-                coordinate [klambda]
+                coordinate [:math:`\lambda`]
 
         Returns:
             k_traj (torch.Tensor): a k-trajectory vector with shape
@@ -368,8 +224,8 @@ class NuFFT(nn.Module):
         # if uu and vv are 1D dimension, then we assume 'same_uv'
         same_uv = (uu.ndim == 1) and (vv.ndim == 1)
 
-        uu_radpix = self._klambda_to_radpix(uu)
-        vv_radpix = self._klambda_to_radpix(vv)
+        uu_radpix = self._lambda_to_radpix(uu)
+        vv_radpix = self._lambda_to_radpix(vv)
 
         # torchkbnufft uses a [nbatch, ncoil, npix, npix] scheme
         # same_uv will parallelize across the coil dimension.
@@ -399,8 +255,8 @@ class NuFFT(nn.Module):
                 f"nchan of vv ({vv_radpix.shape[0]}) is more than one but different than that used to initialize the NuFFT layer ({self.nchan})"
             )
 
-        uu_radpix_aug = torch.unsqueeze(torch.tensor(uu_radpix), 1)
-        vv_radpix_aug = torch.unsqueeze(torch.tensor(vv_radpix), 1)
+        uu_radpix_aug = torch.unsqueeze(uu_radpix, 1)
+        vv_radpix_aug = torch.unsqueeze(vv_radpix, 1)
         # if TorchKbNufft receives a k-traj tensor of shape (nbatch, 2, nvis), it will
         # parallelize across the batch dimension
         k_traj = torch.cat([vv_radpix_aug, uu_radpix_aug], dim=1)
@@ -409,9 +265,9 @@ class NuFFT(nn.Module):
 
     def forward(
         self,
-        cube: torch.Tensor,
-        uu,
-        vv,
+        packed_cube: torch.Tensor,
+        uu: torch.Tensor,
+        vv: torch.Tensor,
         sparse_matrices: bool = False,
     ) -> torch.Tensor:
         r"""
@@ -421,22 +277,29 @@ class NuFFT(nn.Module):
         points. In general, you probably do not want to provide baselines that include
         Hermitian pairs.
 
-        Args:
-            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube
-                should be a "prepacked" image cube, for example,
-                from :meth:`mpol.images.ImageCube.forward`
-            uu (array-like): array of the u (East-West) spatial frequency coordinate
-                [klambda].
-            vv (array-like): array of the v (North-South) spatial frequency coordinate
-                [klambda] (must be the same shape as uu)
-            sparse_matrices (bool): If False, use the default table-based interpolation
-                of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
-                slower but more accurate).  Note that sparse matrices are incompatible
-                with multi-channel `uu` and `vv` arrays (see below).
+        Parameters
+        ----------
+        packed_cube : :class:`torch.Tensor` of :class:`torch.double`
+            shape ``(nchan, npix, npix)``). The cube
+            should be a "prepacked" image cube, for example,
+            from :meth:`mpol.images.ImageCube.forward`
+        uu : :class:`torch.Tensor` of :class:`torch.double`
+            2D array of the u (East-West) spatial frequency coordinate
+            [:math:`\lambda`] of shape ``(nchan, npix)``
+        vv : :class:`torch.Tensor` of :class:`torch.double`
+            2D array of the v (North-South) spatial frequency coordinate
+            [:math:`\lambda`] (must be the same shape as uu)
+        sparse_matrices : bool
+            If False, use the default table-based interpolation
+            of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
+            slower but more accurate).  Note that sparse matrices are incompatible
+            with multi-channel `uu` and `vv` arrays (see below).
 
-        Returns:
-            torch.complex tensor: Fourier samples of shape ``(nchan, nvis)``, evaluated
-                at the ``uu``, ``vv`` points
+        Returns
+        -------
+        :class:`torch.Tensor` of :class:`torch.complex128`
+            Fourier samples of shape ``(nchan, nvis)``, evaluated at the ``uu``,
+            ``vv`` points
 
         **Dimensionality**: You should consider the dimensionality of your image and
         your visibility samples when using this method. If your image has multiple
@@ -497,20 +360,16 @@ class NuFFT(nn.Module):
         depending on your problem.
         """
 
-        # permit numpy, but prefer tensor
-        uu = torch.as_tensor(uu)
-        vv = torch.as_tensor(vv)
-
         # make sure that the nchan assumptions for the ImageCube and the NuFFT
         # setup are the same
-        if cube.size(0) != self.nchan:
+        if packed_cube.size(0) != self.nchan:
             raise DimensionMismatchError(
-                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+                f"nchan of ImageCube ({packed_cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
             )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
-        shifted = torch.fft.fftshift(cube, dim=(1, 2))
+        shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
 
         # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted.type(torch.complex128)
@@ -580,61 +439,11 @@ class NuFFT(nn.Module):
 
 class NuFFTCached(NuFFT):
     r"""
-    This layer translates input from an :class:`mpol.images.ImageCube` directly to
-    loose, ungridded samples of the Fourier plane, directly corresponding to the
-    :math:`u,v` locations of the data. This layer is different than a
-    :class:`mpol.Fourier.FourierCube` in that, rather than producing the dense cube-like
-    output from an FFT routine, it utilizes the non-uniform FFT or 'NuFFT' to
-    interpolate directly to discrete :math:`u,v` locations that need not correspond to
-    grid cell centers. This is implemented using the KbNufft routines of the
-    `TorchKbNufft <https://torchkbnufft.readthedocs.io/en/stable/index.html>`_ package.
-
-    **Dimensionality**: One consideration when using this layer is the dimensionality of
-    your image and your visibility samples. If your image has multiple channels
-    (``nchan > 1``), there is the possibility that the :math:`u,v` sample locations
-    corresponding to each channel may be different. In ALMA/VLA applications, this can
-    arise when continuum observations are taken over significant bandwidth, since the
-    spatial frequency sampled by any pair of antennas is wavelength-dependent
-
-    .. math::
-
-        u = \frac{D}{\lambda},
-
-    where :math:`D` is the projected baseline (measured in, say, meters) and
-    :math:`\lambda` is the observing wavelength. In this application, the image-plane
-    model could be the same for each channel, or it may vary with channel (necessary if
-    the spectral slope of the source is significant).
-
-    On the other hand, with spectral line observations it will usually be the case that
-    the total bandwidth of the observations is small enough such that the :math:`u,v`
-    sample locations could be considered as the same for each channel. In spectral line
-    applications, the image-plane model usually varies substantially with each channel.
-
-    This layer will determine whether the spatial frequencies are treated as constant
-    based upon the dimensionality of the ``uu`` and ``vv`` input arguments.
-
-    * If ``uu`` and ``vv`` have a shape of (``nvis``), then it will be assumed that the
-        spatial frequencies can be treated as constant with channel (and will invoke
-        parallelization across the image cube ``nchan`` dimension using the 'coil'
-        dimension of the TorchKbNufft package).
-    * If the ``uu`` and ``vv`` have a shape of (``nchan, nvis``), then it will be
-        assumed that the spatial frequencies are different for each channel, and the
-        spatial frequencies provided for each channel will be used (and will invoke
-        parallelization across the image cube ``nchan`` dimension using the 'batch'
-        dimension of the TorchKbNufft package).
-
-    Note that there is no straightforward, computationally efficient way to proceed if
-    there are a different number of spatial frequencies for each channel. The best
-    approach is likely to construct ``uu`` and ``vv`` arrays that have a shape of
-    (``nchan, nvis``), such that all channels are padded with bogus :math:`u,v` points
-    to have the same length ``nvis``, and you create a boolean mask to keep track of
-    which points are valid. Then, when this routine returns data points of shape
-    (``nchan, nvis``), you can use that boolean mask to select only the valid
-    :math:`u,v` points.
-
-    **Interpolation mode**: You may choose the type of interpolation mode that KbNufft
-    uses under the hood by changing the boolean value of ``sparse_matrices``. For
-    repeated evaluations of this layer (as might exist within an optimization loop),
+    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra 
+    functionality to cache the sparse matrices for a specific set of ``uu`` and ``vv``
+    points specified at initialization. 
+    
+    For repeated evaluations of this layer (as might exist within an optimization loop),
     ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If
     ``sparse_matrices=False``, this routine will use the default table-based
     interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse
@@ -642,8 +451,6 @@ class NuFFTCached(NuFFT):
     this will result in a warning.
 
     Args:
-        cell_size (float): the width of an image-plane pixel [arcseconds]
-        npix (int): the number of pixels per image side
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         nchan (int): the number of channels in the :class:`mpol.images.ImageCube`.
@@ -658,8 +465,8 @@ class NuFFTCached(NuFFT):
     def __init__(
         self,
         coords: GridCoords,
-        uu,
-        vv,
+        uu: torch.Tensor,
+        vv: torch.Tensor,
         nchan: int = 1,
         sparse_matrices: bool = True,
     ):
@@ -681,10 +488,6 @@ class NuFFTCached(NuFFT):
 
         self.sparse_matrices = sparse_matrices
         self.same_uv = same_uv
-
-        # permit numpy, but prefer tensor
-        uu = torch.as_tensor(uu)
-        vv = torch.as_tensor(vv)
 
         self.register_buffer("k_traj", self._assemble_ktraj(uu, vv))
         self.k_traj: torch.Tensor
@@ -768,97 +571,76 @@ class NuFFTCached(NuFFT):
         return output
 
 
-def make_fake_data(
-    image_cube: ImageCube,
-    uu: NDArray[floating[Any]],
-    vv: NDArray[floating[Any]],
-    weight: NDArray[floating[Any]],
-) -> tuple[NDArray[complexfloating[Any, Any]], ...]:
+def generate_fake_data(
+    packed_cube: torch.Tensor,
+    coords: GridCoords,
+    uu: torch.Tensor,
+    vv: torch.Tensor,
+    weight: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
     r"""
-    Create a fake dataset from a supplied :class:`mpol.images.ImageCube`. See
-    :ref:`mock-dataset-label` for more details on how to prepare a generic image for
-    use in an :class:`~mpol.images.ImageCube`.
+    Create a fake dataset from a supplied packed tensor cube using
+    :class:`mpol.fourier.NuFFT`. See :ref:`mock-dataset-label` for more details on how
+    to prepare a generic image to a `packed_cube`.
 
-    The provided visibilities can be 1d for a single continuum channel, or 2d for
-    image cube. If 1d, visibilities will be converted to 2d arrays of shape
-    ``(1, nvis)``.
+    The ``uu`` and ``vv`` baselines can either be 1D or 2D, depending on the desired
+    broadcasting behavior from the :class:`mpol.fourier.NuFFT`.
 
-    Args:
-        imageCube (:class:`~mpol.images.ImageCube`): the image layer to put into a
-            fake dataset
-        uu (numpy array): array of u spatial frequency coordinates, not including
-            Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        vv (numpy array): array of v spatial frequency coordinates, not including
-            Hermitian pairs. Units of [:math:`\mathrm{k}\lambda`]
-        weight (2d numpy array): length array of thermal weights
-            :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`]
+    If the ``weight`` array is 1D, the routine assumes the weights will be broadcasted
+    to all ``nchan``. Otherwise, provide a 2D weight array.
 
-    Returns:
-        (2-tuple): a two tuple of the fake data. The first array is the mock dataset
+    Parameters
+    ----------
+    packed_cube : :class:`torch.Tensor` of `class:`torch.double`
+        the image in "packed" format with shape (`nchan`, `npix`, `npix`)
+    coords : :class:`mpol.coordinates.GridCoords`
+    uu : :class:`torch.Tensor` of `class:`torch.double`
+        array of u spatial frequency coordinates,
+        not including Hermitian pairs. Units of [:math:`\lambda`]
+    vv : :class:`torch.Tensor` of `class:`torch.double`
+        array of v spatial frequency coordinates,
+        not including Hermitian pairs. Units of [:math:`\lambda`]
+    weight : :class:`torch.Tensor` of `class:`torch.double`
+        shape ``(nchan, nvis)`` array of thermal weights
+        :math:`w_i = 1/\sigma_i^2`. Units of [:math:`1/\mathrm{Jy}^2`] Will broadcast
+        from 1D to 2D if necessary.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of `class:`torch.complex128`
+        A 2-tuple of the fake data. The first array is the mock dataset
         including noise, the second array is the mock dataset without added noise.
+        Each array is shape ``(nchan, npix, npix)``.
     """
 
-    # instantiate a NuFFT object based on the ImageCube
-    # OK if uu shape (nvis,)
-    nufft = NuFFT(coords=image_cube.coords, nchan=image_cube.nchan)
-
-    # make into a multi-channel dataset, even if only a single-channel provided
-    if uu.ndim == 1:
-        uu = np.atleast_2d(uu)
-        vv = np.atleast_2d(vv)
-        weight = np.atleast_2d(weight)
+    # instantiate a NuFFT object based on the
+    nchan, npix, _ = packed_cube.size()
+    assert coords.npix == npix, "npix for packed_cube {:} and coords {:} differ".format(
+        nchan, coords.npix
+    )
+    nufft = NuFFT(coords=coords, nchan=nchan)
 
     # carry it forward to the visibilities, which will be (nchan, nvis)
-    vis_noiseless: NDArray[complexfloating[Any, Any]]
-    vis_noiseless = nufft(image_cube.cube, uu, vv).detach().numpy()
+    vis_noiseless: torch.Tensor
+    vis_noiseless = nufft(packed_cube, uu, vv)
 
     # generate complex noise
-    sigma = 1 / np.sqrt(weight)
-    noise = np.random.normal(
-        loc=0, scale=sigma, size=uu.shape
-    ) + 1.0j * np.random.normal(loc=0, scale=sigma, size=uu.shape)
+    # we could use torch.normal with complex quantities directly, but they treat
+    # a complex normal with std of 1 as having an amplitude of 1.
+    # wheras ALMA "weights" have the definition that their scatter is for the reals
+    # (or imaginaries). So there is a factor of sqrt(2) between them.
+    # we split things up, work with real quantities, and then combine later
+    mean = torch.zeros(vis_noiseless.size())
+
+    # broadcast weight to (nchan, nvis) if it isn't already
+    weight = torch.broadcast_to(weight, vis_noiseless.size())
+    sigma = torch.sqrt(1 / weight)
+
+    noise_re = torch.normal(mean, sigma)
+    noise_im = torch.normal(mean, sigma)
+    noise = torch.complex(noise_re, noise_im)
 
     # add to data
     vis_noise = vis_noiseless + noise
 
     return vis_noise, vis_noiseless
-
-
-def get_vis_residuals(model, u_true, v_true, V_true, return_Vmod=False, channel=0):
-    r"""
-    Use `mpol.fourier.NuFFT` to get residuals between gridded `model` and loose
-    (ungridded) data visiblities at data (u, v) coordinates
-
-    Parameters
-    ----------
-    model : `torch.nn.Module` object
-        Instance of the `mpol.precomposed.SimpleNet` class. Contains model
-        visibilities.
-    u_true, v_true : array, unit=[k\lambda]
-        Data u- and v-coordinates
-    V_true : array, unit=[Jy]
-        Data visibility amplitudes
-    return_Vmod : bool, default=False
-        Whether to return just the residual visibilities, or additionally the
-        loose model visibilities
-    channel : int, default=0
-        Channel (of `model`) to use to calculate residual visibilities
-
-    Returns
-    -------
-    vis_resid : array of complex
-        Model loose residual visibility amplitudes of the form
-        Re(V) + 1j * Im(V)
-    """
-    nufft = NuFFT(coords=model.coords, nchan=model.nchan)
-
-    vis_model = nufft(model.icube.cube.to("cpu"), u_true, v_true)  # TODO: remove 'to' call
-    # convert to numpy, select channel
-    vis_model = vis_model.detach().numpy()[channel]
-
-    vis_resid = V_true - vis_model
-
-    if return_Vmod:
-        return vis_resid, vis_model
-
-    return vis_resid

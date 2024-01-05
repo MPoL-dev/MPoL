@@ -1,7 +1,3 @@
-r"""The ``gridding`` module provides two core classes in 
-:class:`mpol.gridding.DataAverager` and :class:`mpol.gridding.DirtyImager`."""
-
-
 from __future__ import annotations
 
 import warnings
@@ -17,24 +13,38 @@ import torch
 from mpol.coordinates import GridCoords
 from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
 from mpol.datasets import GriddedDataset
+from mpol import utils
 
 
 def _check_data_inputs_2d(
-    uu=npt.NDArray[np.floating[Any]],
-    vv=npt.NDArray[np.floating[Any]],
-    weight=npt.NDArray[np.floating[Any]],
-    data_re=npt.NDArray[np.floating[Any]],
-    data_im=npt.NDArray[np.floating[Any]],
+    uu: npt.NDArray[np.floating[Any]],
+    vv: npt.NDArray[np.floating[Any]],
+    weight: npt.NDArray[np.floating[Any]],
+    data_re: npt.NDArray[np.floating[Any]],
+    data_im: npt.NDArray[np.floating[Any]],
 ) -> tuple[np.ndarray, ...]:
     """
-    Check that all data inputs are the same shape, the weights are positive, and the
-    data_re and data_im are floats.
+    This validation function is called by :class:`mpol.gridding.DataAverager` and
+    :class:`mpol.gridding.DirtyImager`. We have decided to allow these routines to
+    accept either np.ndarrays *or* torch.Tensors, even though they use np.ndarrays
+    internally.
+
+    So within this routine we will cast to np.ndarrays just in case.
+
+    In addition, this routine checks
+    * that all data inputs are the same shape
+    * the weights are positive,
+    * and the data_re and data_im are floats.
 
     Make a reasonable effort to ensure that Hermitian pairs are *not* included.
 
     If the user supplied 1d vectors of shape ``(nvis,)``, make them all 2d with one
     channel, ``(1,nvis)``.
 
+    Returns
+    -------
+    tuple
+        the ``uu``, `vv`, ``weight``, ``data_re`` and ``data_im`` products.
     """
 
     if not 1 <= uu.ndim <= 2:
@@ -103,9 +113,9 @@ def verify_no_hermitian_pairs(
 
     Args:
         uu (numpy array): array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         data (numpy complex): array of data values
         test_vis (int): the number of data points to search for Hermitian 'matches'
         test_channel (int): the index of the channel to perform the check
@@ -205,9 +215,9 @@ class GridderBase:
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the
@@ -287,9 +297,9 @@ class GridderBase:
 
         Args:
             uu (np.array): 1D array of East-West spatial frequency coordinates for a
-                specific channel. Units of [:math:`\mathrm{k}\lambda`]
+                specific channel. Units of [:math:`\lambda`]
             vv (np.array): 1D array of North-South spatial frequency coordinates for a
-                specific channel. Units of [:math:`\mathrm{k}\lambda`]
+                specific channel. Units of [:math:`\lambda`]
             values (np.array): 1D array of values (the same length as uu and vv) to use
                 in the sum over each cell. The default (``values=None``) corresponds to
                 using ``values=np.ones_like(uu)`` such that the routine is equivalent
@@ -303,7 +313,7 @@ class GridderBase:
         result: npt.NDArray[np.floating[Any]] = fast_hist.histogram2d(
             vv,
             uu,
-            bins=self.coords.ncell_u,
+            bins=self.coords.npix_u,
             range=[
                 [self.coords.v_bin_min, self.coords.v_bin_max],
                 [self.coords.u_bin_min, self.coords.u_bin_max],
@@ -334,7 +344,7 @@ class GridderBase:
         """
         # calculate the histogrammed result for all channels
         cube = np.empty(
-            (self.nchan, self.coords.ncell_v, self.coords.ncell_u),
+            (self.nchan, self.coords.npix_v, self.coords.npix_u),
             dtype="float",
         )
 
@@ -385,7 +395,7 @@ class GridderBase:
 
         # calculate the density weights under "uniform"
         # the density weights have the same shape as the re, im samples.
-        # cell_weight is (nchan, ncell_v, ncell_u)
+        # cell_weight is (nchan, npix_v, npix_u)
         # self.index_v, self.index_u are (nchan, nvis)
         # we want density_weights to be (nchan, nvis)
         density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
@@ -455,7 +465,7 @@ class GridderBase:
         # extract the real and imaginary values corresponding to the
         # "loose" visibilities
         # mu_re_gridded and mu_im_gridded are arrays with
-        # shape (nchan, ncell_v, ncell_u)
+        # shape (nchan, npix_v, npix_u)
         # self.index_v, self.index_u are (nchan, nvis)
         # we want mu_re and mu_im to be (nchan, nvis)
         mu_re = self._extract_gridded_values_to_loose(mu_re_gridded)
@@ -592,9 +602,9 @@ class DataAverager(GridderBase):
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the
@@ -710,9 +720,9 @@ class DirtyImager(GridderBase):
         coords (GridCoords): an object already instantiated from the GridCoords class.
             If providing this, cannot provide ``cell_size`` or ``npix``.
         uu (numpy array): (nchan, nvis) array of u spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         vv (numpy array): (nchan, nvis) array of v spatial frequency coordinates.
-            Units of [:math:`\mathrm{k}\lambda`]
+            Units of [:math:`\lambda`]
         weight (2d numpy array): (nchan, nvis) array of thermal weights.
             Units of [:math:`1/\mathrm{Jy}^2`]
         data_re (2d numpy array): (nchan, nvis) array of the real part of the
@@ -757,6 +767,29 @@ class DirtyImager(GridderBase):
 
         # and register cell indices against data
         self._create_cell_indices()
+
+    @classmethod
+    def from_tensors(
+        cls,
+        coords: GridCoords,
+        uu: torch.Tensor,
+        vv: torch.Tensor,
+        weight: torch.Tensor,
+        data: torch.Tensor,
+    ) -> DirtyImager:
+        """
+        :class:`mpol.gridding.DirtyImager` is written internally in numpy. However,
+        one may wish to use :class:`mpol.gridding.DirtyImager` to image residual
+        visibilities, which are commonly of type :class:`torch.Tensor`. This
+        classmethod converts the tensors to numpy arrays and instantiates a
+        :class:`mpol.gridding.DirtyImager` instance.
+        """
+        uu_np: npt.NDArray[np.floating[Any]] = utils.torch2npy(uu)
+        vv_np: npt.NDArray[np.floating[Any]] = utils.torch2npy(vv)
+        weight_np: npt.NDArray[np.floating[Any]] = utils.torch2npy(weight)
+        data_np: npt.NDArray[np.floating[Any]] = utils.torch2npy(data)
+
+        return cls(coords, uu_np, vv_np, weight_np, np.real(data_np), np.imag(data_np))
 
     @property
     def uu(self) -> npt.NDArray[np.floating[Any]]:
@@ -825,7 +858,7 @@ class DirtyImager(GridderBase):
         if weighting == "natural":
             density_weight = np.ones_like(self.weight)
         elif weighting == "uniform":
-            # cell_weight is (nchan, ncell_v, ncell_u)
+            # cell_weight is (nchan, npix_v, npix_u)
             # self.index_v, self.index_u are (nchan, nvis)
             # we want density_weights to be (nchan, nvis)
             density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)

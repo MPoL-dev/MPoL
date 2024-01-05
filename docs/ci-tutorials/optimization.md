@@ -75,12 +75,10 @@ averager = gridding.DataAverager(
 ## The PyTorch dataset
 
 ```{margin} Cell-averaging
-The visibility averaging step performed by the {class}`~mpol.gridding.DataAverager` is a weighted average that is numerically equivalent to "uniform" weighting of the visibilities; this does not mean that MPoL or RML only produces images that have "uniform" weighting, however. The {class}`~mpol.gridding.DataAverager` also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL *forward-models* the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or [ungridded](loose-visibilities.md) visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.
+The visibility averaging step performed by the {class}`~mpol.gridding.DataAverager` is a weighted average that is numerically equivalent to "uniform" weighting of the visibilities; this does not mean that MPoL or RML only produces images that have "uniform" weighting, however. The {class}`~mpol.gridding.DataAverager` also propagates the uncertainties from the individual visibilities to an uncertainty on the averaged visibility cell. When MPoL *forward-models* the visibility dataset and evaluates model image against the data, these uncertainties are used in a likelihood function, which is combined with priors/regularizers and the numerical results will be the same whether or not the likelihood function is computed using the gridded or ungridded visibilities. By contrast, dirty images are a direct inverse Fourier transform of the gridded visibility data and depend on whether the visibilities were weighted with uniform, natural, or Briggs weighting schemes.
 ```
 
 Now we will export the visibilities to a PyTorch dataset to use in the imaging loop. The {meth}`mpol.gridding.DataAverager.to_pytorch_dataset` routine performs a weighted average all of the visibilities to the Fourier grid cells and exports the visibilities to cube-like PyTorch tensors. To keep things simple in this tutorial, we are only using a single channel. But you could just as easily export a multi-channel dataset. Note that the {meth}`~mpol.gridding.DataAverager.to_pytorch_dataset` routine automatically checks the visibility scatter and raises a ``RuntimeError`` if the empirically-estimated scatter exceeds that expected from the provided dataset weights. For more information, see the end of the [Gridding and Diagnostic Images Tutorial](gridder.md).
-
-In the following [tutorial on the NuFFT](loose-visibilities.md), we'll explore an alternate MPoL layer that avoids gridding the visibilities all together. This approach may be more accurate for certain applications, but is usually slower to execute than the gridding approach described in this tutorial. For that reason, we recommend starting with the default gridding approach and only moving to the NuFFT layers once you are reasonably happy with the images you are getting.
 
 ```{code-cell} ipython3
 dset = averager.to_pytorch_dataset()
@@ -89,19 +87,19 @@ print("this dataset has {:} channel".format(dset.nchan))
 
 ## Building an image model
 
-MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We've bundled the most common modules for imaging together in a {class}`mpol.precomposed.SimpleNet` meta-module, which we'll use here.
+MPoL provides "modules" to build and optimize complex imaging workflows, not dissimilar to how a deep neural network might be constructed. We've bundled the most common modules for imaging together in a {class}`mpol.precomposed.GriddedNet` meta-module, which we'll use here.
 
-This diagram shows how the primitive modules, like {class}`mpol.images.BaseCube`, {class}`mpol.images.ImageCube`, etc... are connected together to form {class}`mpol.precomposed.SimpleNet`. In this workflow, the pixel values of the {class}`mpol.images.BaseCube` are the core model parameters representing the image. More information about all of these components is available in the {ref}`API documentation <api-reference-label>`.
+This diagram shows how the primitive modules, like {class}`mpol.images.BaseCube`, {class}`mpol.images.ImageCube`, etc... are connected together to form {class}`mpol.precomposed.GriddedNet`. In this workflow, the pixel values of the {class}`mpol.images.BaseCube` are the core model parameters representing the image. More information about all of these components is available in the API documentation.
 
-```{mermaid} ../_static/mmd/src/SimpleNet.mmd
+```{mermaid} ../_static/mmd/src/GriddedNet.mmd
 ```
 
-It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves following the SimpleNet source code as an example ({class}`mpol.precomposed.SimpleNet`) and swap in/out modules as we saw fit.
+It isn't necessary to construct a meta-module to do RML imaging with MPoL, though it often helps organize your code. If we so desired, we could connect the individual modules together ourselves ourselves following the GriddedNet source code as an example ({class}`mpol.precomposed.GriddedNet`) and swap in/out modules as we saw fit.
 
-We then initialize SimpleNet with the relevant information
+We then initialize GriddedNet with the relevant information
 
 ```{code-cell} ipython3
-rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+rml = precomposed.GriddedNet(coords=coords, nchan=dset.nchan)
 ```
 
 ## Breaking down the training loop
@@ -132,7 +130,7 @@ Let's walk through how we calculate a loss value and optimize the parameters. To
 rml.state_dict()
 ```
 
-These are the default values that were used to initialize the {class}`mpol.images.BaseCube` component of the {class}`mpol.precomposed.SimpleNet`.
+These are the default values that were used to initialize the {class}`mpol.images.BaseCube` component of the {class}`mpol.precomposed.GriddedNet`.
 
 For demonstration purposes, lets access and plot the base cube with matplotlib. In a normal workflow you probably won't need to do this, but to access the basecube in sky orientation, we do
 
@@ -275,8 +273,6 @@ ax.set_ylabel("loss")
 
 and we see that we've reasonably converged to a set of parameters without much further improvement in the loss value.
 
-All of the method presented here can be sped up using GPU acceleration on certain Nvidia GPUs. To learn more about this, please see the {ref}`GPU Setup Tutorial <gpu-reference-label>`.
-
 ## Visualizing the image
 
 Let's visualize the final image product. The bounds for `matplotlib.pyplot.imshow` are available in the `img_ext` parameter.
@@ -309,19 +305,15 @@ $$
 \mathrm{residuals} = \mathrm{data} - \mathrm{model}
 $$
 
-For speed reasons, the {class}`mpol.precomposed.SimpleNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset, we will need to use the {class}`mpol.fourier.NuFFT` layer. More detail on this object is in the [Loose Visibilities tutorial](loose-visibilities.md), but basically we instantiate the NuFFT layer relative to some image dimensions and $u,v$ locations 
+For speed reasons, the {class}`mpol.precomposed.GriddedNet` does not work with the original data visibilities directly, but instead uses an averaged version of them in {class}`~mpol.datasets.GriddedDataset`. To calculate model visibilities corresponding to the original $u,v$ points of the dataset,
 
 ```{code-cell} ipython3
-nufft = fourier.NuFFT(coords=coords, nchan=dset.nchan)
-```
-
-and then we can calculate model visibilities corresponding to some model image (in this case, our optimal image). Since {meth}`mpol.fourier.NuFFT.forward` returns a Pytorch tensor, we'll need to detach it and convert it to numpy. We'll also remove the channel dimension.
-
-```{code-cell} ipython3
+from mpol import utils
 # note the NuFFT expects a "packed image cube," as stored in ImageCube.cube
-vis_model = nufft(rml.icube.cube, uu, vv)
+vis_model = rml.predict_loose_visibilities(torch.as_tensor(uu), torch.as_tensor(vv))
+vis_model = utils.torch2npy(vis_model)
 # convert from Pytorch to numpy, remove channel dimension
-vis_model = np.squeeze(vis_model.detach().numpy())
+vis_model = np.squeeze(vis_model)
 ```
 
 and then use these model visibilities to calculate residual visibilities
