@@ -115,7 +115,7 @@ Here we set the optimizer and the image model (RML). If this is unfamiliar pleas
 
 ```{code-cell}
 dirty_image = torch.tensor(img.copy())  # turns it into a pytorch tensor
-rml = precomposed.SimpleNet(coords=coords, nchan=dset.nchan)
+rml = precomposed.GriddedNet(coords=coords, nchan=dset.nchan)
 optimizer = torch.optim.SGD(
     rml.parameters(), lr=1000.0
 )  # multiple different possiple optimizers
@@ -205,14 +205,14 @@ For more information on saving and loading models in PyTorch, please consult the
 Now let's assume we're about to start an optimization loop in a new file, and we've just created a new model.
 
 ```{code-cell}
-rml = precomposed.SimpleNet(coords=coords)
+rml = precomposed.GriddedNet(coords=coords)
 rml.state_dict()  # the now uninitialized parameters of the model (the ones we started with)
 ```
 
 Here you can clearly see the ``state_dict`` is in its original state, before the training loop changed the parameters through the optimization function. Loading our saved dirty image state into the model is as simple as
 
 ```{code-cell}
-rml.load_state_dict(torch.load("dirty_image_model.pt"))
+rml.load_state_dict(torch.load("dirty_image_model.pt"), strict=False)
 rml.state_dict()  # the reloaded parameters of the model
 ```
 

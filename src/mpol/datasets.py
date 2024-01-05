@@ -216,7 +216,7 @@ class Dartboard:
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
-            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            qs: 1d array of q values :math:`[\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same
                 length as qs)
 
@@ -242,7 +242,7 @@ class Dartboard:
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
-            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            qs: 1d array of q values :math:`[\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same
                 length as qs)
 

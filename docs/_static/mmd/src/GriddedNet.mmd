@@ -1,0 +1,8 @@
+graph TD
+    subgraph GriddedNet
+    bc(BaseCube) --> HannConvCube
+    HannConvCube --> ImageCube
+    ImageCube --> FourierLayer
+    end
+    FourierLayer --> il([Loss])
+    ad[[Dataset]] --> il([Loss])

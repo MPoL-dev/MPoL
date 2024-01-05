@@ -4,11 +4,17 @@
 [![gh-pages docs](https://github.com/MPoL-dev/MPoL/actions/workflows/gh_docs.yml/badge.svg)](https://mpol-dev.github.io/MPoL/)
 [![DOI](https://zenodo.org/badge/224543208.svg)](https://zenodo.org/badge/latestdoi/224543208)
 
-A Million Points of Light are needed to synthesize image cubes from interferometers.
 
-MPoL is a flexible Python package designed for Regularized Maximum Likelihood imaging. We focus on supporting spectral line and continuum observations from interferometers like the Atacama Large Millimeter/Submillimeter Array (ALMA) and the Karl G. Jansky Very Large Array (VLA). There is potential to extend the package to work on other Fourier reconstruction problems like sparse aperture masking and kernel phase interferometry.
 
-Documentation and installation instructions: [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
+MPoL is a [PyTorch](https://pytorch.org/) *library* built for Regularized Maximum Likelihood (RML) imaging and Bayesian Inference with datasets from interferometers like the Atacama Large Millimeter/Submillimeter Array ([ALMA](https://www.almaobservatory.org/en/home/)) and the Karl G. Jansky Very Large Array ([VLA](https://public.nrao.edu/telescopes/vla/)). 
+
+As a PyTorch *library*, MPoL is designed expecting that the user will write Python code that uses MPoL primitives as building blocks to solve their interferometric imaging workflow, much the same way the artificial intelligence community writes Python code that uses PyTorch layers to implement new neural network architectures (for [example](https://github.com/pytorch/examples)). You will find MPoL easiest to use if you adhere to PyTorch customs and idioms, e.g., feed-forward neural networks, data storage, GPU acceleration, and train/test optimization loops. Therefore, a basic familiarity with PyTorch is considered a prerequisite for MPoL.
+
+MPoL is *not* an imaging application nor a pipeline, though such programs could be built for specialized workflows using MPoL components. We are focused on providing a numerically correct and expressive set of core primitives so the user can leverage the full power of the PyTorch (and Python) ecosystem to solve their research-grade imaging tasks. This is already a significant development and maintenance burden for our small research team, so our immediate scope must necessarily be limited.
+
+Installation instructions, documentation, and examples at: [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
+
+
 
 ## Citation
 
@@ -57,4 +63,6 @@ and
     }
 
 ---
-Copyright Ian Czekala and contributors 2019-23
+Copyright Ian Czekala and contributors 2019-24
+
+A Million Points of Light are needed to synthesize image cubes from interferometers.
