@@ -313,7 +313,7 @@ class GridderBase:
         result: npt.NDArray[np.floating[Any]] = fast_hist.histogram2d(
             vv,
             uu,
-            bins=self.coords.ncell_u,
+            bins=self.coords.npix_u,
             range=[
                 [self.coords.v_bin_min, self.coords.v_bin_max],
                 [self.coords.u_bin_min, self.coords.u_bin_max],
@@ -344,7 +344,7 @@ class GridderBase:
         """
         # calculate the histogrammed result for all channels
         cube = np.empty(
-            (self.nchan, self.coords.ncell_v, self.coords.ncell_u),
+            (self.nchan, self.coords.npix_v, self.coords.npix_u),
             dtype="float",
         )
 
@@ -395,7 +395,7 @@ class GridderBase:
 
         # calculate the density weights under "uniform"
         # the density weights have the same shape as the re, im samples.
-        # cell_weight is (nchan, ncell_v, ncell_u)
+        # cell_weight is (nchan, npix_v, npix_u)
         # self.index_v, self.index_u are (nchan, nvis)
         # we want density_weights to be (nchan, nvis)
         density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)
@@ -465,7 +465,7 @@ class GridderBase:
         # extract the real and imaginary values corresponding to the
         # "loose" visibilities
         # mu_re_gridded and mu_im_gridded are arrays with
-        # shape (nchan, ncell_v, ncell_u)
+        # shape (nchan, npix_v, npix_u)
         # self.index_v, self.index_u are (nchan, nvis)
         # we want mu_re and mu_im to be (nchan, nvis)
         mu_re = self._extract_gridded_values_to_loose(mu_re_gridded)
@@ -858,7 +858,7 @@ class DirtyImager(GridderBase):
         if weighting == "natural":
             density_weight = np.ones_like(self.weight)
         elif weighting == "uniform":
-            # cell_weight is (nchan, ncell_v, ncell_u)
+            # cell_weight is (nchan, npix_v, npix_u)
             # self.index_v, self.index_u are (nchan, nvis)
             # we want density_weights to be (nchan, nvis)
             density_weight = 1 / self._extract_gridded_values_to_loose(cell_weight)

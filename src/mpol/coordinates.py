@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import cached_property
 
 from typing import Any
 
@@ -17,9 +18,12 @@ class GridCoords:
     The GridCoords object uses desired image dimensions (via the ``cell_size`` and
     ``npix`` arguments) to define a corresponding Fourier plane grid.
 
-    Args:
-        cell_size (float): width of a single square pixel in [arcsec]
-        npix (int): number of pixels in the width of the image
+    Parameters
+    ----------
+    cell_size : float
+        width of a single square pixel in [arcsec]
+    npix : int
+        number of pixels in the width of the image
 
     The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even
     though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to
@@ -77,107 +81,217 @@ class GridCoords:
         ``origin='lower'``. Units of [:math:`\lambda`]
     """
 
-    def __init__(self, cell_size: float, npix: int) -> None:
-        # set up the bin edges, centers, etc.
-        if not npix % 2 == 0:
-            raise ValueError("Image must have an even number of pixels.")
+    def __init__(self, cell_size: float, npix: int):
+        if npix <= 0 or not (npix % 2 == 0):
+            raise ValueError("Image must have a positive and even number of pixels.")
 
         if cell_size <= 0:
             raise ValueError("cell_size must be a positive real number.")
 
-        self.cell_size = cell_size  # arcsec
-        self.npix = npix
-        self.ncell_u = self.npix
-        self.ncell_v = self.npix
+        # Imply to users that GridCoords instance is read-only and new instance
+        # is the approach if changing values
+        self._cell_size = cell_size
+        self._npix = npix
 
+        # Image related
+        self._image_pixel_width = cell_size * const.arcsec  # [radians]
+        self._image_centers = self._image_pixel_width * (
+            np.arange(npix) - npix // 2
+        )  # [radians]
+
+        # Spatial frequency related
+        # These properties are identical for both u & v and defined here
+        # edges and centers return fftspaced arrays (not packed, though)
+        # All units in [λ]
+        self._uv_pixel_width = 1 / (npix * self._image_pixel_width)
+        self.uv_edges = self._uv_pixel_width * (np.arange(npix + 1) - npix // 2 - 0.5)
+        self._uv_centers = self._uv_pixel_width * (np.arange(npix) - npix // 2)
+        self._min_uv = float(self.uv_edges.min())
+        self._max_uv = float(self.uv_edges.max())
+
+    def __repr__(self):
+        return f"GridCoords(cell_size={self.cell_size:.2e}, npix={self.npix})"
+        # the output spatial frequencies of the FFT routine
+
+    @property
+    def cell_size(self) -> float:
+        return self._cell_size
+
+    @property
+    def npix(self) -> int:
+        return self._npix
+
+    @property
+    def dl(self) -> float:
+        return self._image_pixel_width  # [radians]
+
+    @property
+    def dm(self) -> float:
+        return self._image_pixel_width  # [radians]
+
+    @property
+    def l_centers(self) -> npt.NDArray[np.floating[Any]]:
+        return self._image_centers
+
+    @property
+    def m_centers(self) -> npt.NDArray[np.floating[Any]]:
+        return self._image_centers
+
+    @property
+    def npix_u(self) -> int:
+        return self.npix
+
+    @property
+    def npix_v(self) -> int:
+        return self.npix
+
+    @property
+    def du(self) -> float:
+        return self._uv_pixel_width
+
+    @property
+    def dv(self) -> float:
+        return self._uv_pixel_width
+
+    @property
+    def u_edges(self) -> npt.NDArray[np.floating[Any]]:
+        return self.uv_edges
+
+    @property
+    def v_edges(self) -> npt.NDArray[np.floating[Any]]:
+        return self.uv_edges
+
+    @property
+    def u_centers(self) -> npt.NDArray[np.floating[Any]]:
+        return self._uv_centers
+
+    @property
+    def v_centers(self) -> npt.NDArray[np.floating[Any]]:
+        return self._uv_centers
+
+    @property
+    def u_bin_min(self) -> float:
+        return self._min_uv
+
+    @property
+    def v_bin_min(self) -> float:
+        return self._min_uv
+
+    @property
+    def u_bin_max(self) -> float:
+        return self._max_uv
+
+    @property
+    def v_bin_max(self) -> float:
+        return self._max_uv
+
+    @property
+    def max_uv_grid_value(self) -> float:
+        return self._max_uv
+
+    @property
+    def img_ext(self) -> list[float]:
         # calculate the image extent
         # say we had 10 pixels representing centers -5, -4, -3, ...
         # it should go from -5.5 to +4.5
-        lmax = cell_size * (self.npix // 2 - 0.5)
-        lmin = -cell_size * (self.npix // 2 + 0.5)
-        self.img_ext = [lmax, lmin, lmin, lmax]  # arcsecs
+        lmax = self.cell_size * (self.npix // 2 - 0.5)
+        lmin = -self.cell_size * (self.npix // 2 + 0.5)
+        return [lmax, lmin, lmin, lmax]  # arcsecs
 
-        self.dl = cell_size * const.arcsec  # [radians]
-        self.dm = cell_size * const.arcsec  # [radians]
-
-        int_l_centers = np.arange(self.npix) - self.npix // 2
-        int_m_centers = np.arange(self.npix) - self.npix // 2
-        self.l_centers = self.dl * int_l_centers  # [radians]
-        self.m_centers = self.dm * int_m_centers  # [radians]
-
-        # the output spatial frequencies of the FFT routine
-        self.du = 1 / (self.npix * self.dl)  # [λ]
-        self.dv = 1 / (self.npix * self.dm)  # [λ]
-
-        # define the max/min of the FFT grid
-        # because we store images as [y, x]
-        # this means we store visibilities as [v, u]
-        int_u_edges = np.arange(self.ncell_u + 1) - self.ncell_v // 2 - 0.5
-        int_v_edges = np.arange(self.ncell_v + 1) - self.ncell_v // 2 - 0.5
-
-        self.u_edges = self.du * int_u_edges  # [λ]
-        self.v_edges = self.dv * int_v_edges  # [λ]
-
-        int_u_centers = np.arange(self.ncell_u) - self.ncell_u // 2
-        int_v_centers = np.arange(self.ncell_v) - self.ncell_v // 2
-        self.u_centers = self.du * int_u_centers  # [λ]
-        self.v_centers = self.dv * int_v_centers  # [λ]
-
-        self.v_bin_min = np.min(self.v_edges)
-        self.v_bin_max = np.max(self.v_edges)
-
-        self.u_bin_min = np.min(self.u_edges)
-        self.u_bin_max = np.max(self.u_edges)
-
-        self.vis_ext = [
+    @property
+    def vis_ext(self) -> list[float]:
+        return [
             self.u_bin_min,
             self.u_bin_max,
             self.v_bin_min,
             self.v_bin_max,
-        ]  # [λ]
+        ]  # [kλ]
 
-        # max u or v freq supported by current grid
-        self.max_grid = get_max_spatial_freq(self.cell_size, self.npix)
+    # --------------------------------------------------------------------------
+    # Non-identical u & v properties
+    # --------------------------------------------------------------------------
+    @cached_property
+    def ground_u_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # only useful for plotting a sky_vis
+        # uu increasing, no fftshift
+        # tile replicates the 1D u_centers array to a 2D array the size of the full UV grid
+        return np.tile(self.u_centers, (self.npix_u, 1))
 
-        # only useful for plotting a sky_vis... uu, vv increasing, no fftshift
-        self.sky_u_centers_2D, self.sky_v_centers_2D = np.meshgrid(
-            self.u_centers, self.v_centers, indexing="xy"
-        )  # cartesian indexing (default)
+    @cached_property
+    def ground_v_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # only useful for plotting a sky_vis
+        # vv increasing, no fftshift
+        return np.tile(self.v_centers, (self.npix_v, 1)).T
 
-        # only useful for plotting... uu, vv increasing, no fftshift
-        self.sky_q_centers_2D = np.sqrt(
-            self.sky_u_centers_2D**2 + self.sky_v_centers_2D**2
-        )  # [λ]
+    @cached_property
+    def packed_u_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a packed vis
+        # uu increasing, fftshifted
+        return np_fft.fftshift(self.ground_u_centers_2D)
 
+    @cached_property
+    def packed_v_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a packed vis
+        # vv increasing + fftshifted
+        return np_fft.fftshift(self.ground_v_centers_2D)
+
+    @cached_property
+    def ground_q_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        return np.sqrt(
+            self.ground_u_centers_2D**2 + self.ground_v_centers_2D**2
+        )  # [kλ]
+
+    @cached_property
+    def sky_phi_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
         # https://en.wikipedia.org/wiki/Atan2
-        self.sky_phi_centers_2D = np.arctan2(
-            self.sky_v_centers_2D, self.sky_u_centers_2D
+        return np.arctan2(
+            self.ground_v_centers_2D, self.ground_u_centers_2D
         )  # (pi, pi]
 
-        # for evaluating a packed vis... uu, vv increasing + fftshifted
-        self.packed_u_centers_2D = np_fft.fftshift(self.sky_u_centers_2D)
-        self.packed_v_centers_2D = np_fft.fftshift(self.sky_v_centers_2D)
+    @cached_property
+    def packed_q_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a packed vis in polar coordinates
+        # q increasing, fftshifted
+        return np_fft.fftshift(self.ground_q_centers_2D)
 
-        # and in polar coordinates too
-        self.packed_q_centers_2D = np_fft.fftshift(self.sky_q_centers_2D)
-        self.packed_phi_centers_2D = np_fft.fftshift(self.sky_phi_centers_2D)
+    @cached_property
+    def packed_phi_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a packed vis in polar coordinates
+        # phi increasing, fftshifted
+        return np_fft.fftshift(self.sky_phi_centers_2D)
 
-        self.q_max = float(
-            np.max(np.abs(self.packed_q_centers_2D)) + np.sqrt(2) * self.du
-        )  # outer edge [λ]
+    @cached_property
+    def q_max(self) -> float:
+        # outer edge [lambda]
+        return float(np.abs(self.packed_q_centers_2D).max() + np.sqrt(2) * self.du)
 
-        # x_centers_2D and y_centers_2D are just l and m in units of arcsec
-        x_centers_2D, y_centers_2D = np.meshgrid(
-            self.l_centers / const.arcsec, self.m_centers / const.arcsec, indexing="xy"
-        )  # [arcsec] cartesian indexing (default)
+    @cached_property
+    def x_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        return np.tile(self.l_centers / const.arcsec, (self.npix, 1))  # [arcsec]
 
-        # for evaluating a packed cube... ll, mm increasing + fftshifted
-        self.packed_x_centers_2D = np_fft.fftshift(x_centers_2D)  # [arcsec]
-        self.packed_y_centers_2D = np_fft.fftshift(y_centers_2D)  # [arcsec]
+    @cached_property
+    def y_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        return np.tile(self.m_centers / const.arcsec, (self.npix, 1)).T  # [arcsec]
 
-        # for evaluating a sky image... ll mirrored, mm increasing, no fftshift
-        self.sky_y_centers_2D = y_centers_2D  # [arcsec]
-        self.sky_x_centers_2D = np.fliplr(x_centers_2D)  # [arcsec]
+    @cached_property
+    def packed_x_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        return np.fft.fftshift(self.x_centers_2D)  # [arcsec]
+
+    @cached_property
+    def packed_y_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        return np.fft.fftshift(self.y_centers_2D)  # [arcsec]
+
+    @property
+    def sky_x_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a sky image
+        # ll mirrored, increasing, no fftshift
+        return np.fliplr(self.x_centers_2D)  # [arcsec]
+
+    @property
+    def sky_y_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
+        # for evaluating a sky image
+        # mm increasing, no fftshift
+        return self.y_centers_2D  # [arcsec]
 
     def check_data_fit(
         self,
@@ -208,24 +322,29 @@ class GridCoords:
 
         # we need this routine to work with both numpy.ndarray or torch.Tensor
         # because it is called for DirtyImager setup (numpy only)
-        # and torch layers
+        # so we'll cast to tensor as a precaution
         uu = torch.as_tensor(uu)
         vv = torch.as_tensor(vv)
 
         # max freq in dataset
+        max_uu_vv = np.abs(np.concatenate([uu, vv])).max()
         max_uu_vv = torch.max(torch.abs(torch.concatenate([uu, vv]))).item()
 
         # max freq needed to support dataset
         max_cell_size = get_maximum_cell_size(max_uu_vv)
 
-        if torch.max(torch.abs(uu)) > self.max_grid:
+        if torch.max(torch.abs(uu)) > self.max_uv_grid_value:
             raise CellSizeError(
-                f"Dataset contains uu spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+                "Dataset contains uu spatial frequency measurements larger "
+                "than those in the proposed model image. "
+                f"Decrease cell_size below {max_cell_size} arcsec."
             )
 
-        if torch.max(torch.abs(vv)) > self.max_grid:
+        if torch.max(torch.abs(vv)) > self.max_uv_grid_value:
             raise CellSizeError(
-                f"Dataset contains vv spatial frequency measurements larger than those in the proposed model image. Decrease cell_size below {max_cell_size} arcsec."
+                "Dataset contains vv spatial frequency measurements larger "
+                "than those in the proposed model image. "
+                f"Decrease cell_size below {max_cell_size} arcsec."
             )
 
         return True
@@ -235,6 +354,6 @@ class GridCoords:
             # don't attempt to compare against different types
             return NotImplemented
 
-        # GridCoords objects are considered equal if they have the same cell_size and
-        # npix, since all other attributes are derived from these two core properties.
-        return self.cell_size == other.cell_size and self.npix == other.npix
+        # GridCoords objects are considered equal if they have the same cell_size and npix, since
+        # all other attributes are derived from these two core properties.
+        return bool(self.cell_size == other.cell_size and self.npix == other.npix)

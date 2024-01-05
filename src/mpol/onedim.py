@@ -125,7 +125,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     from frank.geometry import apply_phase_shift, deproject
 
     # projected model (u,v) points [k\lambda]
-    uu, vv = fcube.coords.sky_u_centers_2D, fcube.coords.sky_v_centers_2D
+    uu, vv = fcube.coords.ground_u_centers_2D, fcube.coords.ground_v_centers_2D
 
     # visibilities
     V = torch2npy(fcube.ground_vis[chan]).ravel()

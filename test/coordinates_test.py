@@ -38,13 +38,13 @@ def test_grid_coords_plot_2D_uvq_sky(tmp_path):
     ikw = {"origin": "lower"}
 
     fig, ax = plt.subplots(nrows=1, ncols=3)
-    im = ax[0].imshow(coords.sky_u_centers_2D, **ikw)
+    im = ax[0].imshow(coords.ground_u_centers_2D, **ikw)
     plt.colorbar(im, ax=ax[0])
 
-    im = ax[1].imshow(coords.sky_v_centers_2D, **ikw)
+    im = ax[1].imshow(coords.ground_v_centers_2D, **ikw)
     plt.colorbar(im, ax=ax[1])
 
-    im = ax[2].imshow(coords.sky_q_centers_2D, **ikw)
+    im = ax[2].imshow(coords.ground_q_centers_2D, **ikw)
     plt.colorbar(im, ax=ax[2])
 
     for a, t in zip(ax, ["u", "v", "q"]):
@@ -75,7 +75,9 @@ def test_grid_coords_plot_2D_uvq_packed(tmp_path):
 
 
 def test_grid_coords_odd_fail():
-    with pytest.raises(ValueError, match="Image must have an even number of pixels."):
+    with pytest.raises(
+        ValueError, match="Image must have a positive and even number of pixels."
+    ):
         coordinates.GridCoords(cell_size=0.01, npix=511)
 
 
@@ -100,16 +102,32 @@ def test_grid_coords_fail(baselines_2D_np, baselines_2D_t):
 
     uu, vv = baselines_2D_np
     print("max u data", np.max(uu))
-    print("max u grid", coords.max_grid)
+    print("max u grid", coords.max_uv_grid_value)
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
 
     uu, vv = baselines_2D_t
     print("max u data", torch.max(uu))
-    print("max u grid", coords.max_grid)
+    print("max u grid", coords.max_uv_grid_value)
     with pytest.raises(CellSizeError):
         coords.check_data_fit(uu, vv)
 
+
+def test_tile_vs_meshgrid_implementation():
+    coords = coordinates.GridCoords(cell_size=0.05, npix=800)
+
+    x_centers_2d, y_centers_2d = np.meshgrid(
+        coords.l_centers / arcsec, coords.m_centers / arcsec, indexing="xy"
+    )
+
+    ground_u_centers_2D, ground_v_centers_2D = np.meshgrid(
+        coords.u_centers, coords.v_centers, indexing="xy"
+    )
+
+    assert np.all(coords.ground_u_centers_2D == ground_u_centers_2D)
+    assert np.all(coords.ground_v_centers_2D == ground_v_centers_2D)
+    assert np.all(coords.x_centers_2D == x_centers_2d)
+    assert np.all(coords.y_centers_2D == y_centers_2d)
 
 def test_coords_mock_image(coords, img2D_butterfly):
     npix, _ = img2D_butterfly.shape
