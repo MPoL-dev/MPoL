@@ -33,7 +33,6 @@ def img2D_butterfly():
 @pytest.fixture(scope="session")
 def packed_cube(img2D_butterfly):
     """Create a packed tensor image cube from the butterfly."""
-    # now (1, npix, npix)
     print("npix packed cube", img2D_butterfly.shape)
     # tile to some nchan, npix, npix
     sky_cube = torch.tile(torch.from_numpy(img2D_butterfly), (_nchan, 1, 1))
