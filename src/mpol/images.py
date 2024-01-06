@@ -60,8 +60,10 @@ class BaseCube(nn.Module):
 
         # The ``base_cube`` is already packed to make the Fourier transformation easier
         if base_cube is None:
+            # base_cube = -3 yields a nearly-blank cube after softplus, whereas
+            # base_cube = 0.0 yields a cube with avg value of ~0.7, which is too high
             self.base_cube = nn.Parameter(
-                torch.zeros(
+                -3 * torch.ones(
                     (self.nchan, self.coords.npix, self.coords.npix),
                     requires_grad=True,
                     dtype=torch.double,
