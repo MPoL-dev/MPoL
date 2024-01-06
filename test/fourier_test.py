@@ -142,17 +142,14 @@ def test_predict_vis_nufft(coords, baselines_1D):
 
     nchan = 10
 
-    # instantiate an BaseCube layer filled with zeros
-    basecube = images.BaseCube(coords=coords, nchan=nchan, pixel_mapping=lambda x: x)
-    imagecube = images.ImageCube(coords=coords, nchan=nchan)
-
     # we have a multi-channel cube, but only sent single-channel uu and vv
     # coordinates. The expectation is that TorchKbNufft will parallelize these
 
     layer = fourier.NuFFT(coords=coords, nchan=nchan)
 
     # predict the values of the cube at the u,v locations
-    output = layer(imagecube(basecube()), uu, vv)
+    blank_packed_img = torch.zeros((nchan, coords.npix, coords.npix))
+    output = layer(blank_packed_img, uu, vv)
 
     # make sure we got back the number of visibilities we expected
     assert output.shape == (nchan, len(uu))
@@ -172,18 +169,13 @@ def test_predict_vis_nufft_cached(coords, baselines_1D):
 
     nchan = 10
 
-    # instantiate an ImageCube layer filled with zeros
-    # instantiate an BaseCube layer filled with zeros
-    basecube = images.BaseCube(coords=coords, nchan=nchan, pixel_mapping=lambda x: x)
-    imagecube = images.ImageCube(coords=coords, nchan=nchan)
-
     # we have a multi-channel cube, but sent only single-channel uu and vv
     # coordinates. The expectation is that TorchKbNufft will parallelize these
-
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # predict the values of the cube at the u,v locations
-    output = layer(imagecube(basecube()))
+    blank_packed_img = torch.zeros((nchan, coords.npix, coords.npix))
+    output = layer(blank_packed_img)
 
     # make sure we got back the number of visibilities we expected
     assert output.shape == (nchan, len(uu))
@@ -328,9 +320,7 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = (
-        layer(img_packed_tensor)[0]
-    )  # take the channel dim out
+    num_output = layer(img_packed_tensor)[0]  # take the channel dim out
 
     # calculate the values analytically
     an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
@@ -340,7 +330,6 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     max_diff = torch.max(torch.abs(diff))
     max = torch.max(torch.abs(num_output))
     print(max_diff, max)
-
 
     # collapse the function into 1D by doing q
     qq = utils.torch2npy(torch.hypot(uu, vv))
