@@ -44,7 +44,7 @@ class FourierCube(nn.Module):
         self.register_buffer("vis", None, persistent=persistent_vis)
         self.vis: torch.Tensor
 
-    def forward(self, cube: torch.Tensor) -> torch.Tensor:
+    def forward(self, packed_cube: torch.Tensor) -> torch.Tensor:
         """
         Perform the FFT of the image cube on each channel.
 
@@ -61,12 +61,12 @@ class FourierCube(nn.Module):
         """
 
         # make sure the cube is 3D
-        assert cube.dim() == 3, "cube must be 3D"
+        assert packed_cube.dim() == 3, "cube must be 3D"
 
         # the self.cell_size prefactor (in arcsec) is to obtain the correct output units
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
-        self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
+        self.vis = self.coords.cell_size**2 * torch.fft.fftn(packed_cube, dim=(1, 2))
 
         return self.vis
 
