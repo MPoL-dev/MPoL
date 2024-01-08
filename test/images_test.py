@@ -3,8 +3,9 @@ import pytest
 import torch
 from astropy.io import fits
 
-from mpol import coordinates, images, utils
+from mpol import coordinates, images, plot, utils
 from mpol.constants import *
+
 
 def test_single_chan():
     coords = coordinates.GridCoords(cell_size=0.015, npix=800)
@@ -177,3 +178,67 @@ def test_image_flux(coords):
     im = images.ImageCube(coords=coords, nchan=nchan)
     im(bcube())
     assert im.flux.size()[0] == nchan
+
+
+def test_plot_test_img(packed_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+    fig, ax = plt.subplots(nrows=1)
+
+    # put back to sky
+    sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+    im = ax.imshow(
+        sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+    )
+    plt.colorbar(im)
+    fig.savefig(tmp_path / "sky_cube.png", dpi=300)
+
+    plt.close("all")
+
+
+def test_taper(coords, tmp_path):
+    for r in np.arange(0.0, 0.2, step=0.02):
+        fig, ax = plt.subplots(ncols=1)
+
+        taper_2D = images.uv_gaussian_taper(coords, r, r, 0.0)
+        print(type(taper_2D))
+
+        norm = plot.get_image_cmap_norm(taper_2D, symmetric=True)
+        im = ax.imshow(
+            taper_2D, extent=coords.vis_ext_Mlam, origin="lower", cmap="bwr_r", norm=norm
+        )
+        plt.colorbar(im, ax=ax)
+
+        fig.savefig(tmp_path / "taper{:.2f}.png".format(r), dpi=300)
+
+    plt.close("all")
+
+
+def test_convolve(packed_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+
+    for r in np.arange(0.0, 0.2, step=0.02):
+        fig, ax = plt.subplots(ncols=2)
+        # put back to sky
+        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title("tot flux: {:.3f} Jy".format(flux))
+        plt.colorbar(im, ax=ax[0])
+
+        c = images.convolve_packed_cube(packed_cube, coords, r, r, 0.0)
+        # put back to sky
+        c_sky = utils.packed_cube_to_sky_cube(c)
+        im = ax[1].imshow(
+            c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        ax[1].set_title("tot flux: {:.3f} Jy".format(flux))
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / "convolved_{:.2f}.png".format(r), dpi=300)
+
+    plt.close("all")

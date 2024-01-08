@@ -79,6 +79,7 @@ class GridCoords:
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines
         like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming
         ``origin='lower'``. Units of [:math:`\lambda`]
+    :ivar vis_ext_Mlam: like vis_ext, but in units of [:math:`\mathrm{M}\lambda`].
     """
 
     def __init__(self, cell_size: float, npix: int):
@@ -205,7 +206,11 @@ class GridCoords:
             self.u_bin_max,
             self.v_bin_min,
             self.v_bin_max,
-        ]  # [kλ]
+        ]  # [λ]
+    
+    @property
+    def vis_ext_Mlam(self) -> list[float]:
+        return [1e-6 * edge for edge in self.vis_ext]
 
     # --------------------------------------------------------------------------
     # Non-identical u & v properties

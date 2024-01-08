@@ -10,7 +10,7 @@ from torch import nn
 
 from typing import Any, Callable
 
-from mpol import utils
+from mpol import constants, utils
 from mpol.coordinates import GridCoords
 
 
@@ -314,53 +314,111 @@ class ImageCube(nn.Module):
 
         hdul.close()
 
-    def convolve_packed_cube(
-        packed_cube: torch.Tensor,
-        coords: GridCoords,
-        FWHM_maj: float,
-        FWHM_min: float,
-        Omega: float,
-    ) -> torch.Tensor:
-        r"""
-        Convolve an image cube with a 2D Gaussian PSF. Operation is carried out in the Fourier domain using a Gaussian taper.
 
-        Parameters
-        ----------
-        packed_cube : :class:`torch.Tensor` of :class:`torch.double` type
-            shape ``(nchan, npix, npix)`` image cube in packed format.
-        coords: :class:`mpol.coordinates.GridCoords`
-            object indicating image and Fourier grid specifications.
-        FWHM_maj: float, units of arcsec
-            the FWHH of the Gaussian along the major axis
-        FWHM_min: float, units of arcsec
-            the FWHM of the Gaussian along the minor axis
-        Omega: float, degrees
-            the rotation of the major axis of the PSF, in degrees East of North. 0 degrees rotation has the major axis aligned in the East-West direction.
-        """
-        nchan, npix_m, npix_l = packed_cube.size()
-        assert (npix_m == coords.npix) and (
-            npix_l == coords.npix
-        ), "packed_cube {:} does not have the same pixel dimensions as indicated by coords {:}".format(
-            packed_cube.size(), coords.npix
-        )
+def uv_gaussian_taper(
+    coords: GridCoords, FWHM_maj: float, FWHM_min: float, Omega: float
+) -> torch.Tensor:
+    r"""
+    Compute a packed Gaussian taper in the Fourier domain, to multiply against a packed
+    visibility cube. While similar to :meth:`mpol.utils.fourier_gaussian_lambda_arcsec`,
+    this routine delivers a visibility-plane taper with maximum amplitude normalized
+    to 1.0.
 
-        # in FFT packed format
-        # we're round-tripping, so we can ignore prefactors for correctness
-        # calling this `vis_like`, since it's not actually the vis
-        vis_like = torch.fft.fftn(packed_cube, dim=(1, 2))
-        
-        # convert FWHM to sigma 
-        FWHM2sigma = 1 / (2 * np.sqrt(2 * np.log(2)))
-        sigma_x = FWHM_maj * FWHM2sigma
-        sigma_y = FWHM_min * FWHM2sigma
+    Parameters
+    ----------
+    coords: :class:`mpol.coordinates.GridCoords`
+        object indicating image and Fourier grid specifications.
+    FWHM_maj: float, units of arcsec
+        the FWHH of the Gaussian along the major axis
+    FWHM_min: float, units of arcsec
+        the FWHM of the Gaussian along the minor axis
+    Omega: float, degrees
+        the rotation of the major axis of the PSF, in degrees East of North. 0 degrees rotation has the major axis aligned in the East-West direction.
 
-        # calculate corresponding uu and vv matrices in packed format
-        taper_2D = utils.fourier_gaussian_lambda_arcsec(coords.packed_u_centers_2D, coords.packed_v_centers_2D, a=1.0, delta_x=0.0, delta_y=0.0, sigma_x=sigma_x, sigma_y=sigma_y, Omega=Omega)
-        
-        # calculate taper on packed image
-        tapered_vis = vis_like * torch.broadcast_to(taper_2D, packed_cube.size()) 
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`, shape ``(npix, npix)``
+    """
 
-        # iFFT back, ignoring prefactors for round-trip
-        convolved_packed_cube = torch.fft.fftn(tapered_vis, dim=(1,2)) 
+    # convert FWHM to sigma and to radians
+    FWHM2sigma = 1 / (2 * np.sqrt(2 * np.log(2)))
+    sigma_l = FWHM_maj * FWHM2sigma * constants.arcsec  # radians
+    sigma_m = FWHM_min * FWHM2sigma * constants.arcsec  # radians
 
-        return convolved_packed_cube
+    u = coords.packed_u_centers_2D
+    v = coords.packed_v_centers_2D
+
+    # calculate primed rotated coordinates
+    Omega_d = Omega * constants.deg
+    up = u * np.cos(Omega_d) - v * np.sin(Omega_d)
+    vp = u * np.sin(Omega_d) + v * np.cos(Omega_d)
+
+    # calculate the Fourier Gaussian
+    taper_2D = np.exp(
+        -2 * np.pi**2 * (sigma_l**2 * up**2 + sigma_m**2 * vp**2)
+    )
+
+    # # the fourier_gaussian_lambda_arcsec routine assumes the amplitude
+    # # is 1.0 *in the image plane*. This is not the same as having an
+    # # amplitude 1.0 in the visibility plane, which is a requirement of a
+    # # flux-conserving taper. So we renormalize.
+    # taper_2D /= np.max(np.abs(taper_2D))
+
+    return torch.from_numpy(taper_2D)
+
+
+def convolve_packed_cube(
+    packed_cube: torch.Tensor,
+    coords: GridCoords,
+    FWHM_maj: float,
+    FWHM_min: float,
+    Omega: float,
+) -> torch.Tensor:
+    r"""
+    Convolve an image cube with a 2D Gaussian PSF. Operation is carried out in the Fourier domain using a Gaussian taper.
+
+    Parameters
+    ----------
+    packed_cube : :class:`torch.Tensor` of :class:`torch.double` type
+        shape ``(nchan, npix, npix)`` image cube in packed format.
+    coords: :class:`mpol.coordinates.GridCoords`
+        object indicating image and Fourier grid specifications.
+    FWHM_maj: float, units of arcsec
+        the FWHH of the Gaussian along the major axis
+    FWHM_min: float, units of arcsec
+        the FWHM of the Gaussian along the minor axis
+    Omega: float, degrees
+        the rotation of the major axis of the PSF, in degrees East of North. 0 degrees rotation has the major axis aligned in the East-West direction.
+
+    Returns
+    -------
+    :class:`torch.Tensor` of :class:`torch.double`
+    """
+    nchan, npix_m, npix_l = packed_cube.size()
+    assert (npix_m == coords.npix) and (
+        npix_l == coords.npix
+    ), "packed_cube {:} does not have the same pixel dimensions as indicated by coords {:}".format(
+        packed_cube.size(), coords.npix
+    )
+
+    # in FFT packed format
+    # we're round-tripping, so we can ignore prefactors for correctness
+    # calling this `vis_like`, since it's not actually the vis
+    vis_like = torch.fft.fftn(packed_cube, dim=(1, 2))
+
+    taper_2D = uv_gaussian_taper(coords, FWHM_maj, FWHM_min, Omega)
+    # calculate taper on packed image
+    tapered_vis = vis_like * torch.broadcast_to(taper_2D, packed_cube.size())
+
+    # iFFT back, ignoring prefactors for round-trip
+    convolved_packed_cube = torch.fft.ifftn(tapered_vis, dim=(1, 2))
+
+    # assert imaginaries are effectively zero, otherwise something went wrong
+    thresh = 1e-10
+    assert (
+        torch.max(convolved_packed_cube.imag) < thresh
+    ), "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(
+        torch.max(convolved_packed_cube.imag), thresh
+    )
+
+    return convolved_packed_cube.real
