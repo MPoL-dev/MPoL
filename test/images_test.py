@@ -205,7 +205,11 @@ def test_taper(coords, tmp_path):
 
         norm = plot.get_image_cmap_norm(taper_2D, symmetric=True)
         im = ax.imshow(
-            taper_2D, extent=coords.vis_ext_Mlam, origin="lower", cmap="bwr_r", norm=norm
+            taper_2D,
+            extent=coords.vis_ext_Mlam,
+            origin="lower",
+            cmap="bwr_r",
+            norm=norm,
         )
         plt.colorbar(im, ax=ax)
 
@@ -240,5 +244,37 @@ def test_convolve(packed_cube, coords, tmp_path):
 
         plt.colorbar(im, ax=ax[1])
         fig.savefig(tmp_path / "convolved_{:.2f}.png".format(r), dpi=300)
+
+    plt.close("all")
+
+
+def test_convolve_rotate(packed_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+
+    r_max = 0.2
+    r_min = 0.1 
+    for Omega in np.arange(0.0, 180, step=20):
+        fig, ax = plt.subplots(ncols=2)
+        # put back to sky
+        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title("tot flux: {:.3f} Jy".format(flux))
+        plt.colorbar(im, ax=ax[0])
+
+        c = images.convolve_packed_cube(packed_cube, coords, r_max, r_min, Omega)
+        # put back to sky
+        c_sky = utils.packed_cube_to_sky_cube(c)
+        im = ax[1].imshow(
+            c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        ax[1].set_title("tot flux: {:.3f} Jy".format(flux))
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / "convolved_Omega_{:.0f}.png".format(Omega), dpi=300)
 
     plt.close("all")
