@@ -421,4 +421,5 @@ def convolve_packed_cube(
         torch.max(convolved_packed_cube.imag), thresh
     )
 
-    return convolved_packed_cube.real
+    r_cube: torch.Tensor = convolved_packed_cube.real
+    return r_cube
