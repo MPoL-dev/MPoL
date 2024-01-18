@@ -1,8 +1,5 @@
-import numpy as np
 
-from astropy.utils.data import download_file
 
-from mpol import precomposed
 # from mpol.plot import image_comparison_fig
 
 # def test_image_comparison_fig(coords, tmp_path):

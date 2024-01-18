@@ -1,4 +1,3 @@
-import os
 
 # -- Project information -----------------------------------------------------
 from pkg_resources import DistributionNotFound, get_distribution

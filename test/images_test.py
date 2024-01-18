@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import pytest
 import torch
 from astropy.io import fits
+import numpy as np
 
 from mpol import coordinates, images, plot, utils
-from mpol.constants import *
 
 
 def test_single_chan():

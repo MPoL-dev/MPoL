@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
 
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
-from numpy.typing import NDArray
 from torch import nn
 
 from mpol.exceptions import DimensionMismatchError

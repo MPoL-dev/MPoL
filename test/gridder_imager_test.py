@@ -6,8 +6,6 @@ import numpy as np
 import pytest
 
 from mpol import coordinates, gridding
-from mpol.constants import *
-
 
 # cache an instantiated imager for future imaging ops
 @pytest.fixture

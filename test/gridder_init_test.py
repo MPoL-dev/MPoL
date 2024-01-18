@@ -1,7 +1,7 @@
 import pytest
 
+import numpy as np
 from mpol import coordinates, gridding
-from mpol.constants import *
 from mpol.exceptions import CellSizeError, DataError
 
 

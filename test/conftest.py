@@ -198,7 +198,6 @@ def mock_1d_vis_model(mock_1d_archive):
     geom = m["geometry"]
     geom = geom[()]
 
-    Vtrue = m["vis"]
     Vtrue_dep = m["vis_dep"]
     q_dep = m["baselines_dep"]
 

@@ -1,4 +1,3 @@
-import numpy as np
 
 from astropy.utils.data import download_file
 

@@ -3,8 +3,6 @@ import numpy as np
 import pytest
 
 from mpol import coordinates, utils
-from mpol.constants import *
-
 
 @pytest.fixture
 def imagekw():

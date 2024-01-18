@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import torch
 import pytest
+import numpy as np
 
-from mpol import coordinates
-from mpol.constants import *
+from mpol import coordinates, constants
 from mpol.exceptions import CellSizeError
 
 
@@ -117,7 +117,7 @@ def test_tile_vs_meshgrid_implementation():
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     x_centers_2d, y_centers_2d = np.meshgrid(
-        coords.l_centers / arcsec, coords.m_centers / arcsec, indexing="xy"
+        coords.l_centers / constants.arcsec, coords.m_centers / constants.arcsec, indexing="xy"
     )
 
     ground_u_centers_2D, ground_v_centers_2D = np.meshgrid(

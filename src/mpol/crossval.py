@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import copy
 import logging
-from collections import defaultdict
 from typing import Any
 
 import numpy as np
@@ -11,11 +10,8 @@ from numpy import floating
 from numpy.typing import NDArray
 
 from mpol.datasets import Dartboard, GriddedDataset
-from mpol.precomposed import GriddedNet
 # from mpol.training import TrainTest, train_to_dirty_image
 # from mpol.training import TrainTest, train_to_dirty_image
-from mpol.plot import split_diagnostics_fig
-from mpol.utils import loglinspace
 
 
 # class CrossValidate:

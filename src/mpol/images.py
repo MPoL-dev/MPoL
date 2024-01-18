@@ -8,7 +8,7 @@ import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
 
-from typing import Any, Callable
+from typing import Callable
 
 from mpol import constants, utils
 from mpol.coordinates import GridCoords

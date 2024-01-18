@@ -2,12 +2,10 @@ import copy
 
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
 
 # from mpol.crossval import CrossValidate, DartboardSplitGridded, RandomCellSplitGridded
 from mpol.crossval import DartboardSplitGridded, RandomCellSplitGridded
 from mpol.datasets import Dartboard
-from mpol.plot import split_diagnostics_fig
 
 
 # def test_crossvalclass_split_dartboard(coords, imager, dataset, generic_parameters):
