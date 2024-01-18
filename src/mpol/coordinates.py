@@ -1,6 +1,6 @@
 from __future__ import annotations
-from functools import cached_property
 
+from functools import cached_property
 from typing import Any
 
 import numpy as np
@@ -207,19 +207,17 @@ class GridCoords:
             self.v_bin_min,
             self.v_bin_max,
         ]  # [λ]
-    
+
     @property
     def vis_ext_Mlam(self) -> list[float]:
         return [1e-6 * edge for edge in self.vis_ext]
 
-    # --------------------------------------------------------------------------
-    # Non-identical u & v properties
-    # --------------------------------------------------------------------------
     @cached_property
     def ground_u_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
         # only useful for plotting a sky_vis
         # uu increasing, no fftshift
-        # tile replicates the 1D u_centers array to a 2D array the size of the full UV grid
+        # tile replicates the 1D u_centers array to a 2D array the size of the full
+        # UV grid
         return np.tile(self.u_centers, (self.npix_u, 1))
 
     @cached_property
@@ -359,6 +357,6 @@ class GridCoords:
             # don't attempt to compare against different types
             return NotImplemented
 
-        # GridCoords objects are considered equal if they have the same cell_size and npix, since
-        # all other attributes are derived from these two core properties.
+        # GridCoords objects are considered equal if they have the same cell_size and
+        # npix, since all other attributes are derived from these two core properties.
         return bool(self.cell_size == other.cell_size and self.npix == other.npix)

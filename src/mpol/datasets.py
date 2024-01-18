@@ -7,9 +7,8 @@ import torch
 from numpy import floating, integer
 from numpy.typing import ArrayLike, NDArray
 
-from mpol.coordinates import GridCoords
-
 from mpol import utils
+from mpol.coordinates import GridCoords
 
 
 class GriddedDataset(torch.nn.Module):

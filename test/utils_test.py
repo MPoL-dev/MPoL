@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, utils
+
 
 @pytest.fixture
 def imagekw():

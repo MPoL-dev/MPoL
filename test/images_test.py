@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 import torch
 from astropy.io import fits
-import numpy as np
-
 from mpol import coordinates, images, plot, utils
 
 
@@ -213,7 +212,7 @@ def test_taper(coords, tmp_path):
         )
         plt.colorbar(im, ax=ax)
 
-        fig.savefig(tmp_path / "taper{:.2f}.png".format(r), dpi=300)
+        fig.savefig(tmp_path / f"taper{r:.2f}.png", dpi=300)
 
     plt.close("all")
 
@@ -230,7 +229,7 @@ def test_convolve(packed_cube, coords, tmp_path):
             sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
         flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
-        ax[0].set_title("tot flux: {:.3f} Jy".format(flux))
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
         plt.colorbar(im, ax=ax[0])
 
         c = images.convolve_packed_cube(packed_cube, coords, r, r, 0.0)
@@ -240,10 +239,10 @@ def test_convolve(packed_cube, coords, tmp_path):
             c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
         flux = coords.cell_size**2 * torch.sum(c_sky[chan])
-        ax[1].set_title("tot flux: {:.3f} Jy".format(flux))
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
 
         plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / "convolved_{:.2f}.png".format(r), dpi=300)
+        fig.savefig(tmp_path / f"convolved_{r:.2f}.png", dpi=300)
 
     plt.close("all")
 
@@ -253,7 +252,7 @@ def test_convolve_rotate(packed_cube, coords, tmp_path):
     chan = 0
 
     r_max = 0.2
-    r_min = 0.1 
+    r_min = 0.1
     for Omega in np.arange(0.0, 180, step=20):
         fig, ax = plt.subplots(ncols=2)
         # put back to sky
@@ -262,7 +261,7 @@ def test_convolve_rotate(packed_cube, coords, tmp_path):
             sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
         flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
-        ax[0].set_title("tot flux: {:.3f} Jy".format(flux))
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
         plt.colorbar(im, ax=ax[0])
 
         c = images.convolve_packed_cube(packed_cube, coords, r_max, r_min, Omega)
@@ -272,9 +271,9 @@ def test_convolve_rotate(packed_cube, coords, tmp_path):
             c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
         flux = coords.cell_size**2 * torch.sum(c_sky[chan])
-        ax[1].set_title("tot flux: {:.3f} Jy".format(flux))
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
 
         plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / "convolved_Omega_{:.0f}.png".format(Omega), dpi=300)
+        fig.savefig(tmp_path / f"convolved_Omega_{Omega:.0f}.png", dpi=300)
 
     plt.close("all")

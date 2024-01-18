@@ -7,7 +7,6 @@ import numpy as np
 from mpol.crossval import DartboardSplitGridded, RandomCellSplitGridded
 from mpol.datasets import Dartboard
 
-
 # def test_crossvalclass_split_dartboard(coords, imager, dataset, generic_parameters):
 #     # using the CrossValidate class, split a dataset into train/test subsets
 #     # using 'dartboard' splitter

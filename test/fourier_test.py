@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from pytest import approx
-
 from mpol import fourier, images, utils
+from pytest import approx
 
 
 def test_fourier_cube(coords, tmp_path):

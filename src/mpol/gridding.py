@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import warnings
-
-from typing import Any, Callable, Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+import torch
 from fast_histogram import histogram as fast_hist
 
-import torch
-
-from mpol.coordinates import GridCoords
-from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
-from mpol.datasets import GriddedDataset
 from mpol import utils
+from mpol.coordinates import GridCoords
+from mpol.datasets import GriddedDataset
+from mpol.exceptions import DataError, ThresholdExceededError, WrongDimensionError
 
 
 def _check_data_inputs_2d(

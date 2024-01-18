@@ -1,13 +1,12 @@
+from importlib.resources import files
+
 import numpy as np
 import pytest
 import torch
 import visread.process
 from astropy.utils.data import download_file
-
 from mpol import coordinates, fourier, gridding, images, utils
 from mpol.__init__ import zenodo_record
-
-from importlib.resources import files
 
 # private variables to this module
 _npz_path = files("mpol.data").joinpath("mock_data.npz")

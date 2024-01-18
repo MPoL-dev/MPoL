@@ -20,10 +20,10 @@
 #         pkgname="mpol",
 #     )
 
-#     image_comparison_fig(model, u, v, V, weights, robust=0.5, 
+#     image_comparison_fig(model, u, v, V, weights, robust=0.5,
 #                             clean_fits=fname,
-#                             share_cscale=False, 
+#                             share_cscale=False,
 #                             xzoom=[-2, 2], yzoom=[-2, 2],
 #                             title="test",
-#                             save_prefix=None,                            
+#                             save_prefix=None,
 #                             )

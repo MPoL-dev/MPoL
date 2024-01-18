@@ -10,6 +10,7 @@ from numpy import floating
 from numpy.typing import NDArray
 
 from mpol.datasets import Dartboard, GriddedDataset
+
 # from mpol.training import TrainTest, train_to_dirty_image
 # from mpol.training import TrainTest, train_to_dirty_image
 
@@ -55,7 +56,8 @@ from mpol.datasets import Dartboard, GriddedDataset
 #         Number of k-folds to use in cross-validation
 #     split_method : str, default='dartboard'
 #         Method to split full dataset into train/test subsets
-#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None, unit=[klambda]
+#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None, 
+#   unit=[klambda]
 #         Radial and azimuthal bin edges of the cells used to split the dataset
 #         if `split_method`==`dartboard` (see `datasets.Dartboard`)
 #     split_diag_fig : bool, default=False

@@ -1,14 +1,14 @@
-r"""The ``images`` module provides the core functionality of MPoL via 
+r"""The ``images`` module provides the core functionality of MPoL via
 :class:`mpol.images.ImageCube`."""
 
 from __future__ import annotations
+
+from collections.abc import Callable
 
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 from torch import nn
-
-from typing import Callable
 
 from mpol import constants, utils
 from mpol.coordinates import GridCoords
@@ -114,14 +114,14 @@ class HannConvCube(nn.Module):
         \end{bmatrix}
 
     which is the 2D version of the discretely-sampled response function corresponding to
-    a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a 
-    convolutional kernel in the image plane, and so effectively acts as apodization 
-    by a Hann window function in the Fourier domain. For more information, see the 
-    following Wikipedia articles on `Window Functions 
-    <https://en.wikipedia.org/wiki/Window_function>`_ in general and the `Hann Window 
+    a Hann window, i.e., it is two 1D Hann windows multiplied together. This is a
+    convolutional kernel in the image plane, and so effectively acts as apodization
+    by a Hann window function in the Fourier domain. For more information, see the
+    following Wikipedia articles on `Window Functions
+    <https://en.wikipedia.org/wiki/Window_function>`_ in general and the `Hann Window
     <https://en.wikipedia.org/wiki/Hann_function>`_ specifically.
 
-    The idea is that this layer would help naturally attenuate high spatial frequency 
+    The idea is that this layer would help naturally attenuate high spatial frequency
     artifacts by baking in a natural apodization in the Fourier plane.
 
     Args:

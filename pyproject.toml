@@ -111,7 +111,8 @@ disallow_untyped_defs = true
 [tool.ruff]
 target-version = "py310"
 line-length = 88
-select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLR", "PLW", "UP"]
+# will enable after sorting module locations
+# select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLR", "PLW", "UP"]
 ignore = [
     "E741",    # Allow ambiguous variable names
     "PLR0911", # Allow many return statements

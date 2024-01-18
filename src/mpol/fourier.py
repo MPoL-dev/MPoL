@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
 from torch import nn
 
-from mpol.exceptions import DimensionMismatchError
-
 from mpol import utils
 from mpol.coordinates import GridCoords
+from mpol.exceptions import DimensionMismatchError
 
 
 class FourierCube(nn.Module):
@@ -437,10 +435,10 @@ class NuFFT(nn.Module):
 
 class NuFFTCached(NuFFT):
     r"""
-    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra 
+    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra
     functionality to cache the sparse matrices for a specific set of ``uu`` and ``vv``
-    points specified at initialization. 
-    
+    points specified at initialization.
+
     For repeated evaluations of this layer (as might exist within an optimization loop),
     ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If
     ``sparse_matrices=False``, this routine will use the default table-based

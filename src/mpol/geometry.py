@@ -136,7 +136,7 @@ def observer_to_flat(
     # we don't know Z, but we can solve some equations to find that
     # y = Y / cos(i), as expected by intuition
     y1 = y2 / np.cos(incl)
-    
+
     # 3) inverse rotation about the z1 axis by an amount of omega
     cos_omega = np.cos(omega)
     sin_omega = np.sin(omega)

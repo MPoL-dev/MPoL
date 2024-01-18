@@ -1,6 +1,6 @@
 import logging
-import torch
 
+import torch
 
 
 def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):

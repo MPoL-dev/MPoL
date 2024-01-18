@@ -45,7 +45,7 @@ myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 autodoc_mock_imports = ["torch", "torchvision"]
 autodoc_member_order = "bysource"
 # https://github.com/sphinx-doc/sphinx/issues/9709
-# bug that if we set this here, we can't list individual members in the 
+# bug that if we set this here, we can't list individual members in the
 # actual API doc
 # autodoc_default_options = {"members": None}
 
