@@ -101,9 +101,9 @@ def observer_to_flat(
     Parameters
     ----------
     X : :class:`torch.Tensor` of :class:`torch.double`
-        A tensor representing the x coordinate in the plane of the orbit.
+        A tensor representing the x coordinate in the plane of the sky.
     Y : :class:`torch.Tensor` of :class:`torch.double`
-        A tensor representing the y coordinate in the plane of the orbit.
+        A tensor representing the y coordinate in the plane of the sky.
     omega : float
         A tensor representing an argument of periastron [radians] Default 0.0.
     incl : float
