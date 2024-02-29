@@ -56,11 +56,9 @@ def test_basecube_imagecube(coords, tmp_path):
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     base_cube = torch.normal(mean=mean, std=std)
@@ -111,11 +109,9 @@ def test_base_cube_conv_cube(coords, tmp_path):
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # The HannConvCube expects to function on a pre-packed ImageCube,
     # so in order to get the plots looking correct on this test image,
@@ -156,11 +152,9 @@ def test_multi_chan_conv(coords, tmp_path):
 
     nchan = 10
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     test_cube = torch.normal(mean=mean, std=std)

@@ -67,7 +67,6 @@ class BaseCube(nn.Module):
                 * torch.ones(
                     (self.nchan, self.coords.npix, self.coords.npix),
                     requires_grad=True,
-                    dtype=torch.double,
                 )
             )
 
@@ -146,7 +145,7 @@ class HannConvCube(nn.Module):
         # bias has shape (nchan)
 
         # build out the discretely-sampled Hann kernel
-        spec = torch.tensor([0.25, 0.5, 0.25], dtype=torch.double)
+        spec = torch.tensor([0.25, 0.5, 0.25])
         nugget = torch.outer(spec, spec)  # shape (3,3) 2D Hann kernel
         exp = torch.unsqueeze(torch.unsqueeze(nugget, 0), 0)  # shape (1, 1, 3, 3)
         weight = exp.repeat(nchan, 1, 1, 1)  # shape (nchan, 1, 3, 3)
@@ -158,7 +157,7 @@ class HannConvCube(nn.Module):
 
         # set the bias to zero
         self.m.bias = nn.Parameter(
-            torch.zeros(nchan, dtype=torch.double), requires_grad=requires_grad
+            torch.zeros(nchan), requires_grad=requires_grad
         )
 
     def forward(self, cube: torch.Tensor) -> torch.Tensor:
@@ -239,7 +238,7 @@ class ImageCube(nn.Module):
 
         Returns
         -------
-        :class:`torch.Tensor` of :class:`torch.double` type
+        :class:`torch.Tensor`  type
             tensor of shape ``(nchan, npix, npix)``), same as `cube`
         """
         self.packed_cube = packed_cube
@@ -337,7 +336,7 @@ def uv_gaussian_taper(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`, shape ``(npix, npix)``
+    :class:`torch.Tensor` , shape ``(npix, npix)``
     """
 
     # convert FWHM to sigma and to radians
@@ -379,7 +378,7 @@ def convolve_packed_cube(
 
     Parameters
     ----------
-    packed_cube : :class:`torch.Tensor` of :class:`torch.double` type
+    packed_cube : :class:`torch.Tensor`  type
         shape ``(nchan, npix, npix)`` image cube in packed format.
     coords: :class:`mpol.coordinates.GridCoords`
         object indicating image and Fourier grid specifications.
@@ -392,7 +391,7 @@ def convolve_packed_cube(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
     """
     nchan, npix_m, npix_l = packed_cube.size()
     assert (npix_m == coords.npix) and (
@@ -414,7 +413,7 @@ def convolve_packed_cube(
     convolved_packed_cube = torch.fft.ifftn(tapered_vis, dim=(1, 2))
 
     # assert imaginaries are effectively zero, otherwise something went wrong
-    thresh = 1e-10
+    thresh = 1e-7
     assert (
         torch.max(convolved_packed_cube.imag) < thresh
     ), "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(

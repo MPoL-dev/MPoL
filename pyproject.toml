@@ -113,7 +113,7 @@ target-version = "py310"
 line-length = 88
 # will enable after sorting module locations
 # select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLR", "PLW", "UP"]
-ignore = [
+lint.ignore = [
     "E741",    # Allow ambiguous variable names
     "PLR0911", # Allow many return statements
     "PLR0913", # Allow many arguments to functions

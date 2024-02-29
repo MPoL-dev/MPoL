@@ -21,7 +21,7 @@ _cell_size = 0.005
 def img2D_butterfly():
     """Return the 2D source image of the butterfly, for use as a test image cube."""
     archive = np.load(_npz_path)
-    img = np.float64(archive["img"])
+    img = archive["img"]
 
     # assuming we're going to go with _cell_size, set the total flux of this image
     # total flux should be 0.253 Jy from MPoL-examples.
@@ -43,7 +43,7 @@ def packed_cube(img2D_butterfly):
 def baselines_m():
     "Return the mock baselines (in meters) produced from the IM Lup DSHARP dataset."
     archive = np.load(_npz_path)
-    return np.float64(archive["uu"]), np.float64(archive["vv"])
+    return archive["uu"], archive["vv"]
 
 
 @pytest.fixture(scope="session")

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from mpol import fourier, images, utils
+from mpol import fourier, utils
 from pytest import approx
 
 
@@ -181,44 +181,45 @@ def test_predict_vis_nufft_cached(coords, baselines_1D):
 
     # if the image cube was filled with zeros, then we should make sure this is true
     assert output.detach().numpy() == approx(
-        np.zeros((nchan, len(uu)), dtype=np.complex128)
+        np.zeros((nchan, len(uu)))
     )
 
 
 def test_nufft_cached_predict_GPU(coords, baselines_1D):
-    if not torch.cuda.is_available():
-        pass
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
     else:
-        device = torch.device("cuda:0")
+        device = torch.device("cpu")
+        return
 
-        # just see that we can load the layer and get something through without error
-        # for a very simple blank function
+    # just see that we can load the layer and get something through without error
+    # for a very simple blank function
 
-        # load some data
-        uu, vv = baselines_1D
+    # load some data
+    uu, vv = baselines_1D
 
-        nchan = 10
+    nchan = 10
 
-        # instantiate an ImageCube layer filled with zeros and send to GPU
-        imagecube = images.ImageCube(coords=coords, nchan=nchan).to(device=device)
+    # we have a multi-channel cube, but only sent single-channel uu and vv
+    # coordinates. The expectation is that TorchKbNufft will parallelize these
 
-        # we have a multi-channel cube, but only sent single-channel uu and vv
-        # coordinates. The expectation is that TorchKbNufft will parallelize these
+    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv).to(
+        device=device
+    )
 
-        layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv).to(
-            device=device
-        )
+    # predict the values of the cube at the u,v locations
+    blank_packed_img = torch.zeros((nchan, coords.npix, coords.npix)).to(device=device)
+    output = layer(blank_packed_img)
 
-        # predict the values of the cube at the u,v locations
-        output = layer(imagecube())
+    # make sure we got back the number of visibilities we expected
+    assert output.shape == (nchan, len(uu))
 
-        # make sure we got back the number of visibilities we expected
-        assert output.shape == (nchan, len(uu))
-
-        # if the image cube was filled with zeros, then we should make sure this is true
-        assert output.cpu().detach().numpy() == approx(
-            np.zeros((nchan, len(uu)), dtype=np.complex128)
-        )
+    # if the image cube was filled with zeros, then we should make sure this is true
+    assert output.cpu().detach().numpy() == approx(
+        np.zeros((nchan, len(uu)), dtype=np.complex128)
+    )
 
 
 def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
@@ -316,7 +317,7 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     img_packed = utils.sky_gaussian_arcsec(
         coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
     )
-    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
+    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True, dtype=torch.float32)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
     num_output = layer(img_packed_tensor)[0]  # take the channel dim out
@@ -392,7 +393,7 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
     # broadcast to 5 channels -- the image will be the same for each
     img_packed_tensor = torch.tensor(
         img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)),
-        requires_grad=True,
+        requires_grad=True, dtype=torch.float32
     )
 
     # use the NuFFT to predict the values of the cube at the u,v locations

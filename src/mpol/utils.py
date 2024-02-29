@@ -291,7 +291,7 @@ def get_optimal_image_properties(
     image_width : float, unit = arcsec
         Desired width of the image (for a square image of size
         `image_width` :math:`\times` `image_width`).
-    u, v : :class:`torch.Tensor` of :class:`torch.double`, unit = :math:`\lambda`
+    u, v : :class:`torch.Tensor` , unit = :math:`\lambda`
         `u` and `v` baselines.
 
     Returns

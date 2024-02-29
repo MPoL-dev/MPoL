@@ -30,9 +30,9 @@ def flat_to_observer(
 
     Parameters
     ----------
-    x : :class:`torch.Tensor` of :class:`torch.double`
+    x : :class:`torch.Tensor` 
         A tensor representing the x coordinate in the plane of the orbit.
-    y : :class:`torch.Tensor` of :class:`torch.double`
+    y : :class:`torch.Tensor` 
         A tensor representing the y coordinate in the plane of the orbit.
     omega : float
         Argument of periastron [radians]. Default 0.0.
@@ -43,7 +43,7 @@ def flat_to_observer(
 
     Returns
     -------
-    2-tuple of :class:`torch.Tensor` of :class:`torch.double`
+    2-tuple of :class:`torch.Tensor` 
         Two tensors representing ``(X, Y)`` in the observer frame.
     """
     # Rotation matrices result in a *clockwise* rotation of the axes,
@@ -100,9 +100,9 @@ def observer_to_flat(
 
     Parameters
     ----------
-    X : :class:`torch.Tensor` of :class:`torch.double`
+    X : :class:`torch.Tensor` 
         A tensor representing the x coordinate in the plane of the sky.
-    Y : :class:`torch.Tensor` of :class:`torch.double`
+    Y : :class:`torch.Tensor` 
         A tensor representing the y coordinate in the plane of the sky.
     omega : float
         A tensor representing an argument of periastron [radians] Default 0.0.
@@ -114,7 +114,7 @@ def observer_to_flat(
 
     Returns
     -------
-    2-tuple of :class:`torch.Tensor` of :class:`torch.double`
+    2-tuple of :class:`torch.Tensor` 
         Two tensors representing ``(x, y)`` in the flat frame.
     """
     # Rotation matrices result in a *clockwise* rotation of the axes,
