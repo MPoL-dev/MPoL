@@ -307,10 +307,10 @@ class GridCoords:
 
         Parameters
         ----------
-        uu : :class:`torch.Tensor` of `torch.double`
+        uu : :class:`torch.Tensor`
             u spatial frequency coordinates.
             Units of [:math:`\lambda`]
-        vv : :class:`torch.Tensor` of `torch.double`
+        vv : :class:`torch.Tensor`
             v spatial frequency coordinates.
             Units of [:math:`\lambda`]
 
