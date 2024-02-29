@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from mpol import fourier, images, utils
+from mpol import fourier, utils
 from pytest import approx
 
 
