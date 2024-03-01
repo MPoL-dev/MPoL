@@ -238,7 +238,7 @@ class ImageCube(nn.Module):
 
         Returns
         -------
-        :class:`torch.Tensor`  type
+        :class:`torch.Tensor`
             tensor of shape ``(nchan, npix, npix)``), same as `cube`
         """
         self.packed_cube = packed_cube
@@ -337,6 +337,7 @@ def uv_gaussian_taper(
     Returns
     -------
     :class:`torch.Tensor` , shape ``(npix, npix)``
+        The Gaussian taper in packed format.
     """
 
     # convert FWHM to sigma and to radians
@@ -371,7 +372,7 @@ def convolve_packed_cube(
     coords: GridCoords,
     FWHM_maj: float,
     FWHM_min: float,
-    Omega: float,
+    Omega: float = 0,
 ) -> torch.Tensor:
     r"""
     Convolve an image cube with a 2D Gaussian PSF. Operation is carried out in the Fourier domain using a Gaussian taper.
@@ -392,6 +393,7 @@ def convolve_packed_cube(
     Returns
     -------
     :class:`torch.Tensor` 
+        The convolved cube in packed format.
     """
     nchan, npix_m, npix_l = packed_cube.size()
     assert (npix_m == coords.npix) and (
