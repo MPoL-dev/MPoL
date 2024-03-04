@@ -375,7 +375,7 @@ def sky_gaussian_radians(
         delta_l : offset [radians]
         delta_m : offset [radians]
         sigma_l : width [radians]
-        sigma_M : width [radians]
+        sigma_m : width [radians]
         Omega : position angle of ascending node [degrees] east of north.
 
     Returns:

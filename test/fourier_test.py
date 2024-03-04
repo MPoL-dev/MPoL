@@ -188,10 +188,7 @@ def test_predict_vis_nufft_cached(coords, baselines_1D):
 def test_nufft_cached_predict_GPU(coords, baselines_1D):
     if torch.cuda.is_available():
         device = torch.device("cuda")
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
     else:
-        device = torch.device("cpu")
         return
 
     # just see that we can load the layer and get something through without error

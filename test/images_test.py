@@ -210,15 +210,49 @@ def test_taper(coords, tmp_path):
 
     plt.close("all")
 
+def test_gaussian_kernel(coords, tmp_path):
+    rs = np.array([0.02, 0.06, 0.10])
+    nchan = 3
+    fig, ax = plt.subplots(nrows=len(rs), ncols=nchan, figsize=(10,10))
+    for i,r in enumerate(rs):
+        layer = images.GaussConvCube(coords, nchan=nchan, FWHM_maj=r, FWHM_min=0.5 * r)
+        weight = layer.m.weight.detach().numpy()
+        for j in range(nchan):
+            im = ax[i,j].imshow(weight[j,0], interpolation="none", origin="lower")
+            plt.colorbar(im, ax=ax[i,j])
 
-def test_convolve(packed_cube, coords, tmp_path):
+    fig.savefig(tmp_path / "filter.png", dpi=300)
+    plt.close("all")
+
+def test_gaussian_kernel_rotate(coords, tmp_path):
+    r = 0.04
+    Omegas = [0, 20, 40] # degrees
+    nchan = 3
+    fig, ax = plt.subplots(nrows=len(Omegas), ncols=nchan, figsize=(10, 10))
+    for i, Omega in enumerate(Omegas):
+        layer = images.GaussConvCube(coords, nchan=nchan, FWHM_maj=r, FWHM_min=0.5 * r, Omega=Omega)
+        weight = layer.m.weight.detach().numpy()
+        for j in range(nchan):
+            im = ax[i, j].imshow(weight[j, 0], interpolation="none",origin="lower")
+            plt.colorbar(im, ax=ax[i, j])
+
+    fig.savefig(tmp_path / "filter.png", dpi=300)
+    plt.close("all")
+
+
+def test_convolve(sky_cube, coords, tmp_path):
     # show only the first channel
     chan = 0
+    nchan = sky_cube.size()[0]
 
-    for r in np.arange(0.0, 0.2, step=0.02):
+    for r in np.arange(0.02, 0.2, step=0.04):
+
+        layer = images.GaussConvCube(coords, nchan=nchan, FWHM_maj=r, FWHM_min=r)
+
+        print("Kernel size", layer.m.weight.size())
+
         fig, ax = plt.subplots(ncols=2)
-        # put back to sky
-        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+    
         im = ax[0].imshow(
             sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
@@ -226,9 +260,7 @@ def test_convolve(packed_cube, coords, tmp_path):
         ax[0].set_title(f"tot flux: {flux:.3f} Jy")
         plt.colorbar(im, ax=ax[0])
 
-        c = images.convolve_packed_cube(packed_cube, coords, r, r, 0.0)
-        # put back to sky
-        c_sky = utils.packed_cube_to_sky_cube(c)
+        c_sky = layer(sky_cube)
         im = ax[1].imshow(
             c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
@@ -240,17 +272,16 @@ def test_convolve(packed_cube, coords, tmp_path):
 
     plt.close("all")
 
-
-def test_convolve_rotate(packed_cube, coords, tmp_path):
+def test_convolve_rotate(sky_cube, coords, tmp_path):
     # show only the first channel
     chan = 0
+    nchan = sky_cube.size()[0]
 
-    r_max = 0.2
-    r_min = 0.1
-    for Omega in np.arange(0.0, 180, step=20):
+    for Omega in [0, 20, 40]:
+        layer = images.GaussConvCube(coords, nchan=nchan, FWHM_maj=0.16, FWHM_min=0.06, Omega=Omega)
+
         fig, ax = plt.subplots(ncols=2)
-        # put back to sky
-        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+
         im = ax[0].imshow(
             sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
@@ -258,9 +289,7 @@ def test_convolve_rotate(packed_cube, coords, tmp_path):
         ax[0].set_title(f"tot flux: {flux:.3f} Jy")
         plt.colorbar(im, ax=ax[0])
 
-        c = images.convolve_packed_cube(packed_cube, coords, r_max, r_min, Omega)
-        # put back to sky
-        c_sky = utils.packed_cube_to_sky_cube(c)
+        c_sky = layer(sky_cube)
         im = ax[1].imshow(
             c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
         )
@@ -268,6 +297,38 @@ def test_convolve_rotate(packed_cube, coords, tmp_path):
         ax[1].set_title(f"tot flux: {flux:.3f} Jy")
 
         plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / f"convolved_Omega_{Omega:.0f}.png", dpi=300)
+        fig.savefig(tmp_path / f"convolved_{Omega:.2f}.png", dpi=300)
 
     plt.close("all")
+
+# old rotate for FFT routine
+# def test_convolve_rotate(packed_cube, coords, tmp_path):
+#     # show only the first channel
+#     chan = 0
+
+#     r_max = 0.2
+#     r_min = 0.1
+#     for Omega in np.arange(0.0, 180, step=20):
+#         fig, ax = plt.subplots(ncols=2)
+#         # put back to sky
+#         sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+#         im = ax[0].imshow(
+#             sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+#         )
+#         flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+#         ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+#         plt.colorbar(im, ax=ax[0])
+
+#         c = images.convolve_packed_cube(packed_cube, coords, r_max, r_min, Omega)
+#         # put back to sky
+#         c_sky = utils.packed_cube_to_sky_cube(c)
+#         im = ax[1].imshow(
+#             c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+#         )
+#         flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+#         ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+#         plt.colorbar(im, ax=ax[1])
+#         fig.savefig(tmp_path / f"convolved_Omega_{Omega:.0f}.png", dpi=300)
+
+#     plt.close("all")

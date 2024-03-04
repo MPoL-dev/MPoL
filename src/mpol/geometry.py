@@ -16,8 +16,8 @@ def flat_to_observer(
     (X,Y,Z).
 
     It is assumed that the +Z axis points *towards* the observer. It is assumed that the
-      model is flat in the (x,y) frame (like a flat disk), and so the operations
-      involving ``z`` are neglected. But the model lives in 3D Cartesian space.
+    model is flat in the (x,y) frame (like a flat disk), and so the operations
+    involving ``z`` are neglected. But the model lives in 3D Cartesian space.
 
     In order,
 
@@ -28,11 +28,18 @@ def flat_to_observer(
     Inspired by `exoplanet/keplerian.py
     <https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py>`_
 
+    Note that the (x,y) here are *not* the same as the `x_centers_2D` or `y_centers_2D`
+    attached to the :class:`mpol.coordinates.GridCoords` object. The (x,y) referred to
+    here are the 'perifocal frame' of the orbit, whereas the (X,Y,Z) are the sky or
+    observer frame. Typically, the sky observer frame is oriented such that X is North
+    (pointing up) and Y is East (pointing left). For more detail, see the `exoplanet
+    docs <https://docs.exoplanet.codes/en/latest/tutorials/data-and-models/#orbital-conventions>`_ or `Murray and Correia <https://ui.adsabs.harvard.edu/abs/2010exop.book...15M/abstract>`_.
+
     Parameters
     ----------
-    x : :class:`torch.Tensor` 
+    x : :class:`torch.Tensor`
         A tensor representing the x coordinate in the plane of the orbit.
-    y : :class:`torch.Tensor` 
+    y : :class:`torch.Tensor`
         A tensor representing the y coordinate in the plane of the orbit.
     omega : float
         Argument of periastron [radians]. Default 0.0.
@@ -43,7 +50,7 @@ def flat_to_observer(
 
     Returns
     -------
-    2-tuple of :class:`torch.Tensor` 
+    2-tuple of :class:`torch.Tensor`
         Two tensors representing ``(X, Y)`` in the observer frame.
     """
     # Rotation matrices result in a *clockwise* rotation of the axes,
@@ -98,11 +105,18 @@ def observer_to_flat(
     Inspired by `exoplanet/keplerian.py
     <https://github.com/exoplanet-dev/exoplanet/blob/main/src/exoplanet/orbits/keplerian.py>`_
 
+    Note that the (x,y) here are *not* the same as the `x_centers_2D` or `y_centers_2D`
+    attached to the :class:`mpol.coordinates.GridCoords` object. The (x,y) referred to
+    here are the 'perifocal frame' of the orbit, whereas the (X,Y,Z) are the sky or
+    observer frame. Typically, the sky observer frame is oriented such that X is North
+    (pointing up) and Y is East (pointing left). For more detail, see the `exoplanet
+    docs <https://docs.exoplanet.codes/en/latest/tutorials/data-and-models/#orbital-conventions>`_ or `Murray and Correia <https://ui.adsabs.harvard.edu/abs/2010exop.book...15M/abstract>`_.
+
     Parameters
     ----------
-    X : :class:`torch.Tensor` 
+    X : :class:`torch.Tensor`
         A tensor representing the x coordinate in the plane of the sky.
-    Y : :class:`torch.Tensor` 
+    Y : :class:`torch.Tensor`
         A tensor representing the y coordinate in the plane of the sky.
     omega : float
         A tensor representing an argument of periastron [radians] Default 0.0.
@@ -114,7 +128,7 @@ def observer_to_flat(
 
     Returns
     -------
-    2-tuple of :class:`torch.Tensor` 
+    2-tuple of :class:`torch.Tensor`
         Two tensors representing ``(x, y)`` in the flat frame.
     """
     # Rotation matrices result in a *clockwise* rotation of the axes,

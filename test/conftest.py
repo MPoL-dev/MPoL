@@ -28,6 +28,13 @@ def img2D_butterfly():
 
     return img
 
+@pytest.fixture(scope="session")
+def sky_cube(img2D_butterfly):
+    """Create a sky tensor image cube from the butterfly."""
+    print("npix packed cube", img2D_butterfly.shape)
+    # tile to some nchan, npix, npix
+    sky_cube = torch.tile(torch.from_numpy(img2D_butterfly), (_nchan, 1, 1))
+    return sky_cube
 
 @pytest.fixture(scope="session")
 def packed_cube(img2D_butterfly):
