@@ -240,7 +240,7 @@ def test_gaussian_kernel_rotate(coords, tmp_path):
     plt.close("all")
 
 
-def test_convolve(sky_cube, coords, tmp_path):
+def test_GaussConvCube(sky_cube, coords, tmp_path):
     # show only the first channel
     chan = 0
     nchan = sky_cube.size()[0]
@@ -272,7 +272,7 @@ def test_convolve(sky_cube, coords, tmp_path):
 
     plt.close("all")
 
-def test_convolve_rotate(sky_cube, coords, tmp_path):
+def test_GaussConvCube_rotate(sky_cube, coords, tmp_path):
     # show only the first channel
     chan = 0
     nchan = sky_cube.size()[0]
@@ -300,6 +300,42 @@ def test_convolve_rotate(sky_cube, coords, tmp_path):
         fig.savefig(tmp_path / f"convolved_{Omega:.2f}.png", dpi=300)
 
     plt.close("all")
+
+def test_GaussBaseBeam(packed_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+    nchan = packed_cube.size()[0]
+
+    layer = images.GaussBaseBeam(coords, nchan)
+
+    for FWHM_base in np.linspace(-4, 0.5, num=10):
+        fig, ax = plt.subplots(ncols=2)
+        # put back to sky
+        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+        plt.colorbar(im, ax=ax[0])
+
+        # set base resolution
+        layer._FWHM_base = torch.nn.Parameter(torch.tensor(FWHM_base, dtype=torch.float32))
+
+        c = layer(packed_cube)
+        # put back to sky
+        c_sky = utils.packed_cube_to_sky_cube(c)
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        im = ax[1].imshow(
+            c_sky[chan].detach().numpy(), extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / "convolved_FWHM_{:.2f}.png".format(layer.FWHM), dpi=300)
+
+    plt.close("all")
+
 
 # old rotate for FFT routine
 # def test_convolve_rotate(packed_cube, coords, tmp_path):
