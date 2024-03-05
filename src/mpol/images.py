@@ -198,17 +198,14 @@ class GaussBaseBeam(nn.Module):
     coords : :class:`mpol.coordinates.GridCoords`
         an object instantiated from the GridCoords class, containing information about
         the image `cell_size` and `npix`.
-    nchan : int
-        the number of channels in the base cube. Default = 1.
     FWHM: float, units of arcsec
         the FWHH of the Gaussian
     """
 
-    def __init__(self, coords: GridCoords, nchan: int) -> None:
+    def __init__(self, coords: GridCoords) -> None:
         super().__init__()
         
         self.coords = coords 
-        self.nchan = nchan
         
         self._FWHM_base = nn.Parameter(torch.tensor([-3.0]))
         self.softplus = nn.Softplus()
