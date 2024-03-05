@@ -202,18 +202,98 @@ class GaussBaseBeam(nn.Module):
         the FWHH of the Gaussian
     """
 
+    def __init__(self, coords: GridCoords, FWHM: float) -> None:
+        super().__init__()
+
+        self.coords = coords
+        self.FWHM = FWHM
+
+        # convert FWHM to sigma and to radians
+        FWHM2sigma = 1 / (2 * np.sqrt(2 * np.log(2)))
+        sigma = self.FWHM * FWHM2sigma * constants.arcsec  # radians
+
+        # calculate the UV taper from the FWHM size.
+        u = self.coords.packed_u_centers_2D
+        v = self.coords.packed_v_centers_2D
+
+        taper_2D = np.exp(-2 * np.pi**2 * (sigma**2 * u**2 + sigma**2 * v**2))
+
+        # store taper to register so it transfers to GPU
+        self.register_buffer("taper_2D", torch.tensor(taper_2D, dtype=torch.float32))
+
+    def forward(self, packed_cube):
+        r"""
+        Convolve a packed_cube image with a 2D Gaussian PSF. Operation is carried out
+        in the Fourier domain using a Gaussian taper.
+
+        Parameters
+        ----------
+        packed_cube : :class:`torch.Tensor`  type
+            shape ``(nchan, npix, npix)`` image cube in packed format.
+
+        Returns
+        -------
+        :class:`torch.Tensor`
+            The convolved cube in packed format.
+        """
+        nchan, npix_m, npix_l = packed_cube.size()
+        assert (
+            (npix_m == self.coords.npix) and (npix_l == self.coords.npix)
+        ), "packed_cube {:} does not have the same pixel dimensions as indicated by coords {:}".format(
+            packed_cube.size(), self.coords.npix
+        )
+
+        # in FFT packed format
+        # we're round-tripping, so we can ignore prefactors for correctness
+        # calling this `vis_like`, since it's not actually the vis
+        vis_like = torch.fft.fftn(packed_cube, dim=(1, 2))
+
+        # apply taper to packed image
+        tapered_vis = vis_like * torch.broadcast_to(self.taper_2D, packed_cube.size())
+
+        # iFFT back, ignoring prefactors for round-trip
+        convolved_packed_cube = torch.fft.ifftn(tapered_vis, dim=(1, 2))
+
+        # assert imaginaries are effectively zero, otherwise something went wrong
+        thresh = 1e-7
+        assert (
+            torch.max(convolved_packed_cube.imag) < thresh
+        ), "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(
+            torch.max(convolved_packed_cube.imag), thresh
+        )
+
+        r_cube: torch.Tensor = convolved_packed_cube.real
+        return r_cube
+
+
+class GaussBaseBeamTunable(nn.Module):
+    r"""
+    This layer will convolve the base cube with a Gaussian beam of variable resolution.
+    The FWHM of the beam (in arcsec) is a trainable parameter of the layer.
+
+    Parameters
+    ----------
+    coords : :class:`mpol.coordinates.GridCoords`
+        an object instantiated from the GridCoords class, containing information about
+        the image `cell_size` and `npix`.
+    """
+
     def __init__(self, coords: GridCoords) -> None:
         super().__init__()
-        
-        self.coords = coords 
-        
+
+        self.coords = coords
+
         self._FWHM_base = nn.Parameter(torch.tensor([-3.0]))
         self.softplus = nn.Softplus()
         # -3.0 corresponds to about 0.05 arcsec
 
         # store coordinates to register so they transfer to GPU
-        self.register_buffer("u", torch.tensor(self.coords.packed_u_centers_2D, dtype=torch.float32))
-        self.register_buffer("v", torch.tensor(self.coords.packed_v_centers_2D, dtype=torch.float32))
+        self.register_buffer(
+            "u", torch.tensor(self.coords.packed_u_centers_2D, dtype=torch.float32)
+        )
+        self.register_buffer(
+            "v", torch.tensor(self.coords.packed_v_centers_2D, dtype=torch.float32)
+        )
 
     @property
     def FWHM(self):
@@ -222,7 +302,7 @@ class GaussBaseBeam(nn.Module):
 
     def forward(self, packed_cube):
         r"""
-        Convolve a packed_cube image with a 2D Gaussian PSF. Operation is carried out 
+        Convolve a packed_cube image with a 2D Gaussian PSF. Operation is carried out
         in the Fourier domain using a Gaussian taper.
 
         Parameters
@@ -250,9 +330,11 @@ class GaussBaseBeam(nn.Module):
         # convert FWHM to sigma and to radians
         FWHM2sigma = 1 / (2 * np.sqrt(2 * np.log(2)))
         sigma = self.FWHM * FWHM2sigma * constants.arcsec  # radians
-    
+
         # calculate the UV taper from the FWHM size.
-        taper_2D = torch.exp(-2 * np.pi**2 * (sigma**2 * self.u**2 + sigma**2 * self.v**2))
+        taper_2D = torch.exp(
+            -2 * np.pi**2 * (sigma**2 * self.u**2 + sigma**2 * self.v**2)
+        )
 
         # apply taper to packed image
         tapered_vis = vis_like * torch.broadcast_to(taper_2D, packed_cube.size())
