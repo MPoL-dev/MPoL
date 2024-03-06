@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-import mpol.utils
-
 
 def test_mpol_fftshift(tmp_path):
 

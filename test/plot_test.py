@@ -1,8 +1,5 @@
-import numpy as np
 
-from astropy.utils.data import download_file
 
-from mpol import precomposed
 # from mpol.plot import image_comparison_fig
 
 # def test_image_comparison_fig(coords, tmp_path):
@@ -23,10 +20,10 @@ from mpol import precomposed
 #         pkgname="mpol",
 #     )
 
-#     image_comparison_fig(model, u, v, V, weights, robust=0.5, 
+#     image_comparison_fig(model, u, v, V, weights, robust=0.5,
 #                             clean_fits=fname,
-#                             share_cscale=False, 
+#                             share_cscale=False,
 #                             xzoom=[-2, 2], yzoom=[-2, 2],
 #                             title="test",
-#                             save_prefix=None,                            
+#                             save_prefix=None,
 #                             )

@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import torch
-
 from mpol import coordinates, fourier, losses
 
 

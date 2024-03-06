@@ -2,13 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.optim
-from torch.utils.tensorboard import SummaryWriter
-
 from mpol import losses, precomposed
+
 # from mpol.plot import train_diagnostics_fig
 # from mpol.training import TrainTest, train_to_dirty_image
 from mpol.utils import torch2npy
-
+from torch.utils.tensorboard import SummaryWriter
 
 # def test_traintestclass_training(coords, imager, dataset, generic_parameters):
 #     # using the TrainTest class, run a training loop without regularizers
@@ -16,7 +15,7 @@ from mpol.utils import torch2npy
 #     model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
 #     train_pars = generic_parameters["train_pars"]
-    
+
 #     # no regularizers
 #     train_pars["regularizers"] = {}
 
@@ -29,7 +28,7 @@ from mpol.utils import torch2npy
 
 
 # def test_traintestclass_training_scheduler(coords, imager, dataset, generic_parameters):
-#     # using the TrainTest class, run a training loop with regularizers, 
+#     # using the TrainTest class, run a training loop with regularizers,
 #     # using the learning rate scheduler
 #     nchan = dataset.nchan
 #     model = precomposed.GriddedNet(coords=coords, nchan=nchan)
@@ -54,11 +53,11 @@ from mpol.utils import torch2npy
 #     nchan = dataset.nchan
 #     model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
-#     train_pars = generic_parameters["train_pars"] 
+#     train_pars = generic_parameters["train_pars"]
 
 #     learn_rate = generic_parameters["crossval_pars"]["learn_rate"]
 
-#     train_pars['regularizers']['entropy']['guess'] = True 
+#     train_pars['regularizers']['entropy']['guess'] = True
 
 #     optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
 
@@ -67,8 +66,8 @@ from mpol.utils import torch2npy
 
 
 # def test_traintestclass_train_diagnostics_fig(coords, imager, dataset, generic_parameters, tmp_path):
-#     # using the TrainTest class, run a training loop, 
-#     # and generate the train diagnostics figure 
+#     # using the TrainTest class, run a training loop,
+#     # and generate the train diagnostics figure
 #     nchan = dataset.nchan
 #     model = precomposed.GriddedNet(coords=coords, nchan=nchan)
 
@@ -87,8 +86,8 @@ from mpol.utils import torch2npy
 
 #     old_mod_im = torch2npy(model.icube.sky_cube[0])
 
-#     train_fig, train_axes = train_diagnostics_fig(model, 
-#                                                   losses=loss_history, 
+#     train_fig, train_axes = train_diagnostics_fig(model,
+#                                                   losses=loss_history,
 #                                                   learn_rates=learn_rates,
 #                                                   fluxes=np.zeros(len(loss_history)),
 #                                                   old_model_image=old_mod_im
@@ -111,7 +110,7 @@ from mpol.utils import torch2npy
 
 
 def test_standalone_init_train(coords, dataset):
-    # not using TrainTest class, 
+    # not using TrainTest class,
     # configure a class to train with and test that it initializes
 
     nchan = dataset.nchan
@@ -131,7 +130,7 @@ def test_standalone_init_train(coords, dataset):
 
 
 def test_standalone_train_loop(coords, dataset_cont, tmp_path):
-    # not using TrainTest class, 
+    # not using TrainTest class,
     # set everything up to run on a single channel
     # and run a few iterations
 
@@ -176,7 +175,7 @@ def test_standalone_train_loop(coords, dataset_cont, tmp_path):
 
 
 def test_tensorboard(coords, dataset_cont):
-    # not using TrainTest class, 
+    # not using TrainTest class,
     # set everything up to run on a single channel and then
     # test the writer function
 

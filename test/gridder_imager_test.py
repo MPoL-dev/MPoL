@@ -4,9 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 
 
 # cache an instantiated imager for future imaging ops
@@ -141,7 +139,7 @@ def test_grid_uniform(imager, tmp_path):
     ax[1, 0].imshow(img_uniform[chan], **kw)
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     ax[1, 1].imshow(img_robust[chan], **kw)
 
     # the differences
@@ -183,7 +181,7 @@ def test_grid_uniform_arcsec2(imager, tmp_path):
     plt.colorbar(im, ax=ax[1, 0])
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     im = ax[1, 1].imshow(img_robust[chan], **kw)
     plt.colorbar(im, ax=ax[1, 1])
 
@@ -225,7 +223,7 @@ def test_grid_natural(imager, tmp_path):
     ax[1, 0].imshow(img_natural[chan], **kw)
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     ax[1, 1].imshow(img_robust[chan], **kw)
 
     # the differences
@@ -267,7 +265,7 @@ def test_grid_natural_arcsec2(imager, tmp_path):
     plt.colorbar(im, ax=ax[1, 0])
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     im = ax[1, 1].imshow(img_robust[chan], **kw)
     plt.colorbar(im, ax=ax[1, 1])
 

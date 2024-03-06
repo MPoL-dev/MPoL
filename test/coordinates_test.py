@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
-import torch
+import numpy as np
 import pytest
-
-from mpol import coordinates
-from mpol.constants import *
+import torch
+from mpol import constants, coordinates
 from mpol.exceptions import CellSizeError
 
 
@@ -47,7 +46,7 @@ def test_grid_coords_plot_2D_uvq_sky(tmp_path):
     im = ax[2].imshow(coords.ground_q_centers_2D, **ikw)
     plt.colorbar(im, ax=ax[2])
 
-    for a, t in zip(ax, ["u", "v", "q"]):
+    for a, t in zip(ax, ["u", "v", "q"], strict=False):
         a.set_title(t)
 
     fig.savefig(tmp_path / "sky_uvq.png", dpi=300)
@@ -68,7 +67,7 @@ def test_grid_coords_plot_2D_uvq_packed(tmp_path):
     im = ax[2].imshow(coords.packed_q_centers_2D, **ikw)
     plt.colorbar(im, ax=ax[2])
 
-    for a, t in zip(ax, ["u", "v", "q"]):
+    for a, t in zip(ax, ["u", "v", "q"], strict=False):
         a.set_title(t)
 
     fig.savefig(tmp_path / "packed_uvq.png", dpi=300)
@@ -117,7 +116,7 @@ def test_tile_vs_meshgrid_implementation():
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     x_centers_2d, y_centers_2d = np.meshgrid(
-        coords.l_centers / arcsec, coords.m_centers / arcsec, indexing="xy"
+        coords.l_centers / constants.arcsec, coords.m_centers / constants.arcsec, indexing="xy"
     )
 
     ground_u_centers_2D, ground_v_centers_2D = np.meshgrid(

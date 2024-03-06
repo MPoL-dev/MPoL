@@ -1,3 +1,8 @@
+import csv
+
+import numpy as np
+from mpol.constants import c_ms
+
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -6,11 +11,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument("outfile", help="Destination to save CSV table.")
 args = parser.parse_args()
 
-import csv
-
-import numpy as np
-
-from mpol.constants import c_ms
 
 header = ["baseline", "100 GHz (Band 3)", "230 GHz (Band 6)", "340 GHz (Band 7)"]
 
@@ -20,18 +20,18 @@ frequencies = np.array([100, 230, 340]) * 1e9  # Hz
 
 def format_baseline(baseline_m):
     if baseline_m < 1e3:
-        return "{:.0f} m".format(baseline_m)
+        return f"{baseline_m:.0f} m"
     elif baseline_m < 1e6:
-        return "{:.0f} km".format(baseline_m * 1e-3)
+        return f"{baseline_m * 1e-3:.0f} km"
 
 
 def format_lambda(lam):
     if lam < 1e3:
-        return "{:.0f}".format(lam) + " :math:`\lambda`"
+        return f"{lam:.0f}" + r" :math:`\lambda`"
     elif lam < 1e6:
-        return "{:.0f}".format(lam * 1e-3) + " :math:`\mathrm{k}\lambda`"
+        return f"{lam * 1e-3:.0f}" + r" :math:`\mathrm{k}\lambda`"
     else:
-        return "{:.0f}".format(lam * 1e-6) + " :math:`\mathrm{M}\lambda`"
+        return f"{lam * 1e-6:.0f}" + r" :math:`\mathrm{M}\lambda`"
 
 
 data = []

@@ -1,13 +1,12 @@
+from importlib.resources import files
+
 import numpy as np
 import pytest
 import torch
 import visread.process
 from astropy.utils.data import download_file
-
 from mpol import coordinates, fourier, gridding, images, utils
 from mpol.__init__ import zenodo_record
-
-from importlib.resources import files
 
 # private variables to this module
 _npz_path = files("mpol.data").joinpath("mock_data.npz")
@@ -22,18 +21,24 @@ _cell_size = 0.005
 def img2D_butterfly():
     """Return the 2D source image of the butterfly, for use as a test image cube."""
     archive = np.load(_npz_path)
-    img = np.float64(archive["img"])
+    img = archive["img"]
 
     # assuming we're going to go with _cell_size, set the total flux of this image
     # total flux should be 0.253 Jy from MPoL-examples.
 
     return img
 
+@pytest.fixture(scope="session")
+def sky_cube(img2D_butterfly):
+    """Create a sky tensor image cube from the butterfly."""
+    print("npix packed cube", img2D_butterfly.shape)
+    # tile to some nchan, npix, npix
+    sky_cube = torch.tile(torch.from_numpy(img2D_butterfly), (_nchan, 1, 1))
+    return sky_cube
 
 @pytest.fixture(scope="session")
 def packed_cube(img2D_butterfly):
     """Create a packed tensor image cube from the butterfly."""
-    # now (1, npix, npix)
     print("npix packed cube", img2D_butterfly.shape)
     # tile to some nchan, npix, npix
     sky_cube = torch.tile(torch.from_numpy(img2D_butterfly), (_nchan, 1, 1))
@@ -45,7 +50,7 @@ def packed_cube(img2D_butterfly):
 def baselines_m():
     "Return the mock baselines (in meters) produced from the IM Lup DSHARP dataset."
     archive = np.load(_npz_path)
-    return np.float64(archive["uu"]), np.float64(archive["vv"])
+    return archive["uu"], archive["vv"]
 
 
 @pytest.fixture(scope="session")
@@ -199,7 +204,6 @@ def mock_1d_vis_model(mock_1d_archive):
     geom = m["geometry"]
     geom = geom[()]
 
-    Vtrue = m["vis"]
     Vtrue_dep = m["vis_dep"]
     q_dep = m["baselines_dep"]
 
