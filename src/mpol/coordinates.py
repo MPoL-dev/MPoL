@@ -1,6 +1,6 @@
 from __future__ import annotations
-from functools import cached_property
 
+from functools import cached_property
 from typing import Any
 
 import numpy as np
@@ -10,7 +10,7 @@ import torch
 
 import mpol.constants as const
 from mpol.exceptions import CellSizeError
-from mpol.utils import get_max_spatial_freq, get_maximum_cell_size
+from mpol.utils import get_maximum_cell_size
 
 
 class GridCoords:
@@ -79,6 +79,7 @@ class GridCoords:
     :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines
         like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming
         ``origin='lower'``. Units of [:math:`\lambda`]
+    :ivar vis_ext_Mlam: like vis_ext, but in units of [:math:`\mathrm{M}\lambda`].
     """
 
     def __init__(self, cell_size: float, npix: int):
@@ -205,16 +206,18 @@ class GridCoords:
             self.u_bin_max,
             self.v_bin_min,
             self.v_bin_max,
-        ]  # [kλ]
+        ]  # [λ]
 
-    # --------------------------------------------------------------------------
-    # Non-identical u & v properties
-    # --------------------------------------------------------------------------
+    @property
+    def vis_ext_Mlam(self) -> list[float]:
+        return [1e-6 * edge for edge in self.vis_ext]
+
     @cached_property
     def ground_u_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
         # only useful for plotting a sky_vis
         # uu increasing, no fftshift
-        # tile replicates the 1D u_centers array to a 2D array the size of the full UV grid
+        # tile replicates the 1D u_centers array to a 2D array the size of the full
+        # UV grid
         return np.tile(self.u_centers, (self.npix_u, 1))
 
     @cached_property
@@ -304,10 +307,10 @@ class GridCoords:
 
         Parameters
         ----------
-        uu : :class:`torch.Tensor` of `torch.double`
+        uu : :class:`torch.Tensor`
             u spatial frequency coordinates.
             Units of [:math:`\lambda`]
-        vv : :class:`torch.Tensor` of `torch.double`
+        vv : :class:`torch.Tensor`
             v spatial frequency coordinates.
             Units of [:math:`\lambda`]
 
@@ -354,6 +357,6 @@ class GridCoords:
             # don't attempt to compare against different types
             return NotImplemented
 
-        # GridCoords objects are considered equal if they have the same cell_size and npix, since
-        # all other attributes are derived from these two core properties.
+        # GridCoords objects are considered equal if they have the same cell_size and
+        # npix, since all other attributes are derived from these two core properties.
         return bool(self.cell_size == other.cell_size and self.npix == other.npix)

@@ -1,11 +1,9 @@
+import typing
+
 import torch
 
+from mpol import fourier, images
 from mpol.coordinates import GridCoords
-
-from mpol import fourier
-from mpol import images
-
-import typing
 
 
 class GriddedNet(torch.nn.Module):
@@ -36,7 +34,7 @@ class GriddedNet(torch.nn.Module):
         a pre-packed base cube to initialize the model with. If
         None, assumes ``torch.zeros``.
 
-        
+
     After the object is initialized, instance variables can be accessed, for example
 
     :ivar bcube: the :class:`~mpol.images.BaseCube` instance
@@ -88,7 +86,7 @@ class GriddedNet(torch.nn.Module):
     def predict_loose_visibilities(
         self, uu: torch.Tensor, vv: torch.Tensor
     ) -> torch.Tensor:
-        """
+        r"""
         Use the :class:`mpol.fourier.NuFFT` to calculate loose model visibilities from
         the cube stored to ``self.icube.packed_cube``.
 

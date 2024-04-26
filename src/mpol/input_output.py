@@ -1,6 +1,6 @@
-import numpy as np 
-
+import numpy as np
 from astropy.io import fits
+
 
 class ProcessFitsImage:
     """
@@ -21,7 +21,7 @@ class ProcessFitsImage:
 
     def get_extent(self, header):
         """Get extent (in RA and Dec, units of [arcsec]) of image"""
-        
+
         # get the coordinate labels
         nx = header["NAXIS1"]
         ny = header["NAXIS2"]
@@ -55,7 +55,7 @@ class ProcessFitsImage:
 
 
     def get_beam(self, hdu_list, header):
-        """Get the major and minor widths [arcsec], and position angle, of a 
+        """Get the major and minor widths [arcsec], and position angle, of a
         clean beam"""
 
         if header.get("CASAMBM") is not None:
@@ -74,12 +74,12 @@ class ProcessFitsImage:
 
 
     def get_image(self, beam=True):
-        """Load a .fits image and return as a numpy array. Also return image 
+        """Load a .fits image and return as a numpy array. Also return image
         extent and optionally (`beam`) the clean beam dimensions"""
 
         hdu_list = fits.open(self._fits_file)
         hdu = hdu_list[0]
-        
+
         if len(hdu.data.shape) in [3, 4]:
             image = hdu.data[self._channel]  # first channel
         else:
@@ -98,4 +98,3 @@ class ProcessFitsImage:
             return image, ext, self.get_beam(hdu_list, header)
         else:
             return image, ext
-        

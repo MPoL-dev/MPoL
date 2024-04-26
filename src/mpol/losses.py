@@ -1,9 +1,10 @@
+from typing import Optional
+
 import numpy as np
 import torch
 
 from mpol import constants
 from mpol.datasets import GriddedDataset
-from typing import Optional
 
 
 def _chi_squared(
@@ -29,12 +30,12 @@ def _chi_squared(
         array of the model values representing :math:`\boldsymbol{V}`
     data_vis : :class:`torch.Tensor` of :class:`torch.complex`
         array of the data values representing :math:`M`
-    weight : :class:`torch.Tensor` of :class:`torch.double`
+    weight : :class:`torch.Tensor` 
         array of weight values representing :math:`w_i`
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the :math:`\chi^2` likelihood, summed over all dimensions of input array.
     """
 
@@ -78,12 +79,12 @@ def r_chi_squared(
         array of the model values representing :math:`\boldsymbol{V}`
     data_vis : :class:`torch.Tensor` of :class:`torch.complex`
         array of the data values representing :math:`M`
-    weight : :class:`torch.Tensor` of :class:`torch.double`
+    weight : :class:`torch.Tensor` 
         array of weight values representing :math:`w_i`
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the :math:`\chi^2_\mathrm{R}`, summed over all dimensions of input array.
     """
 
@@ -115,7 +116,7 @@ def r_chi_squared_gridded(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the :math:`\chi^2_\mathrm{R}` value summed over all input dimensions
     """
     model_vis = griddedDataset(modelVisibilityCube)
@@ -165,12 +166,12 @@ def log_likelihood(
         array of the model values representing :math:`\boldsymbol{V}`
     data_vis : :class:`torch.Tensor` of :class:`torch.complex128`
         array of the data values representing :math:`M`
-    weight : :class:`torch.Tensor` of :class:`torch.double`
+    weight : :class:`torch.Tensor` 
         array of weight values representing :math:`w_i`
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the :math:`\ln\mathcal{L}` log likelihood, summed over all dimensions
         of input array.
     """
@@ -207,7 +208,7 @@ def log_likelihood_gridded(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the :math:`\ln\mathcal{L}` value, summed over all dimensions of input data.
     """
 
@@ -246,12 +247,12 @@ def neg_log_likelihood_avg(
         array of the model values representing :math:`\boldsymbol{V}`
     data_vis : :class:`torch.Tensor` of :class:`torch.complex`
         array of the data values representing :math:`M`
-    weight : :class:`torch.Tensor` of :class:`torch.double`
+    weight : :class:`torch.Tensor` 
         array of weight values representing :math:`w_i`
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the average of the negative log likelihood, summed over all dimensions of
         input array.
     """
@@ -274,9 +275,9 @@ def entropy(
 
     Parameters
     ----------
-    cube : :class:`torch.Tensor` of :class:`torch.double`
+    cube : :class:`torch.Tensor` 
         pixel values must be positive :math:`I_i > 0` for all :math:`i`
-    prior_intensity : :class:`torch.Tensor` of :class:`torch.double`
+    prior_intensity : :class:`torch.Tensor` 
         the prior value :math:`p` to calculate entropy against. Tensors of any shape
         are allowed so long as they will broadcast to the shape of the cube under
         division (`/`).
@@ -286,7 +287,7 @@ def entropy(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         entropy loss
     """
     # check to make sure image is positive, otherwise raise an error
@@ -312,7 +313,7 @@ def TV_image(sky_cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
 
     Parameters
     ----------
-    sky_cube: 3D :class:`torch.Tensor` of :class:`torch.double`
+    sky_cube: 3D :class:`torch.Tensor` 
         the image cube array :math:`I_{lmv}`, where :math:`l`
         is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
         :math:`v` is the channel (velocity or frequency) dimension in
@@ -324,7 +325,7 @@ def TV_image(sky_cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         total variation loss
     """
 
@@ -347,7 +348,7 @@ def TV_channel(cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
 
     Parameters
     ----------
-    cube: :class:`torch.Tensor` of :class:`torch.double`
+    cube: :class:`torch.Tensor` 
         the image cube array :math:`I_{lmv}`
     epsilon: float
         a softening parameter in units of [:math:`\mathrm{Jy}/\mathrm{arcsec}^2`].
@@ -356,7 +357,7 @@ def TV_channel(cube: torch.Tensor, epsilon: float = 1e-10) -> torch.Tensor:
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         total variation loss
     """
     # calculate the difference between the n+1 cube and the n cube
@@ -382,7 +383,7 @@ def TSV(sky_cube: torch.Tensor) -> torch.Tensor:
 
     Parameters
     ----------
-    sky_cube :class:`torch.Tensor` of :class:`torch.double`
+    sky_cube :class:`torch.Tensor` 
         the image cube array :math:`I_{lmv}`, where :math:`l`
         is R.A. in :math:`ndim=3`, :math:`m` is DEC in :math:`ndim=2`, and
         :math:`v` is the channel (velocity or frequency) dimension in
@@ -390,7 +391,7 @@ def TSV(sky_cube: torch.Tensor) -> torch.Tensor:
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         total square variation loss
 
     """
@@ -417,7 +418,7 @@ def sparsity(cube: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.T
 
     Parameters
     ----------
-    cube : :class:`torch.Tensor` of :class:`torch.double`
+    cube : :class:`torch.Tensor` 
         the image cube array :math:`I_{lmv}`
     mask : :class:`torch.Tensor` of :class:`torch.bool`
         tensor array the same shape as ``cube``. The sparsity prior
@@ -426,7 +427,7 @@ def sparsity(cube: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.T
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         sparsity loss calculated where ``mask == True``
     """
 
@@ -457,7 +458,7 @@ def UV_sparsity(
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         UV sparsity loss above :math:`q_\mathrm{max}`
     """
 
@@ -497,16 +498,16 @@ def PSD(qs: torch.Tensor, psd: torch.Tensor, l: torch.Tensor) -> torch.Tensor:
 
     Parameters
     ----------
-    qs : :class:`torch.Tensor` of :class:`torch.double`
+    qs : :class:`torch.Tensor` 
         the radial UV coordinate (in :math:`\lambda`)
-    psd : :class:`torch.Tensor` of :class:`torch.double`
+    psd : :class:`torch.Tensor` 
         the power spectral density cube
-    l : :class:`torch.Tensor` of :class:`torch.double`
+    l : :class:`torch.Tensor` 
         the correlation length in the image plane (in arcsec)
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         the loss calculated using the power spectral density
 
     """
@@ -530,12 +531,12 @@ def edge_clamp(cube: torch.Tensor) -> torch.Tensor:
 
     Parameters
     ----------
-    cube: :class:`torch.Tensor` of :class:`torch.double`
+    cube: :class:`torch.Tensor` 
         the image cube array :math:`I_{lmv}`
 
     Returns
     -------
-    :class:`torch.Tensor` of :class:`torch.double`
+    :class:`torch.Tensor` 
         edge loss
     """
 

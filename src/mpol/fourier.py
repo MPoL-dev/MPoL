@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 import torch
 import torch.fft  # to avoid conflicts with old torch.fft *function*
 import torchkbnufft
-from numpy.typing import NDArray
 from torch import nn
-
-from mpol.exceptions import DimensionMismatchError
 
 from mpol import utils
 from mpol.coordinates import GridCoords
+from mpol.exceptions import DimensionMismatchError
 
 
 class FourierCube(nn.Module):
@@ -44,29 +40,29 @@ class FourierCube(nn.Module):
         self.register_buffer("vis", None, persistent=persistent_vis)
         self.vis: torch.Tensor
 
-    def forward(self, cube: torch.Tensor) -> torch.Tensor:
+    def forward(self, packed_cube: torch.Tensor) -> torch.Tensor:
         """
         Perform the FFT of the image cube on each channel.
 
         Parameters
         ----------
-        cube : :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+        cube : :class:`torch.Tensor`  of shape ``(nchan, npix, npix)``
             A 'packed' tensor. For example, an image cube from
             :meth:`mpol.images.ImageCube.forward`
 
         Returns
         -------
-        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``.
+        :class:`torch.Tensor` of shape ``(nchan, npix, npix)``.
             The FFT of the image cube, in packed format.
         """
 
         # make sure the cube is 3D
-        assert cube.dim() == 3, "cube must be 3D"
+        assert packed_cube.dim() == 3, "cube must be 3D"
 
         # the self.cell_size prefactor (in arcsec) is to obtain the correct output units
         # since it needs to correct for the spacing of the input grid.
         # See MPoL documentation and/or TMS Eqn A8.18 for more information.
-        self.vis = self.coords.cell_size**2 * torch.fft.fftn(cube, dim=(1, 2))
+        self.vis = self.coords.cell_size**2 * torch.fft.fftn(packed_cube, dim=(1, 2))
 
         return self.vis
 
@@ -93,7 +89,7 @@ class FourierCube(nn.Module):
 
         Returns
         -------
-        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+        :class:`torch.Tensor`  of shape ``(nchan, npix, npix)``
             amplitude cube in 'ground' format.
         """
         return torch.abs(self.ground_vis)
@@ -106,7 +102,7 @@ class FourierCube(nn.Module):
 
         Returns
         -------
-        :class:`torch.Tensor` of :class:`torch.double` of shape ``(nchan, npix, npix)``
+        :class:`torch.Tensor`  of shape ``(nchan, npix, npix)``
             phase cube in 'ground' format (:math:`[-\pi,\pi)`).
         """
         return torch.angle(self.ground_vis)
@@ -279,14 +275,14 @@ class NuFFT(nn.Module):
 
         Parameters
         ----------
-        packed_cube : :class:`torch.Tensor` of :class:`torch.double`
+        packed_cube : :class:`torch.Tensor` 
             shape ``(nchan, npix, npix)``). The cube
             should be a "prepacked" image cube, for example,
             from :meth:`mpol.images.ImageCube.forward`
-        uu : :class:`torch.Tensor` of :class:`torch.double`
+        uu : :class:`torch.Tensor` 
             2D array of the u (East-West) spatial frequency coordinate
             [:math:`\lambda`] of shape ``(nchan, npix)``
-        vv : :class:`torch.Tensor` of :class:`torch.double`
+        vv : :class:`torch.Tensor` 
             2D array of the v (North-South) spatial frequency coordinate
             [:math:`\lambda`] (must be the same shape as uu)
         sparse_matrices : bool
@@ -372,7 +368,7 @@ class NuFFT(nn.Module):
         shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
 
         # convert the cube to a complex type, since this is required by TorchKbNufft
-        complexed = shifted.type(torch.complex128)
+        complexed = shifted + 0j
 
         k_traj = self._assemble_ktraj(uu, vv)
 
@@ -439,10 +435,10 @@ class NuFFT(nn.Module):
 
 class NuFFTCached(NuFFT):
     r"""
-    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra 
+    This layer is similar to the :class:`mpol.fourier.NuFFT`, but provides extra
     functionality to cache the sparse matrices for a specific set of ``uu`` and ``vv``
-    points specified at initialization. 
-    
+    points specified at initialization.
+
     For repeated evaluations of this layer (as might exist within an optimization loop),
     ``sparse_matrices=True`` is likely to be the more accurate and faster choice. If
     ``sparse_matrices=False``, this routine will use the default table-based
@@ -502,7 +498,7 @@ class NuFFTCached(NuFFT):
             self.real_interp_mat: torch.Tensor
             self.imag_interp_mat: torch.Tensor
 
-    def forward(self, cube):
+    def forward(self, packed_cube):
         r"""
         Perform the FFT of the image cube for each channel and interpolate to the
         ``uu`` and ``vv`` points set at layer initialization. This call should
@@ -510,9 +506,10 @@ class NuFFTCached(NuFFT):
         ``uu`` and ``vv`` points.
 
         Args:
-            cube (torch.double tensor): of shape ``(nchan, npix, npix)``). The cube
-                should be a "prepacked" image cube, for example, from
-                :meth:`mpol.images.ImageCube.forward`
+            packed_cube : :class:`torch.Tensor` 
+                shape ``(nchan, npix, npix)``). The cube
+                should be a "prepacked" image cube, for example,
+                from :meth:`mpol.images.ImageCube.forward`
 
         Returns:
             torch.complex tensor: of shape ``(nchan, nvis)``, Fourier samples evaluated
@@ -521,17 +518,18 @@ class NuFFTCached(NuFFT):
 
         # make sure that the nchan assumptions for the ImageCube and the NuFFT
         # setup are the same
-        if cube.size(0) != self.nchan:
+        if packed_cube.size(0) != self.nchan:
             raise DimensionMismatchError(
-                f"nchan of ImageCube ({cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
+                f"nchan of ImageCube ({packed_cube.size(0)}) is different than that used to initialize NuFFT layer ({self.nchan})"
             )
 
         # "unpack" the cube, but leave it flipped
         # NuFFT routine expects a "normal" cube, not an fftshifted one
-        shifted = torch.fft.fftshift(cube, dim=(1, 2))
+        shifted = torch.fft.fftshift(packed_cube, dim=(1, 2))
 
         # convert the cube to a complex type, since this is required by TorchKbNufft
-        complexed = shifted.type(torch.complex128)
+        complexed = shifted + 0j
+
 
         # Consider how the similarity of the spatial frequency samples should be
         # treated. We already took care of this on the k_traj side, since we set

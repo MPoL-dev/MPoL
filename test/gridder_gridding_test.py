@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 
 
 def test_average_cont(coords, mock_dataset_np):

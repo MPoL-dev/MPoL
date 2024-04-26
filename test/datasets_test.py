@@ -4,7 +4,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-
 from mpol import datasets, fourier, images
 
 
@@ -16,11 +15,9 @@ def test_index(coords, dataset):
     # create a mock cube that includes negative values
     nchan = dataset.nchan
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     base_cube = torch.normal(mean=mean, std=std)

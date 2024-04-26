@@ -145,3 +145,5 @@ runs
 
 # hatch-generated version file
 src/mpol/mpol_version.py
+
+.ruff_cache

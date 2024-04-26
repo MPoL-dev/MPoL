@@ -1,15 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.colors as mco
-from matplotlib.patches import Ellipse
-import torch
-
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.visualization.mpl_normalize import simple_norm
 
-from mpol.gridding import DirtyImager
 from mpol.onedim import radialI, radialV
-from mpol.utils import loglinspace, torch2npy, packed_cube_to_sky_cube
-from mpol.input_output import ProcessFitsImage
+from mpol.utils import loglinspace, packed_cube_to_sky_cube, torch2npy
 
 
 def get_image_cmap_norm(
@@ -265,9 +260,9 @@ def vis_histogram_fig(
     else:
         supported_q = ["count", "weight", "vis_real", "vis_imag"]
         raise ValueError(
-            "`bin_quantity` ({}) must be one of "
-            "{}, or a user-provided numpy "
-            " array".format(bin_quantity, supported_q)
+            f"`bin_quantity` ({bin_quantity}) must be one of "
+            f"{supported_q}, or a user-provided numpy "
+            " array"
         )
 
     # buffer to include longest baselines in last bin
@@ -279,7 +274,7 @@ def vis_histogram_fig(
 
     bin_lab = None
     if all(np.diff(q_edges1d) == np.diff(q_edges1d)[0]):
-        bin_lab = r"Bin size {:.0f} k$\lambda$".format(np.diff(q_edges1d)[0])
+        bin_lab = rf"Bin size {np.diff(q_edges1d)[0]:.0f} k$\lambda$"
 
     # 2d histogram bins
     if q_edges is None:
@@ -891,7 +886,7 @@ def vis_1d_fig(
 
         # deproject the (u,v) points
         uu, vv, _ = deproject(uu, vv, geom["incl"], geom["Omega"])
-        
+
         # if the source is optically thick, rescale the deprojected V(q)
         if rescale_flux:
             V.real /= np.cos(geom["incl"] * np.pi / 180)
@@ -1008,7 +1003,7 @@ def radial_fig(
     channel=0,
     save_prefix=None,
 ):
-    """
+    r"""
     Figure for analysis of 1D (radial) brightness profile of MPoL model image,
     using a user-supplied geometry.
 
@@ -1083,7 +1078,7 @@ def radial_fig(
 
         # deproject the observed (u,v) points
         u, v, _ = deproject(u, v, geom["incl"], geom["Omega"])
-        
+
         # if the source is optically thick, rescale the deprojected V(q)
         if rescale_flux:
             V.real /= np.cos(geom["incl"] * np.pi / 180)

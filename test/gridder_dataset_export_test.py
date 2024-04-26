@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 
 
 def test_cell_variance_error_pytorch(mock_dataset_np):

@@ -1,10 +1,6 @@
 import logging
-import numpy as np
-import torch
 
-from mpol.losses import TSV, TV_image, entropy, r_chi_squared_gridded, sparsity
-from mpol.plot import train_diagnostics_fig
-from mpol.utils import torch2npy
+import torch
 
 
 def train_to_dirty_image(model, imager, robust=0.5, learn_rate=100, niter=1000):

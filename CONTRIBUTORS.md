@@ -10,3 +10,4 @@ Contributors
 * Hannah Grzybowski, `@hgrzy`
 * Mary Ogborn
 * Tyler Quinn, `@trq5014`
+* Kristin Hopley
