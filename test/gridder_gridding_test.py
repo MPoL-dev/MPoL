@@ -1,31 +1,25 @@
-import copy
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 
 
-def test_average_cont(mock_visibility_data_cont):
+def test_average_cont(coords, mock_dataset_np):
     """
-    Test that the gridding operation doesn't error.
+    Test that the gridding operation doesn't error if provided 'continuum'-like
+    quantities (single-channel).
     """
-    uu, vv, weight, data_re, data_im = mock_visibility_data_cont
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
-    coords = coordinates.GridCoords(
-        cell_size=0.005,
-        npix=800,
-    )
+    chan = 0
 
     averager = gridding.DataAverager(
         coords=coords,
-        uu=uu,
-        vv=vv,
-        weight=weight,
-        data_re=data_re,
-        data_im=data_im,
+        uu=uu[chan],
+        vv=vv[chan],
+        weight=weight[chan],
+        data_re=data_re[chan],
+        data_im=data_im[chan],
     )
 
     print(averager.uu.shape)
@@ -35,7 +29,7 @@ def test_average_cont(mock_visibility_data_cont):
 
 
 # test that we're getting the right numbers back for some well defined operations
-def test_uniform_ones(mock_visibility_data, tmp_path):
+def test_uniform_ones(mock_dataset_np, tmp_path):
     """
     Test that we can grid average a set of visibilities that are just 1.
     We should get back entirely 1s.
@@ -43,7 +37,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
 
     coords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     weight = 0.1 * np.ones_like(uu)
     data_re = np.ones_like(uu)
     data_im = np.zeros_like(uu)
@@ -61,7 +55,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     averager._grid_visibilities()
 
     im = plt.imshow(
-        averager.ground_cube[4].real,
+        averager.ground_cube[1].real,
         origin="lower",
         extent=averager.coords.vis_ext,
         interpolation="none",
@@ -72,7 +66,7 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     plt.figure()
 
     im2 = plt.imshow(
-        averager.ground_cube[4].imag,
+        averager.ground_cube[0].imag,
         origin="lower",
         extent=averager.coords.vis_ext,
         interpolation="none",
@@ -93,8 +87,8 @@ def test_uniform_ones(mock_visibility_data, tmp_path):
     assert averager.data_im_gridded == pytest.approx(0)
 
 
-def test_weight_gridding(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def test_weight_gridding(mock_dataset_np):
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
     # initialize random (positive) weight values
     weight = np.random.uniform(low=0.01, high=0.1, size=uu.shape)
@@ -122,10 +116,10 @@ def test_weight_gridding(mock_visibility_data):
 
 
 # test the standard deviation estimation routines
-def test_estimate_stddev(mock_visibility_data, tmp_path):
+def test_estimate_stddev(mock_dataset_np, tmp_path):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     weight = 0.1 * np.ones_like(uu)
     sigma = np.sqrt(1 / weight)
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
@@ -142,7 +136,7 @@ def test_estimate_stddev(mock_visibility_data, tmp_path):
 
     s_re, s_im = averager._estimate_cell_standard_deviation()
 
-    chan = 4
+    chan = 0
 
     fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
 
@@ -159,10 +153,10 @@ def test_estimate_stddev(mock_visibility_data, tmp_path):
     plt.close("all")
 
 
-def test_estimate_stddev_large(mock_visibility_data, tmp_path):
+def test_estimate_stddev_large(mock_dataset_np, tmp_path):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     weight = 0.1 * np.ones_like(uu)
     sigma = np.sqrt(1 / weight)
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
@@ -181,7 +175,7 @@ def test_estimate_stddev_large(mock_visibility_data, tmp_path):
 
     s_re, s_im = averager._estimate_cell_standard_deviation()
 
-    chan = 4
+    chan = 0
 
     fig, ax = plt.subplots(ncols=2, figsize=(7, 4))
 
@@ -198,10 +192,10 @@ def test_estimate_stddev_large(mock_visibility_data, tmp_path):
     plt.close("all")
 
 
-def test_max_scatter_pass(mock_visibility_data):
+def test_max_scatter_pass(mock_dataset_np):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     weight = 0.1 * np.ones_like(uu)
     sigma = np.sqrt(1 / weight)
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=sigma, size=uu.shape)
@@ -222,10 +216,10 @@ def test_max_scatter_pass(mock_visibility_data):
     assert not d["return_status"]
 
 
-def test_max_scatter_fail(mock_visibility_data):
+def test_max_scatter_fail(mock_dataset_np):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     weight = 0.1 * np.ones_like(uu)
     sigma = np.sqrt(1 / weight)
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)

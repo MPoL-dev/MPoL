@@ -7,9 +7,8 @@ import torch
 from numpy import floating, integer
 from numpy.typing import ArrayLike, NDArray
 
-from mpol.coordinates import GridCoords
-
 from mpol import utils
+from mpol.coordinates import GridCoords
 
 
 class GriddedDataset(torch.nn.Module):
@@ -20,7 +19,7 @@ class GriddedDataset(torch.nn.Module):
         If providing this, cannot provide ``cell_size`` or ``npix``.
     vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`
         the gridded visibility data stored in a "packed" format (pre-shifted for fft)
-    weight_gridded : :class:`torch.Tensor` of :class:`torch.double`
+    weight_gridded : :class:`torch.Tensor` 
         the weights corresponding to the gridded visibility data,
         also in a packed format
     mask : :class:`torch.Tensor` of :class:`torch.bool`
@@ -216,7 +215,7 @@ class Dartboard:
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
-            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            qs: 1d array of q values :math:`[\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same
                 length as qs)
 
@@ -242,7 +241,7 @@ class Dartboard:
         Data coordinates should include the points for the Hermitian visibilities.
 
         Args:
-            qs: 1d array of q values :math:`[\mathrm{k}\lambda]`
+            qs: 1d array of q values :math:`[\lambda]`
             phis: 1d array of datapoint azimuth values [radians] (must be the same
                 length as qs)
 

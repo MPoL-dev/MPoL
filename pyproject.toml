@@ -35,7 +35,7 @@ dev = [
     "tensorboard",
     "mypy",
     "frank>=1.2.1",
-    "sphinx>=5.3.0",
+    "sphinx>=7.2.0",
     "jupytext",
     "ipython!=8.7.0", # broken version for syntax higlight https://github.com/spatialaudio/nbsphinx/issues/687
     "nbsphinx",
@@ -50,6 +50,8 @@ dev = [
     "asdf",
     "pyro-ppl",
     "arviz[all]",
+    "visread>=0.0.4",
+    "ruff"
 ]
 test = [
     "pytest",
@@ -58,7 +60,9 @@ test = [
     "requests",
     "tensorboard",
     "mypy",
+    "visread>=0.0.4",
     "frank>=1.2.1",
+    "ruff"
 ]
 
 [project.urls]
@@ -94,11 +98,26 @@ module = [
     "MPoL.constants",
     "MPoL.coordinates",
     "MPoL.datasets",
-    # "MPoL.fourier", # once we remove get_vis_residuals
+    "MPoL.fourier", 
     "MPoL.geometry",
-    # "MPoL.gridding", # once we sort check_data_inputs_2d
+    "MPoL.gridding", 
     "MPoL.images",
-    "MPoL.losses"
-    # "MPoL.utils", # once we fix check_baselines
+    "MPoL.losses",
+    "MPoL.precomposed",
+    "MPoL.utils"
     ]
 disallow_untyped_defs = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+# will enable after sorting module locations
+# select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLR", "PLW", "UP"]
+lint.ignore = [
+    "E741",    # Allow ambiguous variable names
+    "PLR0911", # Allow many return statements
+    "PLR0913", # Allow many arguments to functions
+    "PLR0915", # Allow many statements
+    "PLR2004", # Allow magic numbers in comparisons
+]
+exclude = []

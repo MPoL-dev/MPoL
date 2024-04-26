@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 import torch
 from astropy.io import fits
+from mpol import coordinates, images, plot, utils
 
-from mpol import coordinates, images, utils
-from mpol.constants import *
 
 def test_single_chan():
     coords = coordinates.GridCoords(cell_size=0.015, npix=800)
@@ -56,11 +56,9 @@ def test_basecube_imagecube(coords, tmp_path):
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     base_cube = torch.normal(mean=mean, std=std)
@@ -111,11 +109,9 @@ def test_base_cube_conv_cube(coords, tmp_path):
     # create a mock cube that includes negative values
     nchan = 1
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # The HannConvCube expects to function on a pre-packed ImageCube,
     # so in order to get the plots looking correct on this test image,
@@ -156,11 +152,9 @@ def test_multi_chan_conv(coords, tmp_path):
 
     nchan = 10
     mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=-0.5)
     std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5, dtype=torch.double
-    )
+        (nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     test_cube = torch.normal(mean=mean, std=std)
@@ -177,3 +171,236 @@ def test_image_flux(coords):
     im = images.ImageCube(coords=coords, nchan=nchan)
     im(bcube())
     assert im.flux.size()[0] == nchan
+
+
+def test_plot_test_img(packed_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+    fig, ax = plt.subplots(nrows=1)
+
+    # put back to sky
+    sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+    im = ax.imshow(
+        sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+    )
+    plt.colorbar(im)
+    fig.savefig(tmp_path / "sky_cube.png", dpi=300)
+
+    plt.close("all")
+
+def test_taper(coords, tmp_path):
+    for r in np.arange(0.0, 0.2, step=0.02):
+        fig, ax = plt.subplots(ncols=1)
+
+        taper_2D = images.uv_gaussian_taper(coords, r, r, 0.0)
+        print(type(taper_2D))
+
+        norm = plot.get_image_cmap_norm(taper_2D, symmetric=True)
+        im = ax.imshow(
+            taper_2D,
+            extent=coords.vis_ext_Mlam,
+            origin="lower",
+            cmap="bwr_r",
+            norm=norm,
+        )
+        plt.colorbar(im, ax=ax)
+
+        fig.savefig(tmp_path / f"taper{r:.2f}.png", dpi=300)
+
+    plt.close("all")
+
+def test_gaussian_kernel(coords, tmp_path):
+    rs = np.array([0.02, 0.06, 0.10])
+    nchan = 3
+    fig, ax = plt.subplots(nrows=len(rs), ncols=nchan, figsize=(10,10))
+    for i,r in enumerate(rs):
+        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=r, FWHM_min=0.5 * r)
+        weight = layer.m.weight.detach().numpy()
+        for j in range(nchan):
+            im = ax[i,j].imshow(weight[j,0], interpolation="none", origin="lower")
+            plt.colorbar(im, ax=ax[i,j])
+
+    fig.savefig(tmp_path / "filter.png", dpi=300)
+    plt.close("all")
+
+def test_gaussian_kernel_rotate(coords, tmp_path):
+    r = 0.04
+    Omegas = [0, 20, 40] # degrees
+    nchan = 3
+    fig, ax = plt.subplots(nrows=len(Omegas), ncols=nchan, figsize=(10, 10))
+    for i, Omega in enumerate(Omegas):
+        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=r, FWHM_min=0.5 * r, Omega=Omega)
+        weight = layer.m.weight.detach().numpy()
+        for j in range(nchan):
+            im = ax[i, j].imshow(weight[j, 0], interpolation="none",origin="lower")
+            plt.colorbar(im, ax=ax[i, j])
+
+    fig.savefig(tmp_path / "filter.png", dpi=300)
+    plt.close("all")
+
+
+def test_GaussConvImage(sky_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+    nchan = sky_cube.size()[0]
+
+    for r in np.arange(0.02, 0.11, step=0.04):
+
+        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=r, FWHM_min=r)
+
+        print("Kernel size", layer.m.weight.size())
+
+        fig, ax = plt.subplots(ncols=2)
+    
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+        plt.colorbar(im, ax=ax[0])
+
+        c_sky = layer(sky_cube)
+        im = ax[1].imshow(
+            c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / f"convolved_{r:.2f}.png", dpi=300)
+
+    plt.close("all")
+
+def test_GaussConvImage_rotate(sky_cube, coords, tmp_path):
+    # show only the first channel
+    chan = 0
+    nchan = sky_cube.size()[0]
+
+    for Omega in [0, 20, 40]:
+        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=0.16, FWHM_min=0.06, Omega=Omega)
+
+        fig, ax = plt.subplots(ncols=2)
+
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+        plt.colorbar(im, ax=ax[0])
+
+        c_sky = layer(sky_cube)
+        im = ax[1].imshow(
+            c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / f"convolved_{Omega:.2f}.png", dpi=300)
+
+    plt.close("all")
+
+def test_GaussFourier(packed_cube, coords, tmp_path):
+    chan = 0
+
+    for FWHM in np.linspace(0.02, 0.5, num=10):
+        fig, ax = plt.subplots(ncols=2)
+        # put back to sky
+        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+        plt.colorbar(im, ax=ax[0])
+
+        # set base resolution
+        layer = images.GaussConvFourier(coords, FWHM, FWHM)
+        c = layer(packed_cube)
+        # put back to sky
+        c_sky = utils.packed_cube_to_sky_cube(c)
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        im = ax[1].imshow(
+            c_sky[chan].detach().numpy(),
+            extent=coords.img_ext,
+            origin="lower",
+            cmap="inferno",
+        )
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / "convolved_FWHM_{:.2f}.png".format(FWHM), dpi=300)
+
+    plt.close("all")
+
+def test_GaussFourier_rotate(packed_cube, coords, tmp_path):
+    chan = 0
+
+    sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+
+    for Omega in [0, 20, 40]:
+        layer = images.GaussConvFourier(
+            coords, FWHM_maj=0.16, FWHM_min=0.06, Omega=Omega
+        )
+
+        fig, ax = plt.subplots(ncols=2)
+
+        im = ax[0].imshow(
+            sky_cube[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
+        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+        plt.colorbar(im, ax=ax[0])
+
+        c_sky = layer(sky_cube)
+        im = ax[1].imshow(
+            c_sky[chan], extent=coords.img_ext, origin="lower", cmap="inferno"
+        )
+        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
+        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+
+        plt.colorbar(im, ax=ax[1])
+        fig.savefig(tmp_path / f"convolved_{Omega:.2f}.png", dpi=300)
+
+    plt.close("all")
+
+
+def test_GaussFourier_point(coords, tmp_path):
+    FWHM = 0.5
+
+    # create an image with a point source in the center
+    sky_cube = torch.zeros((1, coords.npix, coords.npix))
+    cpix = coords.npix//2
+    sky_cube[0,cpix,cpix] = 1.0
+
+    fig, ax = plt.subplots(ncols=2, sharex=True, sharey=True)
+    # put back to sky
+    im = ax[0].imshow(
+        sky_cube[0], extent=coords.img_ext, origin="lower", cmap="inferno"
+    )
+    flux = coords.cell_size**2 * torch.sum(sky_cube[0])
+    ax[0].set_title(f"tot flux: {flux:.3f} Jy")
+    plt.colorbar(im, ax=ax[0])
+
+    # set base resolution
+    layer = images.GaussConvFourier(coords, FWHM, FWHM)
+    packed_cube = utils.sky_cube_to_packed_cube(sky_cube)
+    c = layer(packed_cube)
+    # put back to sky
+    c_sky = utils.packed_cube_to_sky_cube(c)
+    flux = coords.cell_size**2 * torch.sum(c_sky[0])
+    im = ax[1].imshow(
+        c_sky[0].detach().numpy(),
+        extent=coords.img_ext,
+        origin="lower",
+        cmap="inferno",
+    )
+    ax[1].set_title(f"tot flux: {flux:.3f} Jy")
+    r = 0.7
+    ax[1].set_xlim(r, -r)
+    ax[1].set_ylim(-r, r)
+
+    plt.colorbar(im, ax=ax[1])
+    fig.savefig(tmp_path / "point_source_FWHM_{:.2f}.png".format(FWHM), dpi=300)
+
+    plt.close("all")

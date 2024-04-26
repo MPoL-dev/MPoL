@@ -1,15 +1,14 @@
+import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 from mpol.exceptions import CellSizeError, DataError
 
 
-def test_hermitian_pairs(mock_visibility_data):
+def test_hermitian_pairs(mock_dataset_np):
     # Test to see whether our routine checking whether Hermitian pairs
     # exist in the dataset works correctly in the False and True cases
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
     # should *NOT* contain Hermitian pairs
     gridding.verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
@@ -28,8 +27,8 @@ def test_hermitian_pairs(mock_visibility_data):
         gridding.verify_no_hermitian_pairs(uu, vv, data_re + 1.0j * data_im)
 
 
-def test_averager_instantiate_cell_npix(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def test_averager_instantiate_cell_npix(mock_dataset_np):
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
     coords = coordinates.GridCoords(
         cell_size=0.005,
@@ -44,8 +43,8 @@ def test_averager_instantiate_cell_npix(mock_visibility_data):
     )
 
 
-def test_averager_instantiate_gridCoord(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def test_averager_instantiate_gridCoord(mock_dataset_np):
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
     mycoords = coordinates.GridCoords(cell_size=0.005, npix=800)
 
@@ -59,8 +58,8 @@ def test_averager_instantiate_gridCoord(mock_visibility_data):
     )
 
 
-def test_averager_instantiate_bounds_fail(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def test_averager_instantiate_bounds_fail(mock_dataset_np):
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
     mycoords = coordinates.GridCoords(cell_size=0.05, npix=800)
 

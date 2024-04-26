@@ -1,11 +1,11 @@
 import math
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import torch
 
-from typing import Any
-import numpy.typing as npt
-from mpol.constants import arcsec, c_ms, cc, deg, kB
+from mpol.constants import arcsec, cc, deg, kB
 
 
 def torch2npy(t: torch.Tensor) -> npt.NDArray:
@@ -197,22 +197,23 @@ def fftspace(width: float, N: int) -> npt.NDArray[np.floating[Any]]:
     return xx
 
 
-def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
-    """
+def check_baselines(q, min_feasible_q=1e3, max_feasible_q=1e8):
+    r"""
     Check if baseline lengths are sensible for expected code unit of
-    [klambda], or if instead they're being supplied in [lambda].
+    [:math:`\lambda`], or if instead they're being supplied in
+    [:math:`\mathrm{k}\lambda`].
 
     Parameters
     ----------
-     q : array, unit = :math:`k\lambda`
+     q : array, unit = :math:`\lambda`
         Baseline distribution (all values must be non-negative).
-    min_feasible_q : float, unit = :math:`k\lambda`, default=1e0
+    min_feasible_q : float, unit = :math:`\lambda`, default=1e3
         Minimum baseline in code units expected for a dataset. The default
-        value of 1e0 is a conservative value for ALMA, assuming a minimum
+        value of 1e3 is a conservative value for ALMA, assuming a minimum
         antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.
-    max_feasible_q : float, unit = :math:`k\lambda`, default=1e5
+    max_feasible_q : float, unit = :math:`\lambda`, default=1e8
         Maximum baseline in code units expected for a dataset. The default
-        value of 1e5 is a conservative value for ALMA, assuming a maximum
+        value of 1e8 is a conservative value for ALMA, assuming a maximum
         antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.
     """
 
@@ -220,72 +221,18 @@ def check_baselines(q, min_feasible_q=1e0, max_feasible_q=1e5):
 
     if max(q) > max_feasible_q:
         raise Warning(
-            "Maximum baseline of {:.1e} is > maximum expected "
-            "value of {:.1e}. Baselines must be in units of "
+            f"Maximum baseline of {max(q):.1e} is > maximum expected "
+            f"value of {max_feasible_q:.1e}. Baselines must be in units of "
             "[klambda], but it looks like they're in "
-            "[lambda].".format(max(q), max_feasible_q)
+            "[lambda]."
         )
 
     if min(q) > min_feasible_q * 1e3:
         raise Warning(
             "Minimum baseline of {:.1e} is large for expected "
             "minimum value of {:.1e}. Baselines must be in units of "
-            "[klambda], but it looks like they're in "
-            "[lambda].".format(min(q), min_feasible_q * 1e3)
+            "[lambda]".format(min(q), min_feasible_q * 1e3)
         )
-
-
-def convert_baselines(baselines, freq=None, wle=None):
-    r"""
-    Convert baselines in meters to kilolambda.
-    Args:
-        baselines (float or np.array): baselines in [m].
-        freq (float or np.array), optional: frequencies in [Hz].
-        wle (float or np.array), optional: wavelengths in [m].
-    Returns:
-        (1D array nvis): baselines in [klambda]
-    Notes:
-        If ``baselines``, ``freq`` or ``wle`` are numpy arrays, their shapes must be
-        broadcast-able.
-    """
-    if (freq is None and wle is None) or (wle and freq):
-        raise AttributeError("Exactly one of 'freq' or 'wle' must be supplied.")
-
-    if wle is None:
-        # calculate wavelengths in meters
-        wle = c_ms / freq  # m
-
-    # calculate baselines in klambda
-    return 1e-3 * baselines / wle  # [klambda]
-
-
-def broadcast_and_convert_baselines(u, v, chan_freq):
-    r"""
-    Convert baselines to kilolambda and broadcast to match shape of channel frequencies.
-    Args:
-        u (1D array nvis): baseline [m]
-        v (1D array nvis): baseline [m]
-        chan_freq (1D array nchan): frequencies [Hz]
-    Returns:
-        (u, v) each of which are (nchan, nvis) arrays of baselines in [klambda]
-    """
-
-    nchan = len(chan_freq)
-
-    # broadcast to the same shape as the data
-    # stub to broadcast u, v to all channels
-    broadcast = np.ones((nchan, 1))
-    uu = u * broadcast
-    vv = v * broadcast
-
-    # calculate wavelengths in meters
-    wavelengths = c_ms / chan_freq[:, np.newaxis]  # m
-
-    # calculate baselines in klambda
-    uu = 1e-3 * uu / wavelengths  # [klambda]
-    vv = 1e-3 * vv / wavelengths  # [klambda]
-
-    return (uu, vv)
 
 
 def get_max_spatial_freq(cell_size: float, npix: int) -> float:
@@ -293,19 +240,24 @@ def get_max_spatial_freq(cell_size: float, npix: int) -> float:
     Calculate the maximum spatial frequency that the image can represent and still
     satisfy the Nyquist Sampling theorem.
 
-    Args:
-        cell_size (float): the pixel size in arcseconds
-        npix (int): the number of pixels in the image
+    Parameters
+    ----------
+    cell_size : float
+        the pixel size in arcseconds
+    npix : int
+        the number of pixels in the image
 
-    Returns:
-        max_freq : the maximum spatial frequency contained in the image (in kilolambda)
+    Returns
+    -------
+    float
+        the maximum spatial frequency contained in the image [:math:`\lambda`]
     """
 
     # technically this is as straightforward as doing 1/(2 * cell_size), but for even-sized
     # arrays, the highest *positive* spatial frequency is (npix/2 - 1) / (npix * cell_size)
     # it is the most negative spatial frequency that goes to - 1/(2 * cell_size)
 
-    return (npix / 2 - 1) / (npix * cell_size * arcsec) * 1e-3  # kilolambda
+    return (npix / 2 - 1) / (npix * cell_size * arcsec)  # λ
 
 
 def get_maximum_cell_size(uu_vv_point: float) -> float:
@@ -315,19 +267,19 @@ def get_maximum_cell_size(uu_vv_point: float) -> float:
 
     Args:
         uu_vv_point (float): a single spatial frequency. Units of
-            [:math:`\mathrm{k}\lambda`].
+            [:math:`\lambda`].
 
     Returns:
         cell_size (in arcsec)
     """
 
-    return 1 / ((2 - 1) * uu_vv_point * 1e3) / arcsec
+    return 1 / ((2 - 1) * uu_vv_point) / arcsec
 
 
 def get_optimal_image_properties(
     image_width: float,
-    u: npt.NDArray[np.floating[Any]],
-    v: npt.NDArray[np.floating[Any]],
+    u: torch.Tensor,
+    v: torch.Tensor,
 ) -> tuple[float, int]:
     r"""
     For an image of desired width, determine the maximum pixel size that
@@ -339,7 +291,7 @@ def get_optimal_image_properties(
     image_width : float, unit = arcsec
         Desired width of the image (for a square image of size
         `image_width` :math:`\times` `image_width`).
-    u, v : np.ndarray of np.float, unit = :math:`k\lambda`
+    u, v : :class:`torch.Tensor` , unit = :math:`\lambda`
         `u` and `v` baselines.
 
     Returns
@@ -353,9 +305,9 @@ def get_optimal_image_properties(
     -----
     Assumes baselines are as-observed.
     """
-    max_freq = max(max(abs(u)), max(abs(v)))
+    max_freq = torch.max(torch.abs(torch.concat([u, v])))
 
-    cell_size = get_maximum_cell_size(max_freq)
+    cell_size = get_maximum_cell_size(max_freq.item())
 
     # round npix up to nearest integer
     npix = math.ceil(image_width / cell_size)
@@ -390,8 +342,8 @@ def sky_gaussian_radians(
     Omega: float,
 ) -> npt.NDArray[np.floating[Any]]:
     r"""
-    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is 
-    centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is 
+    Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is
+    centered at ``delta_l, delta_m``, has widths of ``sigma_l, sigma_m``, and is
     rotated ``Omega`` degrees East of North.
 
     To evaluate the Gaussian, internally first we translate to center
@@ -412,8 +364,8 @@ def sky_gaussian_radians(
 
     .. math::
 
-        f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left 
-        [ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m} 
+        f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left
+        [ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m}
         \right )^2 \right ] \right )
 
     Args:
@@ -423,7 +375,7 @@ def sky_gaussian_radians(
         delta_l : offset [radians]
         delta_m : offset [radians]
         sigma_l : width [radians]
-        sigma_M : width [radians]
+        sigma_m : width [radians]
         Omega : position angle of ascending node [degrees] east of north.
 
     Returns:
@@ -496,11 +448,11 @@ def fourier_gaussian_lambda_radians(
     Omega: float,
 ) -> npt.NDArray[np.floating[Any]]:
     r"""
-    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the 
-    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in 
-    :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The 
-    Fourier Gaussian is parameterized using the sky plane centroid 
-    (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``). 
+    Calculate the Fourier plane Gaussian :math:`F_\mathrm{g}(u,v)` corresponding to the
+    Sky plane Gaussian :math:`f_\mathrm{g}(l,m)` in
+    :func:`~mpol.utils.sky_gaussian_radians`, using analytical relationships. The
+    Fourier Gaussian is parameterized using the sky plane centroid
+    (``delta_l, delta_m``), widths (``sigma_l, sigma_m``) and rotation (``Omega``).
     Assumes that ``a`` was in units of :math:`\mathrm{Jy}/\mathrm{steradian}`.
 
     Args:
@@ -516,12 +468,12 @@ def fourier_gaussian_lambda_radians(
     Returns:
         2D Gaussian evaluated at input args
 
-    The following is a description of how we derived the analytical relationships. In 
-    what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units 
-    of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units 
+    The following is a description of how we derived the analytical relationships. In
+    what follows, all :math:`l` and :math:`m` coordinates are assumed to be in units
+    of radians and all :math:`u` and :math:`v` coordinates are assumed to be in units
     of :math:`\lambda`.
 
-    We start from Fourier dual relationships in Bracewell's `The Fourier Transform and 
+    We start from Fourier dual relationships in Bracewell's `The Fourier Transform and
     Its Applications <https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract>`_
 
     .. math::
@@ -542,8 +494,8 @@ def fourier_gaussian_lambda_radians(
 
     respectively. The sky-plane Gaussian has a maximum value of :math:`a`.
 
-    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into 
-    a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into 
+    We will use the similarity, rotation, and shift theorems to turn :math:`f_0` into
+    a form matching :math:`f_\mathrm{g}`, which simultaneously turns :math:`F_0` into
     :math:`F_\mathrm{g}(u,v)`.
 
     The similarity theorem states that (in 1D)
@@ -559,30 +511,30 @@ def fourier_gaussian_lambda_radians(
         f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 +
         \left( \frac{m}{\sigma_m} \right)^2 \right] \right).
 
-    i.e., something we might call a normalized Gaussian function. Phrased in terms of 
+    i.e., something we might call a normalized Gaussian function. Phrased in terms of
     :math:`f_0`, :math:`f_1` is
 
     .. math::
 
-        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\, 
+        f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\,
         \frac{m}{\sigma_m \sqrt{2 \pi}}\right).
 
     Therefore, according to the similarity theorem, the equivalent :math:`F_1(u,v)` is
 
     .. math::
 
-        F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\, 
+        F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\,
         \sigma_m \sqrt{2 \pi} v \right),
 
     or
 
     .. math::
 
-        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 + 
+        F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 +
         \sigma_m^2 v^2] \right).
 
-    Next, we rotate the Gaussian to match the sky plane rotation. A rotation 
-    :math:`\Omega` in the sky plane is carried out in the same direction in the 
+    Next, we rotate the Gaussian to match the sky plane rotation. A rotation
+    :math:`\Omega` in the sky plane is carried out in the same direction in the
     Fourier plane,
 
     .. math::
@@ -597,8 +549,8 @@ def fourier_gaussian_lambda_radians(
         f_2(l, m) = f_1(l', m') \\
         F_2(u, v) = F_1(u', m')
 
-    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`, 
-    :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian. 
+    Finally, we translate the sky plane Gaussian by amounts :math:`\delta_l`,
+    :math:`\delta_m`, which corresponds to a phase shift in the Fourier plane Gaussian.
     The image plane translation is
 
     .. math::
@@ -611,16 +563,16 @@ def fourier_gaussian_lambda_radians(
 
         F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)
 
-    We have arrived at the corresponding Fourier Gaussian, :math:`F_\mathrm{g}(u,v) = 
+    We have arrived at the corresponding Fourier Gaussian, :math:`F_\mathrm{g}(u,v) =
     F_3(u,v)`. The simplified equation is
 
     .. math::
 
-        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left ( 
-        -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]  
+        F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left (
+        -2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]
         - 2 i \pi \left [\delta_l u + \delta_m v \right] \right).
 
-    N.B. that we have mixed primed (:math:`u'`) and unprimed (:math:`u`) coordinates in 
+    N.B. that we have mixed primed (:math:`u'`) and unprimed (:math:`u`) coordinates in
     the same equation for brevity.
 
     Finally, the same Fourier dual relationship holds
@@ -651,7 +603,7 @@ def fourier_gaussian_lambda_radians(
     return fgauss
 
 
-def fourier_gaussian_klambda_arcsec(
+def fourier_gaussian_lambda_arcsec(
     u: npt.NDArray[np.floating[Any]],
     v: npt.NDArray[np.floating[Any]],
     a: float,
@@ -670,8 +622,8 @@ def fourier_gaussian_klambda_arcsec(
     units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
 
     Args:
-        u: l in units of [klambda]
-        v: m in units of [klambda]
+        u: l in units of [lambda]
+        v: m in units of [lambda]
         a : amplitude prefactor, units of :math:`\mathrm{Jy}/\mathrm{arcsec}^2`.
         delta_x : offset [arcsec]
         delta_y : offset [arcsec]
@@ -685,8 +637,8 @@ def fourier_gaussian_klambda_arcsec(
 
     # convert the parameters and feed to the core routine
     return fourier_gaussian_lambda_radians(
-        1e3 * u,
-        1e3 * v,
+        u,
+        v,
         a / arcsec**2,
         delta_x * arcsec,
         delta_y * arcsec,

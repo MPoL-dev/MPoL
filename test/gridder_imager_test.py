@@ -4,17 +4,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, gridding
-from mpol.constants import *
 
 
 # cache an instantiated imager for future imaging ops
 @pytest.fixture
-def imager(mock_visibility_data):
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+def imager(mock_dataset_np, coords):
+    uu, vv, weight, data_re, data_im = mock_dataset_np
 
-    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
     return gridding.DirtyImager(
         coords=coords,
         uu=uu,
@@ -45,7 +42,7 @@ def test_beam_null(imager, tmp_path):
     beam = imager._get_dirty_beam(imager.C, imager.re_gridded_beam)
     nulled = imager._null_dirty_beam()
 
-    chan = 4
+    chan = 0
     fig, ax = plt.subplots(ncols=2)
 
     cmap = copy.copy(matplotlib.colormaps["viridis"])
@@ -82,7 +79,7 @@ def test_beam_null_full(imager, tmp_path):
     beam = imager._get_dirty_beam(imager.C, imager.re_gridded_beam)
     nulled = imager._null_dirty_beam(single_channel_estimate=False)
 
-    chan = 4
+    chan = 0
     fig, ax = plt.subplots(ncols=2)
 
     cmap = copy.copy(matplotlib.colormaps["viridis"])
@@ -124,7 +121,7 @@ def test_beam_area_before_beam(imager):
 def test_grid_uniform(imager, tmp_path):
     kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
-    chan = 4
+    chan = 0
 
     img_uniform, beam_uniform = imager.get_dirty_image(
         weighting="uniform", check_visibility_scatter=False
@@ -142,7 +139,7 @@ def test_grid_uniform(imager, tmp_path):
     ax[1, 0].imshow(img_uniform[chan], **kw)
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     ax[1, 1].imshow(img_robust[chan], **kw)
 
     # the differences
@@ -166,7 +163,7 @@ def test_grid_uniform(imager, tmp_path):
 def test_grid_uniform_arcsec2(imager, tmp_path):
     kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
-    chan = 4
+    chan = 0
     img_uniform, beam_uniform = imager.get_dirty_image(
         weighting="uniform", unit="Jy/arcsec^2", check_visibility_scatter=False
     )
@@ -184,7 +181,7 @@ def test_grid_uniform_arcsec2(imager, tmp_path):
     plt.colorbar(im, ax=ax[1, 0])
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     im = ax[1, 1].imshow(img_robust[chan], **kw)
     plt.colorbar(im, ax=ax[1, 1])
 
@@ -208,7 +205,7 @@ def test_grid_uniform_arcsec2(imager, tmp_path):
 def test_grid_natural(imager, tmp_path):
     kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
-    chan = 4
+    chan = 0
 
     img_natural, beam_natural = imager.get_dirty_image(
         weighting="natural", check_visibility_scatter=False
@@ -226,7 +223,7 @@ def test_grid_natural(imager, tmp_path):
     ax[1, 0].imshow(img_natural[chan], **kw)
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     ax[1, 1].imshow(img_robust[chan], **kw)
 
     # the differences
@@ -238,10 +235,10 @@ def test_grid_natural(imager, tmp_path):
 
     fig.subplots_adjust(left=0.05, right=0.95, wspace=0.02, bottom=0.07, top=0.94)
 
-    fig.savefig(tmp_path / "natural_v_robust.png", dpi=300)
+    fig.savefig(tmp_path / "grid_natural_v_robust.png", dpi=300)
 
-    assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
-    assert np.all(np.abs(img_natural - img_robust) < 1e-3)
+    assert np.all(np.abs(beam_natural - beam_robust) < 1.5e-3)
+    assert np.all(np.abs(img_natural - img_robust) < 3e-5)
 
     plt.close("all")
 
@@ -249,7 +246,7 @@ def test_grid_natural(imager, tmp_path):
 def test_grid_natural_arcsec2(imager, tmp_path):
     kw = {"origin": "lower", "interpolation": "none", "extent": imager.coords.img_ext}
 
-    chan = 4
+    chan = 0
 
     img_natural, beam_natural = imager.get_dirty_image(
         weighting="natural", unit="Jy/arcsec^2", check_visibility_scatter=False
@@ -268,7 +265,7 @@ def test_grid_natural_arcsec2(imager, tmp_path):
     plt.colorbar(im, ax=ax[1, 0])
 
     ax[0, 1].imshow(beam_robust[chan], **kw)
-    ax[0, 1].set_title("robust={:}".format(r))
+    ax[0, 1].set_title(f"robust={r}")
     im = ax[1, 1].imshow(img_robust[chan], **kw)
     plt.colorbar(im, ax=ax[1, 1])
 
@@ -283,16 +280,16 @@ def test_grid_natural_arcsec2(imager, tmp_path):
 
     fig.savefig(tmp_path / "natural_v_robust_arcsec2.png", dpi=300)
 
-    assert np.all(np.abs(beam_natural - beam_robust) < 1e-3)
-    assert np.all(np.abs(img_natural - img_robust) < 5e-3)
+    assert np.all(np.abs(beam_natural - beam_robust) < 1.5e-3)
+    assert np.all(np.abs(img_natural - img_robust) <2e-4)
 
     plt.close("all")
 
 
-def test_cell_variance_warning_image(mock_visibility_data):
+def test_cell_variance_warning_image(mock_dataset_np):
     coords = coordinates.GridCoords(cell_size=0.01, npix=400)
 
-    uu, vv, weight, data_re, data_im = mock_visibility_data
+    uu, vv, weight, data_re, data_im = mock_dataset_np
     sigma = np.sqrt(1 / weight)
     data_re = np.ones_like(uu) + np.random.normal(loc=0, scale=2 * sigma, size=uu.shape)
     data_im = np.zeros_like(uu) + np.random.normal(

@@ -59,7 +59,7 @@ data_im = np.imag(data)
 
 ## Plotting the data
 
-Following some of the exercises in the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html), let's plot up the baseline distribution and get a rough look at the raw visibilities. For more information on these data types, we recommend you read the [Introduction to RML Imaging](../rml_intro.md).
+Following some of the exercises in the [visread documentation](https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html), let's plot up the baseline distribution and get a rough look at the raw visibilities. 
 
 Note that the `uu`, `vv`, `weight`, `data_re`, and `data_im` arrays are all two-dimensional numpy arrays of shape `(nchan, nvis)`. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape `(1, nvis)`.
 

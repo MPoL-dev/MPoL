@@ -1,4 +1,5 @@
 import numpy as np
+
 from mpol.utils import torch2npy
 
 
@@ -113,7 +114,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
 
     Returns
     -------
-    bin_centers : array, unit=:math:[`k\lambda`]
+    bin_centers : array, unit=:math:[`\lambda`]
         Baselines corresponding to `u` and `v`
     Vs : array, unit=[Jy]
         Visibility amplitudes at `q`
@@ -125,28 +126,24 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     from frank.geometry import apply_phase_shift, deproject
 
     # projected model (u,v) points [k\lambda]
-    uu, vv = fcube.coords.sky_u_centers_2D, fcube.coords.sky_v_centers_2D
+    uu, vv = fcube.coords.ground_u_centers_2D, fcube.coords.ground_v_centers_2D
 
     # visibilities
     V = torch2npy(fcube.ground_vis[chan]).ravel()
 
     # phase-shift the visibilities
     Vp = apply_phase_shift(
-        uu.ravel() * 1e3, vv.ravel() * 1e3, V, geom["dRA"], geom["dDec"], inverse=True
+        uu.ravel(), vv.ravel(), V, geom["dRA"], geom["dDec"], inverse=True
     )
 
     # deproject the (u,v) points
     up, vp, _ = deproject(
-        uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], geom["Omega"]
+        uu.ravel(), vv.ravel(), geom["incl"], geom["Omega"]
     )
 
     # if the source is optically thick, rescale the deprojected V(q)
     if rescale_flux:
         Vp.real /= np.cos(geom["incl"] * np.pi / 180)
-
-    # convert back to [k\lambda]
-    up /= 1e3
-    vp /= 1e3
 
     # deprojected baselines
     qq = np.hypot(up, vp)
