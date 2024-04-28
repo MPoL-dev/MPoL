@@ -3,11 +3,11 @@
 # Changelog
 
 ## v0.3.0
-
-- added {meth}`mpol.images.GaussConvImage` layer to calculate a Gaussian tapering window in the visibility plane.
-- removed explicit type declarations in base MPoL modules. Previously, core representations were set to be in `float64` or `complex128`. Now, core MPoL representations (e.g., {class}`mpol.images.BaseCube`) will follow the [default tensor type](https://pytorch.org/docs/stable/generated/torch.set_default_tensor_type.html), which is commonly `torch.float32`. If you want your model to run fully in `float32` or `complex64`, then be sure that your data is also in these formats, since otherwise PyTorch will promote downstream tensors as needed.  
-- added {meth}`mpol.utils.convolve_packed_cube` method to convolve a 3D packed image cube with a 2D Gaussian. You can specify major axis, minor axis, and rotation angle.
-- added the `vis_ext_Mlam` instance attribute to {class}`mpol.coordinates.GridCoords` for convenience plotting of visibility grids with axes labels in units of M$\lambda$.
+- Moved many continuously-integrated tutorials to [MPoL/examples](https://github.com/MPoL-dev/examples).
+- Added {meth}`mpol.images.GaussConvImage` layer to calculate a Gaussian tapering window in the visibility plane.
+- Removed explicit type declarations in base MPoL modules. Previously, core representations were set to be in `float64` or `complex128`. Now, core MPoL representations (e.g., {class}`mpol.images.BaseCube`) will follow the [default tensor type](https://pytorch.org/docs/stable/generated/torch.set_default_tensor_type.html), which is commonly `torch.float32`. If you want your model to run fully in `float32` or `complex64`, then be sure that your data is also in these formats, since otherwise PyTorch will promote downstream tensors as needed.  
+- Added {meth}`mpol.utils.convolve_packed_cube` method to convolve a 3D packed image cube with a 2D Gaussian. You can specify major axis, minor axis, and rotation angle.
+- Added the `vis_ext_Mlam` instance attribute to {class}`mpol.coordinates.GridCoords` for convenience plotting of visibility grids with axes labels in units of M$\lambda$.
 - Updated [MPoL-dev/examples](https://github.com/MPoL-dev/examples) with Stochastic Gradient Descent Example.
 - Standardized nomenclature of {class}`mpol.coordinates.GridCoords` and {class}`mpol.fourier.FourierCube` to use `sky_cube` for a normal image and `ground_cube` for a normal visibility cube (rather than `sky_` for visibility quantities). Routines use `packed_cube` instead of `cube` internally to be clear when packed format is preferred.
 - Modified {class}`mpol.coordinates.GridCoords` object to use cached properties [#187](https://github.com/MPoL-dev/MPoL/pull/187).
