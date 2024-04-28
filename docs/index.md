@@ -25,7 +25,6 @@ background
 installation
 ci-tutorials/gridder
 ci-tutorials/optimization
-ci-tutorials/crossvalidation
 ci-tutorials/initializedirtyimage
 ci-tutorials/fakedata
 ```
