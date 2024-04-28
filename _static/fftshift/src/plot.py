@@ -1,9 +1,3 @@
-import argparse
-
-parser = argparse.ArgumentParser(description="Create the fftshift plot")
-parser.add_argument("outfile", help="Destination to save plot.")
-args = parser.parse_args()
-
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
@@ -11,8 +5,14 @@ from astropy.utils.data import download_file
 from matplotlib import patches
 from matplotlib.colors import LogNorm
 from matplotlib.gridspec import GridSpec
-
 from mpol import coordinates
+
+import argparse
+
+parser = argparse.ArgumentParser(description="Create the fftshift plot")
+parser.add_argument("outfile", help="Destination to save plot.")
+args = parser.parse_args()
+
 
 fname = download_file(
     "https://zenodo.org/record/4711811/files/logo_cont.fits",

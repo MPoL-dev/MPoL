@@ -1,8 +1,0 @@
-graph TD
-    subgraph SimpleNet
-    bc(BaseCube) --> HannConvCube
-    HannConvCube --> ImageCube
-    ImageCube --> FourierLayer
-    end
-    FourierLayer --> il([Loss])
-    ad[[Dataset]] --> il([Loss])

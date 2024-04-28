@@ -1,0 +1,775 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fourier &#8212; MPoL 0.1.dev1+gda6dbd3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=c80d40b4"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/fourier';</script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Gridding" href="gridding.html" />
+    <link rel="prev" title="Datasets" href="datasets.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Background and prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="coordinates.html">Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Fourier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridding.html">Gridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="precomposed.html">Precomposed Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="train_test.html">Training and testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crossval.html">Cross-validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/MPoL-dev/MPoL" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/fourier.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fourier</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube"><code class="docutils literal notranslate"><span class="pre">FourierCube</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.forward"><code class="docutils literal notranslate"><span class="pre">FourierCube.forward()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_vis"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_vis</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_amp"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_amp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_phase"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_phase</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFT"><code class="docutils literal notranslate"><span class="pre">NuFFT</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFT.forward"><code class="docutils literal notranslate"><span class="pre">NuFFT.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFTCached"><code class="docutils literal notranslate"><span class="pre">NuFFTCached</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFTCached.forward"><code class="docutils literal notranslate"><span class="pre">NuFFTCached.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.generate_fake_data"><code class="docutils literal notranslate"><span class="pre">generate_fake_data()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="module-mpol.fourier">
+<span id="fourier"></span><h1>Fourier<a class="headerlink" href="#module-mpol.fourier" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.fourier.FourierCube">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">FourierCube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mpol/fourier.html#FourierCube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.FourierCube" title="Link to this definition">#</a></dt>
+<dd><p>This layer performs the FFT of an ImageCube and stores the corresponding dense FFT
+output as a cube. If you are using this layer in a forward-modeling RML workflow,
+because the FFT of the model is essentially stored as a grid, you will need to make
+the loss function calculation using a gridded loss function (e.g.,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses.nll_gridded()</span></code>) and a gridded dataset (e.g.,
+<a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>) – object containing image dimensions</p></li>
+<li><p><strong>persistent_vis</strong> (<em>bool</em>) – should the visibility cube be stored as part of
+the module  s <cite>state_dict</cite>? If <cite>True</cite>, the state of the UV grid will be
+stored. It is recommended to use <cite>False</cite> for most applications, since the
+visibility cube will rarely be a direct parameter of the model.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.fourier.FourierCube.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/fourier.html#FourierCube.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.FourierCube.forward" title="Link to this definition">#</a></dt>
+<dd><p>Perform the FFT of the image cube on each channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>  of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>) – A ‘packed’ tensor. For example, an image cube from
+<a class="reference internal" href="images.html#mpol.images.ImageCube.forward" title="mpol.images.ImageCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.images.ImageCube.forward()</span></code></a></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The FFT of the image cube, in packed format.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.fourier.FourierCube.ground_vis">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ground_vis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tensor</span></em><a class="headerlink" href="#mpol.fourier.FourierCube.ground_vis" title="Link to this definition">#</a></dt>
+<dd><p>The visibility cube in ground format cube fftshifted for plotting with
+<code class="docutils literal notranslate"><span class="pre">imshow</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>complex-valued FFT of the image cube (i.e., the visibility cube), in
+‘ground’ format.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex128</span></code> of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.fourier.FourierCube.ground_amp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ground_amp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tensor</span></em><a class="headerlink" href="#mpol.fourier.FourierCube.ground_amp" title="Link to this definition">#</a></dt>
+<dd><p>The amplitude of the cube, arranged in unpacked format corresponding to the FFT
+of the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>amplitude cube in ‘ground’ format.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>  of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mpol.fourier.FourierCube.ground_phase">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ground_phase</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tensor</span></em><a class="headerlink" href="#mpol.fourier.FourierCube.ground_phase" title="Link to this definition">#</a></dt>
+<dd><p>The phase of the cube, arranged in unpacked format corresponding to the FFT of
+the sky_cube. Array dimensions for plotting given by <code class="docutils literal notranslate"><span class="pre">self.coords.vis_ext</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>phase cube in ‘ground’ format (<span class="math notranslate nohighlight">\([-\pi,\pi)\)</span>).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>  of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.fourier.NuFFT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">NuFFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mpol/fourier.html#NuFFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.NuFFT" title="Link to this definition">#</a></dt>
+<dd><p>This layer translates input from an <a class="reference internal" href="images.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a> to loose,
+ungridded samples of the Fourier plane, corresponding to the <span class="math notranslate nohighlight">\(u,v\)</span> locations
+provided. This layer is different than a <code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.Fourier.FourierCube</span></code> in that,
+rather than producing the dense cube-like output from an FFT routine, it utilizes
+the non-uniform FFT or ‘NuFFT’ to interpolate directly to discrete <span class="math notranslate nohighlight">\(u,v\)</span>
+locations. This is implemented using the KbNufft routines of the <a class="reference external" href="https://torchkbnufft.readthedocs.io/en/stable/index.html">TorchKbNufft</a> package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class.
+If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the <a class="reference internal" href="images.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>.
+Default = 1.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.fourier.NuFFT.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_matrices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/fourier.html#NuFFT.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.NuFFT.forward" title="Link to this definition">#</a></dt>
+<dd><p>Perform the FFT of the image cube for each channel and interpolate to the <code class="docutils literal notranslate"><span class="pre">uu</span></code>
+and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points. This call should automatically take the best
+parallelization option as indicated by the shape of the <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code>
+points. In general, you probably do not want to provide baselines that include
+Hermitian pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packed_cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>). The cube
+should be a “prepacked” image cube, for example,
+from <a class="reference internal" href="images.html#mpol.images.ImageCube.forward" title="mpol.images.ImageCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.images.ImageCube.forward()</span></code></a></p></li>
+<li><p><strong>uu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – 2D array of the u (East-West) spatial frequency coordinate
+[<span class="math notranslate nohighlight">\(\lambda\)</span>] of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix)</span></code></p></li>
+<li><p><strong>vv</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – 2D array of the v (North-South) spatial frequency coordinate
+[<span class="math notranslate nohighlight">\(\lambda\)</span>] (must be the same shape as uu)</p></li>
+<li><p><strong>sparse_matrices</strong> (<em>bool</em>) – If False, use the default table-based interpolation
+of TorchKbNufft.If True, use TorchKbNuFFT sparse matrices (generally
+slower but more accurate).  Note that sparse matrices are incompatible
+with multi-channel <cite>uu</cite> and <cite>vv</cite> arrays (see below).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex128</span></code> – Fourier samples of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code>, evaluated at the <code class="docutils literal notranslate"><span class="pre">uu</span></code>,
+<code class="docutils literal notranslate"><span class="pre">vv</span></code> points</p></li>
+<li><p><strong>**Dimensionality**</strong> (<em>You should consider the dimensionality of your image and</em>)</p></li>
+<li><p><em>your visibility samples when using this method. If your image has multiple</em></p></li>
+<li><p>channels (<code class="docutils literal notranslate"><span class="pre">nchan</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>), there is the possibility that the <span class="math notranslate nohighlight">\(u,v\)</span> sample</p></li>
+<li><p><em>locations corresponding to each channel may be different. In ALMA/VLA</em></p></li>
+<li><p><em>applications, this can arise when continuum observations are taken over</em></p></li>
+<li><p><em>significant bandwidth, since the spatial frequency sampled by any pair of</em></p></li>
+<li><p><em>antennas is wavelength-dependent</em></p></li>
+<li><p><em>.. math::</em> – u = frac{D}{lambda},</p></li>
+<li><p>where <span class="math notranslate nohighlight">\(D\)</span> is the projected baseline (measured in, say, meters) and</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda\)</span> is the observing wavelength. In this application, the</p></li>
+<li><p><em>image-plane model could be the same for each channel, or it may vary with</em></p></li>
+<li><p><em>channel (necessary if the spectral slope of the source is significant).</em></p></li>
+<li><p><em>On the other hand, with spectral line observations it will usually be the case</em></p></li>
+<li><p><em>that the total bandwidth of the observations is small enough such that the</em></p></li>
+<li><p><span class="math notranslate nohighlight">\(u,v\)</span> sample locations could be considered as the same for each channel.</p></li>
+<li><p><em>In spectral line applications, the image-plane model usually varies</em></p></li>
+<li><p><em>substantially with each channel.</em></p></li>
+<li><p><em>This routine will determine whether the spatial frequencies are treated as</em></p></li>
+<li><p>constant based upon the dimensionality of the <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> input arguments.</p></li>
+<li><p>* If <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> have a shape of (<code class="docutils literal notranslate"><span class="pre">nvis</span></code>), then it will be assumed that – the spatial frequencies can be treated as constant with channel (and will
+invoke parallelization across the image cube <code class="docutils literal notranslate"><span class="pre">nchan</span></code> dimension using the
+‘coil’ dimension of the TorchKbNufft package).</p></li>
+<li><p>* If the <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> have a shape of (<code class="docutils literal notranslate"><span class="pre">nchan,</span> <span class="pre">nvis</span></code>), then it will be – assumed that the spatial frequencies are different for each channel, and the
+spatial frequencies provided for each channel will be used (and will invoke
+parallelization across the image cube <code class="docutils literal notranslate"><span class="pre">nchan</span></code> dimension using the ‘batch’
+dimension of the TorchKbNufft package).</p></li>
+<li><p><em>Note that there is no straightforward, computationally efficient way to proceed</em></p></li>
+<li><p><em>if there are a different number of spatial frequencies for each channel. The</em></p></li>
+<li><p>best approach is likely to construct <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> arrays that have a shape</p></li>
+<li><p>of (<code class="docutils literal notranslate"><span class="pre">nchan,</span> <span class="pre">nvis</span></code>), such that all channels are padded with bogus <span class="math notranslate nohighlight">\(u,v\)</span></p></li>
+<li><p>points to have the same length <code class="docutils literal notranslate"><span class="pre">nvis</span></code>, and you create a boolean mask to keep</p></li>
+<li><p><em>track of which points are valid. Then, when this routine returns data points of</em></p></li>
+<li><p>shape (<code class="docutils literal notranslate"><span class="pre">nchan,</span> <span class="pre">nvis</span></code>), you can use that boolean mask to select only the valid</p></li>
+<li><p><span class="math notranslate nohighlight">\(u,v\)</span> points points.</p></li>
+<li><p><strong>**Interpolation mode**</strong> (<em>You may choose the type of interpolation mode that</em>)</p></li>
+<li><p><em>KbNufft uses under the hood by changing the boolean value of</em></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sparse_matrices</span></code>. If <code class="docutils literal notranslate"><span class="pre">sparse_matrices=False</span></code>, this routine will use the</p></li>
+<li><p>default table-based interpolation of TorchKbNufft. If <code class="docutils literal notranslate"><span class="pre">sparse_matrices=True</span></code>,</p></li>
+<li><p><em>the routine will calculate sparse matrices (which can be stored for later</em></p></li>
+<li><p>operations, as in {class}`~mpol.fourier.NuFFTCached`) and use them for the</p></li>
+<li><p><em>interpolation. This approach is likely to be more accurate but also slower. If</em></p></li>
+<li><p><em>Note that as of TorchKbNuFFT version 1.4.0, sparse matrices are not yet</em></p></li>
+<li><p><em>available when parallelizing using the ‘batch’ dimension — this will result</em></p></li>
+<li><p><em>in a warning. For most applications, we anticipate the accuracy of the</em></p></li>
+<li><p><em>table-based interpolation to be sufficiently accurate, but this could change</em></p></li>
+<li><p><em>depending on your problem.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mpol.fourier.NuFFTCached">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">NuFFTCached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">uu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_matrices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mpol/fourier.html#NuFFTCached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.NuFFTCached" title="Link to this definition">#</a></dt>
+<dd><p>This layer is similar to the <a class="reference internal" href="#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a>, but provides extra
+functionality to cache the sparse matrices for a specific set of <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code>
+points specified at initialization.</p>
+<p>For repeated evaluations of this layer (as might exist within an optimization loop),
+<code class="docutils literal notranslate"><span class="pre">sparse_matrices=True</span></code> is likely to be the more accurate and faster choice. If
+<code class="docutils literal notranslate"><span class="pre">sparse_matrices=False</span></code>, this routine will use the default table-based
+interpolation of TorchKbNufft. Note that as of TorchKbNuFFT version 1.4.0, sparse
+matrices are not yet available when parallelizing using the ‘batch’ dimension —
+this will result in a warning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><em>GridCoords</em></a>) – an object already instantiated from the GridCoords class.
+If providing this, cannot provide <code class="docutils literal notranslate"><span class="pre">cell_size</span></code> or <code class="docutils literal notranslate"><span class="pre">npix</span></code>.</p></li>
+<li><p><strong>nchan</strong> (<em>int</em>) – the number of channels in the <a class="reference internal" href="images.html#mpol.images.ImageCube" title="mpol.images.ImageCube"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.images.ImageCube</span></code></a>.
+Default = 1.</p></li>
+<li><p><strong>uu</strong> (<em>array-like</em>) – a length <code class="docutils literal notranslate"><span class="pre">nvis</span></code> array (not including Hermitian pairs) of the
+u (East-West) spatial frequency coordinate [klambda]</p></li>
+<li><p><strong>vv</strong> (<em>array-like</em>) – a length <code class="docutils literal notranslate"><span class="pre">nvis</span></code> array (not including Hermitian pairs) of the
+v (North-South) spatial frequency coordinate [klambda]</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mpol.fourier.NuFFTCached.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mpol/fourier.html#NuFFTCached.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.NuFFTCached.forward" title="Link to this definition">#</a></dt>
+<dd><p>Perform the FFT of the image cube for each channel and interpolate to the
+<code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points set at layer initialization. This call should
+automatically take the best parallelization option as set by the shape of the
+<code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>packed_cube</strong> – <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>
+shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>). The cube
+should be a “prepacked” image cube, for example,
+from <a class="reference internal" href="images.html#mpol.images.ImageCube.forward" title="mpol.images.ImageCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.images.ImageCube.forward()</span></code></a></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code>, Fourier samples evaluated</dt><dd><p>corresponding to the <code class="docutils literal notranslate"><span class="pre">uu</span></code>, <code class="docutils literal notranslate"><span class="pre">vv</span></code> points set at initialization.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.complex tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.fourier.generate_fake_data">
+<span class="sig-prename descclassname"><span class="pre">mpol.fourier.</span></span><span class="sig-name descname"><span class="pre">generate_fake_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><span class="pre">GridCoords</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">uu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/fourier.html#generate_fake_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.fourier.generate_fake_data" title="Link to this definition">#</a></dt>
+<dd><p>Create a fake dataset from a supplied packed tensor cube using
+<a class="reference internal" href="#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a>. See <span class="xref std std-ref">mock-dataset-label</span> for more details on how
+to prepare a generic image to a <cite>packed_cube</cite>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">uu</span></code> and <code class="docutils literal notranslate"><span class="pre">vv</span></code> baselines can either be 1D or 2D, depending on the desired
+broadcasting behavior from the <a class="reference internal" href="#mpol.fourier.NuFFT" title="mpol.fourier.NuFFT"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.fourier.NuFFT</span></code></a>.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">weight</span></code> array is 1D, the routine assumes the weights will be broadcasted
+to all <code class="docutils literal notranslate"><span class="pre">nchan</span></code>. Otherwise, provide a 2D weight array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packed_cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <cite>class:`torch.double</cite>) – the image in “packed” format with shape (<cite>nchan</cite>, <cite>npix</cite>, <cite>npix</cite>)</p></li>
+<li><p><strong>coords</strong> (<a class="reference internal" href="coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a>)</p></li>
+<li><p><strong>uu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <cite>class:`torch.double</cite>) – array of u spatial frequency coordinates,
+not including Hermitian pairs. Units of [<span class="math notranslate nohighlight">\(\lambda\)</span>]</p></li>
+<li><p><strong>vv</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <cite>class:`torch.double</cite>) – array of v spatial frequency coordinates,
+not including Hermitian pairs. Units of [<span class="math notranslate nohighlight">\(\lambda\)</span>]</p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <cite>class:`torch.double</cite>) – shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code> array of thermal weights
+<span class="math notranslate nohighlight">\(w_i = 1/\sigma_i^2\)</span>. Units of [<span class="math notranslate nohighlight">\(1/\mathrm{Jy}^2\)</span>] Will broadcast
+from 1D to 2D if necessary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>:class:`torch.Tensor` of `class</strong> – A 2-tuple of the fake data. The first array is the mock dataset
+including noise, the second array is the mock dataset without added noise.
+Each array is shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>torch.complex128</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="datasets.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Datasets</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="gridding.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Gridding</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube"><code class="docutils literal notranslate"><span class="pre">FourierCube</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.forward"><code class="docutils literal notranslate"><span class="pre">FourierCube.forward()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_vis"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_vis</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_amp"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_amp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.FourierCube.ground_phase"><code class="docutils literal notranslate"><span class="pre">FourierCube.ground_phase</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFT"><code class="docutils literal notranslate"><span class="pre">NuFFT</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFT.forward"><code class="docutils literal notranslate"><span class="pre">NuFFT.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFTCached"><code class="docutils literal notranslate"><span class="pre">NuFFTCached</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.NuFFTCached.forward"><code class="docutils literal notranslate"><span class="pre">NuFFTCached.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.fourier.generate_fake_data"><code class="docutils literal notranslate"><span class="pre">generate_fake_data()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Ian Czekala
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2019-24, Ian Czekala.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

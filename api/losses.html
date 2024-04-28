@@ -1,0 +1,1070 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Losses &#8212; MPoL 0.1.dev1+gda6dbd3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=c80d40b4"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/losses';</script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Geometry" href="geometry.html" />
+    <link rel="prev" title="Images" href="images.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Background and prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="coordinates.html">Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fourier.html">Fourier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridding.html">Gridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="precomposed.html">Precomposed Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="train_test.html">Training and testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crossval.html">Cross-validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/MPoL-dev/MPoL" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/losses.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Losses</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#review">Review</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-a-line-example">Fitting a line example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier-data">Fourier data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#averaged-loss-functions">Averaged loss functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization">Regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.losses">Data loss function API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.r_chi_squared"><code class="docutils literal notranslate"><span class="pre">r_chi_squared()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.r_chi_squared_gridded"><code class="docutils literal notranslate"><span class="pre">r_chi_squared_gridded()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.log_likelihood"><code class="docutils literal notranslate"><span class="pre">log_likelihood()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.log_likelihood_gridded"><code class="docutils literal notranslate"><span class="pre">log_likelihood_gridded()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.neg_log_likelihood_avg"><code class="docutils literal notranslate"><span class="pre">neg_log_likelihood_avg()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.losses">Regularizer loss function API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.entropy"><code class="docutils literal notranslate"><span class="pre">entropy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TV_image"><code class="docutils literal notranslate"><span class="pre">TV_image()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TV_channel"><code class="docutils literal notranslate"><span class="pre">TV_channel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TSV"><code class="docutils literal notranslate"><span class="pre">TSV()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.sparsity"><code class="docutils literal notranslate"><span class="pre">sparsity()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.UV_sparsity"><code class="docutils literal notranslate"><span class="pre">UV_sparsity()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.PSD"><code class="docutils literal notranslate"><span class="pre">PSD()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.edge_clamp"><code class="docutils literal notranslate"><span class="pre">edge_clamp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="losses">
+<h1>Losses<a class="headerlink" href="#losses" title="Link to this heading">#</a></h1>
+<p>We have separated the loss functions into two categories: those involving <a class="reference internal" href="#data-loss-function-api">data</a> (derived from likelihood functions) and those acting as <a class="reference internal" href="#regularizer-loss-function-api">regularizers</a> (or priors). We briefly review likelihood functions and their application to Fourier data.</p>
+<section id="review">
+<h2>Review<a class="headerlink" href="#review" title="Link to this heading">#</a></h2>
+<div class="admonition-reference-literature admonition">
+<p class="admonition-title">Reference Literature</p>
+<p>If you are new to Bayesian inference or its notation, we recommend reviewing the following excellent resources as a prerequisite to the following discussion.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023arXiv230204703E/abstract">Eadie et al. 2023</a>: Practical Guidance for Bayesian Inference in Astronomy</p></li>
+<li><p><a class="reference external" href="https://www.amazon.com/Data-Analysis-Bayesian-Devinderjit-Sivia/dp/0198568320">Data Analysis: A Bayesian Tutorial</a> by Sivia and Skilling</p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2010arXiv1008.4686H/abstract">Data analysis recipes: Fitting a model to data</a> by Hogg, Bovy, and Lang</p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2012arXiv1205.4446H/abstract">Data analysis recipes: Probability calculus for inference</a> by Hogg.</p></li>
+</ul>
+</div>
+<section id="fitting-a-line-example">
+<h3>Fitting a line example<a class="headerlink" href="#fitting-a-line-example" title="Link to this heading">#</a></h3>
+<p>Typically, when astronomers fit a model to some dataset, such as a line <span class="math notranslate nohighlight">\(y = m x + b\)</span> to a collection of <span class="math notranslate nohighlight">\(\boldsymbol{X} = \{x_1, x_2, \ldots\, x_N\}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}\)</span> points, we require a likelihood function. The likelihood function specifies the probability of the data, given a model, and encapsulates our assumptions about the data and noise generating processes.</p>
+<p>For most real-world datasets, we don’t measure the “true” <span class="math notranslate nohighlight">\(y\)</span> value of the line (i.e., <span class="math notranslate nohighlight">\(mx + b\)</span>), but rather make a measurement which has been partially corrupted by some “noise.” We say that each <span class="math notranslate nohighlight">\(y_i\)</span> data point is actually generated by</p>
+<div class="math notranslate nohighlight">
+\[
+y_i = m x_i + b + \epsilon_i
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\epsilon_i\)</span> is a noise realization from a standard <a class="reference external" href="https://en.wikipedia.org/wiki/Normal_distribution">normal distribution</a> with standard deviation <span class="math notranslate nohighlight">\(\sigma_i\)</span>, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[
+\epsilon_i \sim \mathcal{N}(0, \sigma_i).
+\]</div>
+<p>This information allows us to write down a likelihood function to calculate the probability of the data, given a set of model parameters <span class="math notranslate nohighlight">\(p(\boldsymbol{Y} |\,\boldsymbol{\theta})\)</span>. Sometimes it is written as <span class="math notranslate nohighlight">\(\mathcal{L}(\boldsymbol{\theta}; \boldsymbol{Y})\)</span> to emphasize that it is in fact a <em>function</em> (note, not probability) of the model parameters, and that it takes the data as an argument. Frequently, when employed in computation, we’ll use the logarithm of the likelihood function, or “log-likelihood,” <span class="math notranslate nohighlight">\(\ln \mathcal{L}\)</span> to avoid numerical under/overflow issues. Let’s call <span class="math notranslate nohighlight">\(\boldsymbol{\theta} = \{m, b\}\)</span> and <span class="math notranslate nohighlight">\(M(x_i |\, \boldsymbol{\theta}) = m x_i + b\)</span> to emphasize that we can use the model <span class="math notranslate nohighlight">\(M\)</span> to calculate a response at input <span class="math notranslate nohighlight">\(x_i\)</span> conditional on model parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>. The likelihood function for this line problem is</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{L}(\boldsymbol{\theta}; \boldsymbol{Y}) = \prod_i^N \frac{1}{\sqrt{2 \pi} \sigma} \exp \left [ - \frac{(y_i - M(x_i |\,\boldsymbol{\theta}))^2}{2 \sigma_i^2}\right ]
+\]</div>
+<p>The logarithm of the likelihood function is</p>
+<div class="math notranslate nohighlight">
+\[
+\ln \mathcal{L}(\boldsymbol{\theta}; \boldsymbol{Y}) = -\frac{N}{2} \ln(2 \pi) - \sum_i^N \ln(\sigma_i) - \frac{1}{2} \sum_i^N \frac{(y_i - M(x_i |\,\boldsymbol{\theta}))^2}{\sigma_i^2}
+\]</div>
+<p>You may recognize the last term contains the <span class="math notranslate nohighlight">\(\chi^2\)</span> metric,</p>
+<div class="math notranslate nohighlight">
+\[
+\chi^2(\boldsymbol{\theta}; \boldsymbol{Y}) = \sum_i^N \frac{(y_i - M(x_i |\,\boldsymbol{\theta}))^2}{\sigma_i^2}
+\]</div>
+<p>Assuming that the uncertainty (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) on each data point is known (and remains constant), the first two terms remain constant and we have</p>
+<div class="math notranslate nohighlight">
+\[
+\ln \mathcal{L}(\boldsymbol{\theta}; \boldsymbol{Y}) = C - \frac{1}{2} \chi^2 (\boldsymbol{\theta}; \boldsymbol{Y})
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(C\)</span> is a constant with respect to the model parameters. It is common to use shorthand to say that “the likelihood function is <span class="math notranslate nohighlight">\(\chi^2\)</span>” to indicate situations where the data uncertainties are Gaussian. Very often, we are interested in the parameter values <span class="math notranslate nohighlight">\(\boldsymbol{\theta}_\mathrm{MLE}\)</span> which maximize the likelihood function, called the <em>maximum likelihood estimate</em> (or MLE).</p>
+<p><span class="math notranslate nohighlight">\(\chi^2\)</span> is not the end of the story for Bayesian parameter inference. To do so, we need the posterior probability distribution of the model parameters given the dataset, <span class="math notranslate nohighlight">\(p(\boldsymbol{\theta}|\,\boldsymbol{Y})\)</span>. We can calculate this quantity using Bayes rule</p>
+<div class="math notranslate nohighlight">
+\[
+p(\boldsymbol{\theta}|\,\boldsymbol{Y}) = \frac{p(\boldsymbol{Y}|\,\boldsymbol{\theta})\, p(\boldsymbol{\theta})}{p(\boldsymbol{Y})}
+\]</div>
+<p>The denominator is a constant so long as the model specification remains the same, leaving</p>
+<div class="math notranslate nohighlight">
+\[
+p(\boldsymbol{\theta}|\,\boldsymbol{Y}) \propto p(\boldsymbol{Y}|\,\boldsymbol{\theta})\, p(\boldsymbol{\theta}).
+\]</div>
+<p>So we need a prior probability distribution <span class="math notranslate nohighlight">\(p(\boldsymbol{\theta})\)</span> in addition to the likelihood function to calculate the posterior probability distribution of the model parameters. Analogous to the maximum likelihood estimate, there is also the <em>maximum a posteriori</em> estimate (or MAP), which includes the effect of the prior probability distribution.</p>
+</section>
+<section id="fourier-data">
+<h3>Fourier data<a class="headerlink" href="#fourier-data" title="Link to this heading">#</a></h3>
+<div class="admonition-reference-literature admonition">
+<p class="admonition-title">Reference Literature</p>
+<p>A full introduction to Fourier transforms, radio astronomy, and interferometry is beyond the scope of MPoL documentation. We recommend reviewing these resources as a prerequisite to the discussion.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cv.nrao.edu/~sransom/web/xxx.html">Essential radio astronomy</a> textbook by James Condon and Scott Ransom, and in particular, Chapter 3.7 on Radio Interferometry.</p></li>
+<li><p>NRAO’s <a class="reference external" href="http://www.cvent.com/events/virtual-17th-synthesis-imaging-workshop/agenda-0d59eb6cd1474978bce811194b2ff961.aspx">17th Synthesis Imaging Workshop</a> recorded lectures and slides available</p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract">Interferometry and Synthesis in Radio Astronomy</a> by Thompson, Moran, and Swenson. An excellent and comprehensive reference on all things interferometry.</p></li>
+<li><p>NJIT’s online course materials for <a class="reference external" href="https://web.njit.edu/~gary/728/">Radio Astronomy</a></p></li>
+<li><p>Ian Czekala’s lecture notes on <a class="reference external" href="https://iancze.github.io/courses/as5003/lectures/">Radio Interferometry and Imaging</a></p></li>
+</ul>
+</div>
+<p>Interferometers acquire samples of data in the Fourier domain, also called the visibility domain. The visibility domain is the Fourier transform of the image sky brightness</p>
+<div class="math notranslate nohighlight">
+\[
+{\cal V}(u,v) = \iint I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> are direction cosines (roughly equivalent to R.A. and Dec) which parameterize the surface brightness distribution of the image <span class="math notranslate nohighlight">\(I(l,m)\)</span>, and <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span> are spatial frequencies which parameterize the visibility function <span class="math notranslate nohighlight">\(\cal{V}(u,v)\)</span>. For more information on the meaning of these units, see <a class="reference internal" href="../units-and-conventions.html#units-conventions-label"><span class="std std-ref">Units and Conventions</span></a>.</p>
+<p>The visibility function is complex-valued, and each measurement of it (denoted by <span class="math notranslate nohighlight">\(V_i\)</span>) is made in the presence of noise</p>
+<div class="math notranslate nohighlight">
+\[
+V_i = \mathcal{V}(u_i, v_i) + \epsilon_i.
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\epsilon_i\)</span> represents a noise realization from a <a class="reference external" href="https://en.wikipedia.org/wiki/Complex_normal_distribution">complex normal</a> (Gaussian) distribution. Thankfully, most interferometric datasets do not exhibit significant covariance between the real and imaginary noise components, so we could equivalently say that the real and imaginary components of the noise are separately generated by draws from normal distributions characterized by standard deviation <span class="math notranslate nohighlight">\(\sigma_i\)</span></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\epsilon_\Re \sim \mathcal{N}(0, \sigma_i) \\
+\epsilon_\Im \sim \mathcal{N}(0, \sigma_i)
+\end{split}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[
+\epsilon_i = \epsilon_\Re + i \epsilon_\Im
+\]</div>
+<p>Radio interferometers will commonly represent the uncertainty on each visibility measurement by a “weight” <span class="math notranslate nohighlight">\(w_i\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[
+w_i = \frac{1}{\sigma_i^2}
+\]</div>
+<p>A full interferometric dataset is a collection of visibility measurements, which we represent by</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{V} = \{V_1, V_2, \ldots \}_{i=1}^N
+\]</div>
+<p>A typical ALMA dataset might contain a half-million individual visibility samples, acquired over a range of spatial frequencies.</p>
+<p>Assume we have some forward model that can predict the value of the visibility function for any spatial frequency, <span class="math notranslate nohighlight">\(\mathcal{V}(u, v) = M_\mathcal{V}(u, v |, \boldsymbol{\theta})\)</span>. It’s difficult to reason about all but the simplest models directly in the Fourier plane, so usually models are constructed in the image plane <span class="math notranslate nohighlight">\(M_I(l,m |,\boldsymbol{\theta})\)</span> and then Fourier transformed (either analytically, or via the FFT) to construct visibility models <span class="math notranslate nohighlight">\(M_\mathcal{V}(u, v |, \boldsymbol{\theta}) \leftrightharpoons M_I(l,m |,\boldsymbol{\theta})\)</span>.</p>
+<p>As with the line example, our statement about the data generating process</p>
+<div class="math notranslate nohighlight">
+\[
+V_i = \mathcal{V}(u_i, v_i) + \epsilon_i
+\]</div>
+<p>leads to the formulation of the likelihood function</p>
+<div class="math notranslate nohighlight">
+\[
+\ln \mathcal{L}(\boldsymbol{\theta}; \boldsymbol{V}) = - \frac{1}{2} \chi^2(\boldsymbol{\theta}; \boldsymbol{V}) + C
+\]</div>
+<p>Because the data and model are complex-valued, <span class="math notranslate nohighlight">\(\chi^2\)</span> is evaluated as</p>
+<div class="math notranslate nohighlight">
+\[
+\chi^2(\boldsymbol{\theta}; \boldsymbol{V}) = \sum_i^N  w_i |V_i - M_\mathcal{V}(u_i, v_i |\,\boldsymbol{\theta})|^2
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(| |\)</span> denotes the modulus squared. Equivalently, the calculation can be broken up into sums over the real (<span class="math notranslate nohighlight">\(\Re\)</span>) and imaginary (<span class="math notranslate nohighlight">\(\Im\)</span>) components of the visibility data and model</p>
+<div class="math notranslate nohighlight">
+\[
+\chi^2(\boldsymbol{\theta}; \boldsymbol{V}) = \sum_i^N w_i (V_{\Re,i} - M_\mathcal{V,\Re}(u_i, v_i |\,\boldsymbol{\theta}))^2 + \sum_i^N w_i (V_{\Im,i} - M_\mathcal{V,\Im}(u_i, v_i |\,\boldsymbol{\theta}))^2
+\]</div>
+<div class="admonition-spectral-covariance admonition">
+<p class="admonition-title">Spectral covariance</p>
+<p>The <span class="math notranslate nohighlight">\(\chi^2\)</span> likelihood function as formulated above is appropriate for visibilities with minimal spectral covariance. When modeling spectral line datasets, in particular those that have not been channel-averaged and retain the spectral response function from their Hann windowing, this covariance must be taken into account in the likelihood function. More information on how to derive these covariance matrices is provided in the appendices of <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018AJ....155..182L/abstract">Loomis et al. 2018</a> and will be detailed in forthcoming tutorials.</p>
+</div>
+<div class="admonition-hermitian-visibilities admonition">
+<p class="admonition-title">Hermitian visibilities</p>
+<p>Because the sky brightness <span class="math notranslate nohighlight">\(I_\nu\)</span> is real, the visibility function <span class="math notranslate nohighlight">\(\mathcal{V}\)</span> is Hermitian, meaning that</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{V}(u, v) = \mathcal{V}^*(-u, -v).
+\]</div>
+<p>Most datasets (e.g., those extracted from CASA) will only record one visibility measurement per baseline and not include the duplicate Hermitian pair (to save storage space). We recommend that you evaluate all data loss functions <em>without the Hermitian pair</em>.</p>
+<p>For the likelihood function calculation to be accurate with Hermitian pairs, the simple <span class="math notranslate nohighlight">\(\chi^2\)</span> sum of data - model would need to be replaced with a multivariate Gaussian likelihood that included a perfect covariance between each data point and its Hermitian pair. This complicates the calculation unnecessarily.</p>
+<p>The one case where Hermitian pairs <em>do</em> need to be included is when using the inverse FFT. This applies to the <a class="reference internal" href="gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager()</span></code></a> and is handled internally.</p>
+<p>You can check whether your dataset already includes Hermitian pairs using <a class="reference internal" href="gridding.html#mpol.gridding.verify_no_hermitian_pairs" title="mpol.gridding.verify_no_hermitian_pairs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.verify_no_hermitian_pairs()</span></code></a>.</p>
+</div>
+</section>
+<section id="averaged-loss-functions">
+<h3>Averaged loss functions<a class="headerlink" href="#averaged-loss-functions" title="Link to this heading">#</a></h3>
+<p>In an optimization workflow, we usually minimize a loss function <span class="math notranslate nohighlight">\(L\)</span> rather than maximize the log likelihood function. If we are just optimizing (instead of sampling), we only care about the value of <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\theta}}\)</span> that minimizes the function <span class="math notranslate nohighlight">\(L\)</span>. The normalization of <span class="math notranslate nohighlight">\(L\)</span> does not matter, we only care that <span class="math notranslate nohighlight">\(L(\hat{\boldsymbol{\theta}}) &lt; L(\hat{\boldsymbol{\theta}} + \varepsilon)\)</span>, not by how much. In these applications we recommend using an <em>averaged</em> data loss function, whose value remains approximately constant as the size of the dataset varies.</p>
+<p>In the most common scenario where you are keeping data and weights fixed, we recommend using a reduced <span class="math notranslate nohighlight">\(\chi_R^2\)</span> data loss function, available in either <a class="reference internal" href="#mpol.losses.r_chi_squared" title="mpol.losses.r_chi_squared"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.losses.r_chi_squared()</span></code></a> or <a class="reference internal" href="#mpol.losses.r_chi_squared_gridded" title="mpol.losses.r_chi_squared_gridded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.losses.r_chi_squared_gridded()</span></code></a>. The hope is that for many applications, the reduced <span class="math notranslate nohighlight">\(\chi^2_R\)</span> loss function will have a minimum value of <span class="math notranslate nohighlight">\(\chi^2_R(\hat{\boldsymbol{\theta}}) \approx 1\)</span> for a well-fit model (regardless of the number of data points).</p>
+<p>In the situation where you may be modifying the data and weights (as in a self-calibration workflow), we recommend using the <a class="reference internal" href="#mpol.losses.neg_log_likelihood_avg" title="mpol.losses.neg_log_likelihood_avg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.losses.neg_log_likelihood_avg()</span></code></a> loss function.</p>
+</section>
+<section id="regularization">
+<h3>Regularization<a class="headerlink" href="#regularization" title="Link to this heading">#</a></h3>
+<p>With RML imaging, we’re trying to come up with a model that will fit the dataset. But rather than using a parametric model like a series of Gaussian rings for a protoplanetary disk, we’re using a non-parametric model of <em>the image itself</em>. This could be as simple as parameterizing the image using the intensity values of the pixels themselves, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{\theta} = \{I_1, I_2, \ldots, I_{N^2} \}
+\]</div>
+<p>assuming we have an <span class="math notranslate nohighlight">\(N \times N\)</span> image.</p>
+<p>This flexible image model is analogous to using a spline or Gaussian process to fit a series of points <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \{y_1, y_2, \ldots\, y_N\}\)</span>—the model will nearly always have enough flexibility to capture the structure that exists in the dataset. The pixel basis set is the most straightforward non-parametric image model, but we could also use more sophisticated basis sets like a set of wavelet coefficients, or even more exotic basis sets constructed from trained neural networks.</p>
+<p>Because the Fourier transform is a linear operation with respect to the pixel basis, the maximum likelihood model image (called the dirty image) can be calculated analytically by the inverse Fourier transform. The point spread function of the dirty image is called the dirty beam. By construction, all unsampled spatial frequencies are set to zero power. This means that the dirty image will only contain spatial frequencies about which we have at least some data. This assumption, however, rarely translates into good image fidelity, especially if there are many unsampled spatial frequencies which carry significant power. It’s also important to recognize that dirty image is only <em>one</em> out of a set of <em>many</em> images that could maximize the likelihood function. From the perspective of the likelihood calculation, we could modify the unsampled spatial frequencies of the dirty image to whatever power we might like, and, because they are <em>unsampled</em>, the value of the likelihood calculation won’t change, i.e., it will still remain maximal.</p>
+<p>When synthesis imaging is described as an “ill-posed inverse problem,” this is what is meant. There is a (potentially infinite) range of images that could <em>exactly</em> fit the dataset, and without additional information we have no way of discriminating which is best. This is where “regularization” comes in.</p>
+<p>One can talk about regularization from a Bayesian perspective using <em>priors</em>, i.e., we introduce terms like <span class="math notranslate nohighlight">\(p(\boldsymbol{\theta})\)</span> such that we might calculate the maximum a posteriori (MAP) image <span class="math notranslate nohighlight">\(\boldsymbol{\theta}_\mathrm{MAP}\)</span> using the posterior probability distribution</p>
+<div class="math notranslate nohighlight">
+\[
+p(\boldsymbol{\theta} |\, \boldsymbol{V}) \propto \mathcal{L}(\boldsymbol{\theta}; \boldsymbol{V}) \, p(\boldsymbol{\theta}).
+\]</div>
+<p>For computational reasons related to numerical over/underflow, we would most likely use the logarithm of the posterior probability distribution</p>
+<div class="math notranslate nohighlight">
+\[
+\ln p(\boldsymbol{\theta} |\, \boldsymbol{V}) \propto \ln \mathcal{L}( \boldsymbol{\theta}; \boldsymbol{V}) + \ln p(\boldsymbol{\theta}).
+\]</div>
+<p>One could also describe the optimization processes without Bayesian terminology as minimizing an objective loss function comprising data loss functions and regularization penalties, e.g.,</p>
+<div class="math notranslate nohighlight">
+\[
+L(\boldsymbol{\theta}) = L_\mathrm{data}(\boldsymbol{\theta})  + L_\mathrm{sparsity}(\boldsymbol{\theta}) + L_\mathrm{TSV}(\boldsymbol{\theta}) + \ldots
+\]</div>
+<p>The relative “strength” of the regularization is controlled via a scalar prefactor <span class="math notranslate nohighlight">\(\lambda\)</span>, internal to each loss function. This is one situation where a normalized data loss function is useful, because it preserves the relative strength of the regularizer even if the dataset (or mini-batches of it, in a stochastic gradient descent setting) change size.</p>
+</section>
+</section>
+<section id="module-mpol.losses">
+<span id="data-loss-function-api"></span><h2>Data loss function API<a class="headerlink" href="#module-mpol.losses" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.r_chi_squared">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">r_chi_squared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#r_chi_squared"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.r_chi_squared" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the reduced <span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}\)</span> between the complex data
+<span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span> and model <span class="math notranslate nohighlight">\(M\)</span> visibilities using</p>
+<div class="math notranslate nohighlight">
+\[\chi^2_\mathrm{R} = \frac{1}{2 N} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})\]</div>
+<p>where <span class="math notranslate nohighlight">\(\chi^2\)</span> is evaluated using private function <code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses._chi_squared()</span></code>.
+Data and model visibilities may be any shape as long as all tensors (including
+weight) have the same shape. Following <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, we apply
+a prefactor <span class="math notranslate nohighlight">\(1/(2 N)\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of visibilities. The
+factor of 2 comes in because we must count real and imaginaries in the
+<span class="math notranslate nohighlight">\(\chi^2\)</span> sum. This loss function will have a minimum value of
+<span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}(\hat{\boldsymbol{\theta}};\,\boldsymbol{V})
+\approx 1\)</span> for a well-fit model (regardless of the number of data points), making
+it easier to set the prefactor strengths of other regularizers <em>relative</em> to this
+value.</p>
+<p>Note that this function should only be used in an optimization or point estimate
+situation <cite>and</cite> where you are not adjusting the weight or the amplitudes of
+the data values. If it is used in any situation where uncertainties on parameter values
+are determined (such as Markov Chain Monte Carlo), it will return the wrong answer.
+This is because the relative scaling of <span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}\)</span> with respect to
+parameter value is incorrect. For those applications, you should use
+<a class="reference internal" href="#mpol.losses.log_likelihood" title="mpol.losses.log_likelihood"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.losses.log_likelihood()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – array of the model values representing <span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span></p></li>
+<li><p><strong>data_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – array of the data values representing <span class="math notranslate nohighlight">\(M\)</span></p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – array of weight values representing <span class="math notranslate nohighlight">\(w_i\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}\)</span>, summed over all dimensions of input array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.r_chi_squared_gridded">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">r_chi_squared_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#r_chi_squared_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.r_chi_squared_gridded" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the reduced <span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}\)</span> between the complex data
+<span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span> and model <span class="math notranslate nohighlight">\(M\)</span> visibilities using gridded quantities.
+Function will return the same value regardless of whether Hermitian pairs are
+included.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modelVisibilityCube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the
+<code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is
+“pre-packed,” as in output from <a class="reference internal" href="fourier.html#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
+<li><p><strong>griddedDataset</strong> (<a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object) – the gridded dataset, most likely produced from
+<a class="reference internal" href="gridding.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\chi^2_\mathrm{R}\)</span> value summed over all input dimensions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.log_likelihood">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#log_likelihood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.log_likelihood" title="Link to this definition">#</a></dt>
+<dd><p>Compute the log likelihood function <span class="math notranslate nohighlight">\(\ln\mathcal{L}\)</span> between the complex data
+<span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span> and model <span class="math notranslate nohighlight">\(M\)</span> visibilities using</p>
+<div class="math notranslate nohighlight">
+\[\ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V}) =
+- N \ln 2 \pi +  \sum_i^N w_i -
+\frac{1}{2} \chi^2(\boldsymbol{\theta};\,\boldsymbol{V})\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the number of complex visibilities and <span class="math notranslate nohighlight">\(\chi^2\)</span> is
+evaluated internally using <code class="xref py py-func docutils literal notranslate"><span class="pre">mpol.losses._chi_squared()</span></code>. Note that this expression has
+factors of 2 in different places compared to the multivariate Normal you might be
+used to seeing because the visibilities are complex-valued. We could alternatively
+write</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V}) =
+\mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\}) \times
+\mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{L}(\boldsymbol{\theta};\,\Re\{\boldsymbol{V}\})\)</span> and
+<span class="math notranslate nohighlight">\(\mathcal{L}(\boldsymbol{\theta};\,\Im\{\boldsymbol{V}\})\)</span> each are the
+well-known multivariate Normal for reals.</p>
+<p>This function is agnostic as to whether the sum should include the Hermitian
+conjugate visibilities, but be aware that the normalization of the answer returned
+will be different between the two cases. Inference of the parameter values should
+be unaffected. We recommend not including the Hermitian conjugates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex128</span></code>) – array of the model values representing <span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span></p></li>
+<li><p><strong>data_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex128</span></code>) – array of the data values representing <span class="math notranslate nohighlight">\(M\)</span></p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – array of weight values representing <span class="math notranslate nohighlight">\(w_i\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\ln\mathcal{L}\)</span> log likelihood, summed over all dimensions
+of input array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.log_likelihood_gridded">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">log_likelihood_gridded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelVisibilityCube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">griddedDataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><span class="pre">GriddedDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#log_likelihood_gridded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.log_likelihood_gridded" title="Link to this definition">#</a></dt>
+<dd><p>Calculate <span class="math notranslate nohighlight">\(\ln\mathcal{L}\)</span> (corresponding to
+<a class="reference internal" href="#mpol.losses.log_likelihood" title="mpol.losses.log_likelihood"><code class="xref py py-func docutils literal notranslate"><span class="pre">log_likelihood()</span></code></a>) using gridded quantities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modelVisibilityCube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – torch tensor with shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code> to be indexed by the
+<code class="docutils literal notranslate"><span class="pre">mask</span></code> from <a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a>. Assumes tensor is
+“pre-packed,” as in output from <a class="reference internal" href="fourier.html#mpol.fourier.FourierCube.forward" title="mpol.fourier.FourierCube.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.fourier.FourierCube.forward()</span></code></a>.</p></li>
+<li><p><strong>griddedDataset</strong> (<a class="reference internal" href="datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">GriddedDataset</span></code></a> object) – the gridded dataset, most likely produced from
+<a class="reference internal" href="gridding.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <span class="math notranslate nohighlight">\(\ln\mathcal{L}\)</span> value, summed over all dimensions of input data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.neg_log_likelihood_avg">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">neg_log_likelihood_avg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#neg_log_likelihood_avg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.neg_log_likelihood_avg" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the average value of the negative log likelihood</p>
+<div class="math notranslate nohighlight">
+\[L = - \frac{1}{2 N} \ln \mathcal{L}(\boldsymbol{\theta};\,\boldsymbol{V})\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the number of complex visibilities. This loss function is most
+useful where you are in an optimization or point estimate
+situation <cite>and</cite> where you may adjusting the weight or the amplitudes of
+the data values, perhaps via a self-calibration operation.</p>
+<p>If you are in any situation where uncertainties on parameter values
+are determined (such as Markov Chain Monte Carlo), you should use
+<a class="reference internal" href="#mpol.losses.log_likelihood" title="mpol.losses.log_likelihood"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.losses.log_likelihood()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – array of the model values representing <span class="math notranslate nohighlight">\(\boldsymbol{V}\)</span></p></li>
+<li><p><strong>data_vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex</span></code>) – array of the data values representing <span class="math notranslate nohighlight">\(M\)</span></p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – array of weight values representing <span class="math notranslate nohighlight">\(w_i\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the average of the negative log likelihood, summed over all dimensions of
+input array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mpol.losses">
+<span id="regularizer-loss-function-api"></span><h2>Regularizer loss function API<a class="headerlink" href="#module-mpol.losses" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.entropy">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_intensity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_flux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.entropy" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the entropy loss of a set of pixels following the definition in
+<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>.</p>
+<div class="math notranslate nohighlight">
+\[L = \frac{1}{\zeta} \sum_i I_i \; \ln \frac{I_i}{p_i}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – pixel values must be positive <span class="math notranslate nohighlight">\(I_i &gt; 0\)</span> for all <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><strong>prior_intensity</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the prior value <span class="math notranslate nohighlight">\(p\)</span> to calculate entropy against. Tensors of any shape
+are allowed so long as they will broadcast to the shape of the cube under
+division (<cite>/</cite>).</p></li>
+<li><p><strong>tot_flux</strong> (<em>float</em>) – a fixed normalization factor; the user-defined target total flux density, in
+units of Jy.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>entropy loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.TV_image">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">TV_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#TV_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.TV_image" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the total variation (TV) loss in the image dimension (R.A. and DEC).
+Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a> Promotes the
+image to be piecewise smooth and the gradient of the image to be sparse.</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{l,m,v} \sqrt{(I_{l + 1, m, v} - I_{l,m,v})^2 +
+    (I_{l, m+1, v} - I_{l, m, v})^2 + \epsilon}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sky_cube</strong> (3D <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span>, where <span class="math notranslate nohighlight">\(l\)</span>
+is R.A. in <span class="math notranslate nohighlight">\(ndim=3\)</span>, <span class="math notranslate nohighlight">\(m\)</span> is DEC in <span class="math notranslate nohighlight">\(ndim=2\)</span>, and
+<span class="math notranslate nohighlight">\(v\)</span> is the channel (velocity or frequency) dimension in
+<span class="math notranslate nohighlight">\(ndim=1\)</span>. Should be in sky format representation.</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – a softening parameter in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>].
+Any pixel-to-pixel variations within each image North-South or East-West
+slice greater than this parameter will incur a significant penalty.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>total variation loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.TV_channel">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">TV_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#TV_channel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.TV_channel" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the total variation (TV) loss in the channel (first) dimension.
+Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a>, calculate</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{l,m,v} \sqrt{(I_{l, m, v + 1} - I_{l,m,v})^2 + \epsilon}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span></p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – a softening parameter in units of [<span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>].
+Any channel-to-channel pixel variations greater than this parameter will incur
+a significant penalty.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>total variation loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.TSV">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">TSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#TSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.TSV" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the total square variation (TSV) loss in the image dimension
+(R.A. and DEC). Following the definition in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...875L...4E/abstract">EHT-IV 2019</a> Promotes the
+image to be edge smoothed which may be a better reoresentation of the truth image
+<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018ApJ...858...56K/abstract">K. Kuramochi et al 2018</a>.</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{l,m,v} (I_{l + 1, m, v} - I_{l,m,v})^2 +
+(I_{l, m+1, v} - I_{l, m, v})^2\]</div>
+<dl class="simple">
+<dt>:param sky_cube <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>: the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span>, where <span class="math notranslate nohighlight">\(l\)</span></dt><dd><p>is R.A. in <span class="math notranslate nohighlight">\(ndim=3\)</span>, <span class="math notranslate nohighlight">\(m\)</span> is DEC in <span class="math notranslate nohighlight">\(ndim=2\)</span>, and
+<span class="math notranslate nohighlight">\(v\)</span> is the channel (velocity or frequency) dimension in
+<span class="math notranslate nohighlight">\(ndim=1\)</span>. Should be in sky format representation.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>total square variation loss</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.sparsity">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">sparsity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.sparsity" title="Link to this definition">#</a></dt>
+<dd><p>Enforce a sparsity prior on the image cube using the <span class="math notranslate nohighlight">\(L_1\)</span> norm. Optionally
+provide a boolean mask to apply the prior to only the <code class="docutils literal notranslate"><span class="pre">True</span></code> locations. For
+example, you might want this mask to be <code class="docutils literal notranslate"><span class="pre">True</span></code> for background regions.</p>
+<p>The sparsity loss calculated as</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_i | I_i |\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span></p></li>
+<li><p><strong>mask</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.bool</span></code>) – tensor array the same shape as <code class="docutils literal notranslate"><span class="pre">cube</span></code>. The sparsity prior
+will be applied to those pixels where the mask is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default is
+to apply prior to all pixels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparsity loss calculated where <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">==</span> <span class="pre">True</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.UV_sparsity">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">UV_sparsity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#UV_sparsity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.UV_sparsity" title="Link to this definition">#</a></dt>
+<dd><p>Enforce a sparsity prior for all <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span> points larger than
+<span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.complex128</span></code>) – visibility cube of (nchan, npix, npix//2 +1, 2)</p></li>
+<li><p><strong>qs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.float64</span></code>) – array corresponding to visibility coordinates. Dimensionality of
+(npix, npix//2)</p></li>
+<li><p><strong>q_max</strong> (<em>float</em>) – maximum radial baseline</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>UV sparsity loss above <span class="math notranslate nohighlight">\(q_\mathrm{max}\)</span></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.PSD">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">PSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#PSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.PSD" title="Link to this definition">#</a></dt>
+<dd><p>Apply a loss function corresponding to the power spectral density using a Gaussian
+process kernel.</p>
+<p>Assumes an image plane kernel of</p>
+<div class="math notranslate nohighlight">
+\[k(r) = \exp(-\frac{r^2}{2 \ell^2})\]</div>
+<p>The corresponding power spectral density is</p>
+<div class="math notranslate nohighlight">
+\[P(q) = (2 \pi \ell^2) \exp(- 2 \pi^2 \ell^2 q^2)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the radial UV coordinate (in <span class="math notranslate nohighlight">\(\lambda\)</span>)</p></li>
+<li><p><strong>psd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the power spectral density cube</p></li>
+<li><p><strong>l</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the correlation length in the image plane (in arcsec)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the loss calculated using the power spectral density</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.losses.edge_clamp">
+<span class="sig-prename descclassname"><span class="pre">mpol.losses.</span></span><span class="sig-name descname"><span class="pre">edge_clamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/losses.html#edge_clamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.losses.edge_clamp" title="Link to this definition">#</a></dt>
+<dd><p>Promote all pixels at the edge of the image to be zero using an <span class="math notranslate nohighlight">\(L_2\)</span> norm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cube</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – the image cube array <span class="math notranslate nohighlight">\(I_{lmv}\)</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>edge loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="images.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Images</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="geometry.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Geometry</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#review">Review</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-a-line-example">Fitting a line example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier-data">Fourier data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#averaged-loss-functions">Averaged loss functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regularization">Regularization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.losses">Data loss function API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.r_chi_squared"><code class="docutils literal notranslate"><span class="pre">r_chi_squared()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.r_chi_squared_gridded"><code class="docutils literal notranslate"><span class="pre">r_chi_squared_gridded()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.log_likelihood"><code class="docutils literal notranslate"><span class="pre">log_likelihood()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.log_likelihood_gridded"><code class="docutils literal notranslate"><span class="pre">log_likelihood_gridded()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.neg_log_likelihood_avg"><code class="docutils literal notranslate"><span class="pre">neg_log_likelihood_avg()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-mpol.losses">Regularizer loss function API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.entropy"><code class="docutils literal notranslate"><span class="pre">entropy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TV_image"><code class="docutils literal notranslate"><span class="pre">TV_image()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TV_channel"><code class="docutils literal notranslate"><span class="pre">TV_channel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.TSV"><code class="docutils literal notranslate"><span class="pre">TSV()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.sparsity"><code class="docutils literal notranslate"><span class="pre">sparsity()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.UV_sparsity"><code class="docutils literal notranslate"><span class="pre">UV_sparsity()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.PSD"><code class="docutils literal notranslate"><span class="pre">PSD()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.losses.edge_clamp"><code class="docutils literal notranslate"><span class="pre">edge_clamp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Ian Czekala
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2019-24, Ian Czekala.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

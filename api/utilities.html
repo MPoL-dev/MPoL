@@ -1,0 +1,958 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Utilities &#8212; MPoL 0.1.dev1+gda6dbd3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=c80d40b4"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/utilities';</script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Precomposed Modules" href="precomposed.html" />
+    <link rel="prev" title="Geometry" href="geometry.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Background and prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="coordinates.html">Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fourier.html">Fourier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gridding.html">Gridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="precomposed.html">Precomposed Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="train_test.html">Training and testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crossval.html">Cross-validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/MPoL-dev/MPoL" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/utilities.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Utilities</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.torch2npy"><code class="docutils literal notranslate"><span class="pre">torch2npy()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.ground_cube_to_packed_cube"><code class="docutils literal notranslate"><span class="pre">ground_cube_to_packed_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.packed_cube_to_ground_cube"><code class="docutils literal notranslate"><span class="pre">packed_cube_to_ground_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_cube_to_packed_cube"><code class="docutils literal notranslate"><span class="pre">sky_cube_to_packed_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.packed_cube_to_sky_cube"><code class="docutils literal notranslate"><span class="pre">packed_cube_to_sky_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_Jy_arcsec2"><code class="docutils literal notranslate"><span class="pre">get_Jy_arcsec2()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.loglinspace"><code class="docutils literal notranslate"><span class="pre">loglinspace()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fftspace"><code class="docutils literal notranslate"><span class="pre">fftspace()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.check_baselines"><code class="docutils literal notranslate"><span class="pre">check_baselines()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_max_spatial_freq"><code class="docutils literal notranslate"><span class="pre">get_max_spatial_freq()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_maximum_cell_size"><code class="docutils literal notranslate"><span class="pre">get_maximum_cell_size()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_optimal_image_properties"><code class="docutils literal notranslate"><span class="pre">get_optimal_image_properties()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_gaussian_radians"><code class="docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_gaussian_arcsec"><code class="docutils literal notranslate"><span class="pre">sky_gaussian_arcsec()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fourier_gaussian_lambda_radians"><code class="docutils literal notranslate"><span class="pre">fourier_gaussian_lambda_radians()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fourier_gaussian_lambda_arcsec"><code class="docutils literal notranslate"><span class="pre">fourier_gaussian_lambda_arcsec()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="module-mpol.utils">
+<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-mpol.utils" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.torch2npy">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">torch2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#torch2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.torch2npy" title="Link to this definition">#</a></dt>
+<dd><p>Copy a tensor (potentially on the GPU) to the CPU and convert to a numpy
+<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>, e.g., for visualization or further analysis with non-PyTorch
+scientific libraries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>torch.Tensor</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.ground_cube_to_packed_cube">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">ground_cube_to_packed_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#ground_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.ground_cube_to_packed_cube" title="Link to this definition">#</a></dt>
+<dd><p>Converts a Ground Cube to a Packed Visibility Cube for visibility-plane work.
+See Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ground_cube</strong> – a previously initialized Ground Cube object (cube (3D torch tensor</p></li>
+<li><p><strong>``</strong> (<em>of shape</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting</dt><dd><p>array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the input arg; i.e Returns a
+Packed Visibility Cube.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.packed_cube_to_ground_cube">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">packed_cube_to_ground_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#packed_cube_to_ground_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_ground_cube" title="Link to this definition">#</a></dt>
+<dd><p>Converts a Packed Visibility Cube to a Ground Cube for visibility-plane work. See
+Units and Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packed_cube</strong> – a previously initialized Packed Cube object (cube (3D torch tensor</p></li>
+<li><p><strong>``</strong> (<em>of shape</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting</dt><dd><p>array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the input arg; i.e Returns a
+Ground Cube.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.sky_cube_to_packed_cube">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">sky_cube_to_packed_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sky_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#sky_cube_to_packed_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_cube_to_packed_cube" title="Link to this definition">#</a></dt>
+<dd><p>Converts a Sky Cube to a Packed Image Cube for image-plane work. See Units and
+Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sky_cube</strong> – a previously initialized Sky Cube object with RA increasing to the
+<em>left</em> (cube (3D torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>))</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting</dt><dd><p>array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the <code class="docutils literal notranslate"><span class="pre">torch.flip()</span></code> of the
+RA axis; i.e Returns a Packed Image Cube.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.packed_cube_to_sky_cube">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">packed_cube_to_sky_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packed_cube</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#packed_cube_to_sky_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.packed_cube_to_sky_cube" title="Link to this definition">#</a></dt>
+<dd><p>Converts a Packed Image Cube to a Sky Cube for image-plane work. See Units and
+Conventions for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>packed_cube</strong> – a previously initialized Packed Image Cube object (cube (3D torch</p></li>
+<li><p><strong>``</strong> (<em>tensor</em><em> of </em><em>shape</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>3D image cube of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">npix,</span> <span class="pre">npix)</span></code>; The resulting</dt><dd><p>array after applying <code class="docutils literal notranslate"><span class="pre">torch.fft.fftshift</span></code> to the <code class="docutils literal notranslate"><span class="pre">torch.flip()</span></code> of the
+RA axis; i.e Returns a Sky Cube.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.double</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.get_Jy_arcsec2">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_Jy_arcsec2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">230000000000.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#get_Jy_arcsec2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_Jy_arcsec2" title="Link to this definition">#</a></dt>
+<dd><p>Calculate specific intensity from the brightness temperature, using the
+Rayleigh-Jeans definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T_b</strong> – brightness temperature in [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>nu</strong> – frequency (in Hz)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>specific intensity (in [<span class="math notranslate nohighlight">\(\mathrm{Jy}\, \mathrm{arcsec}^2]\)</span>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.loglinspace">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">loglinspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_linear</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#loglinspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.loglinspace" title="Link to this definition">#</a></dt>
+<dd><p>Return a logspaced array of bin edges, with the first <code class="docutils literal notranslate"><span class="pre">M_linear</span></code> cells being
+equal width. There is a one-cell overlap between the linear and logarithmic
+stretches of the array, since the last linear cell is also the first logarithmic
+cell, which means the total number of cells is <code class="docutils literal notranslate"><span class="pre">M_linear</span> <span class="pre">+</span> <span class="pre">N_log</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – starting cell left edge</p></li>
+<li><p><strong>end</strong> (<em>float</em>) – ending cell right edge</p></li>
+<li><p><strong>N_log</strong> (<em>int</em>) – number of logarithmically spaced bins</p></li>
+<li><p><strong>M_linear</strong> (<em>int</em>) – number of linearly (equally) spaced bins</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>logspaced bin edges</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.fftspace">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">fftspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#fftspace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fftspace" title="Link to this definition">#</a></dt>
+<dd><p>Delivers a (nearly) symmetric coordinate array that spans <span class="math notranslate nohighlight">\(N\)</span> elements
+(where <span class="math notranslate nohighlight">\(N\)</span> is even) from <cite>-width</cite> to <cite>+width</cite>, but ensures that the middle
+point lands on <span class="math notranslate nohighlight">\(0\)</span>. The array indices go from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(N -1.\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> (<em>float</em>) – the width of the array</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – the number of elements in the array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the fftspace array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.float64 1D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.check_baselines">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">check_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_feasible_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_feasible_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mpol/utils.html#check_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.check_baselines" title="Link to this definition">#</a></dt>
+<dd><p>Check if baseline lengths are sensible for expected code unit of
+[<span class="math notranslate nohighlight">\(\lambda\)</span>], or if instead they’re being supplied in
+[<span class="math notranslate nohighlight">\(\mathrm{k}\lambda\)</span>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>q</strong> (array, unit = <span class="math notranslate nohighlight">\(\lambda\)</span>) – Baseline distribution (all values must be non-negative).</p>
+</dd>
+</dl>
+<dl>
+<dt>min_feasible_q<span class="classifier">float, unit = <span class="math notranslate nohighlight">\(\lambda\)</span>, default=1e3</span></dt><dd><p>Minimum baseline in code units expected for a dataset. The default
+value of 1e3 is a conservative value for ALMA, assuming a minimum
+antenna separation of ~12 m and maximum observing wavelength of 3.6 mm.</p>
+</dd>
+<dt>max_feasible_q<span class="classifier">float, unit = <span class="math notranslate nohighlight">\(\lambda\)</span>, default=1e8</span></dt><dd><p>Maximum baseline in code units expected for a dataset. The default
+value of 1e8 is a conservative value for ALMA, assuming a maximum
+antenna separation of ~16 km and minimum observing wavelength of 0.3 mm.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.get_max_spatial_freq">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_max_spatial_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#get_max_spatial_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_max_spatial_freq" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the maximum spatial frequency that the image can represent and still
+satisfy the Nyquist Sampling theorem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float</em>) – the pixel size in arcseconds</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – the number of pixels in the image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the maximum spatial frequency contained in the image [<span class="math notranslate nohighlight">\(\lambda\)</span>]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.get_maximum_cell_size">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_maximum_cell_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uu_vv_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#get_maximum_cell_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_maximum_cell_size" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the maximum possible cell_size that will still Nyquist sample the uu or
+vv point. Note: not q point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uu_vv_point</strong> (<em>float</em>) – a single spatial frequency. Units of
+[<span class="math notranslate nohighlight">\(\lambda\)</span>].</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cell_size (in arcsec)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.get_optimal_image_properties">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">get_optimal_image_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#get_optimal_image_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.get_optimal_image_properties" title="Link to this definition">#</a></dt>
+<dd><p>For an image of desired width, determine the maximum pixel size that
+ensures Nyquist sampling of the provided spatial frequency points, and the
+corresponding number of pixels to obtain the desired image width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_width</strong> (<em>float</em><em>, </em><em>unit = arcsec</em>) – Desired width of the image (for a square image of size
+<cite>image_width</cite> <span class="math notranslate nohighlight">\(\times\)</span> <cite>image_width</cite>).</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> , unit = <span class="math notranslate nohighlight">\(\lambda\)</span>) – <cite>u</cite> and <cite>v</cite> baselines.</p></li>
+<li><p><strong>v</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> , unit = <span class="math notranslate nohighlight">\(\lambda\)</span>) – <cite>u</cite> and <cite>v</cite> baselines.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cell_size</strong> (<em>float, unit = arcsec</em>) – Image pixel size required to Nyquist sample.</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – Number of pixels of cell_size to equal (or slightly exceed) the image
+width (npix will be rounded up and enforced as even).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Assumes baselines are as-observed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.sky_gaussian_radians">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">sky_gaussian_radians</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#sky_gaussian_radians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_gaussian_radians" title="Link to this definition">#</a></dt>
+<dd><p>Calculates a 2D Gaussian on the sky plane with inputs in radians. The Gaussian is
+centered at <code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>, has widths of <code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>, and is
+rotated <code class="docutils literal notranslate"><span class="pre">Omega</span></code> degrees East of North.</p>
+<p>To evaluate the Gaussian, internally first we translate to center</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}l' = l - \delta_l\\
+m' = m - \delta_m\end{split}\]</div>
+<p>then rotate coordinates</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}l'' = l' \cos \phi - m' \sin \phi \\
+m'' = l' \sin \phi + m' \cos \phi\end{split}\]</div>
+<p>and then evaluate the Gaussian</p>
+<div class="math notranslate nohighlight">
+\[f_\mathrm{g}(l,m) = a \exp \left ( - \frac{1}{2} \left
+[ \left (\frac{l''}{\sigma_l} \right)^2 + \left( \frac{m''}{\sigma_m}
+\right )^2 \right ] \right )\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> – units of [radians]</p></li>
+<li><p><strong>m</strong> – units of [radians]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor</p></li>
+<li><p><strong>delta_l</strong> – offset [radians]</p></li>
+<li><p><strong>delta_m</strong> – offset [radians]</p></li>
+<li><p><strong>sigma_l</strong> – width [radians]</p></li>
+<li><p><strong>sigma_m</strong> – width [radians]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args with peak amplitude <span class="math notranslate nohighlight">\(a\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.sky_gaussian_arcsec">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">sky_gaussian_arcsec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#sky_gaussian_arcsec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.sky_gaussian_arcsec" title="Link to this definition">#</a></dt>
+<dd><p>Calculates a Gaussian on the sky plane using inputs in arcsec. This is a convenience
+wrapper to <a class="reference internal" href="#mpol.utils.sky_gaussian_radians" title="mpol.utils.sky_gaussian_radians"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a> that automatically converts
+from arcsec to radians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – equivalent to l, but in units of [arcsec]</p></li>
+<li><p><strong>y</strong> – equivalent to m, but in units of [arcsec]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor</p></li>
+<li><p><strong>delta_x</strong> – offset [arcsec]</p></li>
+<li><p><strong>delta_y</strong> – offset [arcsec]</p></li>
+<li><p><strong>sigma_x</strong> – width [arcsec]</p></li>
+<li><p><strong>sigma_y</strong> – width [arcsec]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args with peak amplitude <span class="math notranslate nohighlight">\(a\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.fourier_gaussian_lambda_radians">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">fourier_gaussian_lambda_radians</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#fourier_gaussian_lambda_radians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fourier_gaussian_lambda_radians" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the Fourier plane Gaussian <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span> corresponding to the
+Sky plane Gaussian <span class="math notranslate nohighlight">\(f_\mathrm{g}(l,m)\)</span> in
+<a class="reference internal" href="#mpol.utils.sky_gaussian_radians" title="mpol.utils.sky_gaussian_radians"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a>, using analytical relationships. The
+Fourier Gaussian is parameterized using the sky plane centroid
+(<code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>), widths (<code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>) and rotation (<code class="docutils literal notranslate"><span class="pre">Omega</span></code>).
+Assumes that <code class="docutils literal notranslate"><span class="pre">a</span></code> was in units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{steradian}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – l in units of [lambda]</p></li>
+<li><p><strong>v</strong> – m in units of [lambda]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor, units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{steradian}\)</span>.</p></li>
+<li><p><strong>delta_x</strong> – offset [radians]</p></li>
+<li><p><strong>delta_y</strong> – offset [radians]</p></li>
+<li><p><strong>sigma_x</strong> – width [radians]</p></li>
+<li><p><strong>sigma_y</strong> – width [radians]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D Gaussian evaluated at input args</p>
+</dd>
+</dl>
+<p>The following is a description of how we derived the analytical relationships. In
+what follows, all <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(m\)</span> coordinates are assumed to be in units
+of radians and all <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span> coordinates are assumed to be in units
+of <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p>We start from Fourier dual relationships in Bracewell’s <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2000fta..book.....B/abstract">The Fourier Transform and
+Its Applications</a></p>
+<div class="math notranslate nohighlight">
+\[f_0(l, m) \leftrightharpoons F_0(u, v)\]</div>
+<p>where the sky-plane and Fourier-plane Gaussians are</p>
+<div class="math notranslate nohighlight">
+\[f_0(l,m) = a \exp \left ( -\pi [l^2 + m^2] \right)\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[F_0(u,v) = a \exp \left ( -\pi [u^2 + v^2] \right),\]</div>
+<p>respectively. The sky-plane Gaussian has a maximum value of <span class="math notranslate nohighlight">\(a\)</span>.</p>
+<p>We will use the similarity, rotation, and shift theorems to turn <span class="math notranslate nohighlight">\(f_0\)</span> into
+a form matching <span class="math notranslate nohighlight">\(f_\mathrm{g}\)</span>, which simultaneously turns <span class="math notranslate nohighlight">\(F_0\)</span> into
+<span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span>.</p>
+<p>The similarity theorem states that (in 1D)</p>
+<div class="math notranslate nohighlight">
+\[f(bl) = \frac{1}{|b|}F\left(\frac{u}{b}\right).\]</div>
+<p>First, we scale <span class="math notranslate nohighlight">\(f_0\)</span> to include sigmas. Let</p>
+<div class="math notranslate nohighlight">
+\[f_1(l, m) = a \exp \left(-\frac{1}{2} \left [\left(\frac{l}{\sigma_l}\right)^2 +
+\left( \frac{m}{\sigma_m} \right)^2 \right] \right).\]</div>
+<p>i.e., something we might call a normalized Gaussian function. Phrased in terms of
+<span class="math notranslate nohighlight">\(f_0\)</span>, <span class="math notranslate nohighlight">\(f_1\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[f_1(l, m) = f_0\left ( \frac{l}{\sigma_l \sqrt{2 \pi}},\,
+\frac{m}{\sigma_m \sqrt{2 \pi}}\right).\]</div>
+<p>Therefore, according to the similarity theorem, the equivalent <span class="math notranslate nohighlight">\(F_1(u,v)\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[F_1(u, v) = \sigma_l \sigma_m 2 \pi F_0 \left( \sigma_l \sqrt{2 \pi} u,\,
+\sigma_m \sqrt{2 \pi} v \right),\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[F_1(u, v) = a \sigma_l \sigma_m 2 \pi \exp \left ( -2 \pi^2 [\sigma_l^2 u^2 +
+\sigma_m^2 v^2] \right).\]</div>
+<p>Next, we rotate the Gaussian to match the sky plane rotation. A rotation
+<span class="math notranslate nohighlight">\(\Omega\)</span> in the sky plane is carried out in the same direction in the
+Fourier plane,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}u' = u \cos \Omega - v \sin \Omega \\
+v' = u \sin \Omega + v \cos \Omega\end{split}\]</div>
+<p>such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f_2(l, m) = f_1(l', m') \\
+F_2(u, v) = F_1(u', m')\end{split}\]</div>
+<p>Finally, we translate the sky plane Gaussian by amounts <span class="math notranslate nohighlight">\(\delta_l\)</span>,
+<span class="math notranslate nohighlight">\(\delta_m\)</span>, which corresponds to a phase shift in the Fourier plane Gaussian.
+The image plane translation is</p>
+<div class="math notranslate nohighlight">
+\[f_3(l,m) = f_2(l - \delta_l, m - \delta_m)\]</div>
+<p>According to the shift theorem, the equivalent <span class="math notranslate nohighlight">\(F_3(u,v)\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[F_3(u,v) = \exp\left (- 2 i \pi [\delta_l u + \delta_m v] \right) F_2(u,v)\]</div>
+<p>We have arrived at the corresponding Fourier Gaussian, <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v) =
+F_3(u,v)\)</span>. The simplified equation is</p>
+<div class="math notranslate nohighlight">
+\[F_\mathrm{g}(u,v) = a \sigma_l \sigma_m 2 \pi \exp \left (
+-2 \pi^2 \left [\sigma_l^2 u'^2 + \sigma_m^2 v'^2 \right]
+- 2 i \pi \left [\delta_l u + \delta_m v \right] \right).\]</div>
+<p>N.B. that we have mixed primed (<span class="math notranslate nohighlight">\(u'\)</span>) and unprimed (<span class="math notranslate nohighlight">\(u\)</span>) coordinates in
+the same equation for brevity.</p>
+<p>Finally, the same Fourier dual relationship holds</p>
+<div class="math notranslate nohighlight">
+\[f_\mathrm{g}(l,m) \leftrightharpoons F_\mathrm{g}(u,v)\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mpol.utils.fourier_gaussian_lambda_arcsec">
+<span class="sig-prename descclassname"><span class="pre">mpol.utils.</span></span><span class="sig-name descname"><span class="pre">fourier_gaussian_lambda_arcsec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">floating</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mpol/utils.html#fourier_gaussian_lambda_arcsec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mpol.utils.fourier_gaussian_lambda_arcsec" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the Fourier plane Gaussian <span class="math notranslate nohighlight">\(F_\mathrm{g}(u,v)\)</span> corresponding to the
+Sky plane Gaussian <span class="math notranslate nohighlight">\(f_\mathrm{g}(l,m)\)</span> in
+<a class="reference internal" href="#mpol.utils.sky_gaussian_arcsec" title="mpol.utils.sky_gaussian_arcsec"><code class="xref py py-func docutils literal notranslate"><span class="pre">sky_gaussian_arcsec()</span></code></a>, using analytical relationships. The Fourier
+Gaussian is parameterized using the sky plane centroid (<code class="docutils literal notranslate"><span class="pre">delta_l,</span> <span class="pre">delta_m</span></code>),
+widths (<code class="docutils literal notranslate"><span class="pre">sigma_l,</span> <span class="pre">sigma_m</span></code>) and rotation (<code class="docutils literal notranslate"><span class="pre">Omega</span></code>). Assumes that <code class="docutils literal notranslate"><span class="pre">a</span></code> was in
+units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – l in units of [lambda]</p></li>
+<li><p><strong>v</strong> – m in units of [lambda]</p></li>
+<li><p><strong>a</strong> – amplitude prefactor, units of <span class="math notranslate nohighlight">\(\mathrm{Jy}/\mathrm{arcsec}^2\)</span>.</p></li>
+<li><p><strong>delta_x</strong> – offset [arcsec]</p></li>
+<li><p><strong>delta_y</strong> – offset [arcsec]</p></li>
+<li><p><strong>sigma_x</strong> – width [arcsec]</p></li>
+<li><p><strong>sigma_y</strong> – width [arcsec]</p></li>
+<li><p><strong>Omega</strong> – position angle of ascending node [degrees] east of north.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D Fourier Gaussian evaluated at input args</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="geometry.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Geometry</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="precomposed.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Precomposed Modules</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.torch2npy"><code class="docutils literal notranslate"><span class="pre">torch2npy()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.ground_cube_to_packed_cube"><code class="docutils literal notranslate"><span class="pre">ground_cube_to_packed_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.packed_cube_to_ground_cube"><code class="docutils literal notranslate"><span class="pre">packed_cube_to_ground_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_cube_to_packed_cube"><code class="docutils literal notranslate"><span class="pre">sky_cube_to_packed_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.packed_cube_to_sky_cube"><code class="docutils literal notranslate"><span class="pre">packed_cube_to_sky_cube()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_Jy_arcsec2"><code class="docutils literal notranslate"><span class="pre">get_Jy_arcsec2()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.loglinspace"><code class="docutils literal notranslate"><span class="pre">loglinspace()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fftspace"><code class="docutils literal notranslate"><span class="pre">fftspace()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.check_baselines"><code class="docutils literal notranslate"><span class="pre">check_baselines()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_max_spatial_freq"><code class="docutils literal notranslate"><span class="pre">get_max_spatial_freq()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_maximum_cell_size"><code class="docutils literal notranslate"><span class="pre">get_maximum_cell_size()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.get_optimal_image_properties"><code class="docutils literal notranslate"><span class="pre">get_optimal_image_properties()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_gaussian_radians"><code class="docutils literal notranslate"><span class="pre">sky_gaussian_radians()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.sky_gaussian_arcsec"><code class="docutils literal notranslate"><span class="pre">sky_gaussian_arcsec()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fourier_gaussian_lambda_radians"><code class="docutils literal notranslate"><span class="pre">fourier_gaussian_lambda_radians()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpol.utils.fourier_gaussian_lambda_arcsec"><code class="docutils literal notranslate"><span class="pre">fourier_gaussian_lambda_arcsec()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Ian Czekala
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2019-24, Ian Czekala.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

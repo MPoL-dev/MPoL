@@ -1,15 +1,14 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Gridding and diagnostic images &#8212; MPoL 0.1.dev1+ge5f2f84 documentation</title>
+    <title>Gridding and diagnostic images &#8212; MPoL 0.1.dev1+gda6dbd3 documentation</title>
   
   
   
@@ -19,44 +18,41 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script src="https://buttons.github.io/buttons.js"></script>
+    <script src="../_static/documentation_options.js?v=c80d40b4"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'ci-tutorials/gridder';</script>
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Intro to RML with MPoL" href="optimization.html" />
-    <link rel="prev" title="Introduction to PyTorch: Tensors and Gradient Descent" href="PyTorch.html" />
+    <link rel="next" title="Coordinates" href="../api/coordinates.html" />
+    <link rel="prev" title="MPoL Installation" href="../installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -66,10 +62,9 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -110,11 +105,14 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -143,37 +141,51 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+ge5f2f84 documentation - Home"/>
-    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+ge5f2f84 documentation - Home"/>`);</script>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../rml_intro.html">Introduction to Regularized Maximum Likelihood Imaging</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Background and prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">MPoL Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Gridding and diagnostic images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../api/coordinates.html">Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/fourier.html">Fourier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gridding.html">Gridding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/images.html">Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/losses.html">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/precomposed.html">Precomposed Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/train_test.html">Training and testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/plotting.html">Plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/crossval.html">Cross-validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/analysis.html">Analysis</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../units-and-conventions.html">Units and Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer-documentation.html">Developer Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
-</ul>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="PyTorch.html">Introduction to PyTorch: Tensors and Gradient Descent</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Gridding and diagnostic images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="optimization.html">Intro to RML with MPoL</a></li>
-<li class="toctree-l1"><a class="reference internal" href="loose-visibilities.html">Likelihood functions and model visibilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="crossvalidation.html">Cross validation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gpu_setup.html">GPU Acceleration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="initializedirtyimage.html">Initializing with the Dirty Image</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_1.html">HD143006 Tutorial Part 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/HD143006_part_2.html">HD143006 Tutorial Part 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fakedata.html">Making a Mock Dataset</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../large-tutorials/pyro.html">Parametric Inference with Pyro</a></li>
 </ul>
 
     </div>
@@ -352,7 +364,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <div class="cell tag_hide-cell docutils container">
 <details class="hide above-input">
@@ -368,10 +380,10 @@ document.write(`
 </details>
 </div>
 <section class="tex2jax_ignore mathjax_ignore" id="gridding-and-diagnostic-images">
-<h1>Gridding and diagnostic images<a class="headerlink" href="#gridding-and-diagnostic-images" title="Permalink to this heading">#</a></h1>
+<h1>Gridding and diagnostic images<a class="headerlink" href="#gridding-and-diagnostic-images" title="Link to this heading">#</a></h1>
 <p>This tutorial provides a brief introduction to complex visibility data, shows how to average it to a “grid”, and how to make diagnostic images (e.g., the “dirty image”). The RML imaging workflow is demonstrated in later tutorials.</p>
 <section id="importing-data">
-<h2>Importing data<a class="headerlink" href="#importing-data" title="Permalink to this heading">#</a></h2>
+<h2>Importing data<a class="headerlink" href="#importing-data" title="Link to this heading">#</a></h2>
 <p>We’ll use a mock CASA measurement set that we produced as part of the <a class="reference external" href="https://github.com/MPoL-dev/mpoldatasets">mpoldatasets</a> package. One of the tricky things about working with CASA measurement sets is that you need to use CASA to read the visibilities themselves. CASA has historically been packaged as a “monolithic” distribution with its own Python interpreter (which is difficult to install new packages into), but recently, <a class="reference external" href="https://casadocs.readthedocs.io/en/stable/notebooks/introduction.html#Modular-Packages">“modular” CASA</a> has made it possible to install the CASA routines into your own Python environment (with some restrictions on recent Python version). To avoid introducing a CASA dependence to MPoL, we assume that the user provides the arrays of complex visibilities directly as numpy arrays. The data requirements of RML imaging are really that simple.</p>
 <p>In our opinion, the most straightforward way of obtaining the visibilities from a measurement set is to use the CASA <code class="docutils literal notranslate"><span class="pre">table</span></code> and <code class="docutils literal notranslate"><span class="pre">ms</span></code> tools as described <a class="reference external" href="https://mpol-dev.github.io/visread/">here</a>. The user can use either “monolithic” or “modular” CASA to read the visibilities and save them to a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> array on disk. Then, in your normal (less restrictive) Python environment (e.g., Python 3.11) you can read these visibilities and pass them to the MPoL routines.</p>
 <div class="admonition attention">
@@ -416,8 +428,8 @@ document.write(`
 </div>
 </section>
 <section id="plotting-the-data">
-<h2>Plotting the data<a class="headerlink" href="#plotting-the-data" title="Permalink to this heading">#</a></h2>
-<p>Following some of the exercises in the <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html">visread documentation</a>, let’s plot up the baseline distribution and get a rough look at the raw visibilities. For more information on these data types, we recommend you read the <a class="reference internal" href="../rml_intro.html"><span class="doc std std-doc">Introduction to RML Imaging</span></a>.</p>
+<h2>Plotting the data<a class="headerlink" href="#plotting-the-data" title="Link to this heading">#</a></h2>
+<p>Following some of the exercises in the <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/introduction_to_casatools.html">visread documentation</a>, let’s plot up the baseline distribution and get a rough look at the raw visibilities.</p>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">uu</span></code>, <code class="docutils literal notranslate"><span class="pre">vv</span></code>, <code class="docutils literal notranslate"><span class="pre">weight</span></code>, <code class="docutils literal notranslate"><span class="pre">data_re</span></code>, and <code class="docutils literal notranslate"><span class="pre">data_im</span></code> arrays are all two-dimensional numpy arrays of shape <code class="docutils literal notranslate"><span class="pre">(nchan,</span> <span class="pre">nvis)</span></code>. This is because MPoL has the capacity to image spectral line observations. MPoL will absolutely still work with single-channel continuum data, you will just need to work with 2D arrays of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">nvis)</span></code>.</p>
 <p>For this particular dataset,</p>
 <div class="cell docutils container">
@@ -447,7 +459,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/c7ed61ad5586f93762b1f8d48f5950ee42ae689a3dca9b7fd402346b29230322.png" src="../_images/c7ed61ad5586f93762b1f8d48f5950ee42ae689a3dca9b7fd402346b29230322.png" />
+<img alt="../_images/1f8c14dc18dea069d28bf8a085ae017cc06f247215b0b038371f0524bb122fed.png" src="../_images/1f8c14dc18dea069d28bf8a085ae017cc06f247215b0b038371f0524bb122fed.png" />
 </div>
 </div>
 <p>The fact that visibility data has two spatial frequency coordinates sometimes makes plotting representations of the data values a little challenging. To simplify things, let’s define a 1D “radial” visibility coordinate as <span class="math notranslate nohighlight">\(q = \sqrt{u^2 + v^2}\)</span>, and plot the real, imaginary, amplitude, and phase values of the visibilities against this.</p>
@@ -480,14 +492,14 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/2ca2ebbbf95afeb6b6c35999759366faaedc25b206e5cf2c485e0ffd2a3fe020.png" src="../_images/2ca2ebbbf95afeb6b6c35999759366faaedc25b206e5cf2c485e0ffd2a3fe020.png" />
+<img alt="../_images/2e6a5cd85c00b17294da2e6f3fccea70bd18b511b0b95b172e7d7e5bb20000cc.png" src="../_images/2e6a5cd85c00b17294da2e6f3fccea70bd18b511b0b95b172e7d7e5bb20000cc.png" />
 </div>
 </div>
 <p>There are nearly a third of a million points in each figure, and each is quite noisy, so we can’t learn much from this plot alone. But we should be reassured that we see similar types of scatter as we might observe were we to inspect the raw data using CASA’s <a class="reference external" href="https://casadocs.readthedocs.io/en/v6.5.2/api/tt/casaplotms.plotms.html?highlight=plotms">plotms</a> tool.</p>
 </section>
 <section id="the-gridcoords-object">
-<h2>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object<a class="headerlink" href="#the-gridcoords-object" title="Permalink to this heading">#</a></h2>
-<p>Now, lets familiarize ourselves with MPoL’s <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object.</p>
+<h2>The <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object<a class="headerlink" href="#the-gridcoords-object" title="Link to this heading">#</a></h2>
+<p>Now, lets familiarize ourselves with MPoL’s <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">gridding</span>
@@ -503,7 +515,7 @@ Dataset has 325080 visibilities
 </div>
 </div>
 </div>
-<p>The <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
+<p>The <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> object is mainly a container for all of the information about this grid. You can see all of the properties accessible in the <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.coordinates.GridCoords</span></code></a> API documentation. The information you’ll most likely want to access are the image dimensions</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span><span class="o">.</span><span class="n">img_ext</span>  <span class="c1"># [arcsec]</span>
@@ -519,9 +531,9 @@ Dataset has 325080 visibilities
 <p>which are meant to feed into the <code class="docutils literal notranslate"><span class="pre">extent</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow</span></code>.</p>
 </section>
 <section id="making-images-with-dirtyimager">
-<h2>Making images with <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a><a class="headerlink" href="#making-images-with-dirtyimager" title="Permalink to this heading">#</a></h2>
-<p>Those familiar with radio astronomy will be familiar with the idea of “gridding” loose visibilities to a Cartesian <span class="math notranslate nohighlight">\(u,v\)</span> grid. MPoL has two classes that “grid” visibilities: <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code></a>. Their internals may be similar, but they serve different purposes. First, let’s look at how we can use the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> to make diagnostic images using the inverse Fast Fourier Transform, frequently called the “dirty image” by radio astronomers.</p>
-<p>We can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object by</p>
+<h2>Making images with <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a><a class="headerlink" href="#making-images-with-dirtyimager" title="Link to this heading">#</a></h2>
+<p>Those familiar with radio astronomy will be familiar with the idea of “gridding” loose visibilities to a Cartesian <span class="math notranslate nohighlight">\(u,v\)</span> grid. MPoL has two classes that “grid” visibilities: <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> and <a class="reference internal" href="../api/gridding.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager</span></code></a>. Their internals may be similar, but they serve different purposes. First, let’s look at how we can use the <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager</span></code></a> to make diagnostic images using the inverse Fast Fourier Transform, frequently called the “dirty image” by radio astronomers.</p>
+<p>We can instantiate a <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object by</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="p">(</span>
@@ -536,25 +548,9 @@ Dataset has 325080 visibilities
 </div>
 </div>
 </div>
-<p>Instantiating the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object attaches the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>  object and the loose visibilities. There is also a convenience method to create the <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object in one shot by</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DirtyImager</span><span class="o">.</span><span class="n">from_image_properties</span><span class="p">(</span>
-    <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>  <span class="c1"># [arcsec]</span>
-    <span class="n">npix</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
-    <span class="n">uu</span><span class="o">=</span><span class="n">uu</span><span class="p">,</span>
-    <span class="n">vv</span><span class="o">=</span><span class="n">vv</span><span class="p">,</span>
-    <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
-    <span class="n">data_re</span><span class="o">=</span><span class="n">data_re</span><span class="p">,</span>
-    <span class="n">data_im</span><span class="o">=</span><span class="n">data_im</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>if you don’t want to specify your <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> object separately.</p>
+<p>Instantiating the <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object attaches the <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a>  object and the loose visibilities.</p>
 <p>As we saw, the raw visibility dataset is a set of complex-valued Fourier samples. Our objective is to make images of the sky-brightness distribution and do astrophysics. We’ll cover how to do this with MPoL and RML techniques in later tutorials, but it is possible to get a rough idea of the sky brightness by calculating the inverse Fourier transform of the visibility values.</p>
-<p>To do this, you can call the <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager.get_dirty_image" title="mpol.gridding.DirtyImager.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager.get_dirty_image()</span></code></a> method on your <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.</p>
+<p>To do this, you can call the <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager.get_dirty_image" title="mpol.gridding.DirtyImager.get_dirty_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager.get_dirty_image()</span></code></a> method on your <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> object. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then calculate the diagnostic dirty image and dirty beam cubes that correspond to the Fourier transform of the gridded visibilities.</p>
 <p>There are several different schemes by which to do the averaging, each of which will deliver different image plane resolutions (defined by the size of the PSF or dirty beam) and thermal noise properties. MPoL implements ‘uniform’, ‘natural’, and ‘briggs’ robust weighting. For more information on the difference between these schemes, see the <a class="reference external" href="https://casa.nrao.edu/casadocs-devel/stable/imaging/synthesis-imaging/data-weighting">CASA documentation</a> or Chapter 3 of Daniel Briggs’ <a class="reference external" href="http://www.aoc.nrao.edu/dissertations/dbriggs/">Ph.D. thesis</a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -600,15 +596,15 @@ Dataset has 325080 visibilities
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/e6bd70892ff8dc42537ba12063351b66fb1b0144f6f92e3da943e460c35bd356.png" src="../_images/e6bd70892ff8dc42537ba12063351b66fb1b0144f6f92e3da943e460c35bd356.png" />
+<img alt="../_images/c2db6a102f5b5cca66ab5ab614f164b539496bb8bc924e3083af4548b6a16159.png" src="../_images/c2db6a102f5b5cca66ab5ab614f164b539496bb8bc924e3083af4548b6a16159.png" />
 </div>
 </div>
 <p>If you were working with this measurement set in CASA, it’s a good idea to compare the dirty image produced here to the dirty image from CASA (i.e., produced by <code class="docutils literal notranslate"><span class="pre">tclean</span></code> with zero CLEAN iterations). You should confirm that these two dirty images look very similar (i.e., nearly but most likely not quite to numerical precision) before moving on to regularized maximum imaging. If your image appears upside down or mirrored, check whether you converted your visibility data from the CASA baseline convention to the regular TMS baseline convention by complex-conjugating your visibilities.</p>
 </section>
 <section id="averaging-and-exporting-data-with-dataaverager">
-<h2>Averaging and exporting data with <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a><a class="headerlink" href="#averaging-and-exporting-data-with-dataaverager" title="Permalink to this heading">#</a></h2>
+<h2>Averaging and exporting data with <a class="reference internal" href="../api/gridding.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a><a class="headerlink" href="#averaging-and-exporting-data-with-dataaverager" title="Link to this heading">#</a></h2>
 <p>As we saw at the beginning of this tutorial, an ALMA dataset may easily contain 1/3 million or more individual visibility measurements, which can present a computational burden for some imaging routines. Just like many noisy data points can be “binned” into a set of fewer higher signal to noise points (for example, as with a lightcurve of a transiting exoplanet), so too can visibility data points be averaged down.</p>
-<p>To do this, you can instantiate a <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> object and then call the <a class="reference internal" href="../api.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a> method. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then export the dataset as a <a class="reference internal" href="../api.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a> object.</p>
+<p>To do this, you can instantiate a <a class="reference internal" href="../api/gridding.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a> object and then call the <a class="reference internal" href="../api/gridding.html#mpol.gridding.DataAverager.to_pytorch_dataset" title="mpol.gridding.DataAverager.to_pytorch_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DataAverager.to_pytorch_dataset()</span></code></a> method. This routine will average, or ‘grid’, the loose visibilities to the Fourier grid defined by <a class="reference internal" href="../api/coordinates.html#mpol.coordinates.GridCoords" title="mpol.coordinates.GridCoords"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridCoords</span></code></a> and then export the dataset as a <a class="reference internal" href="../api/datasets.html#mpol.datasets.GriddedDataset" title="mpol.datasets.GriddedDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mpol.datasets.GriddedDataset</span></code></a> object.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">averager</span> <span class="o">=</span> <span class="n">gridding</span><span class="o">.</span><span class="n">DataAverager</span><span class="p">(</span>
@@ -627,14 +623,14 @@ Dataset has 325080 visibilities
 </div>
 </section>
 <section id="checking-data-weights">
-<h2>Checking data weights<a class="headerlink" href="#checking-data-weights" title="Permalink to this heading">#</a></h2>
-<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the routines internal to <a class="reference internal" href="../api.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the user image may still want the dirty image—hence why these routines issue a warning instead of an error.</p>
+<h2>Checking data weights<a class="headerlink" href="#checking-data-weights" title="Link to this heading">#</a></h2>
+<p>When working with real data, it is possible that the statistical uncertainties—conveyed by the weights—were <a class="reference external" href="https://mpol-dev.github.io/visread/tutorials/rescale_AS209_weights.html">not correctly calibrated by certain CASA versions</a>. For dirty and CLEAN imaging purposes, it’s OK if the weights are not correctly scaled so long as their <em>relative</em> scalings are correct (to each other). For forward-modeling and RML imaging, it’s important that the weights are correctly scaled in an absolute sense. To alert the user to the possibility that their weights may be incorrectly calibrated, the routines internal to <a class="reference internal" href="../api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirtyImager</span></code></a> will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> if the weights are incorrectly scaled. Even though the weights are incorrect, the user image may still want the dirty image—hence why these routines issue a warning instead of an error.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">img</span><span class="p">,</span> <span class="n">beam</span> <span class="o">=</span> <span class="n">imager</span><span class="o">.</span><span class="n">get_dirty_image</span><span class="p">(</span>
         <span class="n">weighting</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span>
   <span class="p">)</span>
 </pre></div>
 </div>
-<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging using <a class="reference internal" href="../api.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a>, incorrectly scaled weights will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
+<p>However, if the user goes to export the gridded visibilities as a PyTorch dataset for RML imaging using <a class="reference internal" href="../api/gridding.html#mpol.gridding.DataAverager" title="mpol.gridding.DataAverager"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataAverager</span></code></a>, incorrectly scaled weights will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>. RML images and forward modeling inferences will be compromised if the weights are not statistically valid.</p>
 <p>The sensitivity of the export routines can be adjusted by changing the <code class="docutils literal notranslate"><span class="pre">max_scatter</span></code> keyword. Scatter checking can be disabled by setting <code class="docutils literal notranslate"><span class="pre">check_visibility_scatter=False</span></code>, but is not recommended unless you are trying to debug things.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">dset</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">to_pytorch_dataset</span><span class="p">(</span><span class="n">check_visibility_scatter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_scatter</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
 </pre></div>
@@ -654,20 +650,20 @@ Dataset has 325080 visibilities
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="PyTorch.html"
+       href="../installation.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Introduction to PyTorch: Tensors and Gradient Descent</p>
+        <p class="prev-next-title">MPoL Installation</p>
       </div>
     </a>
     <a class="right-next"
-       href="optimization.html"
+       href="../api/coordinates.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Intro to RML with MPoL</p>
+        <p class="prev-next-title">Coordinates</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -679,6 +675,7 @@ Dataset has 325080 visibilities
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -716,7 +713,7 @@ By Ian Czekala
 
   <p class="copyright">
     
-      © Copyright 2019-22, Ian Czekala.
+      © Copyright 2019-24, Ian Czekala.
       <br/>
     
   </p>
@@ -740,8 +737,8 @@ By Ian Czekala
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

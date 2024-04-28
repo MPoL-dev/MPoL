@@ -18,6 +18,11 @@ $$
 f(x) = \int_{-\infty}^\infty F(s) e^{i 2 \pi  x s} \mathrm{d}s
 $$
 
+## Baseline Convention
+
+For two antennas `ant1` and `ant2`, the baseline convention describes how the baseline between them is represented in UVW coordinates and whether the positive baseline is measured from `ant1->ant2`, or from `ant2->ant1`.
+MPoL follows the former, standard baseline convention as laid out in [Thompson, Moran, and Swenson](https://ui.adsabs.harvard.edu/abs/2017isra.book.....T/abstract) and other radio interferometry textbooks. However, CASA follows a historically complicated convention [described in CASA Memo 2](https://casadocs.readthedocs.io/en/stable/notebooks/memo-series.html). The difference between the two can be expressed as the complex conjugate of the visibilities. So, if you find that your image appears upside down and mirrored, you'll want to take ``np.conj`` of your visibilities before proceeding.
+
 ## Continuous representation of interferometry
 
 Consider some astronomical source parameterized by its sky brightness distribution $I$. The sky brightness is a function of position on the sky. For small fields of view (typical to single-pointing ALMA or VLA observations) we parameterize the sky direction using the direction cosines $l$ and $m$, which correspond to R.A. and Dec, respectively. In that case, we would have a function $I(l,m)$. The sky brightness is an *intensity*, so it has units of $\mathrm{Jy\,arcsec}^{-2}$ (equivalently $\mathrm{Jy\, beam}^{-1}$, where $\mathrm{beam}$ is the effective area of the synthesized beam).
@@ -28,7 +33,11 @@ $$
 {\cal V}(u,v) = \int \int I(l,m) \exp \left \{- 2 \pi i (ul + vm) \right \} \, \mathrm{d}l\,\mathrm{d}m.
 $$
 
-This integral demonstrates that the units of visibility function (and samples of it) are $\mathrm{Jy}$.
+This integral demonstrates that the units of visibility function (and samples of it) are $\mathrm{Jy}$. 
+
+```{note}
+This simplified relationship omits many additional effects that modify the cosmic intensity before it is recorded as visibility data. A full treatment of these effects can be mathematically described by the Radio Interferometric Measurement Equation (RIME). See the [Revisiting the radio interferometer measurement equation](https://ui.adsabs.harvard.edu/abs/2011A%26A...527A.106S/abstract) series by O. Smirnov, 2011 for more details.
+```
 
 ## Discretized representation
 
