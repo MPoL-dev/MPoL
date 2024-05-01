@@ -12,9 +12,8 @@ As a PyTorch *library*, MPoL is designed expecting that the user will write Pyth
 
 MPoL is *not* an imaging application nor a pipeline, though such programs could be built for specialized workflows using MPoL components. We are focused on providing a numerically correct and expressive set of core primitives so the user can leverage the full power of the PyTorch (and Python) ecosystem to solve their research-grade imaging tasks. This is already a significant development and maintenance burden for our small research team, so our immediate scope must necessarily be limited.
 
-Installation instructions, documentation, and examples at: [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
-
-
+* **Documentation** is available at [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/)
+* **Examples** are available at [https://github.com/MPoL-dev/examples/](https://github.com/MPoL-dev/examples/)
 
 ## Citation
 
