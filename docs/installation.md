@@ -1,4 +1,4 @@
-# MPoL Installation
+# Installation and Examples
 
 MPoL requires `python >= 3.10`.
 
@@ -59,3 +59,7 @@ $ python
 The documentation served online ([here](https://mpol-dev.github.io/MPoL/index.html)) corresponds to the `main` branch. This represents the current state of MPoL and is usually the best place to reference MPoL functionality. However, this documentation may be more current than last tagged version or the version you have installed. If you require the new features detailed in the documentation, then we recommend installing the package from source (as above).
 
 In the (foreseeably rare) situation where the latest online documentation significantly diverges from the package version you wish to use (but there are reasons you do not want to build the `main` branch from source), you can access the documentation for that version by [building the older documentation locally](developer-documentation.md#older-documentation-versions)
+
+## Getting Started
+
+As a PyTorch imaging library, there are many things one could do with MPoL. Over at the [MPoL-dev/examples](https://github.com/MPoL-dev/examples/) repository, we've collected example scripts for some of the more common workflows such as diagnostic imaging with {meth}`mpol.gridding.DirtyImager`, imaging with a stochastic gradient descent workflow, and visibility inference with Pyro.
