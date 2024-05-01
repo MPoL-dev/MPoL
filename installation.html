@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MPoL Installation &#8212; MPoL 0.1.dev1+gda6dbd3 documentation</title>
+    <title>Installation and Examples &#8212; MPoL 0.1.dev1+gba985bc documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="_static/documentation_options.js?v=c80d40b4"></script>
+    <script src="_static/documentation_options.js?v=9e42f109"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Gridding and diagnostic images" href="ci-tutorials/gridder.html" />
+    <link rel="next" title="Coordinates" href="api/coordinates.html" />
     <link rel="prev" title="Background and prerequisites" href="background.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -139,8 +139,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gda6dbd3 documentation - Home"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+gba985bc documentation - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="MPoL 0.1.dev1+gba985bc documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -160,8 +160,7 @@
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background and prerequisites</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">MPoL Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ci-tutorials/gridder.html">Gridding and diagnostic images</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Installation and Examples</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul class="nav bd-sidenav">
@@ -337,7 +336,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>MPoL Installation</h1>
+    <h1>Installation and Examples</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -351,6 +350,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From source</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#upgrading">Upgrading</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
 </ul>
             </nav>
         </div>
@@ -362,8 +362,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="mpol-installation">
-<h1>MPoL Installation<a class="headerlink" href="#mpol-installation" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="installation-and-examples">
+<h1>Installation and Examples<a class="headerlink" href="#installation-and-examples" title="Link to this heading">#</a></h1>
 <p>MPoL requires <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">&gt;=</span> <span class="pre">3.10</span></code>.</p>
 <section id="using-pip">
 <h2>Using pip<a class="headerlink" href="#using-pip" title="Link to this heading">#</a></h2>
@@ -411,6 +411,10 @@ $ pip install .
 <p>The documentation served online (<a class="reference external" href="https://mpol-dev.github.io/MPoL/index.html">here</a>) corresponds to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. This represents the current state of MPoL and is usually the best place to reference MPoL functionality. However, this documentation may be more current than last tagged version or the version you have installed. If you require the new features detailed in the documentation, then we recommend installing the package from source (as above).</p>
 <p>In the (foreseeably rare) situation where the latest online documentation significantly diverges from the package version you wish to use (but there are reasons you do not want to build the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch from source), you can access the documentation for that version by <a class="reference internal" href="developer-documentation.html#older-documentation-versions"><span class="std std-ref">building the older documentation locally</span></a></p>
 </section>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
+<p>As a PyTorch imaging library, there are many things one could do with MPoL. Over at the <a class="reference external" href="https://github.com/MPoL-dev/examples/">MPoL-dev/examples</a> repository, we’ve collected example scripts for some of the more common workflows such as diagnostic imaging with <a class="reference internal" href="api/gridding.html#mpol.gridding.DirtyImager" title="mpol.gridding.DirtyImager"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mpol.gridding.DirtyImager()</span></code></a>, imaging with a stochastic gradient descent workflow, and visibility inference with Pyro.</p>
+</section>
 </section>
 
 
@@ -434,11 +438,11 @@ $ pip install .
       </div>
     </a>
     <a class="right-next"
-       href="ci-tutorials/gridder.html"
+       href="api/coordinates.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Gridding and diagnostic images</p>
+        <p class="prev-next-title">Coordinates</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -462,6 +466,7 @@ $ pip install .
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From source</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#upgrading">Upgrading</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
 </ul>
   </nav></div>
 

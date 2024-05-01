@@ -23,10 +23,7 @@ If you'd like to help build the MPoL package, please check out the [](developer-
 
 background
 installation
-ci-tutorials/gridder
-ci-tutorials/optimization
-ci-tutorials/initializedirtyimage
-ci-tutorials/fakedata
+getting_started
 ```
 
 ```{toctree}
