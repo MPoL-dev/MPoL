@@ -13,7 +13,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.13"
+          python-version: "3.12"
       - name: Install dependencies needed to download files
         # we're just installing mpol here to reference the zenodo record number 
         # in __init__. below we'll reinstall for the tests.
