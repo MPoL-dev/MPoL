@@ -1,6 +1,6 @@
 
-from astropy.utils.data import download_file
-from mpol.input_output import ProcessFitsImage
+# from astropy.utils.data import download_file
+# from mpol.input_output import ProcessFitsImage
 
 
 # def test_ProcessFitsImage():
