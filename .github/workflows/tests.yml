@@ -6,36 +6,7 @@ on:
   pull_request:
 
 jobs:
-  dl_files:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-      - name: Install dependencies needed to download files
-        # we're just installing mpol here to reference the zenodo record number 
-        # in __init__. below we'll reinstall for the tests.
-        run: |
-          pip install astropy
-          pip install frank
-          pip install .
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
-      - name: Download large files
-        run: |
-          python3 docs/download_external_files.py
-
   tests:
-    needs: dl_files # don't bother running if we didn't succeed getting the files
     runs-on: ubuntu-20.04
     strategy:
       max-parallel: 4
@@ -71,15 +42,6 @@ jobs:
       - name: Check types with MyPy
         run: |
           mypy src/mpol --pretty
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
