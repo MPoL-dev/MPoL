@@ -276,8 +276,8 @@ def test_GaussConvImage_rotate(sky_cube, coords, tmp_path):
     chan = 0
     nchan = sky_cube.size()[0]
 
-    for Omega in [0, 20, 40]:
-        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=0.16, FWHM_min=0.06, Omega=Omega)
+    for Omega in [0, 30]:
+        layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=0.10, FWHM_min=0.05, Omega=Omega)
 
         fig, ax = plt.subplots(ncols=2)
 
@@ -296,7 +296,7 @@ def test_GaussConvImage_rotate(sky_cube, coords, tmp_path):
         ax[1].set_title(f"tot flux: {flux:.3f} Jy")
 
         plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / f"convolved_{Omega:.2f}.png", dpi=300)
+        fig.savefig(tmp_path / f"convolved_{Omega:.0f}_deg.png", dpi=300)
 
     plt.close("all")
 
