@@ -76,7 +76,7 @@ def test_basecube_imagecube(coords, tmp_path):
     imagecube(basecube())
 
     fig, ax = plt.subplots(ncols=1)
-    im = ax.imshow(
+    ax.imshow(
         np.squeeze(imagecube.sky_cube.detach().numpy()),
         extent=imagecube.coords.img_ext,
         origin="lower",
