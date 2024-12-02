@@ -4,22 +4,22 @@ import pytest
 import torch
 from astropy.io import fits
 from mpol import coordinates, images, plot, utils
+from plot_utils import imshow_two
 
-
-def test_single_chan():
+def test_instantiate_single_chan():
     coords = coordinates.GridCoords(cell_size=0.015, npix=800)
     im = images.ImageCube(coords=coords)
     assert im.nchan == 1
 
 
-def test_basecube_grad():
+def test_basecube_apply_grad():
     coords = coordinates.GridCoords(cell_size=0.015, npix=800)
     bcube = images.BaseCube(coords=coords)
     loss = torch.sum(bcube())
     loss.backward()
 
 
-def test_imagecube_grad(coords):
+def test_imagecube_apply_grad(coords):
     bcube = images.BaseCube(coords=coords)
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords)
@@ -67,21 +67,7 @@ def test_basecube_imagecube(coords, tmp_path):
     # the default softplus function should map everything to positive values
     output = basecube()
 
-    fig, ax = plt.subplots(ncols=2, nrows=1)
-
-    im = ax[0].imshow(
-        np.squeeze(base_cube.detach().numpy()), origin="lower", interpolation="none"
-    )
-    plt.colorbar(im, ax=ax[0])
-    ax[0].set_title("input")
-
-    im = ax[1].imshow(
-        np.squeeze(output.detach().numpy()), origin="lower", interpolation="none"
-    )
-    plt.colorbar(im, ax=ax[1])
-    ax[1].set_title("mapped")
-
-    fig.savefig(tmp_path / "basecube_mapped.png")
+    imshow_two(tmp_path / "basecube_mapped.png", [base_cube, output], titles=["input", "mapped"])
 
     # try passing through ImageLayer
     imagecube = images.ImageCube(coords=coords, nchan=nchan)
