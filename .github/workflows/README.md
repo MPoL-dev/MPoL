@@ -1,0 +1,6 @@
+# MPoL GitHub Actions Workflows
+
+We use GitHub actions to continuously integrate and deploy the MPoL codebase. This document summarizes the intended functionality of each of the workflows.
+
+* `verify-tests-and-docs.yml` runs the unit tests and (if successful) builds (but does not deploy) the documentation to ascertain whether the codebase is in a working state (defined as passing tests on all non-experimental Python versions and a successful documentation build). This workflow is intended to run on every commit to the `main` branch as well as every commit to open pull requests.
+* `docs-build-deploy.yml` builds and deploys the documentation to [GitHub Pages](https://mpol-dev.github.io/MPoL/). This workflow is intended to run on every commit to the `main` branch, to ensure that the currently deployed documentation matches the current state of the source code. Note that if you are merging a PR: you may find that the docs are built twice, once as part of the `verify-tests-and-docs.yml` and then again as part of `docs-build-deploy.yml`. This duplication is OK, since it is designed to support small changes implemented directly on `main` as well as changes introduced through branches and PRs.
