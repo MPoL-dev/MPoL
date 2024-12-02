@@ -1,4 +1,4 @@
-name: package test
+name: verify tests pass and docs build
 
 on:
   push:
@@ -41,3 +41,21 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
+  docs_build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install doc dependencies
+        run: |
+          pip install .[dev]
+      - name: Install Pandoc dependency
+        run: |
+          sudo apt-get install pandoc
+      - name: Build the docs
+        run: |
+          make -C docs clean
+          make -C docs html
