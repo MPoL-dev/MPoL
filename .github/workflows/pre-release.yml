@@ -6,43 +6,17 @@ on:
       - prereleased
 
 jobs:
-  dl_files:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install package deps
-        run: |
-          pip install .[dev]
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
-      - name: Download large files
-        run: |
-          python3 docs/download_external_files.py
-
   tests:
-    needs: dl_files # don't bother running if we didn't succeed getting the files
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      max-parallel: 4
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-20.04, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -61,15 +35,6 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol
