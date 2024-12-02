@@ -6,56 +6,23 @@ on:
   pull_request:
 
 jobs:
-  dl_files:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install dependencies needed to download files
-        # we're just installing mpol here to reference the zenodo record number 
-        # in __init__. below we'll reinstall for the tests.
-        run: |
-          pip install astropy
-          pip install frank
-          pip install .
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
-      - name: Download large files
-        run: |
-          python3 docs/download_external_files.py
-
   tests:
-    needs: dl_files # don't bother running if we didn't succeed getting the files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
-      max-parallel: 4
+      fail-fast: true
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
+        experimental: [false]
+        include:
+          - python-version: "3.13"
+            experimental: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      # cache the Python environment, including installed dependencies
-      # (unique to each python-version; speeds up tests more than caching pip cache)
-      - name: Cache/Restore the Python env
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-python${{ matrix.python-version }}-env
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
       - name: Install pip
         run: |
           pip install --upgrade pip
@@ -71,15 +38,6 @@ jobs:
       - name: Check types with MyPy
         run: |
           mypy src/mpol --pretty
-      - name: Cache/Restore the .mpol folder cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-mpol-dls
-        with:
-          # files are stored in .mpol
-          path: ~/.mpol
-          # the "key" is the hash of the download script
-          key: ${{ hashFiles('docs/download_external_files.py') }}
       - name: Run tests with coverage
         run: |
           pytest --cov=mpol

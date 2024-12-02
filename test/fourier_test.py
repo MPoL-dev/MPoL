@@ -4,13 +4,8 @@ import torch
 from mpol import fourier, utils
 from pytest import approx
 
-
-def test_fourier_cube(coords, tmp_path):
-    # test image packing
-    # test whether we get the same Fourier Transform using the FFT as we could
-    # calculate analytically
-
-    kw = {
+# parameters for analytic Gaussian used for all tests
+gauss_kw = {
         "a": 1,
         "delta_x": 0.02,  # arcsec
         "delta_y": -0.01,
@@ -19,8 +14,14 @@ def test_fourier_cube(coords, tmp_path):
         "Omega": 20,  # degrees
     }
 
+def test_fourier_cube(coords, tmp_path):
+    # test image packing
+    # test whether we get the same Fourier Transform using the FFT as we could
+    # calculate analytically
+
+    
     img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
 
     # calculated the packed FFT using the FourierLayer
@@ -31,7 +32,7 @@ def test_fourier_cube(coords, tmp_path):
 
     # calculate the analytical FFT
     fourier_packed_an = utils.fourier_gaussian_lambda_arcsec(
-        coords.packed_u_centers_2D, coords.packed_v_centers_2D, **kw
+        coords.packed_u_centers_2D, coords.packed_v_centers_2D, **gauss_kw
     )
 
     ikw = {"origin": "lower"}
@@ -70,17 +71,8 @@ def test_fourier_cube(coords, tmp_path):
 def test_fourier_cube_grad(coords):
     # Test that we can calculate a gradient on a loss function using the Fourier layer
 
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
-
     img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
 
     # calculated the packed FFT using the FourierLayer
@@ -218,54 +210,15 @@ def test_nufft_cached_predict_GPU(coords, baselines_1D):
         np.zeros((nchan, len(uu)), dtype=np.complex128)
     )
 
+def plot_nufft_comparison(uu, vv, an_output, num_output, path):
+    """Plot and save a figure comparing the analytic and numerical FT points.
+    """
 
-def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
-    # create a single-channel ImageCube using a function we know the true FT analytically
-    # use NuFFT to FT and sample that image
-    # assert that the NuFFT samples and the analytic FT samples are close
+    qq = utils.torch2npy(torch.hypot(uu, vv)) * 1e-6
 
-    # load some data
-    uu, vv = baselines_1D
-    nchan = 1
-
-    # create a NuFFT layer to perform interpolations to these points
-    layer = fourier.NuFFT(coords=coords, nchan=nchan)
-
-    # a sky Gaussian
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
-
-    img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
-    )
-    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
-
-    # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor, uu, vv)[0]  # take the channel dim out
-
-    # calculate the values analytically
-    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
-
-    # find max difference
     diff = num_output - an_output
-    max_diff = torch.max(torch.abs(diff))
-    max = torch.max(torch.abs(num_output))
-    print(max_diff, max)
-
-    # collapse the function into 1D by doing q
-    qq = utils.torch2npy(torch.hypot(uu, vv))
-
-    # convert to numpy for plotting
-    num_output = utils.torch2npy(num_output)
-    diff = utils.torch2npy(diff)
-
-    fig, ax = plt.subplots(nrows=4, sharex=True)
+    
+    fig, ax = plt.subplots(nrows=4, sharex=True, figsize=(7,5))
     ax[0].scatter(qq, an_output.real, s=3, label="analytic")
     ax[0].scatter(qq, num_output.real, s=1, label="NuFFT")
     ax[0].set_ylabel("Real")
@@ -280,12 +233,43 @@ def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
 
     ax[3].scatter(qq, diff.imag, s=1, c="k")
     ax[3].set_ylabel("diff Imag")
-    ax[3].set_xlabel(r"$q$ [k lambda]")
+    ax[3].set_xlabel(r"$q$ [M$\lambda$]")
 
+    fig.subplots_adjust(hspace=0.2, left=0.15, right=0.85, top=0.92)
     fig.suptitle("NuFFT Accuracy compared to analytic")
-    fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
+    fig.savefig(path, dpi=300)
 
-    # should be < 2.5e-6, based on plot
+
+
+def test_nufft_accuracy_single_chan(coords, baselines_1D, tmp_path):
+    """Create a single-channel ImageCube using an analytic function for which we know 
+    the true FT. 
+    Then use the NuFFT to FT and sample that image.
+    Plot both and their difference.
+    Assert that the NuFFT samples and the analytic FT samples are close.
+    """
+
+    uu, vv = baselines_1D
+
+    # NuFFT layer to perform interpolations to these points
+    layer = fourier.NuFFT(coords=coords, nchan=1)
+
+    img_packed = utils.sky_gaussian_arcsec(
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
+    )
+    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True)
+
+    # use the NuFFT to predict the values of the cube at the u,v locations
+    num_output = layer(img_packed_tensor, uu, vv)[0]  # take the channel dim out
+    num_output = utils.torch2npy(num_output)
+
+    # calculate the values analytically
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **gauss_kw)
+    an_output = utils.torch2npy(an_output)
+
+    plot_nufft_comparison(uu, vv, an_output, num_output, tmp_path / "nufft_comparison.png")
+    
+    # threshold based on visual inspection of plot
     assert num_output == approx(an_output, abs=2.5e-6)
 
 
@@ -296,70 +280,30 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
 
     # load some data
     uu, vv = baselines_1D
-    nchan = 1
 
     # create a NuFFT layer to perform interpolations to these points
-    layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
-
-    # a sky Gaussian
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
+    layer = fourier.NuFFTCached(coords=coords, nchan=1, uu=uu, vv=vv)
 
     img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
     img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True, dtype=torch.float32)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
     num_output = layer(img_packed_tensor)[0]  # take the channel dim out
+    num_output = utils.torch2npy(num_output)
 
     # calculate the values analytically
-    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **gauss_kw)
+    an_output = utils.torch2npy(an_output)
 
-    # find max difference
-    diff = num_output - an_output
-    max_diff = torch.max(torch.abs(diff))
-    max = torch.max(torch.abs(num_output))
-    print(max_diff, max)
+    plot_nufft_comparison(uu, vv, an_output, num_output, tmp_path / "nufft_cached_comparison.png")
 
-    # collapse the function into 1D by doing q
-    qq = utils.torch2npy(torch.hypot(uu, vv))
-
-    # convert to numpy for plotting
-    num_output = utils.torch2npy(num_output)
-    diff = utils.torch2npy(diff)
-
-    fig, ax = plt.subplots(nrows=4, sharex=True)
-    ax[0].scatter(qq, an_output.real, s=3, label="analytic")
-    ax[0].scatter(qq, num_output.real, s=1, label="NuFFT")
-    ax[0].set_ylabel("Real")
-    ax[0].legend()
-
-    ax[1].scatter(qq, diff.real, s=1, c="k")
-    ax[1].set_ylabel("diff Real")
-
-    ax[2].scatter(qq, an_output.imag, s=3)
-    ax[2].scatter(qq, num_output.imag, s=1)
-    ax[2].set_ylabel("Imag")
-
-    ax[3].scatter(qq, diff.imag, s=1, c="k")
-    ax[3].set_ylabel("diff Imag")
-    ax[3].set_xlabel(r"$q$ [k lambda]")
-
-    fig.suptitle("NuFFT Accuracy compared to analytic")
-    fig.savefig(tmp_path / "nufft_cached_comparison.png", dpi=300)
-
-    # should be < 2e-8, based on plot
+    # threshold based on visual inspection of plot
     assert num_output == approx(an_output, abs=2e-8)
 
 
-def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
+def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D, tmp_path):
     # create a multi-channel ImageCube using a function we know the true FT analytically
     # use NuFFT to FT and sample that image
     # assert that the NuFFT samples and the analytic FT samples are close
@@ -373,18 +317,8 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
     # this should use the coil dimension of NuFFT to do the broadcasting
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
-    # a sky Gaussian
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
-
     img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
 
     # broadcast to 5 channels -- the image will be the same for each
@@ -394,14 +328,23 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D):
     )
 
     # use the NuFFT to predict the values of the cube at the u,v locations
-    num_output = layer(img_packed_tensor).detach().numpy()
+    num_output = layer(img_packed_tensor)
+    num_output = utils.torch2npy(num_output)
+    
+    # plot a single channel, to check
+    ichan = 1
 
     # calculate the values analytically, for a single channel
-    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu, vv, **gauss_kw)
+    an_output = utils.torch2npy(an_output)
+
+    plot_nufft_comparison(
+        uu, vv, an_output, num_output[ichan], tmp_path / "nufft_cached_comparison.png"
+    )
 
     # loop through each channel and assert that things are the same
     for i in range(nchan):
-        # should be < 2e-8, based on plot for single-channel
+        # threshold based on visual inspection of plot for single channel
         assert num_output[i] == approx(an_output, abs=2e-8)
 
 
@@ -421,18 +364,8 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D_t, tmp_path)
         coords=coords, nchan=nchan, uu=uu, vv=vv, sparse_matrices=False
     )
 
-    # a sky Gaussian
-    kw = {
-        "a": 1,
-        "delta_x": 0.02,  # arcsec
-        "delta_y": -0.01,
-        "sigma_x": 0.02,
-        "sigma_y": 0.01,
-        "Omega": 20,  # degrees
-    }
-
     img_packed = utils.sky_gaussian_arcsec(
-        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **kw
+        coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
 
     # broadcast to all channels -- the image will be the same for each
@@ -443,44 +376,23 @@ def test_nufft_cached_accuracy_batch_broadcast(coords, baselines_2D_t, tmp_path)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
     num_output = layer(img_packed_tensor)
+    num_output = utils.torch2npy(num_output)
 
     # plot a single channel, to check
     ichan = 1
 
-    an_output = utils.fourier_gaussian_lambda_arcsec(uu[ichan], vv[ichan], **kw)
+    an_output = utils.fourier_gaussian_lambda_arcsec(uu[ichan], vv[ichan], **gauss_kw)
+    an_output = utils.torch2npy(an_output)
 
-    diff = num_output[ichan] - an_output
-
-    # convert for plotting
-    qq = utils.torch2npy(torch.hypot(uu[ichan], vv[ichan]))
-    num_output = utils.torch2npy(num_output)
-    diff = utils.torch2npy(diff)
-
-    fig, ax = plt.subplots(nrows=4, sharex=True)
-    ax[0].scatter(qq, an_output.real, s=3, label="analytic")
-    ax[0].scatter(qq, num_output[ichan].real, s=1, label="NuFFT")
-    ax[0].set_ylabel("Real")
-    ax[0].legend()
-
-    ax[1].scatter(qq, diff.real, s=1, c="k")
-    ax[1].set_ylabel("diff Real")
-
-    ax[2].scatter(qq, an_output.imag, s=3)
-    ax[2].scatter(qq, num_output[ichan].imag, s=1)
-    ax[2].set_ylabel("Imag")
-
-    ax[3].scatter(qq, diff.imag, s=1, c="k")
-    ax[3].set_ylabel("diff Imag")
-    ax[3].set_xlabel(r"$q$ [k lambda]")
-
-    fig.suptitle("NuFFT Accuracy compared to analytic")
-    fig.savefig(tmp_path / "nufft_comparison.png", dpi=300)
+    plot_nufft_comparison(
+        uu[ichan], vv[ichan], an_output, num_output[ichan], tmp_path / "nufft_cached_comparison.png"
+    )
 
     # loop through each channel and assert that things are the same
     for i in range(nchan):
         # calculate the values analytically for this channel
-        an_output = utils.fourier_gaussian_lambda_arcsec(uu[i], vv[i], **kw)
+        an_output = utils.fourier_gaussian_lambda_arcsec(uu[i], vv[i], **gauss_kw)
 
         # using table-based interpolation, so the accuracy bar is lower
-        # should be < 3e-6, based on plot for single-channel
+        # threshold based on visual inspection of plot of single channel
         assert num_output[i] == approx(an_output, abs=3e-6)

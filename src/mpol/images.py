@@ -366,7 +366,7 @@ class GaussConvFourier(nn.Module):
         # store taper to register so it transfers to GPU
         self.register_buffer("taper_2D", torch.tensor(taper_2D, dtype=torch.float32))
 
-    def forward(self, packed_cube):
+    def forward(self, packed_cube, thresh=1e-6):
         r"""
         Convolve a packed_cube image with a 2D Gaussian PSF. Operation is carried out
         in the Fourier domain using a Gaussian taper.
@@ -400,7 +400,6 @@ class GaussConvFourier(nn.Module):
         convolved_packed_cube = torch.fft.ifftn(tapered_vis, dim=(1, 2))
 
         # assert imaginaries are effectively zero, otherwise something went wrong
-        thresh = 1e-7
         assert (
             torch.max(convolved_packed_cube.imag) < thresh
         ), "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(
