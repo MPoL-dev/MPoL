@@ -1,0 +1,4 @@
+image.cmap: inferno
+figure.figsize: 7.1, 5.0
+figure.autolayout: True
+savefig.dpi: 200
