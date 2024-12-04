@@ -172,12 +172,13 @@ def test_GaussConvImage_kernel_rotate(coords, tmp_path):
     fig.savefig(tmp_path / "filter.png")
     plt.close("all")
 
-@pytest.mark.parametrize("r", [0.02, 0.06, 0.1])
-def test_GaussConvImage(sky_cube, coords, tmp_path, r):
+
+@pytest.mark.parametrize("FWHM", [0.02, 0.06, 0.1])
+def test_GaussConvImage(sky_cube, coords, tmp_path, FWHM):
     chan = 0
     nchan = sky_cube.size()[0]
 
-    layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=r, FWHM_min=r)
+    layer = images.GaussConvImage(coords, nchan=nchan, FWHM_maj=FWHM, FWHM_min=FWHM)
     c_sky = layer(sky_cube)
 
     imgs = [sky_cube[chan], c_sky[chan]]
@@ -185,17 +186,18 @@ def test_GaussConvImage(sky_cube, coords, tmp_path, r):
     title = [f"tot flux: {flux:.3f} Jy" for flux in fluxes]
 
     imshow_two(
-        tmp_path / f"convolved_{r:.2f}.png",
+        tmp_path / f"convolved_{FWHM:.2f}.png",
         imgs,
         sky=True,
-        suptitle=f"Image Plane Gauss Convolution FWHM={r}",
+        suptitle=f"Image Plane Gauss Convolution FWHM={FWHM}",
         title=title,
-        extent=[coords.img_ext]
+        extent=[coords.img_ext],
     )
 
-    assert pytest.approx(fluxes[0])  == fluxes[1]
-        
-@pytest.mark.parametrize("Omega", [0, 30])
+    assert pytest.approx(fluxes[0]) == fluxes[1]
+
+
+@pytest.mark.parametrize("Omega", [0, 15, 30, 45])
 def test_GaussConvImage_rotate(sky_cube, coords, tmp_path, Omega):
     chan = 0
     nchan = sky_cube.size()[0]
@@ -216,74 +218,72 @@ def test_GaussConvImage_rotate(sky_cube, coords, tmp_path, Omega):
         tmp_path / f"convolved_{Omega:.0f}_deg.png",
         imgs,
         sky=True,
-        suptitle=r'Image Plane Gauss Convolution: $\Omega$=' + f'{Omega}, {FWHM_maj}", {FWHM_min}"',
+        suptitle=r"Image Plane Gauss Convolution: $\Omega$="
+        + f'{Omega}, {FWHM_maj}", {FWHM_min}"',
         title=title,
         extent=[coords.img_ext],
     )
 
     assert pytest.approx(fluxes[0], abs=4e-7) == fluxes[1]
 
-def test_GaussFourier(packed_cube, coords, tmp_path):
+
+@pytest.mark.parametrize("FWHM", [0.02, 0.1, 0.2, 0.3, 0.5])
+def test_GaussConvFourier(packed_cube, coords, tmp_path, FWHM):
     chan = 0
-
-    for FWHM in np.linspace(0.02, 0.5, num=10):
-        fig, ax = plt.subplots(ncols=2)
-        # put back to sky
-        sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
-        im = ax[0].imshow(sky_cube[chan], extent=coords.img_ext, origin="lower")
-        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
-        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
-        plt.colorbar(im, ax=ax[0])
-
-        # set base resolution
-        layer = images.GaussConvFourier(coords, FWHM, FWHM)
-        c = layer(packed_cube)
-        # put back to sky
-        c_sky = utils.packed_cube_to_sky_cube(c)
-        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
-        im = ax[1].imshow(
-            c_sky[chan].detach().numpy(),
-            extent=coords.img_ext,
-            origin="lower",
-            cmap="inferno",
-        )
-        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
-
-        plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / "convolved_FWHM_{:.2f}.png".format(FWHM))
-
-    plt.close("all")
-
-
-def test_GaussFourier_rotate(packed_cube, coords, tmp_path):
-    chan = 0
-
     sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
 
-    for Omega in [0, 30]:
-        layer = images.GaussConvFourier(
-            coords, FWHM_maj=0.10, FWHM_min=0.05, Omega=Omega
-        )
+    layer = images.GaussConvFourier(coords, FWHM, FWHM)
+    c = layer(packed_cube)
+    c_sky = utils.packed_cube_to_sky_cube(c)
 
-        fig, ax = plt.subplots(ncols=2)
+    imgs = [sky_cube[chan], c_sky[chan]]
+    fluxes = [coords.cell_size**2 * torch.sum(img).item() for img in imgs]
+    title = [f"tot flux: {flux:.3f} Jy" for flux in fluxes]
 
-        im = ax[0].imshow(sky_cube[chan], extent=coords.img_ext, origin="lower")
-        flux = coords.cell_size**2 * torch.sum(sky_cube[chan])
-        ax[0].set_title(f"tot flux: {flux:.3f} Jy")
-        plt.colorbar(im, ax=ax[0])
+    imshow_two(
+        tmp_path / "convolved_FWHM_{:.2f}.png".format(FWHM),
+        imgs,
+        sky=True,
+        suptitle=f"Fourier Plane Gauss Convolution: FWHM={FWHM}",
+        title=title,
+        extent=[coords.img_ext],
+    )
 
-        c_sky = layer(sky_cube)
-        im = ax[1].imshow(c_sky[chan], extent=coords.img_ext, origin="lower")
-        flux = coords.cell_size**2 * torch.sum(c_sky[chan])
-        ax[1].set_title(f"tot flux: {flux:.3f} Jy")
-
-        plt.colorbar(im, ax=ax[1])
-        fig.savefig(tmp_path / f"convolved_{Omega:.0f}_deg.png")
-
-    plt.close("all")
+    assert pytest.approx(fluxes[0], abs=4e-7) == fluxes[1]
 
 
-def test_GaussFourier_point(coords, tmp_path):
+@pytest.mark.parametrize("Omega", [0, 15, 30, 45])
+def test_GaussConvFourier_rotate(packed_cube, coords, tmp_path, Omega):
+    chan = 0
+    sky_cube = utils.packed_cube_to_sky_cube(packed_cube)
+
+    FWHM_maj = 0.10
+    FWHM_min = 0.05
+    layer = images.GaussConvFourier(
+        coords, FWHM_maj=FWHM_maj, FWHM_min=FWHM_min, Omega=Omega
+    )
+
+    c = layer(packed_cube)
+    c_sky = utils.packed_cube_to_sky_cube(c)
+
+    imgs = [sky_cube[chan], c_sky[chan]]
+    fluxes = [coords.cell_size**2 * torch.sum(img).item() for img in imgs]
+    title = [f"tot flux: {flux:.3f} Jy" for flux in fluxes]
+
+    imshow_two(
+        tmp_path / f"convolved_{Omega:.0f}_deg.png",
+        imgs,
+        sky=True,
+        suptitle=r"Fourier Plane Gauss Convolution: $\Omega$="
+        + f'{Omega}, {FWHM_maj}", {FWHM_min}"',
+        title=title,
+        extent=[coords.img_ext],
+    )
+
+    assert pytest.approx(fluxes[0], abs=4e-7) == fluxes[1]
+
+
+def test_GaussConvFourier_point(coords, tmp_path):
     FWHM = 0.5
 
     # create an image with a point source in the center
