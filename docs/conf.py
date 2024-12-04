@@ -1,4 +1,3 @@
-import os
 
 # -- Project information -----------------------------------------------------
 from pkg_resources import DistributionNotFound, get_distribution
@@ -16,7 +15,7 @@ import sphinx.util.osutil
 sphinx.util.osutil.ENOENT = errno.ENOENT
 
 project = "MPoL"
-copyright = "2019-22, Ian Czekala"
+copyright = "2019-24, Ian Czekala"
 author = "Ian Czekala"
 
 # The full version, including alpha/beta/rc tags
@@ -45,7 +44,10 @@ myst_enable_extensions = ["dollarmath", "colon_fence", "amsmath"]
 
 autodoc_mock_imports = ["torch", "torchvision"]
 autodoc_member_order = "bysource"
-autodoc_default_options = {"members": None}
+# https://github.com/sphinx-doc/sphinx/issues/9709
+# bug that if we set this here, we can't list individual members in the
+# actual API doc
+# autodoc_default_options = {"members": None}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -94,5 +96,9 @@ nb_execution_timeout = -1
 nb_execution_raise_on_error = True
 # .ipynb are produced using Makefile on own terms,
 # # both .md and executed .ipynb are kept in git repo
-nb_execution_excludepatterns = ["large-tutorials/*.md", "large-tutorials/*.ipynb", "**.ipynb_checkpoints"]
+nb_execution_excludepatterns = [
+    "large-tutorials/*.md",
+    "large-tutorials/*.ipynb",
+    "**.ipynb_checkpoints",
+]
 myst_heading_anchors = 3

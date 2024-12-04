@@ -1,0 +1,32 @@
+name: build and upload to PyPI
+
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install setuptools wheel twine
+          pip install pep517 --user
+      - name: Install vanilla package
+        run: |
+          pip install .
+      - name: Build a binary wheel and a source tarball
+        run: |
+          python -m pep517.build --source --binary --out-dir dist/ .
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}

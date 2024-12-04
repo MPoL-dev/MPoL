@@ -1,5 +1,7 @@
-import numpy as np 
+import numpy as np
+
 from mpol.utils import torch2npy
+
 
 def radialI(icube, geom, chan=0, bins=None):
     r"""
@@ -9,12 +11,12 @@ def radialI(icube, geom, chan=0, bins=None):
     ----------
     icube : `mpol.images.ImageCube` object
         Instance of the MPoL `images.ImageCube` class
-    geom : dict 
+    geom : dict
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
-                Inclination 
+                Inclination
             "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
+                Position angle of the ascending node
             "omega" : float, unit=[deg]
                 Argument of periastron
             "dRA" : float, unit=[arcsec]
@@ -24,7 +26,7 @@ def radialI(icube, geom, chan=0, bins=None):
     chan : int, default=0
         Channel of the image cube corresponding to the desired image
     bins : array, default=None, unit=[arcsec]
-        Radial bin edges to use in calculating I(r). If None, bins will span 
+        Radial bin edges to use in calculating I(r). If None, bins will span
         the full image, with widths equal to the hypotenuse of the pixels
 
     Returns
@@ -59,12 +61,12 @@ def radialI(icube, geom, chan=0, bins=None):
     bin_counts, bin_edges = np.histogram(a=rr, bins=bins, weights=None)
 
     # cumulative binned brightness in each annulus
-    Is, _ = np.histogram(a=rr, bins=bins, 
-                         weights=torch2npy(icube.sky_cube[chan]).ravel()
-                         )
+    Is, _ = np.histogram(
+        a=rr, bins=bins, weights=torch2npy(icube.sky_cube[chan]).ravel()
+    )
 
     # mask empty bins
-    mask = (bin_counts == 0)
+    mask = bin_counts == 0
     Is = np.ma.masked_where(mask, Is)
 
     # average binned brightness in each annulus
@@ -77,44 +79,44 @@ def radialI(icube, geom, chan=0, bins=None):
 
 def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     r"""
-    Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL 
-    image. 
+    Obtain the 1D (radial) visibility model V(q) corresponding to a 2D MPoL
+    image.
 
     Parameters
     ----------
     fcube : `~mpol.fourier.FourierCube` object
         Instance of the MPoL `fourier.FourierCube` class
-    geom : dict 
+    geom : dict
         Dictionary of source geometry. Keys:
             "incl" : float, unit=[deg]
-                Inclination 
+                Inclination
             "Omega" : float, unit=[deg]
-                Position angle of the ascending node 
+                Position angle of the ascending node
             "omega" : float, unit=[deg]
                 Argument of periastron
             "dRA" : float, unit=[arcsec]
-                Phase center offset in right ascension. Positive is west of north. 
+                Phase center offset in right ascension. Positive is west of north.
             "dDec" : float, unit=[arcsec]
                 Phase center offset in declination
     rescale_flux : bool
-        If True, the visibility amplitudes and weights are rescaled to account 
-        for the difference between the inclined (observed) brightness and the 
-        assumed face-on brightness, assuming the emission is optically thick. 
+        If True, the visibility amplitudes are rescaled to account
+        for the difference between the inclined (observed) brightness and the
+        assumed face-on brightness, assuming the emission is optically thick.
         The source's integrated (2D) flux is assumed to be:
-            :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
-        No rescaling would be appropriate in the optically thin limit. 
+        :math:`F = \cos(i) \int_r^{r=R}{I(r) 2 \pi r dr}`.
+        No rescaling would be appropriate in the optically thin limit.
     chan : int, default=0
-        Channel of the image cube corresponding to the desired image        
+        Channel of the image cube corresponding to the desired image
     bins : array, default=None, unit=[k\lambda]
-        Baseline bin edges to use in calculating V(q). If None, bins will span 
-        the model baseline distribution, with widths equal to the hypotenuse of 
+        Baseline bin edges to use in calculating V(q). If None, bins will span
+        the model baseline distribution, with widths equal to the hypotenuse of
         the (u, v) coordinates
 
     Returns
     -------
-    bin_centers : array, unit=:math:[`k\lambda`]
+    bin_centers : array, unit=:math:[`\lambda`]
         Baselines corresponding to `u` and `v`
-    Vs : array, unit=[Jy] 
+    Vs : array, unit=[Jy]
         Visibility amplitudes at `q`
 
     Notes
@@ -124,29 +126,27 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     from frank.geometry import apply_phase_shift, deproject
 
     # projected model (u,v) points [k\lambda]
-    uu, vv = fcube.coords.sky_u_centers_2D, fcube.coords.sky_v_centers_2D
+    uu, vv = fcube.coords.ground_u_centers_2D, fcube.coords.ground_v_centers_2D
 
-    # visibilities 
-    V = torch2npy(fcube.ground_cube[chan]).ravel()
+    # visibilities
+    V = torch2npy(fcube.ground_vis[chan]).ravel()
 
     # phase-shift the visibilities
-    Vp = apply_phase_shift(uu.ravel() * 1e3, vv.ravel() * 1e3, V, geom["dRA"], 
-                           geom["dDec"], inverse=True)
-    
+    Vp = apply_phase_shift(
+        uu.ravel(), vv.ravel(), V, geom["dRA"], geom["dDec"], inverse=True
+    )
+
     # deproject the (u,v) points
-    up, vp, _ = deproject(uu.ravel() * 1e3, vv.ravel() * 1e3, geom["incl"], 
-                          geom["Omega"])
+    up, vp, _ = deproject(
+        uu.ravel(), vv.ravel(), geom["incl"], geom["Omega"]
+    )
 
     # if the source is optically thick, rescale the deprojected V(q)
-    if rescale_flux: 
+    if rescale_flux:
         Vp.real /= np.cos(geom["incl"] * np.pi / 180)
 
-    # convert back to [k\lambda]
-    up /= 1e3
-    vp /= 1e3
-
     # deprojected baselines
-    qq = np.hypot(up, vp) 
+    qq = np.hypot(up, vp)
 
     if bins is None:
         # choose sensible bin size and range
@@ -159,12 +159,12 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     Vs, _ = np.histogram(a=qq, bins=bins, weights=Vp)
 
     # mask empty bins
-    mask = (bin_counts == 0)
+    mask = bin_counts == 0
     Vs = np.ma.masked_where(mask, Vs)
 
     # average binned visibility amplitude in each annulus
     Vs /= bin_counts
-    
+
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
     return bin_centers, Vs

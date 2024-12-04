@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 from mpol import coordinates, utils
-from mpol.constants import *
 
 
 @pytest.fixture
@@ -87,7 +85,7 @@ def test_analytic_plot(tmp_path):
     fourier_packed_num = coords.cell_size**2 * np.fft.fft2(img_packed)
 
     # calculate the analytical FFT
-    fourier_packed_an = utils.fourier_gaussian_klambda_arcsec(
+    fourier_packed_an = utils.fourier_gaussian_lambda_arcsec(
         coords.packed_u_centers_2D, coords.packed_v_centers_2D, **kw
     )
 
@@ -130,11 +128,11 @@ def test_loglinspace():
     assert len(array) == 5 + 3
 
 
-def test_get_optimal_image_properties(mock_visibility_data_cont):
+def test_get_optimal_image_properties(baselines_1D):
     # test that get_optimal_image_properties returns sensible cell_size, npix
     image_width = 5.0 # [arcsec]
 
-    u, v, *_ = mock_visibility_data_cont
+    u, v = baselines_1D
 
     cell_size, npix = utils.get_optimal_image_properties(image_width, u, v)
 

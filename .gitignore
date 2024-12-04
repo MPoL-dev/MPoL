@@ -139,5 +139,11 @@ dirty_image_model.pt
 # setup file
 project_setup.sh
 
+# likely folders from testing
 plotsdir
 runs
+
+# hatch-generated version file
+src/mpol/mpol_version.py
+
+.ruff_cache
