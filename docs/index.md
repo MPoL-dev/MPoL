@@ -1,6 +1,6 @@
 # Million Points of Light (MPoL)
 
-[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
+[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/verify-tests-and-docs.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/verify-tests-and-docs.yml)
 [![gh-pages docs](https://img.shields.io/badge/community-Github%20Discussions-orange)](https://github.com/MPoL-dev/MPoL/discussions)
 
 MPoL is a [PyTorch](https://pytorch.org/) *library* built for Regularized Maximum Likelihood (RML) imaging and Bayesian Inference with datasets from interferometers like the Atacama Large Millimeter/Submillimeter Array ([ALMA](https://www.almaobservatory.org/en/home/)) and the Karl G. Jansky Very Large Array ([VLA](https://public.nrao.edu/telescopes/vla/)). 

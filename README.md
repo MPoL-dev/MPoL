@@ -1,9 +1,8 @@
 # MPoL
 
-[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/tests.yml)
-[![gh-pages docs](https://github.com/MPoL-dev/MPoL/actions/workflows/gh_docs.yml/badge.svg)](https://mpol-dev.github.io/MPoL/)
+[![Tests](https://github.com/MPoL-dev/MPoL/actions/workflows/verify-tests-and-docs.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/verify-tests-and-docs.yml)
+[![build and deploy docs](https://github.com/MPoL-dev/MPoL/actions/workflows/docs-build-deploy.yml/badge.svg?branch=main)](https://github.com/MPoL-dev/MPoL/actions/workflows/docs-build-deploy.yml)
 [![DOI](https://zenodo.org/badge/224543208.svg)](https://zenodo.org/badge/latestdoi/224543208)
-
 
 
 MPoL is a [PyTorch](https://pytorch.org/) *library* built for Regularized Maximum Likelihood (RML) imaging and Bayesian Inference with datasets from interferometers like the Atacama Large Millimeter/Submillimeter Array ([ALMA](https://www.almaobservatory.org/en/home/)) and the Karl G. Jansky Very Large Array ([VLA](https://public.nrao.edu/telescopes/vla/)). 
