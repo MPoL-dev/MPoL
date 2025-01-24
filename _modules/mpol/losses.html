@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.losses &#8212; MPoL 0.1.dev1+g7dbb096 documentation</title>
+    <title>mpol.losses &#8212; MPoL 0.1.dev1+g33fcf91 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,21 +26,21 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=3f7e954b"></script>
+    <script src="../../_static/documentation_options.js?v=8a7460f4"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@ window.addEventListener("load", () => mermaid.run());
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.dev1+g7dbb096" />
+  <meta name="docsearch:version" content="0.1.dev1+g33fcf91" />
   </head>
   
   
@@ -142,8 +142,8 @@ window.addEventListener("load", () => mermaid.run());
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g7dbb096 documentation - Home"/>
-    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g7dbb096 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g33fcf91 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g33fcf91 documentation - Home"/>
   
   
 </a></div>
@@ -190,9 +190,14 @@ window.addEventListener("load", () => mermaid.run());
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -292,16 +297,16 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for mpol.losses</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">mpol</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">mpol.datasets</span> <span class="kn">import</span> <span class="n">GriddedDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpol</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpol.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">GriddedDataset</span>
 
 
-<span class="k">def</span> <span class="nf">_chi_squared</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_chi_squared</span><span class="p">(</span>
     <span class="n">model_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -338,7 +343,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="r_chi_squared">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.r_chi_squared">[docs]</a>
-<span class="k">def</span> <span class="nf">r_chi_squared</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">r_chi_squared</span><span class="p">(</span>
     <span class="n">model_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -393,7 +398,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="r_chi_squared_gridded">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.r_chi_squared_gridded">[docs]</a>
-<span class="k">def</span> <span class="nf">r_chi_squared_gridded</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">r_chi_squared_gridded</span><span class="p">(</span>
     <span class="n">modelVisibilityCube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">:</span> <span class="n">GriddedDataset</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -428,7 +433,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="log_likelihood">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.log_likelihood">[docs]</a>
-<span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span>
     <span class="n">model_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -493,7 +498,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="log_likelihood_gridded">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.log_likelihood_gridded">[docs]</a>
-<span class="k">def</span> <span class="nf">log_likelihood_gridded</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood_gridded</span><span class="p">(</span>
     <span class="n">modelVisibilityCube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">griddedDataset</span><span class="p">:</span> <span class="n">GriddedDataset</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -530,7 +535,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="neg_log_likelihood_avg">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.neg_log_likelihood_avg">[docs]</a>
-<span class="k">def</span> <span class="nf">neg_log_likelihood_avg</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">neg_log_likelihood_avg</span><span class="p">(</span>
     <span class="n">model_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">data_vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -573,7 +578,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="entropy">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.entropy">[docs]</a>
-<span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">entropy</span><span class="p">(</span>
     <span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">prior_intensity</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">tot_flux</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -612,7 +617,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TV_image">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.TV_image">[docs]</a>
-<span class="k">def</span> <span class="nf">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TV_image</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the total variation (TV) loss in the image dimension (R.A. and DEC).</span>
 <span class="sd">    Following the definition in `EHT-IV 2019</span>
@@ -653,7 +658,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TV_channel">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.TV_channel">[docs]</a>
-<span class="k">def</span> <span class="nf">TV_channel</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TV_channel</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the total variation (TV) loss in the channel (first) dimension.</span>
 <span class="sd">    Following the definition in `EHT-IV 2019</span>
@@ -687,7 +692,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TSV">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.TSV">[docs]</a>
-<span class="k">def</span> <span class="nf">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TSV</span><span class="p">(</span><span class="n">sky_cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the total square variation (TSV) loss in the image dimension</span>
 <span class="sd">    (R.A. and DEC). Following the definition in `EHT-IV 2019</span>
@@ -727,7 +732,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="sparsity">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.sparsity">[docs]</a>
-<span class="k">def</span> <span class="nf">sparsity</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sparsity</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enforce a sparsity prior on the image cube using the :math:`L_1` norm. Optionally</span>
 <span class="sd">    provide a boolean mask to apply the prior to only the ``True`` locations. For</span>
@@ -765,7 +770,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="UV_sparsity">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.UV_sparsity">[docs]</a>
-<span class="k">def</span> <span class="nf">UV_sparsity</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">UV_sparsity</span><span class="p">(</span>
     <span class="n">vis</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">qs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">q_max</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -807,7 +812,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PSD">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.PSD">[docs]</a>
-<span class="k">def</span> <span class="nf">PSD</span><span class="p">(</span><span class="n">qs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">psd</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">PSD</span><span class="p">(</span><span class="n">qs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">psd</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply a loss function corresponding to the power spectral density using a Gaussian</span>
 <span class="sd">    process kernel.</span>
@@ -857,7 +862,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="edge_clamp">
 <a class="viewcode-back" href="../../api/losses.html#mpol.losses.edge_clamp">[docs]</a>
-<span class="k">def</span> <span class="nf">edge_clamp</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edge_clamp</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Promote all pixels at the edge of the image to be zero using an :math:`L_2` norm.</span>
 
@@ -944,8 +949,8 @@ By Ian Czekala
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
