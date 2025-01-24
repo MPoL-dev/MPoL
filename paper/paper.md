@@ -14,49 +14,49 @@ authors:
     orcid: 0000-0002-1483-8811
     corresponding: true
     affiliation: 1
-  - name: co-authors
-  # - name: Jeff Jennings
-  #   orcid: 0000-0002-7032-2350
-  #   affiliation: 2
-  # - name: Brianna Zawadzki
-  #   orcid: 0000-0001-9319-1296
-  #   affiliation: 3
-  # - name: Kadri Nizam
-  #   orcid: 0000-0002-7217-446X
-  #   affiliation: 2
-  # - name: Ryan Loomis
-  #   orcid: 0000-0002-8932-1219
-  #   affiliation: 4
-  # - name: Megan Delamer
-  #   orcid: 0000-0003-1439-2781
-  #   affiliation: 2     
-  # - name: Kaylee de Soto
-  #   orcid: 0000-0002-9886-2834
-  #   affiliation: 2
-  # - name: Robert Frazier
-  #   orcid: 0000-0001-6569-3731
-  #   affiliation: 2      
-  # - name: Hannah Grzybowski
-  #   # orcid: # can't find
-  #   affiliation: 2         
-  # - name: Mary Ogborn
-  #   orcid: 0000-0001-9741-2703
-  #   affiliation: 2
-  # - name: Tyler Quinn
-  #   orcid: 0000-0002-8974-8095
-  #   affiliation: 2
+  - name: Jeff Jennings
+    orcid: 0000-0002-7032-2350
+    affiliation: 2
+  - name: Brianna Zawadzki
+    orcid: 0000-0001-9319-1296
+    affiliation: 3
+  - name: Kadri Nizam
+    orcid: 0000-0002-7217-446X
+    affiliation: 4
+  - name: Ryan Loomis
+    orcid: 0000-0002-8932-1219
+    affiliation: 5
+  - name: Megan Delamer
+    orcid: 0000-0003-1439-2781
+    affiliation: 4     
+  - name: Kaylee de Soto
+    orcid: 0000-0002-9886-2834
+    affiliation: 4
+  - name: Robert Frazier
+    orcid: 0000-0001-6569-3731
+    affiliation: 4      
+  - name: Hannah Grzybowski
+    orcid: # can't find
+    affiliation: 4         
+  - name: Mary Ogborn
+    orcid: 0000-0001-9741-2703
+    affiliation: 4
+  - name: Tyler Quinn
+    orcid: 0000-0002-8974-8095
+    affiliation: 4
 affiliations:
- - name: University of St Andrews, Scotland 
-   index: 1
-#  - name: Pennsylvania State University, USA
-#    index: 2
-#  - name: Wesleyan University, USA
-#    index: 3
-#  - name: National Radio Astronomy Observatory, Charlottesville, VA, USA
-#    index: 4      
-date: 16 December 2024
+  - name: University of St Andrews, Scotland 
+    index: 1
+  - name:  CCA, Flatiron Institute, NY, USA
+    index: 2
+  - name: Wesleyan University, CT, USA
+    index: 3
+  - name: Pennsylvania State University, PA, USA
+    index: 4
+  - name: National Radio Astronomy Observatory, Charlottesville, VA, USA
+    index: 5      
+date: 24 January 2025
 bibliography: paper.bib
-aas-journal: Astrophysical Journal
 ---
 
 # Summary
@@ -71,15 +71,17 @@ High fidelity imaging algorithms for spatially resolved sources are needed to re
 
 # The Million Points of Light (MPoL) library
 
-`MPoL` is a library designed for feed-forward modeling of interferometric datasets using Python, Numpy [@harris20], and the computationally performant machine learning framework PyTorch [@paszke19], which debuted with @zawadzki23. `MPoL` implements a set of foundational interferometry components using PyTorch `nn.module`, which can be easily combined to build a forward-model of the interferometric dataset(s) at hand. We strive to seamlessly integrate with the PyTorch ecosystem so that users can easily leverage well-established machine learning workflows: optimization with stochastic gradient descent [@bishop23; Ch. 7], straightforward acceleration with GPU(s), and integration with common neural network architectures.
+`MPoL` is a library designed for feed-forward modeling of interferometric datasets using Python, Numpy [@harris20], and the computationally performant machine learning framework PyTorch [@paszke19], which debuted with @zawadzki23. `MPoL` implements a set of foundational interferometry components using PyTorch `nn.module`, which can be easily combined to build a forward-model of the interferometric dataset(s) at hand. We strive to seamlessly integrate with the PyTorch ecosystem so that users can easily leverage well-established machine learning workflows: optimization with stochastic gradient descent [@bishop23, Ch. 7], straightforward acceleration with GPU(s), and integration with common neural network architectures.
 
-In a typical feed-forward workflow, `MPoL` users will use foundational components like `BaseCube` and `ImageCube` to define the true-sky model, Fourier layers like `FourierCube` or `NuFFT` [wrapping `torchkbnufft`; @nufft20] to apply the Fourier transform and sample the visibility function at the location of the array baselines, and the negative log likelihood to calculate a data loss. Backpropagation [see @baydin18 for a review] and stochastic gradient descent [e.g., AdamW; @loshchilov17] are used to find the true-sky model that minimizes the loss function. However, because of the aforementioned gaps in spatial frequency coverage, there is technically an infinite number of true-sky images fully consistent with the data likelihood, so regularization loss terms are required. `MPoL` supports Regularized Maximum Likelihood (RML) imaging with common regularizers like maximum entropy, sparsity, and others [e.g., as used in @eht19d]; users can also implement custom regularizers with PyTorch.
+In a typical feed-forward workflow, `MPoL` users will use foundational components like `BaseCube` and `ImageCube` to define the true-sky model, Fourier layers like `FourierCube` or `NuFFT` [wrapping `torchkbnufft`, @nufft20] to apply the Fourier transform and sample the visibility function at the location of the array baselines, and the negative log likelihood to calculate a data loss. Backpropagation [see @baydin18 for a review] and stochastic gradient descent [e.g., AdamW, @loshchilov17] are used to find the true-sky model that minimizes the loss function. However, because of the aforementioned gaps in spatial frequency coverage, there is technically an infinite number of true-sky images fully consistent with the data likelihood, so regularization loss terms are required. `MPoL` supports Regularized Maximum Likelihood (RML) imaging with common regularizers like maximum entropy, sparsity, and others [e.g., as used in @eht19d]; users can also implement custom regularizers with PyTorch.
 
 `MPoL` also provides several other workflows relevant to astrophysical research. First, by seamlessly coupling with the probabilistic programming language Pyro [@pyro19], `MPoL` supports Bayesian parametric inference of astronomical sources by modeling the data visibilities. Second, users can implement additional data calibration components as their data requires, enabling fine-scale, residual calibration physics to be parameterized and optimized simultaneously with image synthesis [following the radio interferometric measurement equation @hamaker96; @smirnov11a]. Finally, the library also provides convenience utilities like `DirtyImager` (including Briggs robust and UV taper) to confirm the data has been loaded correctly. The MPoL-dev organization also develops the [MPoL-dev/visread](https://mpol-dev.github.io/visread/) package, which is designed to facilitate the extraction of visibility data from CASA's Measurement Set format for use in alternative imaging workflows.
 
 # Documentation, examples, and scientific results
 
-MPoL is freely available, open-source software licensed via the MIT license and is developed on GitHub at [MPoL-dev/MPoL](https://github.com/MPoL-dev/MPoL). Installation and API documentation is hosted at [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/), and is continuously built with each commit to the `main` branch. As a library, `MPoL` expects researchers to write short scripts using use `MPoL` and PyTorch primitives, in much the same way that PyTorch users write scripts for machine learning workflows (e.g., as in the [official PyTorch examples](https://github.com/pytorch/examples)). `MPoL` example projects are hosted on GitHub at [MPoL-dev/examples](https://github.com/MPoL-dev/examples). These include an introduction to generating mock data, a quickstart using stochastic gradient descent, and a Pyro workflow using stochastic variational inference (SVI) to replicate the parametric inference done in @guzman18, among others. In Figure \ref{imlup}, we compare an image obtained with CLEAN to that using `MPoL` and RML, synthesized from the data presented in @huang18b, highlighting the improvement in resolution offered by feed-forward modeling technologies.
+MPoL is freely available, open-source software licensed via the MIT license and is developed on GitHub at [MPoL-dev/MPoL](https://github.com/MPoL-dev/MPoL). Installation and API documentation is hosted at [https://mpol-dev.github.io/MPoL/](https://mpol-dev.github.io/MPoL/), and is continuously built with each commit to the `main` branch. As a library, `MPoL` expects researchers to write short scripts using use `MPoL` and PyTorch primitives, in much the same way that PyTorch users write scripts for machine learning workflows (e.g., as in the [official PyTorch examples](https://github.com/pytorch/examples)). `MPoL` example projects are hosted on GitHub at [MPoL-dev/examples](https://github.com/MPoL-dev/examples). These include an introduction to generating mock data, a quickstart using stochastic gradient descent, and a Pyro workflow using stochastic variational inference (SVI) to replicate the parametric inference done in @guzman18, among others. In Figure \ref{imlup}, we compare an image obtained with CLEAN to that using `MPoL` and RML, synthesized from the data presented in @huang18b, highlighting the improvement in resolution offered by feed-forward modeling technologies.[^1]
+
+[^1]: Source code to reproduce this result is available as an [MPoL example](https://github.com/MPoL-dev/examples/tree/main).
 
 `MPoL` has already been used in a number of scientific publications. @zawadzki23 introduced `MPoL` and explored RML imaging for ALMA observations of protoplanetary disks, finding a 3x improvement in spatial resolution at comparable sensitivity. @dia23 used `MPoL` as a reference imaging implementation to evaluate the performance of their score-based prior algorithm. @huang24 used the parametric inference capabilities of `MPoL` to analyze radial dust substructures in a suite of eight protoplanetary disks in the $\sigma$ Orionis stellar cluster. `MPoL` was selected as an imaging technology of the exoALMA large program, where Zawadzki et al. 2024 *submitted* used RML imaging to obtain high resolution image cubes of molecular line emission in protoplanetary disks in order to identify non-Keplerian features that may trace planet-disk interactions.
 
