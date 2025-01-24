@@ -147,3 +147,6 @@ runs
 src/mpol/mpol_version.py
 
 .ruff_cache
+
+build_joss.sh
+prof
