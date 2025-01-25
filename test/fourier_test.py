@@ -165,7 +165,7 @@ def test_predict_vis_nufft_cached(coords, baselines_1D):
     layer = fourier.NuFFTCached(coords=coords, nchan=nchan, uu=uu, vv=vv)
 
     # predict the values of the cube at the u,v locations
-    blank_packed_img = torch.zeros((nchan, coords.npix, coords.npix))
+    blank_packed_img = torch.zeros((nchan, coords.npix, coords.npix), dtype=torch.double)
     output = layer(blank_packed_img)
 
     # make sure we got back the number of visibilities we expected
@@ -287,7 +287,7 @@ def test_nufft_cached_accuracy_single_chan(coords, baselines_1D, tmp_path):
     img_packed = utils.sky_gaussian_arcsec(
         coords.packed_x_centers_2D, coords.packed_y_centers_2D, **gauss_kw
     )
-    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True, dtype=torch.float32)
+    img_packed_tensor = torch.tensor(img_packed[np.newaxis, :, :], requires_grad=True, dtype=torch.double)
 
     # use the NuFFT to predict the values of the cube at the u,v locations
     num_output = layer(img_packed_tensor)[0]  # take the channel dim out
@@ -324,7 +324,7 @@ def test_nufft_cached_accuracy_coil_broadcast(coords, baselines_1D, tmp_path):
     # broadcast to 5 channels -- the image will be the same for each
     img_packed_tensor = torch.tensor(
         img_packed[np.newaxis, :, :] * np.ones((nchan, coords.npix, coords.npix)),
-        requires_grad=True, dtype=torch.float32
+        requires_grad=True, dtype=torch.double
     )
 
     # use the NuFFT to predict the values of the cube at the u,v locations
