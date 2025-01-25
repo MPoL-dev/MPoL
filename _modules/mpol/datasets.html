@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.datasets &#8212; MPoL 0.1.dev1+g129f23b documentation</title>
+    <title>mpol.datasets &#8212; MPoL 0.1.dev1+ge9af555 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=5b77ef6f"></script>
+    <script src="../../_static/documentation_options.js?v=0327dda6"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@ window.addEventListener("load", () => mermaid.run());
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.dev1+g129f23b" />
+  <meta name="docsearch:version" content="0.1.dev1+ge9af555" />
   </head>
   
   
@@ -142,8 +142,8 @@ window.addEventListener("load", () => mermaid.run());
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g129f23b documentation - Home"/>
-    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g129f23b documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+ge9af555 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+ge9af555 documentation - Home"/>
   
   
 </a></div>
@@ -538,8 +538,8 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="n">histogram</span><span class="p">:</span> <span class="n">NDArray</span>
         <span class="c1"># make a polar histogram</span>
-        <span class="n">histogram</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>
-            <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="n">histogram</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span> <span class="c1"># type:ignore</span>
+            <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span> <span class="c1"># type:ignore</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">histogram</span></div>
