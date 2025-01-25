@@ -510,7 +510,7 @@ class DartboardSplitGridded:
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
 
         # indices of cells in the smallest q bin that also have data
-        small_q_idx = [i for i, l in enumerate(self.cell_list) if l[0] == 0]
+        small_q_idx = [i for i, l in enumerate(self.cell_list) if l[0] == 0] #type: ignore
         # cells in the smallest q bin
         self.small_q = self.cell_list[: len(small_q_idx)]
 

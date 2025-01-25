@@ -226,8 +226,8 @@ class Dartboard:
 
         histogram: NDArray
         # make a polar histogram
-        histogram, *_ = np.histogram2d(
-            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()]
+        histogram, *_ = np.histogram2d( # type:ignore
+            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()] # type:ignore
         )
 
         return histogram

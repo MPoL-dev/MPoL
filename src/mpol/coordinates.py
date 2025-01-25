@@ -247,7 +247,7 @@ class GridCoords:
     @cached_property
     def sky_phi_centers_2D(self) -> npt.NDArray[np.floating[Any]]:
         # https://en.wikipedia.org/wiki/Atan2
-        return np.arctan2(
+        return np.arctan2( # type: ignore
             self.ground_v_centers_2D, self.ground_u_centers_2D
         )  # (pi, pi]
 
