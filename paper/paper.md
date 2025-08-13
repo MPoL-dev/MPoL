@@ -37,7 +37,10 @@ authors:
     affiliation: 4      
   - name: Hannah Grzybowski
     orcid: # can't find
-    affiliation: 4         
+    affiliation: 4
+  - name: Jane Huang
+    orcid: 0000-0001-6947-6072
+    affiliation: 6         
   - name: Mary Ogborn
     orcid: 0000-0001-9741-2703
     affiliation: 4
@@ -54,7 +57,9 @@ affiliations:
   - name: Pennsylvania State University, PA, USA
     index: 4
   - name: National Radio Astronomy Observatory, Charlottesville, VA, USA
-    index: 5      
+    index: 5
+  - name: Columbia University, NY, USA
+    index: 6
 date: 24 January 2025
 bibliography: paper.bib
 ---
