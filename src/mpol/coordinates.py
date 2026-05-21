@@ -25,6 +25,8 @@ class GridCoords:
     npix : int
         number of pixels in the width of the image
 
+    Notes
+    -----
     The Fourier grid is defined over the domain :math:`[-u,+u]`, :math:`[-v,+v]`, even
     though for real images, technically we could use an RFFT grid from :math:`[0,+u]` to
     :math:`[-v,+v]`. The reason we opt for a full FFT grid in this instance is
@@ -37,49 +39,73 @@ class GridCoords:
     representation assumes the Fourier grid (and thus image) are laid out as one might
     normally expect an image (i.e., no ``np.fft.fftshift`` has been applied).
 
-    After the object is initialized, instance variables can be accessed, for example
+    After the object is initialized, any of the instance variables listed below can be
+    accessed. For example,
 
-    >>> myCoords = GridCoords(cell_size=0.005, npix=512)
-    >>> myCoords.img_ext
+    .. code-block:: python
 
-    :ivar dl: image-plane cell spacing in RA direction (assumed to be positive)
-        [radians]
-    :ivar dm: image-plane cell spacing in DEC direction [radians]
-    :ivar img_ext: The length-4 list of (left, right, bottom, top) expected by routines
+        >>> myCoords = GridCoords(cell_size=0.005, npix=512)
+        >>> myCoords.img_ext
+
+    Attributes
+    ----------
+    dl : float
+        image-plane cell spacing in RA direction (assumed to be positive) [radians]
+    dm : float
+        image-plane cell spacing in DEC direction [radians]
+    img_ext: list
+        The length-4 list of (left, right, bottom, top) expected by routines
         like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming
         ``origin='lower'``. Units of [arcsec]
-    :ivar packed_x_centers_2D: 2D array of l increasing, with fftshifted applied
+    packed_x_centers_2D : numpy.ndarray
+        2D array of l increasing, with fftshifted applied
         [arcseconds]. Useful for directly evaluating some function to create a
         packed cube.
-    :ivar packed_y_centers_2D: 2D array of m increasing, with fftshifted applied
+    packed_y_centers_2D : numpy.ndarray
+        2D array of m increasing, with fftshifted applied
         [arcseconds]. Useful for directly evaluating some function to create a
         packed cube.
-    :ivar sky_x_centers_2D: 2D array of l arranged for evaluating a sky image
+    sky_x_centers_2D : numpy.ndarray
+        2D array of l arranged for evaluating a sky image
         [arcseconds]. l coordinate increases to the left (as on sky).
-    :ivar sky_y_centers_2D: 2D array of m arranged for evaluating a sky image
+    sky_y_centers_2D : numpy.ndarray
+        2D array of m arranged for evaluating a sky image
         [arcseconds].
-    :ivar du: Fourier-plane cell spacing in East-West direction
+    du: float
+        Fourier-plane cell spacing in East-West direction
         [:math:`\lambda`]
-    :ivar dv: Fourier-plane cell spacing in North-South direction
+    dv : float
+        Fourier-plane cell spacing in North-South direction
         [:math:`\lambda`]
-    :ivar u_centers: 1D array of cell centers in East-West direction
+    u_centers : numpy.ndarray
+        1D array of cell centers in East-West direction
         [:math:`\lambda`].
-    :ivar v_centers: 1D array of cell centers in North-West direction
+    v_centers : numpy.ndarray
+        1D array of cell centers in North-West direction
         [:math:`\lambda`].
-    :ivar u_edges: 1D array of cell edges in East-West direction
+    u_edges : numpy.ndarray
+        1D array of cell edges in East-West direction
         [:math:`\lambda`].
-    :ivar v_edges: 1D array of cell edges in North-South direction
+    v_edges : numpy.ndarray
+        1D array of cell edges in North-South direction
         [:math:`\lambda`].
-    :ivar u_bin_min: minimum u edge [:math:`\lambda`]
-    :ivar u_bin_max: maximum u edge [:math:`\lambda`]
-    :ivar v_bin_min: minimum v edge [:math:`\lambda`]
-    :ivar v_bin_max: maximum v edge [:math:`\lambda`]
-    :ivar max_grid: maximum spatial frequency enclosed by Fourier grid
+    u_bin_min : float
+        minimum u edge [:math:`\lambda`]
+    u_bin_max : float
+        maximum u edge [:math:`\lambda`]
+    v_bin_min : float
+        minimum v edge [:math:`\lambda`]
+    v_bin_max : float
+        maximum v edge [:math:`\lambda`]
+    max_grid : float
+        maximum spatial frequency enclosed by Fourier grid
         [:math:`\lambda`]
-    :ivar vis_ext: length-4 list of (left, right, bottom, top) expected by routines
+    vis_ext : list
+        length-4 list of (left, right, bottom, top) expected by routines
         like ``matplotlib.pyplot.imshow`` in the ``extent`` parameter assuming
         ``origin='lower'``. Units of [:math:`\lambda`]
-    :ivar vis_ext_Mlam: like vis_ext, but in units of [:math:`\mathrm{M}\lambda`].
+    vis_ext_Mlam : list 
+        like vis_ext, but in units of [:math:`\mathrm{M}\lambda`].
     """
 
     def __init__(self, cell_size: float, npix: int):
