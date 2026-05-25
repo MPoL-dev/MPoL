@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.crossval &#8212; MPoL 0.1.dev1+g8403f0b04 documentation</title>
+    <title>mpol.crossval &#8212; MPoL 0.1.dev1+g4748207fe documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b936125c"></script>
+    <script src="../../_static/documentation_options.js?v=32b8cda0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -489,7 +489,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.dev1+g8403f0b04" />
+  <meta name="docsearch:version" content="0.1.dev1+g4748207fe" />
   </head>
   
   
@@ -570,8 +570,8 @@ window.runMermaid = runMermaid;</script>
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
-    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
   
   
 </a></div>
@@ -783,7 +783,7 @@ window.runMermaid = runMermaid;</script>
 <span class="c1">#         Number of k-folds to use in cross-validation</span>
 <span class="c1">#     split_method : str, default=&#39;dartboard&#39;</span>
 <span class="c1">#         Method to split full dataset into train/test subsets</span>
-<span class="c1">#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None, </span>
+<span class="c1">#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None,</span>
 <span class="c1">#   unit=[klambda]</span>
 <span class="c1">#         Radial and azimuthal bin edges of the cells used to split the dataset</span>
 <span class="c1">#         if `split_method`==`dartboard` (see `datasets.Dartboard`)</span>
@@ -1242,7 +1242,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dartboard</span><span class="o">.</span><span class="n">get_nonzero_cell_indices</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">)</span>
 
         <span class="c1"># indices of cells in the smallest q bin that also have data</span>
-        <span class="n">small_q_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="c1">#type: ignore</span>
+        <span class="n">small_q_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
         <span class="c1"># cells in the smallest q bin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">small_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_list</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">small_q_idx</span><span class="p">)]</span>
 
@@ -1288,7 +1288,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">                seed (int): (optional) numpy random seed to use for the permutation,</span>
 <span class="sd">                for reproducibility</span>
 <span class="sd">            verbose (bool): whether to print notification messages</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dartboard</span> <span class="o">=</span> <span class="n">Dartboard</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">q_edges</span><span class="p">,</span> <span class="n">phi_edges</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gridded_dataset</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">dartboard</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
 

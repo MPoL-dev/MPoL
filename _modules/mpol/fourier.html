@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.fourier &#8212; MPoL 0.1.dev1+g8403f0b04 documentation</title>
+    <title>mpol.fourier &#8212; MPoL 0.1.dev1+g4748207fe documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b936125c"></script>
+    <script src="../../_static/documentation_options.js?v=32b8cda0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -489,7 +489,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.dev1+g8403f0b04" />
+  <meta name="docsearch:version" content="0.1.dev1+g4748207fe" />
   </head>
   
   
@@ -570,8 +570,8 @@ window.runMermaid = runMermaid;</script>
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
-    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
   
   
 </a></div>
@@ -1012,14 +1012,14 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        packed_cube : :class:`torch.Tensor` </span>
+<span class="sd">        packed_cube : :class:`torch.Tensor`</span>
 <span class="sd">            shape ``(nchan, npix, npix)``). The cube</span>
 <span class="sd">            should be a &quot;prepacked&quot; image cube, for example,</span>
 <span class="sd">            from :meth:`mpol.images.ImageCube.forward`</span>
-<span class="sd">        uu : :class:`torch.Tensor` </span>
+<span class="sd">        uu : :class:`torch.Tensor`</span>
 <span class="sd">            2D array of the u (East-West) spatial frequency coordinate</span>
 <span class="sd">            [:math:`\lambda`] of shape ``(nchan, npix)``</span>
-<span class="sd">        vv : :class:`torch.Tensor` </span>
+<span class="sd">        vv : :class:`torch.Tensor`</span>
 <span class="sd">            2D array of the v (North-South) spatial frequency coordinate</span>
 <span class="sd">            [:math:`\lambda`] (must be the same shape as uu)</span>
 <span class="sd">        sparse_matrices : bool</span>
@@ -1249,7 +1249,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ``uu`` and ``vv`` points.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            packed_cube : :class:`torch.Tensor` </span>
+<span class="sd">            packed_cube : :class:`torch.Tensor`</span>
 <span class="sd">                shape ``(nchan, npix, npix)``). The cube</span>
 <span class="sd">                should be a &quot;prepacked&quot; image cube, for example,</span>
 <span class="sd">                from :meth:`mpol.images.ImageCube.forward`</span>
@@ -1272,7 +1272,6 @@ window.runMermaid = runMermaid;</script>
 
         <span class="c1"># convert the cube to a complex type, since this is required by TorchKbNufft</span>
         <span class="n">complexed</span> <span class="o">=</span> <span class="n">shifted</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
-
 
         <span class="c1"># Consider how the similarity of the spatial frequency samples should be</span>
         <span class="c1"># treated. We already took care of this on the k_traj side, since we set</span>

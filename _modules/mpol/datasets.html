@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mpol.datasets &#8212; MPoL 0.1.dev1+g8403f0b04 documentation</title>
+    <title>mpol.datasets &#8212; MPoL 0.1.dev1+g4748207fe documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b936125c"></script>
+    <script src="../../_static/documentation_options.js?v=32b8cda0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -489,7 +489,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.dev1+g8403f0b04" />
+  <meta name="docsearch:version" content="0.1.dev1+g4748207fe" />
   </head>
   
   
@@ -570,8 +570,8 @@ window.runMermaid = runMermaid;</script>
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
-    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g8403f0b04 documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="MPoL 0.1.dev1+g4748207fe documentation - Home"/>
   
   
 </a></div>
@@ -748,7 +748,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        If providing this, cannot provide ``cell_size`` or ``npix``.</span>
 <span class="sd">    vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`</span>
 <span class="sd">        the gridded visibility data stored in a &quot;packed&quot; format (pre-shifted for fft)</span>
-<span class="sd">    weight_gridded : :class:`torch.Tensor` </span>
+<span class="sd">    weight_gridded : :class:`torch.Tensor`</span>
 <span class="sd">        the weights corresponding to the gridded visibility data,</span>
 <span class="sd">        also in a packed format</span>
 <span class="sd">    mask : :class:`torch.Tensor` of :class:`torch.bool`</span>
@@ -851,9 +851,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">                across cube dimensions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">modelVisibilityCube</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">),</span> <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
+        <span class="k">assert</span> <span class="n">modelVisibilityCube</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span>
+            <span class="s2">&quot;vis and dataset mask do not have the same number of channels.&quot;</span>
+        <span class="p">)</span>
 
         <span class="c1"># As of Pytorch 1.7.0, complex numbers are partially supported.</span>
         <span class="c1"># However, masked_select does not yet work (with gradients)</span>
@@ -966,8 +966,10 @@ window.runMermaid = runMermaid;</script>
 
         <span class="n">histogram</span><span class="p">:</span> <span class="n">NDArray</span>
         <span class="c1"># make a polar histogram</span>
-        <span class="n">histogram</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span> <span class="c1"># type:ignore</span>
-            <span class="n">qs</span><span class="p">,</span> <span class="n">phis</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span> <span class="c1"># type:ignore</span>
+        <span class="n">histogram</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram2d</span><span class="p">(</span>  <span class="c1"># type:ignore</span>
+            <span class="n">qs</span><span class="p">,</span>
+            <span class="n">phis</span><span class="p">,</span>
+            <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">q_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_edges</span><span class="o">.</span><span class="n">tolist</span><span class="p">()],</span>  <span class="c1"># type:ignore</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">histogram</span></div>
