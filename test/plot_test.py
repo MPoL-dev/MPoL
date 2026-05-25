@@ -1,5 +1,3 @@
-
-
 # from mpol.plot import image_comparison_fig
 
 # def test_image_comparison_fig(coords, tmp_path):

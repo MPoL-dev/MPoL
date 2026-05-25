@@ -18,7 +18,6 @@ class ProcessFitsImage:
         self._fits_file = filename
         self._channel = channel
 
-
     def get_extent(self, header):
         """Get extent (in RA and Dec, units of [arcsec]) of image"""
 
@@ -26,9 +25,9 @@ class ProcessFitsImage:
         nx = header["NAXIS1"]
         ny = header["NAXIS2"]
 
-        assert (
-            nx % 2 == 0 and ny % 2 == 0
-        ), f"Image dimensions x {nx} and y {ny} must be even."
+        assert nx % 2 == 0 and ny % 2 == 0, (
+            f"Image dimensions x {nx} and y {ny} must be even."
+        )
 
         # RA coordinates
         CDELT1 = 3600 * header["CDELT1"]  # arcsec (converted from decimal deg)
@@ -53,7 +52,6 @@ class ProcessFitsImage:
 
         return RA, DEC, ext
 
-
     def get_beam(self, hdu_list, header):
         """Get the major and minor widths [arcsec], and position angle, of a
         clean beam"""
@@ -71,7 +69,6 @@ class ProcessFitsImage:
             BPA = header["BPA"]
 
         return BMAJ, BMIN, BPA
-
 
     def get_image(self, beam=True):
         """Load a .fits image and return as a numpy array. Also return image

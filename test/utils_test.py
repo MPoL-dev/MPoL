@@ -130,7 +130,7 @@ def test_loglinspace():
 
 def test_get_optimal_image_properties(baselines_1D):
     # test that get_optimal_image_properties returns sensible cell_size, npix
-    image_width = 5.0 # [arcsec]
+    image_width = 5.0  # [arcsec]
 
     u, v = baselines_1D
 
@@ -138,4 +138,4 @@ def test_get_optimal_image_properties(baselines_1D):
 
     max_data_freq = max(abs(u).max(), abs(v).max())
 
-    assert(utils.get_max_spatial_freq(cell_size, npix) >= max_data_freq)
+    assert utils.get_max_spatial_freq(cell_size, npix) >= max_data_freq

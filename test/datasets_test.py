@@ -14,10 +14,8 @@ def test_index(coords, dataset):
 
     # create a mock cube that includes negative values
     nchan = dataset.nchan
-    mean = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=-0.5)
-    std = torch.full(
-        (nchan, coords.npix, coords.npix), fill_value=0.5)
+    mean = torch.full((nchan, coords.npix, coords.npix), fill_value=-0.5)
+    std = torch.full((nchan, coords.npix, coords.npix), fill_value=0.5)
 
     # tensor
     base_cube = torch.normal(mean=mean, std=std)
@@ -77,7 +75,6 @@ def test_dartboard_init(coords):
 
 
 def test_dartboard_histogram(coords, dataset, tmp_path):
-
     # use default bins
     dartboard = datasets.Dartboard(coords=coords)
 
@@ -119,7 +116,6 @@ def test_dartboard_histogram(coords, dataset, tmp_path):
 
 
 def test_dartboard_nonzero(coords, dataset, tmp_path):
-
     # use default bins
     dartboard = datasets.Dartboard(coords=coords)
 
@@ -173,7 +169,6 @@ def test_dartboard_mask(coords, dataset, tmp_path):
 
 
 def test_hermitian_mask_full(coords, dataset, tmp_path):
-
     dartboard = datasets.Dartboard(coords=coords)
 
     chan = 1

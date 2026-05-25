@@ -24,9 +24,7 @@ def gridded_vis_model(coords, packed_cube):
     return flayer(packed_cube)
 
 
-def test_chi_squared_evaluation(
-    loose_vis_model, mock_data_t, weight_2D_t
-):
+def test_chi_squared_evaluation(loose_vis_model, mock_data_t, weight_2D_t):
     # because of the way likelihood functions are defined, we would not expect
     # the loose chi_squared or log_likelihood function to give the same answers as
     # the gridded chi_squared or log_likelihood functions. This is because the normalization
@@ -46,6 +44,7 @@ def test_chi_squared_evaluation(
 def test_log_likelihood_loose(loose_vis_model, mock_data_t, weight_2D_t):
     # calculate the ungridded log likelihood
     losses.log_likelihood(loose_vis_model, mock_data_t, weight_2D_t)
+
 
 def test_log_likelihood_gridded(gridded_vis_model, dataset):
     losses.log_likelihood_gridded(gridded_vis_model, dataset)

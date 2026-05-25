@@ -874,12 +874,8 @@ def vis_1d_fig(
 
     if geom is not None:
         # phase-shift the visibilities
-        V = apply_phase_shift(
-            uu, vv, V, geom["dRA"], geom["dDec"], inverse=True
-        )
-        Vmod = apply_phase_shift(
-            uu, vv, Vmod, geom["dRA"], geom["dDec"], inverse=True
-        )
+        V = apply_phase_shift(uu, vv, V, geom["dRA"], geom["dDec"], inverse=True)
+        Vmod = apply_phase_shift(uu, vv, Vmod, geom["dRA"], geom["dDec"], inverse=True)
         Vresid = apply_phase_shift(
             uu, vv, Vresid, geom["dRA"], geom["dDec"], inverse=True
         )
@@ -1072,9 +1068,7 @@ def radial_fig(
         from frank.utilities import UVDataBinner
 
         # phase-shift the observed visibilities
-        V = apply_phase_shift(
-            u, v, V, geom["dRA"], geom["dDec"], inverse=True
-        )
+        V = apply_phase_shift(u, v, V, geom["dRA"], geom["dDec"], inverse=True)
 
         # deproject the observed (u,v) points
         u, v, _ = deproject(u, v, geom["incl"], geom["Omega"])

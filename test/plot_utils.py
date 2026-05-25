@@ -31,7 +31,8 @@ def extend_list(l, num=2):
         return num * l
     else:
         return l[:num]
-    
+
+
 def extend_kwargs(kwargs):
     """
     This is a helper routine for imshow_two, designed to flexibly consume a variety
@@ -39,19 +40,20 @@ def extend_kwargs(kwargs):
 
     kwargs: dict
         the kwargs dict provided from the function call
-    
+
     Returns
     -------
     dict
         Updated kwargs with length 2 lists of items.
     """
-    
+
     for key, item in kwargs.items():
         kwargs[key] = extend_list(item)
 
+
 def imshow_two(path, imgs, sky=False, suptitle=None, **kwargs):
     """Plot two images side by side, with scalebars.
-    
+
     imgs is a list
     Parameters
     ----------
@@ -65,8 +67,8 @@ def imshow_two(path, imgs, sky=False, suptitle=None, **kwargs):
         if provided, list of strings corresponding to title for each subplot. If only one provided,
     xlabel: list
         if provided, list of strings
-    
-        
+
+
     Returns
     -------
     None
@@ -85,28 +87,28 @@ def imshow_two(path, imgs, sky=False, suptitle=None, **kwargs):
     cax_height = ax_height
     yy = bmargin + ax_height + tmargin
 
-    with mpl.rc_context({'figure.autolayout': False}):
+    with mpl.rc_context({"figure.autolayout": False}):
         fig = plt.figure(figsize=(xx, yy))
 
         ax = []
         cax = []
-        
-        extend_kwargs(kwargs) 
+
+        extend_kwargs(kwargs)
 
         if "extent" not in kwargs:
             kwargs["extent"] = [None, None]
-            
+
         for i in [0, 1]:
             a = fig.add_axes(
-                    [
-                        (lmargin + i * (ax_width + middle_sep)) / xx,
-                        bmargin / yy,
-                        ax_width / xx,
-                        ax_height / yy,
-                    ]
-                )
+                [
+                    (lmargin + i * (ax_width + middle_sep)) / xx,
+                    bmargin / yy,
+                    ax_width / xx,
+                    ax_height / yy,
+                ]
+            )
             ax.append(a)
-                
+
             ca = fig.add_axes(
                 (
                     [
@@ -118,13 +120,18 @@ def imshow_two(path, imgs, sky=False, suptitle=None, **kwargs):
                 )
             )
             cax.append(ca)
-                
+
             img = imgs[i]
             img = img.detach().numpy() if torch.is_tensor(img) else img
 
-            im = a.imshow(np.squeeze(img), origin="lower", interpolation="none", extent=kwargs["extent"][i])
+            im = a.imshow(
+                np.squeeze(img),
+                origin="lower",
+                interpolation="none",
+                extent=kwargs["extent"][i],
+            )
             plt.colorbar(im, cax=ca)
-            
+
             if "title" in kwargs:
                 a.set_title(kwargs["title"][i])
 

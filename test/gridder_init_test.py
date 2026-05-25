@@ -30,11 +30,9 @@ def test_hermitian_pairs(mock_dataset_np):
 def test_averager_instantiate_cell_npix(mock_dataset_np):
     uu, vv, weight, data_re, data_im = mock_dataset_np
 
-    coords = coordinates.GridCoords(
-        cell_size=0.005,
-        npix=800
-    )
-    gridding.DataAverager(coords=coords,
+    coords = coordinates.GridCoords(cell_size=0.005, npix=800)
+    gridding.DataAverager(
+        coords=coords,
         uu=uu,
         vv=vv,
         weight=weight,

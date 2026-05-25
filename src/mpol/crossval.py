@@ -56,7 +56,7 @@ from mpol.datasets import Dartboard, GriddedDataset
 #         Number of k-folds to use in cross-validation
 #     split_method : str, default='dartboard'
 #         Method to split full dataset into train/test subsets
-#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None, 
+#     dartboard_q_edges, dartboard_phi_edges : list of float, default=None,
 #   unit=[klambda]
 #         Radial and azimuthal bin edges of the cells used to split the dataset
 #         if `split_method`==`dartboard` (see `datasets.Dartboard`)
@@ -510,7 +510,7 @@ class DartboardSplitGridded:
         self.cell_list = self.dartboard.get_nonzero_cell_indices(qs, phis)
 
         # indices of cells in the smallest q bin that also have data
-        small_q_idx = [i for i, l in enumerate(self.cell_list) if l[0] == 0] #type: ignore
+        small_q_idx = [i for i, l in enumerate(self.cell_list) if l[0] == 0]  # type: ignore
         # cells in the smallest q bin
         self.small_q = self.cell_list[: len(small_q_idx)]
 
@@ -554,7 +554,7 @@ class DartboardSplitGridded:
                 seed (int): (optional) numpy random seed to use for the permutation,
                 for reproducibility
             verbose (bool): whether to print notification messages
-    """
+        """
         dartboard = Dartboard(gridded_dataset.coords, q_edges, phi_edges)
         return cls(gridded_dataset, k, dartboard, seed, verbose)
 
