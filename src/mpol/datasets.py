@@ -19,7 +19,7 @@ class GriddedDataset(torch.nn.Module):
         If providing this, cannot provide ``cell_size`` or ``npix``.
     vis_gridded : :class:`torch.Tensor` of :class:`torch.complex128`
         the gridded visibility data stored in a "packed" format (pre-shifted for fft)
-    weight_gridded : :class:`torch.Tensor` 
+    weight_gridded : :class:`torch.Tensor`
         the weights corresponding to the gridded visibility data,
         also in a packed format
     mask : :class:`torch.Tensor` of :class:`torch.bool`
@@ -117,9 +117,9 @@ class GriddedDataset(torch.nn.Module):
                 across cube dimensions.
         """
 
-        assert (
-            modelVisibilityCube.size()[0] == self.mask.size()[0]
-        ), "vis and dataset mask do not have the same number of channels."
+        assert modelVisibilityCube.size()[0] == self.mask.size()[0], (
+            "vis and dataset mask do not have the same number of channels."
+        )
 
         # As of Pytorch 1.7.0, complex numbers are partially supported.
         # However, masked_select does not yet work (with gradients)
@@ -226,8 +226,10 @@ class Dartboard:
 
         histogram: NDArray
         # make a polar histogram
-        histogram, *_ = np.histogram2d( # type:ignore
-            qs, phis, bins=[self.q_edges.tolist(), self.phi_edges.tolist()] # type:ignore
+        histogram, *_ = np.histogram2d(  # type:ignore
+            qs,
+            phis,
+            bins=[self.q_edges.tolist(), self.phi_edges.tolist()],  # type:ignore
         )
 
         return histogram

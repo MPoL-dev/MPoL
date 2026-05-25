@@ -4,7 +4,6 @@ import torch
 
 
 def test_mpol_fftshift(tmp_path):
-
     # create a fake image
     xx, yy = np.mgrid[0:20, 0:20]
     image_init = xx + 2 * yy
@@ -24,6 +23,6 @@ def test_mpol_fftshift(tmp_path):
     ax[2].imshow(shifted_numpy - shifted_torch.detach().numpy(), origin="upper")
     fig.savefig(str(tmp_path / "fftshift.png"))
 
-    assert np.allclose(
-        shifted_numpy, shifted_torch.detach().numpy()
-    ), "fftshifts do not match"
+    assert np.allclose(shifted_numpy, shifted_torch.detach().numpy()), (
+        "fftshifts do not match"
+    )

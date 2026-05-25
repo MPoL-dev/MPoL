@@ -11,14 +11,15 @@ def test_rotate_points():
     xs = torch.tensor([0.0, 1.0, 2.0])
     ys = torch.tensor([1.0, -1.0, 2.0])
 
-    omega = 35. * np.pi/180
-    incl = 30. * np.pi/180
-    Omega = 210. * np.pi/180
+    omega = 35.0 * np.pi / 180
+    incl = 30.0 * np.pi / 180
+    Omega = 210.0 * np.pi / 180
 
     X, Y = geometry.flat_to_observer(xs, ys, omega=omega, incl=incl, Omega=Omega)
 
-    xs_back, ys_back = geometry.observer_to_flat(X, Y, omega=omega, incl=incl, Omega=Omega)
-
+    xs_back, ys_back = geometry.observer_to_flat(
+        X, Y, omega=omega, incl=incl, Omega=Omega
+    )
 
     print("original", xs, ys)
     print("Observer", X, Y)
@@ -29,13 +30,16 @@ def test_rotate_points():
 
 
 def test_rotate_coords(coords):
+    omega = 35.0 * np.pi / 180
+    incl = 30.0 * np.pi / 180
+    Omega = 210.0 * np.pi / 180
 
-    omega = 35. * np.pi/180
-    incl = 30. * np.pi/180
-    Omega = 210. * np.pi/180
-
-    x, y = geometry.observer_to_flat(coords.sky_x_centers_2D, coords.sky_y_centers_2D, omega=omega, incl=incl, Omega=Omega)
+    x, y = geometry.observer_to_flat(
+        coords.sky_x_centers_2D,
+        coords.sky_y_centers_2D,
+        omega=omega,
+        incl=incl,
+        Omega=Omega,
+    )
 
     print(x, y)
-
-

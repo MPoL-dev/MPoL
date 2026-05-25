@@ -83,9 +83,9 @@ class BaseCube(nn.Module):
             self.base_cube = nn.Parameter(base_cube, requires_grad=True)
 
         if pixel_mapping is None:
-            self.pixel_mapping: Callable[
-                [torch.Tensor], torch.Tensor
-            ] = torch.nn.Softplus()
+            self.pixel_mapping: Callable[[torch.Tensor], torch.Tensor] = (
+                torch.nn.Softplus()
+            )
         else:
             self.pixel_mapping = pixel_mapping
 
@@ -193,10 +193,10 @@ class HannConvCube(nn.Module):
 
 class GaussConvImage(nn.Module):
     r"""
-    This convolutional layer will convolve the input cube with a 2D Gaussian kernel. 
+    This convolutional layer will convolve the input cube with a 2D Gaussian kernel.
     The filter is the same for all channels in the input cube.
     Because the operation is carried out in the image domain, note that it may become
-    computationally prohibitive for large kernel sizes. In that case, 
+    computationally prohibitive for large kernel sizes. In that case,
     :class:`mpol.images.GaussConvFourier` may be preferred.
 
     Parameters
@@ -329,6 +329,7 @@ class GaussConvImage(nn.Module):
         convolved_sky = self.m(sky_cube)
         return convolved_sky
 
+
 class GaussConvFourier(nn.Module):
     r"""
     This layer will convolve the input cube with a (potentially non-circular) Gaussian
@@ -349,19 +350,18 @@ class GaussConvFourier(nn.Module):
     """
 
     def __init__(
-        self,
-        coords: GridCoords,
-        FWHM_maj: float,
-        FWHM_min: float,
-        Omega: float = 0) -> None:
+        self, coords: GridCoords, FWHM_maj: float, FWHM_min: float, Omega: float = 0
+    ) -> None:
         super().__init__()
 
         self.coords = coords
         self.FWHM_maj = FWHM_maj
-        self.FWHM_min = FWHM_min 
+        self.FWHM_min = FWHM_min
         self.Omega = Omega
 
-        taper_2D = uv_gaussian_taper(self.coords, self.FWHM_maj, self.FWHM_min, self.Omega)
+        taper_2D = uv_gaussian_taper(
+            self.coords, self.FWHM_maj, self.FWHM_min, self.Omega
+        )
 
         # store taper to register so it transfers to GPU
         self.register_buffer("taper_2D", torch.tensor(taper_2D, dtype=torch.float32))
@@ -382,10 +382,10 @@ class GaussConvFourier(nn.Module):
             The convolved cube in packed format.
         """
         nchan, npix_m, npix_l = packed_cube.size()
-        assert (
-            (npix_m == self.coords.npix) and (npix_l == self.coords.npix)
-        ), "packed_cube {:} does not have the same pixel dimensions as indicated by coords {:}".format(
-            packed_cube.size(), self.coords.npix
+        assert (npix_m == self.coords.npix) and (npix_l == self.coords.npix), (
+            "packed_cube {:} does not have the same pixel dimensions as indicated by coords {:}".format(
+                packed_cube.size(), self.coords.npix
+            )
         )
 
         # in FFT packed format
@@ -400,10 +400,10 @@ class GaussConvFourier(nn.Module):
         convolved_packed_cube = torch.fft.ifftn(tapered_vis, dim=(1, 2))
 
         # assert imaginaries are effectively zero, otherwise something went wrong
-        assert (
-            torch.max(convolved_packed_cube.imag) < thresh
-        ), "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(
-            torch.max(convolved_packed_cube.imag), thresh
+        assert torch.max(convolved_packed_cube.imag) < thresh, (
+            "Round-tripped image contains max imaginary value {:} > {:} threshold, something may be amiss.".format(
+                torch.max(convolved_packed_cube.imag), thresh
+            )
         )
 
         r_cube: torch.Tensor = convolved_packed_cube.real

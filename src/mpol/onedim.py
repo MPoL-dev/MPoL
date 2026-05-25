@@ -137,9 +137,7 @@ def radialV(fcube, geom, rescale_flux, chan=0, bins=None):
     )
 
     # deproject the (u,v) points
-    up, vp, _ = deproject(
-        uu.ravel(), vv.ravel(), geom["incl"], geom["Omega"]
-    )
+    up, vp, _ = deproject(uu.ravel(), vv.ravel(), geom["incl"], geom["Omega"])
 
     # if the source is optically thick, rescale the deprojected V(q)
     if rescale_flux:

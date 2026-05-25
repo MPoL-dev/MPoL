@@ -275,14 +275,14 @@ class NuFFT(nn.Module):
 
         Parameters
         ----------
-        packed_cube : :class:`torch.Tensor` 
+        packed_cube : :class:`torch.Tensor`
             shape ``(nchan, npix, npix)``). The cube
             should be a "prepacked" image cube, for example,
             from :meth:`mpol.images.ImageCube.forward`
-        uu : :class:`torch.Tensor` 
+        uu : :class:`torch.Tensor`
             2D array of the u (East-West) spatial frequency coordinate
             [:math:`\lambda`] of shape ``(nchan, npix)``
-        vv : :class:`torch.Tensor` 
+        vv : :class:`torch.Tensor`
             2D array of the v (North-South) spatial frequency coordinate
             [:math:`\lambda`] (must be the same shape as uu)
         sparse_matrices : bool
@@ -506,7 +506,7 @@ class NuFFTCached(NuFFT):
         ``uu`` and ``vv`` points.
 
         Args:
-            packed_cube : :class:`torch.Tensor` 
+            packed_cube : :class:`torch.Tensor`
                 shape ``(nchan, npix, npix)``). The cube
                 should be a "prepacked" image cube, for example,
                 from :meth:`mpol.images.ImageCube.forward`
@@ -529,7 +529,6 @@ class NuFFTCached(NuFFT):
 
         # convert the cube to a complex type, since this is required by TorchKbNufft
         complexed = shifted + 0j
-
 
         # Consider how the similarity of the spatial frequency samples should be
         # treated. We already took care of this on the k_traj side, since we set

@@ -9,6 +9,7 @@ from mpol import coordinates, fourier, gridding, images, utils
 from mpol.__init__ import zenodo_record
 
 import matplotlib.pyplot as plt
+
 plt.style.use("mpol.tests")
 
 # private variables to this module
@@ -31,6 +32,7 @@ def img2D_butterfly():
 
     return img
 
+
 @pytest.fixture(scope="session")
 def sky_cube(img2D_butterfly):
     """Create a sky tensor image cube from the butterfly."""
@@ -38,6 +40,7 @@ def sky_cube(img2D_butterfly):
     # tile to some nchan, npix, npix
     sky_cube = torch.tile(torch.from_numpy(img2D_butterfly), (_nchan, 1, 1))
     return sky_cube
+
 
 @pytest.fixture(scope="session")
 def packed_cube(img2D_butterfly):

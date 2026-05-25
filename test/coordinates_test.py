@@ -116,7 +116,9 @@ def test_tile_vs_meshgrid_implementation():
     coords = coordinates.GridCoords(cell_size=0.05, npix=800)
 
     x_centers_2d, y_centers_2d = np.meshgrid(
-        coords.l_centers / constants.arcsec, coords.m_centers / constants.arcsec, indexing="xy"
+        coords.l_centers / constants.arcsec,
+        coords.m_centers / constants.arcsec,
+        indexing="xy",
     )
 
     ground_u_centers_2D, ground_v_centers_2D = np.meshgrid(
@@ -127,6 +129,7 @@ def test_tile_vs_meshgrid_implementation():
     assert np.all(coords.ground_v_centers_2D == ground_v_centers_2D)
     assert np.all(coords.x_centers_2D == x_centers_2d)
     assert np.all(coords.y_centers_2D == y_centers_2d)
+
 
 def test_coords_mock_image(coords, img2D_butterfly):
     npix, _ = img2D_butterfly.shape

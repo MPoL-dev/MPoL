@@ -281,7 +281,7 @@ def test_grid_natural_arcsec2(imager, tmp_path):
     fig.savefig(tmp_path / "natural_v_robust_arcsec2.png", dpi=300)
 
     assert np.all(np.abs(beam_natural - beam_robust) < 1.5e-3)
-    assert np.all(np.abs(img_natural - img_robust) <2e-4)
+    assert np.all(np.abs(img_natural - img_robust) < 2e-4)
 
     plt.close("all")
 
