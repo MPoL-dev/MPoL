@@ -116,7 +116,7 @@ $$
 I_{l,m} = U V (\Delta u)(\Delta v) \mathtt{iFFT}({\cal V}_{u,v})
 $$
 
-For more information on this procedure as implmented in MPoL, see the {class}`~mpol.gridding.Gridder` class and the source code of its {func}`~mpol.gridding.Gridder.get_dirty_image` method. When the grid of ${\cal V}_{u,v}$ values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) of Daniel Briggs.
+For more information on this procedure as implemented in MPoL, see the {class}`~mpol.gridding.Gridder` class and the source code of its {func}`~mpol.gridding.Gridder.get_dirty_image` method. When the grid of ${\cal V}_{u,v}$ values is not fully sampled (as in any real-world interferometric observation), there are many subtleties beyond this simple equation that warrant consideration when synthesizing an image via inverse Fourier transform. For more information, consult the seminal [Ph.D. thesis](http://www.aoc.nrao.edu/dissertations/dbriggs/) of Daniel Briggs.
 
 (cube-orientation-label)=
 ### Image Cube Packing for FFTs
